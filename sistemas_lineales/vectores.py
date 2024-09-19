@@ -2,7 +2,7 @@ from os import system
 from fractions import Fraction
 
 def imprimir_vectores(lista_vecs):
-    if lista_vecs is None: print("\nNo hay vectores ingresados!")
+    if not lista_vecs: print("\nNo hay vectores ingresados!")
     else:
         print("\nVectores ingresados:")
         for i in range(len(lista_vecs)):
@@ -25,8 +25,7 @@ def menu_vectores(lista_vecs=None):
 
     try:
         option = int(input("\nSeleccione una opción: "))
-        if option < 1 or option > 6:
-            raise ValueError
+        if option < 1 or option > 6: raise ValueError
     except ValueError:
         input("\nError: Ingrese una opción válida!")
         return menu_vectores(lista_vecs)
@@ -125,6 +124,7 @@ def sumar_vectores(lista_vecs):
     try:
         imprimir_vectores(lista_vecs)
         vecs_indices = [int(i)-1 for i in input("\n¿Cuáles vectores desea sumar? (separados por espacios): ").split()]
+        if not all(len(lista_vecs[i]) == len(lista_vecs[vecs_indices[0]]) for i in vecs_indices): raise ValueError
 
         suma_vecs = [0 for _ in range(len(lista_vecs[0]))]
         for i in range(len(suma_vecs)):
@@ -143,6 +143,7 @@ def restar_vectores(lista_vecs):
     try:
         imprimir_vectores(lista_vecs)
         vecs_indices = [int(i) - 1 for i in input("\n¿Cuáles vectores desea restar? (separados por espacios): ").split()]
+        if not all(len(lista_vecs[i]) == len(lista_vecs[vecs_indices[0]]) for i in vecs_indices): raise ValueError
 
         resta_vecs = lista_vecs[vecs_indices[0]].copy()
         for j in vecs_indices:
