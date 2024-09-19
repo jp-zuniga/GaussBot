@@ -10,7 +10,7 @@ def pedir_matriz():
     try:
         filas = int(input("\nIngrese el número de ecuaciones: "))
         if filas <= 0: raise ValueError
-        columnas = int(input("Ingrese el número de variables: ")) + 1 # agregar la columna de constantes
+        columnas = int(input("Ingrese el número de variables: "))
         if columnas <= 0: raise ValueError
     except ValueError:
         input("\nError: Ingrese un número entero positivo!")
@@ -21,10 +21,10 @@ def pedir_matriz():
     while i < filas:
         fila = []
         print(f"\nEcuación {i+1}:")
-        while j < columnas:
+        while j < columnas+1: # +1 para la columna aumentada
             try:
                 # cambiar el mensaje a imprimir dependiendo si se esta pidiendo una variable o la constante
-                if j != columnas-1: mensaje = f"-> X{j+1} = "
+                if j != columnas: mensaje = f"-> X{j+1} = "
                 else: mensaje = "-> b = "
 
                 elemento = float(Fraction(input(mensaje)).limit_denominator())
@@ -43,8 +43,10 @@ def resolver_sistema():
     print("\nMatriz inicial:")
     imprimir_matriz(M)
 
-    rectangular = len(M) < len(M[0]) - 1 # -1 para no contar la columna aumentada
-    if rectangular: M = resolver_rectangular(M)
+    filas = len(M)
+    columnas = len(M[0])-1 # -1 para no contar la columna aumentada
+
+    if filas != columnas: M = resolver_rectangular(M)
     else: M = resolver_cuadrada(M)
 
     return M
@@ -52,7 +54,7 @@ def resolver_sistema():
 def resolver_cuadrada(M):
     filas = len(M)
     columnas = len(M[0])
-    consistente = validar_consistencia(M)
+    consistente = validar_consistencia(M, False)
     if not consistente[0]:
         imprimir_resultado(M, consistente)
         return None
@@ -108,7 +110,7 @@ def resolver_cuadrada(M):
             print(f"\nF{j+1} => F{j+1} - ({str(Fraction(factor).limit_denominator())} * F{i+1})")
             imprimir_matriz(M)
 
-    consistente = validar_consistencia(M)
+    consistente = validar_consistencia(M, False)
     if consistente[0]:
         imprimir_resultado(M, consistente)
         return M # solo retornar la matriz si tiene solucion
@@ -117,7 +119,7 @@ def resolver_cuadrada(M):
 def resolver_rectangular(M):
     M = reducir_matriz(M)
 
-    consistente = validar_consistencia(M)
+    consistente = validar_consistencia(M, True)
     if not consistente[0]:
         imprimir_resultado(M, consistente)
         return None
@@ -153,7 +155,7 @@ def resolver_rectangular(M):
                 break
     
     # imprimir las soluciones en orden
-    soluciones = sorted(soluciones, key=lambda x: x[3])
+    soluciones.sort(key=lambda x: x[3])
     print("\n| Sistema no tiene solución única!")
     print("| Solución general encontrada:")
     for solucion in soluciones:
@@ -166,7 +168,7 @@ def reducir_matriz(M):
     columnas = len(M[0])
     filas_pivotes = []
 
-    consistente = validar_consistencia(M)
+    consistente = validar_consistencia(M, True)
     if not consistente[0]:
         imprimir_resultado(M, consistente)
         return M
@@ -182,7 +184,7 @@ def reducir_matriz(M):
 
             # si el elemento actual es 0, buscar otro elemento en la misma columna que no sea 0, e intercambiar las filas
             if pivote == 0:
-                for h in range(i+1, filas):
+                for h in range(i, filas):
                     if M[h][j] != 0:
                         M[i], M[h] = M[h], M[i]
                         pivote = M[i][j] # reasignar el pivote despues del intercambio
@@ -209,11 +211,13 @@ def reducir_matriz(M):
         for i in reversed(range(filas)):
             if M[i][j] == 0: continue # si el elemento es 0, no es un pivote
             pivote = M[i][j]
-
-            for l in range(columnas):
-                M[i][l] /= pivote
             
-            print(f"\nF{i+1} => F{i+1} / {str(Fraction(pivote).limit_denominator())}")
+            if pivote != 1:
+                for l in range(columnas):
+                    M[i][l] /= pivote
+            
+            if pivote == -1: print(f"\nF{i+1} => -F{i+1}")
+            else: print(f"\nF{i+1} => F{i+1} / {str(Fraction(pivote).limit_denominator())}")
             imprimir_matriz(M)
             
             for k in range(i):
@@ -225,6 +229,7 @@ def reducir_matriz(M):
                 imprimir_matriz(M)
 
             break # ir al siguiente pivote
+
     return M
 
 def imprimir_resultado(M, validacion):
@@ -232,8 +237,9 @@ def imprimir_resultado(M, validacion):
     solucion, i = validacion
 
     if solucion:
+        print("\n| Solución encontrada:", end='')
         for i in range(filas):
-            print("\n| Solución encontrada:", end='')
+            if all(val == 0 for val in M[i]): continue
             print(f"\n| X{i+1} = {str(Fraction(M[i][-1]).limit_denominator())}", end='')
         input('')
     
@@ -241,7 +247,7 @@ def imprimir_resultado(M, validacion):
         print(f"\n| En F{i+1}: 0 != {str(Fraction(M[i][-1]).limit_denominator())}")
         input("| Sistema es inconsistente!")
 
-    return
+    return None
 
 def imprimir_matriz(M):
     filas = len(M)
@@ -268,4 +274,4 @@ def imprimir_matriz(M):
             # si es un elemento en medio, solo imprimir la coma despues del elemento    
             else:
                 print(f"{elemento}", end=", ")
-    return
+    return None

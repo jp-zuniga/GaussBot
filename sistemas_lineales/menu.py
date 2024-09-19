@@ -3,17 +3,17 @@ from matrices import resolver_sistema
 
 def imprimir_menu():
     system('cls || clear')
-
     print("\n######################")
     print("### Menú Principal ###")
     print("######################\n")
     print("1. Resolver sistema de ecuaciones lineales")
-    print("2. Cerrar programa")
+    print("2. Operaciones de vectores")
+    print("3. Cerrar programa")
 
     # try/except para validar la opcion ingresada
     try:
         option = int(input("\nSeleccione una opción: "))
-        if option < 1 or option > 2: raise ValueError
+        if option < 1 or option > 3: raise ValueError
     except ValueError:
         input("\nError: Ingrese una opción válida!")
         return imprimir_menu()
@@ -23,27 +23,34 @@ def imprimir_menu():
 def main_menu():
     option = imprimir_menu()
     
-    while True:
-        if option == 1:
-            M = resolver_sistema()
+    while option != 3:
+        match option:
+            case 1:
+                M = resolver_sistema()
 
-            while (True):
-                continuar = input("\n¿Desea resolver otra matriz? (s/n) ")
-                if continuar.lower() == 's': break
-                elif continuar.lower() == 'n':
-                    input("\nSaliendo del programa...")
-                    break
+                while (True):
+                    continuar = input("\n¿Desea resolver otra matriz? (s/n) ")
+                    if continuar.lower() == 's': break
+                    elif continuar.lower() == 'n':
+                        input("\nCerrando programa...")
+                        break
+                    else:
+                        input("\nOpción inválida...")
+                        continue
+                
+                if continuar.lower() == 's': continue
                 else:
-                    input("\nOpción inválida...")
-                    continue
+                    option = 3
+                    break
             
-            if continuar.lower() == 's': continue
-            else: break
+            case 2:
+                #operaciones_vectores()
+                break
 
-        elif option == 2:
-            input("\nSaliendo del programa...")
-            break
-        else:
-            input("\nOpción inválida, por favor intente de nuevo.")
+            case 3:
+                input("\nSaliendo del programa...")
+                break
+
+            case _: input("\nOpción inválida, por favor intente de nuevo.")
     
-    return
+    return None

@@ -1,14 +1,19 @@
-def validar_consistencia(M):
+def validar_consistencia(M, es_rectangular):
     filas = len(M)
 
     for i in range(filas):
         # ver si la fila tiene la forma de 0 = b (donde b != 0)
         if [0 for _ in range(len(M[0]))] == M[i] and M[i][-1] != 0: return [False, i]
 
+        # encontrar la primera entrada no 0 en la fila
+        try: indice = M[i].index(next(filter(lambda x: x != 0, M[i])))
+        except StopIteration: indice = -1
+
         # ver si la fila tiene la forma de b = b (donde b != 1)
-        j = M[i].index(next(filter(lambda x: x != 0, M[i]))) # obtener el indice de la primera entrada no nula
-        if M[i][j] == M[i][-1] and M[i][j] != 1: return [False, i]
-    
+        if indice != -1 and M[i][indice] == M[i][-1] and M[i][indice] != 1:
+            if es_rectangular: return [True, None]
+            else: return [False, i]
+
     return [True, None] # si no se ha retornado False, entonces la matriz si es consistente
 
 def validar_escalonada(M):
@@ -76,4 +81,3 @@ def encontrar_variables_libres(M):
             variables_libres.append(j)
 
     return variables_libres
-
