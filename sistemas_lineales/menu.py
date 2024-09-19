@@ -1,5 +1,6 @@
 from os import system
 from matrices import resolver_sistema
+from vectores import operaciones_vectores
 
 def imprimir_menu():
     system('cls || clear')
@@ -44,8 +45,8 @@ def main_menu():
                     break
             
             case 2:
-                #operaciones_vectores()
-                break
+                operaciones_vectores()
+                return main_menu()
 
             case 3:
                 input("\nSaliendo del programa...")
