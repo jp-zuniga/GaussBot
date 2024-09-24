@@ -2,6 +2,9 @@ from os import system
 from matrices import resolver_sistema
 from vectores import operaciones_vectores
 
+# interfaz del programa:
+# ----------------------------
+
 def imprimir_menu():
     system('cls || clear')
     print("\n######################")
@@ -27,6 +30,7 @@ def main_menu():
     while option != 3:
         match option:
             case 1:
+                system('cls || clear')
                 M = resolver_sistema()
 
                 while (True):

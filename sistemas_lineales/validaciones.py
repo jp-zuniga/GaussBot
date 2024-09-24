@@ -1,9 +1,12 @@
+# funciones para validar sistemas de ecuaciones:
+# -------------------------------------------------------
+
 def validar_consistencia(M, es_rectangular):
     filas = len(M)
 
     for i in range(filas):
         # ver si la fila tiene la forma de 0 = b (donde b != 0)
-        if [0 for _ in range(len(M[0]))] == M[i] and M[i][-1] != 0: return [False, i]
+        if [0 for _ in range(len(M[0])-1)] == M[i][:-1] and M[i][-1] != 0: return [False, i]
 
         # encontrar la primera entrada no 0 en la fila
         try: indice = M[i].index(next(filter(lambda x: x != 0, M[i])))

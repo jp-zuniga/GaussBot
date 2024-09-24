@@ -2,30 +2,35 @@ from os import system
 from fractions import Fraction
 from validaciones import *
 
-def pedir_matriz():
-    system("cls || clear")
+# funciones para trabajar con matrices y resolver sistemas de ecuaciones:
+# --------------------------------------------------------------------------------
+
+def pedir_matriz(aumentada=True):
     M = []
 
     # try/except para validar el input
     try:
-        filas = int(input("\nIngrese el número de ecuaciones: "))
+        filas = int(input("\nIngrese el número de filas: "))
         if filas <= 0: raise ValueError
-        columnas = int(input("Ingrese el número de variables: "))
+        columnas = int(input("Ingrese el número de columnas: "))
         if columnas <= 0: raise ValueError
     except ValueError:
         input("\nError: Ingrese un número entero positivo!")
         return pedir_matriz() # volver a pedir los datos si hay error
     
     # usar while loops para que no siga al siguiente elemento si el input no es un número
-    i = j = 0    
+    i = j = 0
+    if aumentada: columnas += 1 # +1 para la columna aumentada si se llama con True
     while i < filas:
         fila = []
-        print(f"\nEcuación {i+1}:")
-        while j < columnas+1: # +1 para la columna aumentada
+        print(f"\nFila {i+1}:")
+        while j < columnas: 
             try:
                 # cambiar el mensaje a imprimir dependiendo si se esta pidiendo una variable o la constante
-                if j != columnas: mensaje = f"-> X{j+1} = "
-                else: mensaje = "-> b = "
+                if not aumentada: mensaje = f"-> X{j+1} = "
+                else:
+                    if j is not columnas-1: mensaje = f"-> X{j+1} = "
+                    else: mensaje = "-> b = "
 
                 elemento = float(Fraction(input(mensaje)).limit_denominator())
                 fila.append(elemento) # solo se agrega el elemento e incrementa j si la conversion del input funciona
