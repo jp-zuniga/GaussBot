@@ -193,7 +193,7 @@ def imprimir_resultado(M, validacion, libres=None):
 
     return None
 
-def imprimir_matriz(M):
+def imprimir_matriz(M, vectorial=False):
     filas = len(M)
     columnas = len(M[0])
 
@@ -207,13 +207,13 @@ def imprimir_matriz(M):
             # convertir el elemento actual a un string y ajustarlo a la derecha de la longitud maxima
             elemento = str(Fraction(M[i][j]).limit_denominator()).center(max_len)
 
-            # si es el primer elemento, imprimir el | y una coma despues del elemento
+            # si es el primer elemento, imprimir el ( y una coma despues del elemento
             if j == 0: print(f"( {elemento}", end=", ")
 
-            # si es el penultimo elemento, imprimir el | para separar las variables de las constantes
-            elif j == columnas-2: print(f"{elemento} |", end=' ')
+            # si es el penultimo elemento, imprimir el ) para separar las variables de las constantes
+            elif j == columnas-2 and not vectorial: print(f"{elemento} |", end=' ')
 
-            # si el es el ultimo elemento, cerrar el |, e imprimir un salto de linea
+            # si el es el ultimo elemento, cerrar el ), e imprimir un salto de linea
             elif j == columnas-1: print(f"{elemento} )")
 
             # si es un elemento en medio, solo imprimir la coma despues del elemento    

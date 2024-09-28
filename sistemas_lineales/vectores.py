@@ -1,4 +1,4 @@
-from math import floor
+from math import ceil
 from fractions import Fraction
 from matrices import pedir_matriz, imprimir_matriz
 from validaciones import limpiar_pantalla
@@ -64,7 +64,7 @@ def operaciones_vectoriales():
                     continue
                 
                 A = pedir_matriz(False, 'A')
-                A = matriz_por_suma_vectores(lista_vecs, A)
+                A = matriz_por_suma_vectores(A, lista_vecs)
                 option = menu_vectores(lista_vecs)
                 continue
             
@@ -255,99 +255,58 @@ def restar_vectores(input_vecs, lista_vecs):
     
     return resta_vecs
 
-def matriz_por_suma_vectores(lista_vecs, A):
+def matriz_por_suma_vectores(A, lista_vecs):
     limpiar_pantalla()
     resultado = []
     
     input_vecs = input_suma_resta(lista_vecs, option=True, matricial=True) # pedir los vectores
     suma_vecs = sumar_vectores(input_vecs, lista_vecs) # sumar los vectores seleccionados
-    u, v = lista_vecs[input_vecs[0]], lista_vecs[input_vecs[1]] # guardar los vectores seleccionados como u y v
+    u, v = lista_vecs[input_vecs[0]], lista_vecs[input_vecs[1]]
     
-    if len(A[0]) != len(u):
-        input("\nError: Las dimensiones de A y (u + v) no son compatibles!")
-        return None
+    if len(A[0]) != len(lista_vecs[input_vecs[0]]):
+        input("\nError: Las dimensiones de A y los vectores no son compatibles!")
+        return matriz_por_suma_vectores(A, lista_vecs)
 
     # calcular A(u + v)
     for i in range(len(suma_vecs)):
         resultado.append(sum([A[i][j] * suma_vecs[j] for j in range(len(suma_vecs))]))
     
-    imprimir_MPSV(A, u, v, suma_vecs, resultado) # imprimir las operaciones realizadas
-    input()
+    imprimir_MPSV(A, input_vecs, lista_vecs, suma_vecs, resultado) # imprimir las operaciones realizadas
+    resolver = input("\nDesea comprobar la propiedad distributiva (A(u + v) = Au + Av)? (s/n) ")
+    
+    if resolver.lower() == 's': suma_matriz_por_vector(A, input_vecs, lista_vecs)
+    elif resolver.lower() != 'n':
+        input("Opción inválida! Regresando al menú de vectores...")
+        return resultado
 
     return resultado
 
-def suma_matriz_por_vector(A, u, v):
-    filas = len(A)
-    columnas = len(A[0])
-
+def suma_matriz_por_vector(A, input_vecs, lista_vecs):
+    limpiar_pantalla()
+    u, v = lista_vecs[input_vecs[0]], lista_vecs[input_vecs[1]]
     resultado_u = []
     resultado_v = []
-    operaciones_u = []
-    operaciones_v = []
 
-    for i in range(filas):
-        resultado_u.append([A[i][j] * u[j] for j in range(len(u))])
-        resultado_v.append([A[i][j] * v[j] for j in range(len(v))])
+    # calcular Au y Av
+    for i in range(len(u)):
+        resultado_u.append(sum([A[i][j] * u[j] for j in range(len(u))]))
+        resultado_v.append(sum([A[i][j] * v[j] for j in range(len(v))]))
 
-    max_resultado_u = max(len(str(resultado_u[i][j])) for i in range(filas) for j in range(columnas))
-    max_resultado_v = max(len(str(resultado_v[i][j])) for i in range(filas) for j in range(columnas))
+    imprimir_SMPV(A, input_vecs, lista_vecs, resultado_u, resultado_v) # imprimir las operaciones realizadas
+    input("\nLa respuesta sigue siendo la misma, asi que la propiedad distributiva se cumple!")
+    return resultado_u, resultado_v
 
-    for j in range(filas):
-        fila_u = ""
-        fila_v = ""
-        for k in range(columnas):
-            if k != columnas-1:
-                fila_u += f"({A[j][k]}*{u[k]}) + "
-                fila_v += f"({A[j][k]}*{v[k]}) + "
-            else:
-                fila_u += f"({A[j][k]}*{u[k]})"
-                fila_v += f"({A[j][k]}*{v[k]})"
-
-        operaciones_u.append("| " + fila_u.center(max_resultado_u) + " |")
-        operaciones_v.append("| " + fila_v.center(max_resultado_v) + " |")
-
-    print("\nAu:")
-    for linea in operaciones_u: print(linea)
-    print("    =")
-    for linea in resultado_u: print(linea)
-
-    print("\nAv:")
-    for linea in operaciones_v: print(linea)
-    print("    =")
-    for linea in resultado_v: print(linea)
-
-    resultado = [[resultado_u[i][j] + resultado_v[i][j] for j in range(columnas)] for i in range(filas)]
-    max_resultado = max(len(str(resultado[i][j])) for i in range(filas) for j in range(columnas))
-
-    operaciones = []
-    for j in range(filas):
-        fila = ""
-        for k in range(columnas):
-            if k != columnas-1:
-                fila += f"({resultado_u[j][k]} + {resultado_v[j][k]}) + "
-            else:
-                fila += f"({resultado_u[j][k]} + {resultado_v[j][k]})"
-
-        operaciones.append("| " + fila.center(max_resultado) + " |")
-
-    print("\nAu + Av:")
-    for linea in operaciones: print(linea)
-    print("    =")
-    for linea in resultado: print(linea)
-    input()
-
-    return resultado
-
-def imprimir_MPSV(A, u, v, suma_vecs, resultado):
+def imprimir_MPSV(A, input_vecs, lista_vecs, suma_vecs, resultado): 
     filas = len(A)
     columnas = len(A[0])
+    u, v = lista_vecs[input_vecs[0]], lista_vecs[input_vecs[1]]
 
     limpiar_pantalla()
     print("\nMatriz A:")
-    imprimir_matriz(A)
-    imprimir_vectores({'u': u, 'v': v}, True)
+    imprimir_matriz(A, True)
+    imprimir_vectores({input_vecs[0]: u, input_vecs[1]: v}, True)
 
-    # guardar las longitudes de todos los elementos  en u y v
+    # guardar las longitudes de todos los elementos en u y v
     longitudes = [len(str(i)) for i in u]
     longitudes += [len(str(j)) for j in v]
 
@@ -362,8 +321,8 @@ def imprimir_MPSV(A, u, v, suma_vecs, resultado):
     for i in range(len(u)):
         signo = "+" if v[i] > 0 else "-"
 
-        if len(u) % 2 == 0: igual = '=' if (i == len(u)/2 + 1) else ' '
-        else: igual = '=' if (i == floor(len(u)/2)) else ' '
+        if len(u) % 2 == 0: igual = '=' if (i == ceil(len(u) / 2)) else ' '
+        else: igual = '=' if (i == len(u) // 2) else ' '
 
         uv = f"{str(u[i]).center(max_uv)} {signo} {str(abs(v[i])).center(max_uv)}"
         print(f"[ {uv} ] {igual} [ {str(suma_vecs[i]).center(max_suma)} ]")
@@ -383,12 +342,78 @@ def imprimir_MPSV(A, u, v, suma_vecs, resultado):
 
     print("\nA(u + v):")
     for k in range(len(operaciones)):
-        if len(operaciones) % 2 == 0: igual = '=' if (k == len(operaciones)/2 + 1) else ' '
-        else: igual = '=' if (k == floor(len(operaciones)/2)) else ' '
+        if len(operaciones) % 2 == 0: igual = '=' if (k == ceil(len(operaciones) / 2)) else ' '
+        else: igual = '=' if (k == len(operaciones) // 2) else ' '
 
-        print(f"{operaciones[k]} {igual} [ {str(resultado[k])} ]")
-    
+        print(f"{operaciones[k]} {igual} [ {str(resultado[k]).center(max_resultado)} ]")
+
     return None
 
-def imprimir_SMPV(A, u, v, suma_vecs):
-    pass
+def imprimir_SMPV(A, input_vecs, lista_vecs, resultado_u, resultado_v):
+    filas = len(A)
+    columnas = len(A[0])
+    u, v = lista_vecs[input_vecs[0]], lista_vecs[input_vecs[1]]
+
+    limpiar_pantalla()
+    print("\nMatriz A:")
+    imprimir_matriz(A, True)
+    imprimir_vectores({input_vecs[0]: u, input_vecs[1]: v}, True)
+
+    # guardar las longitudes de todos los elementos en u y v
+    longitudes = [len(str(i)) for i in u]
+    longitudes += [len(str(j)) for j in v]
+
+    # encontrar la longitud maxima de todos los elementos de todas las listas (u, v, A, resultado_u, resultado_v)
+    max_A = max(len(str(A[i][j])) for i in range(filas) for j in range(columnas))
+    max_resultado_u = max(len(str(resultado_u[i])) for i in range(filas))
+    max_resultado_v = max(len(str(resultado_v[i])) for i in range(filas))
+
+    # guardar procedimiento de Au
+    operaciones_u = []
+    for j in range(filas):
+        fila = ""
+        for k in range(columnas):
+            linea = f"({str(A[j][k]).center(max_A)} * {str(u[k]).center(max_A)})"
+            if k == 0: linea = f"[ {linea} + "
+            elif k == columnas-1: linea = f"{linea} ]"
+            else: linea = f"{linea} + "
+            fila += linea
+        
+        operaciones_u.append(fila)
+
+    print("\nAu:") # imprimir procedimiento
+    for k in range(len(operaciones_u)):
+        if len(operaciones_u) % 2 == 0: igual = '=' if (k == ceil(len(operaciones_u) / 2)) else ' '
+        else: igual = '=' if (k == len(operaciones_u) // 2) else ' '
+
+        print(f"{operaciones_u[k]} {igual} [ {str(resultado_u[k]).center(max_resultado_u)} ]")
+
+    # guardar procedimiento de Av
+    operaciones_v = []
+    for j in range(filas):
+        fila = ""
+        for k in range(columnas):
+            linea = f"({str(A[j][k]).center(max_A)} * {str(v[k]).center(max_A)})"
+            if k == 0: linea = f"[ {linea} + "
+            elif k == columnas-1: linea = f"{linea} ]"
+            else: linea = f"{linea} + "
+            fila += linea
+        
+        operaciones_v.append(fila)
+
+    print("\nAv:") # imprimir procedimiento
+    for k in range(len(operaciones_v)):
+        if len(operaciones_v) % 2 == 0: igual = '=' if (k == ceil(len(operaciones_v) / 2)) else ' '
+        else: igual = '=' if (k == len(operaciones_v) // 2) else ' '
+
+        print(f"{operaciones_v[k]} {igual} [ {str(resultado_v[k]).center(max_resultado_v)} ]")
+
+    # calcular y imprimir procedimiento de Au + Av
+    resultado_suma = [resultado_u[i] + resultado_v[i] for i in range(filas)]
+    max_resultado_suma = max(len(str(resultado_suma[i])) for i in range(filas))
+
+    print("\nAu + Av:")
+    for i in range(filas):
+        print(f"[ {str(resultado_u[i]).center(max_resultado_u)} + {str(resultado_v[i]).center(max_resultado_v)} ] = [ {str(resultado_suma[i]).center(max_resultado_suma)} ]")
+    
+    return None
