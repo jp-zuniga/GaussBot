@@ -1,14 +1,16 @@
-from os import system
+from math import floor
 from fractions import Fraction
-from matrices import pedir_matriz
+from matrices import pedir_matriz, imprimir_matriz
+from validaciones import limpiar_pantalla
 
 # funciones para realizar operaciones con vectores:
 # -------------------------------------------------------
 
-def imprimir_vectores(lista_vecs):
+def imprimir_vectores(lista_vecs, matricial=False):
+    mensaje = "seleccionados" if matricial else "ingresados"
     if not lista_vecs: print("\nNo hay vectores ingresados!")
     else:
-        print("\nVectores ingresados:")
+        print(f"\nVectores {mensaje}:")
         for nombre, vector in lista_vecs.items():
             vec = [str(Fraction(x).limit_denominator().limit_denominator()) for x in vector]
             print(f"{nombre}: {vec}")
@@ -16,9 +18,9 @@ def imprimir_vectores(lista_vecs):
     return None
 
 def menu_vectores(lista_vecs=None):
-    system('cls || clear')
+    limpiar_pantalla()
     print("\n###############################")
-    print("### Operaciones de Vectores ###")
+    print("### Operaciones Vectoriales ###")
     print("###############################")
     imprimir_vectores(lista_vecs)
     print("\n1. Agregar un vector\n")
@@ -38,23 +40,31 @@ def menu_vectores(lista_vecs=None):
     
     return option
 
-def operaciones_vectores():
+def operaciones_vectoriales():
     lista_vecs = {}
     option = menu_vectores(lista_vecs)
 
     while option != 7:
         match option:
             case 1:
+                limpiar_pantalla()
                 lista_vecs = agregar_vector(lista_vecs)
                 option = menu_vectores(lista_vecs)
                 continue
 
             case 2:
-                system('cls || clear')
-                A = pedir_matriz(False)
-                u = ingresar_vector(len(A[0]))
-                v = ingresar_vector(len(A[0]))
-                matriz_por_suma_vectores(A, u, v)
+                limpiar_pantalla()
+                if not lista_vecs:
+                    input("\nError: No hay vectores ingresados!")
+                    option = menu_vectores(lista_vecs)
+                    continue
+                elif len(lista_vecs) == 1:
+                    input("\nError: Deben haber al menos dos vectores ingresados!")
+                    option = menu_vectores(lista_vecs)
+                    continue
+                
+                A = pedir_matriz(False, 'A')
+                A = matriz_por_suma_vectores(lista_vecs, A)
                 option = menu_vectores(lista_vecs)
                 continue
             
@@ -69,42 +79,54 @@ def operaciones_vectores():
                 continue
 
             case 5:
-                suma_resta_vecs(lista_vecs, True)
+                limpiar_pantalla()
+                input_suma_resta(lista_vecs, True)
                 option = menu_vectores(lista_vecs)
                 continue
 
             case 6:
-                suma_resta_vecs(lista_vecs, False)
+                limpiar_pantalla()
+                input_suma_resta(lista_vecs, False)
                 option = menu_vectores(lista_vecs)
                 continue
 
-            case 7:
-                input("\nRegresando al menú principal...")
-                break
-
+            case 7: break
             case _:
                 input("\nOpción inválida...")
                 continue
 
+    input("\nRegresando al menú principal...")
     return None
 
 def agregar_vector(lista_vecs):
-    system('cls || clear')
+    limpiar_pantalla()
     try:
         nombre = input("Ingrese el nombre del vector (una letra minúscula): ").lower()
-        if not nombre.isalpha() or len(nombre) is not 1: raise NameError
+        if not nombre.isalpha() or len(nombre) != 1: raise NameError
+        if nombre in lista_vecs: raise KeyError
         longitud = int(input(f"¿Cuántas dimensiones tendrá el vector? "))
     except NameError:
-        input("Error: Ingrese una letra alfabética!")
+        input("Error: Ingrese solamente una letra minúscula!")
         return agregar_vector(lista_vecs)
     except ValueError:
         input("Error: Ingrese un número entero!")
         return agregar_vector(lista_vecs)
+    except KeyError:
+        input(f"Error: Ya hay un vector con el nombre '{nombre}'!")
+        return agregar_vector(lista_vecs)
 
     vec = ingresar_vector(longitud)
     lista_vecs[nombre] = vec
-    input(f"Vector agregado exitosamente!")
-    return lista_vecs
+    print(f"Vector agregado exitosamente!")
+
+    continuar = input("\n¿Desea agregar otro vector? (s/n) ")
+    if continuar.lower() == 's': return agregar_vector(lista_vecs)
+    elif continuar.lower() == 'n': 
+        input("Regresando al menú de vectores...")
+        return lista_vecs
+    else:
+        input("Opción inválida! Regresando al menú de vectores...")
+        return lista_vecs
 
 def ingresar_vector(longitud):
     try:
@@ -120,29 +142,40 @@ def ingresar_vector(longitud):
     return vec
 
 def mult_escalar(lista_vecs):
-    system('cls || clear')
+    limpiar_pantalla()
+    if not lista_vecs:
+        input("\nError: No hay vectores ingresados!")
+        return lista_vecs
+    
     try:
         imprimir_vectores(lista_vecs)
-        vec_index = input("\n¿Cuál vector desea multiplicar escalarmente? ")
-        if vec_index not in lista_vecs: raise KeyError(vec_index)
+        vec_nombre = input("\n¿Cuál vector desea multiplicar escalarmente? ")
+        if vec_nombre not in lista_vecs: raise KeyError(vec_nombre)
         escalar = Fraction(input("Ingrese el escalar: "))
     except KeyError:
-        input(f"Error: El vector '{vec_index}' no existe!")
+        input(f"Error: El vector '{vec_nombre}' no existe!")
         return mult_escalar(lista_vecs)
     except ValueError:
         input("Error: Ingrese un número real!")
         return mult_escalar(lista_vecs)
     
-    lista_vecs[vec_index] = [Fraction(x * escalar) for x in lista_vecs[vec_index]]
-    imprimir_escalar = escalar if escalar.is_integer() else f"({str(Fraction(escalar))})*   "
-    input(f"\n{imprimir_escalar}{vec_index} = {[str(Fraction(x).limit_denominator()) for x in lista_vecs[vec_index]]}")
+    lista_vecs[vec_nombre] = [Fraction(x*escalar) for x in lista_vecs[vec_nombre]]
+    imprimir_escalar = escalar if escalar.is_integer() else f"({str(Fraction(escalar))})*"
+    input(f"\n{imprimir_escalar}{vec_nombre} = {[str(Fraction(x).limit_denominator()) for x in lista_vecs[vec_nombre]]}")
     return lista_vecs
 
 def mult_vectorial(lista_vecs):
-    system('cls || clear')
+    limpiar_pantalla()
+    if not lista_vecs:
+        input("\nError: No hay vectores ingresados!")
+        return lista_vecs
+    elif len(lista_vecs) == 1:
+        input("\nError: Deben haber dos vectores ingresados!")
+        return lista_vecs
+    
     try:
         imprimir_vectores(lista_vecs)
-        vec1 = input("Ingrese el nombre del primer vector: ")
+        vec1 = input("\nIngrese el nombre del primer vector: ")
         if vec1 not in lista_vecs: raise KeyError(vec1)
         vec2 = input("Ingrese el nombre del segundo vector: ")
         if vec2 not in lista_vecs: raise KeyError(vec2)
@@ -158,26 +191,52 @@ def mult_vectorial(lista_vecs):
     input(f"\n{vec1}.{vec2} = {str(Fraction(producto_punto))}")
     return lista_vecs
 
-def suma_resta_vecs(lista_vecs, option):
-    system('cls || clear')
+def input_suma_resta(lista_vecs, option, matricial=False):
+    if not lista_vecs:
+        input("\nError: No hay vectores ingresados!")
+        return lista_vecs
+    elif len(lista_vecs) == 1:
+        input("\nError: Deben haber al menos dos vectores ingresados!")
+        return lista_vecs
+    
     try:
         imprimir_vectores(lista_vecs)
         operacion = "sumar" if option else "restar"
-        input_vecs = [i for i in input(f"\n¿Cuáles vectores desea {operacion}? (separados por espacios): ").split()]
+        input_vecs = input(f"\n¿Cuáles vectores desea {operacion}? (separados por espacios): ").split()
+        if len(input_vecs) <= 1 or (matricial and len(input_vecs) != 2): raise IndexError
 
         for vec in input_vecs:
             if vec not in lista_vecs: raise KeyError(vec)
+            
         if not all(len(lista_vecs[j]) == len(lista_vecs[input_vecs[0]]) for j in input_vecs):
-            raise ArithmeticError    
+            raise ArithmeticError
+        
     except KeyError as k:
         input(f"Error: El vector '{k}' no existe!")
-        return suma_resta_vecs(lista_vecs)
+        return input_suma_resta(lista_vecs, option, matricial)
+    except IndexError:
+        error = "dos vectores para realizar el producto matriz-vector" if matricial else "dos o más vectores para sumar"
+        input(f"Error: Debe ingresar {error}!")
+        return input_suma_resta(lista_vecs, option, matricial)
     except ArithmeticError:
         input("Error: Los vectores deben tener la misma longitud!")
-        return suma_resta_vecs(lista_vecs)
+        return input_suma_resta(lista_vecs, option, matricial)
+
+    if matricial: return input_vecs
     
-    if option: sumar_vectores(input_vecs, lista_vecs)
-    else: restar_vectores(input_vecs, lista_vecs)
+    if option:
+        resultado = sumar_vectores(input_vecs, lista_vecs)
+        signo = "+"
+    else:
+        resultado = restar_vectores(input_vecs, lista_vecs)
+        signo = "-"
+
+    mensaje = ""
+    for i in input_vecs:
+        if i != input_vecs[-1]: mensaje += f"{i} {signo} "
+        else: mensaje += f"{i}"
+
+    input(f"\n{mensaje} = {[str(Fraction(x).limit_denominator()) for x in resultado]}")
     return None
 
 def sumar_vectores(input_vecs, lista_vecs):
@@ -186,13 +245,7 @@ def sumar_vectores(input_vecs, lista_vecs):
         for j in input_vecs:
             suma_vecs[i] += lista_vecs[j][i]
     
-    mensaje = ""
-    for i in input_vecs:
-        if i != input_vecs[-1]: mensaje += f"{i} + "
-        else: mensaje += f"{i}"
-
-    input(f"\n{mensaje} = {[str(Fraction(x).limit_denominator()) for x in suma_vecs]}")
-    return None
+    return suma_vecs
 
 def restar_vectores(input_vecs, lista_vecs):
     resta_vecs = lista_vecs[input_vecs[0]]
@@ -200,53 +253,26 @@ def restar_vectores(input_vecs, lista_vecs):
         for j in input_vecs[1:]:
             resta_vecs[i] -= lista_vecs[j][i]
     
-    mensaje = ""
-    for i in input_vecs:
-        if i != input_vecs[-1]: mensaje += f"{i} - "
-        else: mensaje += f"{i}"
+    return resta_vecs
 
-    input(f"\n{mensaje} = {[str(Fraction(x).limit_denominator()) for x in resta_vecs]}")
-    return None
-
-def matriz_por_suma_vectores(A, u, v):
-    filas = len(A)
-    columnas = len(A[0])
-
+def matriz_por_suma_vectores(lista_vecs, A):
+    limpiar_pantalla()
     resultado = []
-    operaciones = []
-    suma_vecs = [u[i] + v[i] for i in range(len(u))]
-
-    lens = [len(str(x)) for x in u]
-    for x in u: lens.append(len(str(x)))
-    max_uv = max(lens)
-    max_suma = max([len(str(x)) for x in suma_vecs])
-
-    u_mas_v = [f"{u[y]} + {v[y]}" for y in range(len(u))]
-    print(f"\nu + v:")
-    for linea in u_mas_v: print(f"| {linea.center(max_uv)} | ")
-    print("    =")
-    for linea in suma_vecs: print(f"| {str(linea).center(max_suma)} |")
-
-    for i in range(filas):
-        resultado.append([A[i][j] * suma_vecs[j] for j in range(len(suma_vecs))])
     
-    max_resultado = max(len(str(resultado[i][j])) for i in range(filas) for j in range(columnas))
-    for j in range(filas):
-        fila = ""
-        for k in range(columnas):
-            if k != columnas-1: fila += f"({A[j][k]}*{suma_vecs[k]}) + "
-            else: fila += f"({A[j][k]}*{suma_vecs[k]})"
-        
-        operaciones.append("| " + fila.center(max_resultado) + " |")
+    input_vecs = input_suma_resta(lista_vecs, option=True, matricial=True) # pedir los vectores
+    suma_vecs = sumar_vectores(input_vecs, lista_vecs) # sumar los vectores seleccionados
+    u, v = lista_vecs[input_vecs[0]], lista_vecs[input_vecs[1]] # guardar los vectores seleccionados como u y v
     
-    print("\nA(u + v):")
-    for linea in operaciones: print(linea)
-    print("    =")
+    if len(A[0]) != len(u):
+        input("\nError: Las dimensiones de A y (u + v) no son compatibles!")
+        return None
 
-    for linea in resultado: print(linea)
-    resolver = input("\n¿Desea resolver la matriz como suma de productos (Au + Av)? (s/n) ")
-    if resolver.lower() == 's':
-        suma_matriz_por_vector(A, u, v)
+    # calcular A(u + v)
+    for i in range(len(suma_vecs)):
+        resultado.append(sum([A[i][j] * suma_vecs[j] for j in range(len(suma_vecs))]))
+    
+    imprimir_MPSV(A, u, v, suma_vecs, resultado) # imprimir las operaciones realizadas
+    input()
 
     return resultado
 
@@ -311,3 +337,58 @@ def suma_matriz_por_vector(A, u, v):
     input()
 
     return resultado
+
+def imprimir_MPSV(A, u, v, suma_vecs, resultado):
+    filas = len(A)
+    columnas = len(A[0])
+
+    limpiar_pantalla()
+    print("\nMatriz A:")
+    imprimir_matriz(A)
+    imprimir_vectores({'u': u, 'v': v}, True)
+
+    # guardar las longitudes de todos los elementos  en u y v
+    longitudes = [len(str(i)) for i in u]
+    longitudes += [len(str(j)) for j in v]
+
+    # encontrar la longitud maxima de todos los elementos de todas las listas (u, v, suma_vecs, A, resultado)
+    max_uv = max(longitudes)
+    max_suma = max(len(str(k)) for k in suma_vecs)
+    max_A = max(len(str(A[i][j])) for i in range(filas) for j in range(columnas))
+    max_resultado = max(len(str(resultado[i])) for i in range(filas))
+
+    # imprimir procedimiento de u + v
+    print("\nu + v:")
+    for i in range(len(u)):
+        signo = "+" if v[i] > 0 else "-"
+
+        if len(u) % 2 == 0: igual = '=' if (i == len(u)/2 + 1) else ' '
+        else: igual = '=' if (i == floor(len(u)/2)) else ' '
+
+        uv = f"{str(u[i]).center(max_uv)} {signo} {str(abs(v[i])).center(max_uv)}"
+        print(f"[ {uv} ] {igual} [ {str(suma_vecs[i]).center(max_suma)} ]")
+
+    # imprimir procedimiento de A(u + v)
+    operaciones = []
+    for j in range(filas):
+        fila = ""
+        for k in range(columnas):
+            linea = f"({str(A[j][k]).center(max_A)} * {str(suma_vecs[k]).center(max_A)})"
+            if k == 0: linea = f"[ {linea} + "
+            elif k == columnas-1: linea = f"{linea} ]"
+            else: linea = f"{linea} + "
+            fila += linea
+        
+        operaciones.append(fila)
+
+    print("\nA(u + v):")
+    for k in range(len(operaciones)):
+        if len(operaciones) % 2 == 0: igual = '=' if (k == len(operaciones)/2 + 1) else ' '
+        else: igual = '=' if (k == floor(len(operaciones)/2)) else ' '
+
+        print(f"{operaciones[k]} {igual} [ {str(resultado[k])} ]")
+    
+    return None
+
+def imprimir_SMPV(A, u, v, suma_vecs):
+    pass

@@ -1,12 +1,12 @@
-from os import system
 from matrices import resolver_sistema
-from vectores import operaciones_vectores
+from vectores import operaciones_vectoriales
+from validaciones import limpiar_pantalla
 
 # interfaz del programa:
 # ----------------------------
 
 def imprimir_menu():
-    system('cls || clear')
+    limpiar_pantalla()
     print("\n######################")
     print("### Menú Principal ###")
     print("######################\n")
@@ -30,32 +30,27 @@ def main_menu():
     while option != 3:
         match option:
             case 1:
-                system('cls || clear')
+                limpiar_pantalla()
                 M = resolver_sistema()
 
-                while (True):
-                    continuar = input("\n¿Desea resolver otra matriz? (s/n) ")
-                    if continuar.lower() == 's': break
-                    elif continuar.lower() == 'n':
-                        input("\nCerrando programa...")
-                        break
-                    else:
-                        input("\nOpción inválida...")
-                        continue
-                
+                continuar = input("\n¿Desea resolver otro sistema? (s/n) ")
                 if continuar.lower() == 's': continue
+                elif continuar.lower() == 'n':
+                    input("Regresando al menú principal...")
+                    option = imprimir_menu()
+                    continue
                 else:
-                    option = 3
-                    break
+                    input("Opción inválida! Regresando al menú principal...")
+                    option = imprimir_menu()
+                    continue
+                
             
             case 2:
-                operaciones_vectores()
+                operaciones_vectoriales()
                 return main_menu()
 
-            case 3:
-                input("\nSaliendo del programa...")
-                break
-
-            case _: input("\nOpción inválida, por favor intente de nuevo.")
+            case 3: break
+            case _: input("Opción inválida, por favor intente de nuevo.")
     
+    input("Cerrando programa...")
     return None

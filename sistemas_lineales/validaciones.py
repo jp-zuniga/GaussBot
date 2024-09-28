@@ -1,7 +1,13 @@
+import os
+
 # funciones para validar sistemas de ecuaciones:
 # -------------------------------------------------------
 
-def validar_consistencia(M, es_rectangular):
+def limpiar_pantalla():
+    command = "cls" if os.name == "nt" else "clear"
+    os.system(command)
+
+def validar_consistencia(M):
     filas = len(M)
 
     for i in range(filas):
@@ -13,9 +19,7 @@ def validar_consistencia(M, es_rectangular):
         except StopIteration: indice = -1
 
         # ver si la fila tiene la forma de b = b (donde b != 1)
-        if indice != -1 and M[i][indice] == M[i][-1] and M[i][indice] != 1:
-            if es_rectangular: return [True, None]
-            else: return [False, i]
+        if indice != -1 and M[i][indice] == M[i][-1] and M[i][indice] != 1: return [True, None]
 
     return [True, None] # si no se ha retornado False, entonces la matriz si es consistente
 
@@ -25,10 +29,13 @@ def validar_escalonada(M):
 
     # si las filas distintas de cero no estan en orden descendiente, no es escalonada
     fila_cero = [0 for _ in range(columnas)]
-    if (M[-1] != fila_cero): return False
+    for i in range(filas):
+        if M[i] == fila_cero:
+            # checkear si alguna fila debajo de la fila de ceros no es cero
+            if any(M[j] != fila_cero for j in range(i+1, filas)):
+                return False # si se encuentra una fila no cero, no es escalonada
 
-    # para guardar el indice de la entrada anterior (inicializada en -1 para la primera iteracion)
-    entrada_anterior = -1
+    entrada_anterior = -1 # para guardar el indice de la entrada anterior (inicializada en -1 para la primera iteracion)
     for i in range(filas):
         for j in range(columnas):
             if M[i][j] != 0:
@@ -64,23 +71,21 @@ def validar_escalonada_reducida(M):
                     break # ir a la proxima entrada principal
         
         return True # si no se retorno False despues del bucle, la matriz es escalonada reducida
-    return False # retornar False por defecto
+    return False # si validar_escalonada no retorno True, la matriz tampoco es escalonada reducida, y se retorna False
 
 def encontrar_variables_libres(M):
     filas = len(M)
     columnas = len(M[0])
-    variables_libres = []
-
-    # recorrer todas las columnas excepto la aumentada para encontrar las columnas pivotes
-    for j in range(columnas-1):
-        es_pivote = False
-        for i in range(filas):
-            if M[i][j] == 1:
-                # verificar si es un pivote
-                es_pivote = all(M[k][j] == 0 for k in range(filas) if k != i)
-                if es_pivote: break
-
-        if not es_pivote: # si la columna no es pivote, es una variable libre
-            variables_libres.append(j)
-
-    return variables_libres
+    entradas = []
+    
+    # encontrar entradas principales en cada fila
+    for i in range(filas):
+        for j in range(columnas-1):
+            if M[i][j] != 0:
+                entradas.append(j)
+                break
+    
+    # las variables que no son entradas principales son variables libres
+    libres = [j for j in range(columnas-1) if j not in entradas]
+    if libres == []: return None
+    return libres
