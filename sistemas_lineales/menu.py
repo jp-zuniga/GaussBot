@@ -1,11 +1,11 @@
 from matrices import resolver_sistema
 from vectores import operaciones_vectoriales
-from validaciones import limpiar_pantalla
+from utils import limpiar_pantalla
 
-# interfaz del programa:
+# interfaz del programa
 # ----------------------------
 
-def imprimir_menu():
+def imprimir_menu() -> int:
     limpiar_pantalla()
     print("\n######################")
     print("### Menú Principal ###")
@@ -14,7 +14,7 @@ def imprimir_menu():
     print("2. Operaciones de vectores")
     print("3. Cerrar programa")
 
-    # try/except para validar la opcion ingresada
+    # validar la opcion ingresada
     try:
         option = int(input("\nSeleccione una opción: "))
         if option < 1 or option > 3: raise ValueError
@@ -24,33 +24,30 @@ def imprimir_menu():
     
     return option
 
-def main_menu():
+def main_menu() -> None:
+    lista_vecs = {}
     option = imprimir_menu()
-    
     while option != 3:
         match option:
             case 1:
                 limpiar_pantalla()
                 M = resolver_sistema()
-
-                continuar = input("\n¿Desea resolver otro sistema? (s/n) ")
-                if continuar.lower() == 's': continue
-                elif continuar.lower() == 'n':
-                    input("Regresando al menú principal...")
-                    option = imprimir_menu()
-                    continue
-                else:
-                    input("Opción inválida! Regresando al menú principal...")
-                    option = imprimir_menu()
-                    continue
-                
-            
+                match input("\n¿Desea resolver otro sistema? (s/n) "):
+                    case 's': continue
+                    case 'n':
+                        input("Regresando al menú principal...")
+                        option = imprimir_menu()
+                        continue
+                    case _:
+                        input("Opción inválida! Regresando al menú principal...")
+                        option = imprimir_menu()
+                        continue
             case 2:
-                operaciones_vectoriales()
-                return main_menu()
-
+                lista_vecs = operaciones_vectoriales(lista_vecs)
+                option = imprimir_menu()
+                continue
             case 3: break
-            case _: input("Opción inválida, por favor intente de nuevo.")
+            case _: input("Opción inválida! Por favor, intente de nuevo...")
     
     input("Cerrando programa...")
     return None
