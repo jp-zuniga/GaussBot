@@ -1,2 +1,2 @@
 # Algebra_Lineal
-Proyecto de curso para la asignatura de Algebral Lineal
+Proyecto de curso de la asignatura Álgebra Lineal
