@@ -2,6 +2,9 @@ from fractions import Fraction
 from typing import List
 from utils import Mat, Vec, DictVectores, limpiar_pantalla
 
+# funciones para realizar operaciones con vectores
+# --------------------------------------------------------------------------------
+
 class Vector:
     def __init__(self):
         from matrices import Matriz
@@ -131,7 +134,7 @@ class Vector:
             if vec_nombre not in self.vecs_ingresados: raise KeyError(vec_nombre)
             escalar = Fraction(input("Ingrese el escalar: ").strip())
         except KeyError as k:
-            input(f"Error: El vector '{k}' no existe!")
+            input(f"Error: El vector {k} no existe!")
             return self.mult_escalar()
         except ValueError:
             input("Error: Ingrese un número real!")
@@ -160,7 +163,7 @@ class Vector:
             input("Error: Debe ingresar dos vectores para multiplicar!")
             return self.mult_vectorial()
         except KeyError as k:
-            input(f"Error: El vector '{k}' no existe!")
+            input(f"Error: El vector {k} no existe!")
             return self.mult_vectorial()
         except ArithmeticError:
             input("Error: Los vectores deben tener la misma longitud!")
@@ -183,7 +186,7 @@ class Vector:
             if not all(len(self.vecs_ingresados[j]) == len(self.vecs_ingresados[input_vecs[0]]) for j in input_vecs):
                 raise ArithmeticError
         except KeyError as k:
-            input(f"Error: El vector '{k}' no existe!")
+            input(f"Error: El vector {k} no existe!")
             return self.input_suma_resta(option, es_matricial)
         except IndexError:
             error = "dos vectores para realizar el producto matriz-vector" if es_matricial else f"dos o más vectores para {operacion}"

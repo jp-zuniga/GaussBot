@@ -1,5 +1,8 @@
 from utils import List, Mat, Validacion, limpiar_pantalla
 
+# funciones para resolver sistemas de ecuaciones con matrices
+# --------------------------------------------------------------------------------
+
 class SistemaEcuaciones:
     def __init__(self):
         from matrices import Matriz
@@ -43,7 +46,7 @@ class SistemaEcuaciones:
             # buscar la entrada con el valor mas grande para usarla como pivote
             for i in range(fila_actual, filas):
                 if abs(M[i][j]) > maximo:
-                    maximo = M[i][j]
+                    maximo = abs(M[i][j])
                     fila_pivote = i
             
             # si fila_pivote sigue siendo None, significa que todas las entradas de la columna son 0
@@ -57,8 +60,8 @@ class SistemaEcuaciones:
                 self.mat.imprimir_matriz(M)
             
             # si el diagonal no es 1, dividir toda la fila por el diagonal para que sea 1
-            if M[fila_actual][j] != 1 and M[fila_actual][j] != 0:
-                pivote = M[fila_actual][j]
+            pivote = M[fila_actual][j]
+            if pivote != 1 and pivote != 0:
                 for k in range(columnas):
                     M[fila_actual][k] /= pivote
 
@@ -68,13 +71,13 @@ class SistemaEcuaciones:
 
             # eliminar los elementos debajo del pivote
             for f in range(fila_actual+1, filas):
-                if M[f][j] != 0:
-                    factor = M[f][j]
-                    for k in range(columnas):
-                        M[f][k] -= factor * M[fila_actual][k]
+                factor = M[f][j]
+                if factor == 0: continue
+                for k in range(columnas):
+                    M[f][k] -= factor * M[fila_actual][k]
 
-                    print(f"\nF{fila_actual+1} => F{fila_actual+1} - ({str(factor.limit_denominator(100))} * F{fila_pivote+1})")
-                    self.mat.imprimir_matriz(M)
+                print(f"\nF{fila_actual+1} => F{fila_actual+1} - ({str(factor.limit_denominator(100))} * F{fila_pivote+1})")
+                self.mat.imprimir_matriz(M)
 
             fila_actual += 1 # ir a la siguiente fila
 
@@ -90,7 +93,6 @@ class SistemaEcuaciones:
             for f in reversed(range(i)):
                 factor = M[f][columna_pivote]
                 if factor == 0: continue
-                    
                 for k in range(columnas):
                     M[f][k] -= factor * M[i][k]
                     
