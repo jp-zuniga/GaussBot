@@ -1,224 +1,261 @@
 from fractions import Fraction
-from validaciones import validar_consistencia, validar_escalonada_reducida, encontrar_variables_libres
-from utils import Tuple, List, Matriz, limpiar_pantalla
+from typing import List
+from utils import Mat, DictMatrices, limpiar_pantalla
 
 # funciones para trabajar con matrices y resolver sistemas de ecuaciones
 # --------------------------------------------------------------------------------
 
-def pedir_matriz(aumentada=True, nombre='M') -> Matriz:
-    M = []
-    mensaje = ["ecuaciones", "variables"] if aumentada else ["filas", "columnas"]
+class Matriz:
+    def __init__(self):
+        from validaciones import Validaciones
+        self.vals = Validaciones()
+        self.mats_ingresadas = {}
 
-    print(f"\nDatos de la matriz {nombre}:")
-    print("----------------------------", end='')
-    try:
-        filas = int(input(f"\nIngrese el número de {mensaje[0]}: "))
-        if filas <= 0: raise ValueError
-        columnas = int(input(f"Ingrese el número de {mensaje[1]}: "))
-        if columnas <= 0: raise ValueError
-    except ValueError:
-        input("\nError: Ingrese un número entero positivo!")
-        return pedir_matriz(aumentada, nombre)
-    
-    fila_actual = 0
-    if aumentada: columnas += 1 # si se esta pidiendo una matriz aumentada, incrementar las columnas por 1
+    def imprimir_matriz(self, M: Mat, es_aumentada=True) -> None:
+        filas = len(M)
+        columnas = len(M[0])
 
-    while fila_actual < filas:
-        columna_actual = 0
-        f = []
-
-        print(f"\nFila {fila_actual+1}:")
-        while columna_actual < columnas: 
-            try:
-                if not aumentada or columna_actual != columnas-1: mensaje = f"-> X{columna_actual+1} = "
-                else: mensaje = "-> b = "
-
-                elemento = Fraction(input(mensaje)).limit_denominator() # si el usuario ingresa algo invalido, se salta a los excepts
-                f.append(elemento) # si no, se agrega el elemento y se incrementa columna_actual
-                columna_actual += 1
-            except ValueError: input("\nError: Ingrese un número real!")
-            except ZeroDivisionError: input("\nError: El denominador no puede ser cero!")
-            
-        fila_actual += 1
-        M.append(f)
-
-    return M
-
-def resolver_sistema() -> Matriz | None:
-    M = pedir_matriz()
-    limpiar_pantalla()
-    M = reducir_matriz(M)
-    if not M: return None # si reducir_matriz() retorna None, no se puede resolver el sistema
-    
-    libres = encontrar_variables_libres(M)
-    if validar_escalonada_reducida(M) and not libres:
-        # si la matriz esta en su forma escalonada reducida y no hay variables libres,
-        imprimir_soluciones(M, unica=True, libres=None, validacion=(True, None)) # imprimir la solucion unica
-        return M
-    
-    imprimir_soluciones(M, unica=False, libres=libres, validacion=(True, None)) # imprimir la solucion general
-    return M
-
-def reducir_matriz(M: Matriz) -> Matriz | None:
-    filas = len(M)
-    columnas = len(M[0])
-    if not validar_matriz(M): return None
-
-    print("\nMatriz inicial:")
-    imprimir_matriz(M)
-    print("\nReduciendo la matriz a su forma escalonada:")
-
-    # encontrar los pivotes y eliminar los elementos debajo de ellos
-    fila_actual = 0
-    for j in range(columnas-1):
-        fila_pivote = None
-        maximo = 0
-
-        # buscar la entrada con el valor mas grande para usarla como pivote
-        for i in range(fila_actual, filas):
-            if abs(M[i][j]) > maximo:
-                maximo = M[i][j]
-                fila_pivote = i
-        
-        # si fila_pivote sigue siendo None, significa que todas las entradas de la columna son 0
-        # entonces no hay pivote y se pasa a la siguiente columna
-        if fila_pivote is None or maximo == 0: continue
-
-        # si la fila actual no es la pivote, se intercambian
-        if fila_pivote != fila_actual:
-            M[fila_actual], M[fila_pivote] = M[fila_pivote], M[fila_actual]
-            print(f"\nF{fila_actual+1} <==> F{fila_pivote+1}")
-            imprimir_matriz(M)
-        
-        # si el diagonal no es 1, dividir toda la fila por el diagonal para que sea 1
-        if M[fila_actual][j] != 1 and M[fila_actual][j] != 0:
-            pivote = M[fila_actual][j]
-            for k in range(columnas):
-                M[fila_actual][k] /= pivote
-
-            if pivote == -1: print(f"\nF{fila_actual+1} => -F{fila_actual+1}")
-            else: print(f"\nF{fila_actual+1} => F{fila_actual+1} / {str(pivote.limit_denominator())}")
-            imprimir_matriz(M)
-
-        # eliminar los elementos debajo del pivote
-        for f in range(fila_actual+1, filas):
-            if M[f][j] != 0:
-                factor = M[f][j]
-                for k in range(columnas):
-                    M[f][k] -= factor * M[fila_actual][k]
-
-                print(f"\nF{fila_actual+1} => F{fila_actual+1} - ({str(factor.limit_denominator())} * F{fila_pivote+1})")
-                imprimir_matriz(M)
-
-        fila_actual += 1 # ir a la siguiente fila
-
-    # se termina de reducir la matriz, eliminando los elementos encima de los pivotes
-    for i in reversed(range(filas)):
-        try: columna_pivote = M[i].index(next(filter(lambda x: x != 0, M[i])))
-        except StopIteration: columna_pivote = None
-            
-        # si columna_pivote es None, no hay entrada pivote en la fila, y se pasa a la siguiente
-        if columna_pivote is None: continue
-
-        # eliminar los elementos encima del pivote
-        for f in reversed(range(i)):
-            factor = M[f][columna_pivote]
-            if factor == 0: continue
-                
-            for k in range(columnas):
-                M[f][k] -= factor * M[i][k]
-                
-            print(f"\nF{f+1} => F{f+1} - ({str(factor.limit_denominator())} * F{i+1})")
-            imprimir_matriz(M)
-
-    # validar si la matriz resultante es consistente
-    if not validar_matriz(M): return None
-    return M
-
-def despejar_variables(M: Matriz, libres: List[int]) -> List[str]:
-    filas = len(M)
-    columnas = len(M[0])
-    ecuaciones = [] # almacenar las ecuaciones de cada variable
-    for variable in libres:
-        ecuaciones.append(f"| X{variable+1} es libre")
-    
-    # recorrer las filas para encontrar las ecuaciones de las variables
-    for i in range(filas):
-        for j in range(columnas-1):            
-            if M[i][j] != 0:
-                # construir la expresion para la variable en terminos de las variables libres
-                constante = M[i][-1].limit_denominator()
-                expresion = str(constante) if constante != 0 else ''
-
-                # pasar las variables a la derecha de la ecuacion
-                for k in range(j+1, columnas-1):
-                    if M[i][k] != 0:
-                        coeficiente = -M[i][k].limit_denominator()
-                        signo = '+' if coeficiente > 0 else '-'
-                        if len(expresion) > 0: signo = f" {signo} "
-                        else: signo = '' if signo == '+' else '-'
-                        expresion += f"{signo}{abs(coeficiente)}*X{k+1}" if abs(coeficiente) != 1 else f"{signo}X{k+1}"
-                if expresion == '': expresion = '0'
-                ecuaciones.append(f"| X{j+1} = " + expresion)
-                break
-    
-    # retornar las ecuaciones en orden
-    ecuaciones.sort(key=lambda x: x[3])
-    return ecuaciones
-
-def imprimir_soluciones(M: Matriz, unica: bool, validacion: Tuple, libres: List[int | None]) -> None:
-    filas = len(M)
-    solucion, fila_inconsistente = validacion # unpack la validacion
-
-    if not solucion: # si no hay solucion, imprimir la fila inconsistente y retornar
-        print(f"\n| En F{fila_inconsistente+1}: 0 != {str(M[fila_inconsistente][-1].limit_denominator())}")
-        input("| Sistema es inconsistente!")
-        return None
-    elif unica: # imprimir la solucion unica
-        print("\n| Solución encontrada:")
+        # calcular la longitud maxima de los elementos para alinearlos y siempre mantener el formato:
+        # - crear una lista de las longitudes de todos los elementos de la matriz
+        # - encontrar la longitud maxima en esa lista con max()
+        max_len = max(len(str(M[i][j].limit_denominator(100))) for i in range(filas) for j in range(columnas))
         for i in range(filas):
-            if all(x == 0 for x in M[i]): continue
-            print(f"| X{i+1} = {str(M[i][-1].limit_denominator())}")
+            for j in range(columnas):
+                # convertir el elemento actual a un string y ajustarlo a la derecha de la longitud maxima
+                elemento = str(M[i][j].limit_denominator(100)).center(max_len)
+
+                # si es el primer elemento, imprimir el ( y una coma despues del elemento
+                if j == 0: print(f"( {elemento}, ", end='')
+
+                # si es aumentada y j es el penultimo elemento, imprimir el | para separar las columnas
+                elif j == columnas-2 and es_aumentada: print(f"{elemento} |", end=' ')
+
+                # si el es el ultimo elemento, cerrar el )
+                elif j == columnas-1: print(f"{elemento} )")
+
+                # si es un elemento en medio, solo imprimir la coma despues del elemento    
+                else: print(f"{elemento}, ", end='')
+
         return None
-    
-    # si no se cumplieron las condiciones anteriores, el sistema tiene una solucion general
-    ecuaciones = despejar_variables(M, libres)
-    print("\n| Sistema no tiene solución única!")
-    print("| Solución general encontrada:")
-    for linea in ecuaciones: print(linea)
-    return None
 
-def imprimir_matriz(M: Matriz, vectorial=False) -> None:
-    filas = len(M)
-    columnas = len(M[0])
+    def imprimir_matrices(self) -> None:
+        if not self.vals.validar_mats(self.mats_ingresadas): return None
+        print("\nMatrices guardadas:")
+        print("---------------------------------------------", end='')
+        for nombre, mat in self.mats_ingresadas.items():
+            print(f"\n{nombre}:")
+            self.imprimir_matriz(mat[0], mat[1])
+        print("---------------------------------------------")
+        return None
 
-    # calcular la longitud maxima de los elementos para alinearlos y siempre mantener el formato:
-    # - crear una lista de las longitudes de todos los elementos de la matriz
-    # - encontrar la longitud maxima en esa lista con max()
-    max_len = max(len(str(M[i][j].limit_denominator())) for i in range(filas) for j in range(columnas))
+    def menu_matrices(self) -> int:
+        limpiar_pantalla()
+        print("\n###############################")
+        print("### Operaciones Matriciales ###")
+        print("###############################")
+        self.imprimir_matrices()
+        print("\n1. Agregar una matriz")
+        print("2. Resolver sistema de ecuaciones")
+        print("3. Suma y resta de matrices")
+        print("4. Multiplicación de matrices")
+        print("5. Transposición de una matriz")
+        print("6. Regresar al menú principal")
 
-    for i in range(filas):
-        for j in range(columnas):
-            # convertir el elemento actual a un string y ajustarlo a la derecha de la longitud maxima
-            elemento = str(M[i][j].limit_denominator()).center(max_len)
+        try:
+            option = int(input("\nSeleccione una opción: ").strip())
+            if option < 1 or option > 6: raise ValueError
+        except ValueError:
+            input("\nError: Ingrese una opción válida!")
+            return self.menu_matrices()
+        return option
 
-            # si es el primer elemento, imprimir el ( y una coma despues del elemento
-            if j == 0: print(f"( {elemento}, ", end='')
+    def operaciones_matriciales(self) -> None:
+        option = self.menu_matrices()
+        while option != 7:
+            match option:
+                case 1:
+                    limpiar_pantalla()
+                    self.mats_ingresadas = self.agregar_matriz()
+                    option = self.menu_matrices()
+                    continue
+                case 2:
+                    from sistemas_ecuaciones import SistemaEcuaciones
+                    M = self.mats_ingresadas[self.seleccionar_matriz(es_sistema=True)][0]
+                    M = SistemaEcuaciones().resolver_sistema(M)
+                    match input("\n¿Desea resolver otra matriz? (s/n) ").strip().lower():
+                        case 's': continue
+                        case 'n':
+                            input("De acuerdo! Regresando al menú de matrices...")
+                            option = self.menu_matrices()
+                            continue
+                        case _:
+                            input("Opción inválida! Regresando al menú de matrices...")
+                            option = self.menu_matrices()
+                            continue
+                case 3:
+                    limpiar_pantalla()
+                    M = self.suma_resta_matrices()
+                    option = self.menu_matrices()
+                    continue
+                case 4:
+                    limpiar_pantalla()
+                    M = self.mult_matrices()
+                    option = self.menu_matrices()
+                    continue
+                case 5: break
+                case 6: break
+                case _:
+                    input("Opción inválida! Por favor, intente de nuevo...")
+                    continue
 
-            # si es el penultimo elemento, imprimir el | para separar las columnas
-            elif j == columnas-2 and not vectorial: print(f"{elemento} |", end=' ')
+        input("Regresando al menú principal...")
+        return None
 
-            # si el es el ultimo elemento, cerrar el )
-            elif j == columnas-1: print(f"{elemento} )")
+    def agregar_matriz(self) -> DictMatrices:
+        try:
+            limpiar_pantalla()
+            nombre = input("Ingrese el nombre de la matriz (una letra mayúscula): ").strip().upper()
+            if not nombre.isalpha() or len(nombre) != 1: raise NameError
+            if nombre in self.mats_ingresadas: raise KeyError
+            match input("¿Se ingresará una matriz aumentada? (s/n) ").strip().lower():
+                case 's': es_aumentada = True
+                case 'n': es_aumentada = False
+                case _: raise ValueError
+        except NameError:
+            input("Error: Ingrese solamente una letra mayúscula!")
+            return self.agregar_matriz()
+        except KeyError:
+            input(f"Error: Ya hay un vector con el nombre {nombre}!")
+            return self.agregar_matriz()
+        except ValueError:
+            input("Error: Ingrese una opción válida!")
+            return self.agregar_matriz()
 
-            # si es un elemento en medio, solo imprimir la coma despues del elemento    
-            else: print(f"{elemento}, ", end='')
+        self.mats_ingresadas[nombre] = (self.pedir_matriz(es_aumentada, nombre), es_aumentada)
+        print(f"\nMatriz agregada exitosamente!")
+        
+        match input("¿Desea agregar otra matriz? (s/n) ").strip().lower():
+            case 's': return self.agregar_matriz()
+            case 'n': input("Regresando al menú de matrices...")
+            case _: input("Opción inválida! Regresando al menú de matrices...")
+        return self.mats_ingresadas
 
-    return None
+    def pedir_matriz(self, es_aumentada=True, nombre='M') -> Mat:
+        M = []
+        mensaje = ["ecuaciones", "variables"] if es_aumentada else ["filas", "columnas"]
+        print(f"\nDatos de la matriz {nombre}:")
+        print("----------------------------")
 
-def validar_matriz(M: Matriz) -> bool:
-    consistente = validar_consistencia(M)
-    if not consistente[0]:
-        imprimir_soluciones(M, unica=False, libres=None, validacion=consistente)
-        return False
-    else: return True
+        try:
+            filas = int(input(f"Ingrese el número de {mensaje[0]}: "))
+            if filas <= 0: raise ValueError
+            columnas = int(input(f"Ingrese el número de {mensaje[1]}: "))
+            if columnas <= 0: raise ValueError
+        except ValueError:
+            input("Error: Ingrese un número entero positivo!")
+            return self.pedir_matriz(es_aumentada, nombre)
+        
+        fila_actual = 0
+        if es_aumentada: columnas += 1
+
+        while fila_actual < filas:
+            columna_actual = 0
+            fila = []
+            print(f"\nFila {fila_actual+1}:")
+            while columna_actual < columnas: 
+                try:
+                    if not es_aumentada or columna_actual != columnas-1: mensaje = f"-> X{columna_actual+1} = "
+                    else: mensaje = "-> b = "
+                    elemento = Fraction(input(mensaje).strip()).limit_denominator(100)
+                    fila.append(elemento)
+                    columna_actual += 1
+                except ValueError: input("\nError: Ingrese un número real!\n")
+                except ZeroDivisionError: input("\nError: El denominador no puede ser cero!\n")
+            fila_actual += 1
+            M.append(fila)
+
+        return M
+
+    def seleccionar_matriz(self, es_sistema=False) -> List[str] | None:
+        if not self.vals.validar_mats(self.mats_ingresadas): return None
+        if es_sistema: mensaje = "\n¿Cuál matriz desea resolver? "
+        else: mensaje = "\n¿Cuáles matrices desea seleccionar? (nombres separados por comas) "
+
+        try:
+            limpiar_pantalla()
+            self.imprimir_matrices()
+            input_mats = input(mensaje).strip().split(',')
+            for mat in input_mats:
+                if mat not in self.mats_ingresadas: raise KeyError(mat)
+            
+            if not es_sistema and len(input_mats) != 2: raise ValueError("Error: Debe seleccionar dos matrices!")
+            elif es_sistema and len(input_mats) != 1: raise ValueError("Error: Solo debe seleccionar una matriz!")
+            elif es_sistema and not self.mats_ingresadas[input_mats[0]][1]: raise ValueError("Error: La matriz seleccionada no es aumentada!")
+            elif not es_sistema and self.mats_ingresadas[input_mats[0][1]] or self.mats_ingresadas[input_mats[1][1]]:
+                raise ValueError("Error: Las matrices seleccionadas no pueden ser aumentadas!")
+        except KeyError as k:
+            input(f"Error: La matriz '{k}' no existe!")
+            return self.seleccionar_matriz(es_sistema)
+        except ValueError as v:
+            input(v)
+            return self.seleccionar_matriz(es_sistema)
+        if es_sistema: return input_mats[0]
+        else: return input_mats
+
+    def suma_resta_matrices(self) -> Mat:
+        A, B = self.seleccionar_matriz()
+        filas_A = len(A)
+        filas_B = len(B)
+        columnas_A = len(A[0])
+        columnas_B = len(B[0])
+
+        if filas_A != filas_B or columnas_A != columnas_B:
+            input("\nError: Las matrices deben tener las mismas dimensiones!")
+            return None
+        
+        option = input("\n¿Desea sumar o restar las matrices? (+/-) ").strip()
+        if option not in ('+', '-'):
+            input("Error: Ingrese un operador válido!")
+            return None
+        
+        limpiar_pantalla()
+        print("\nMatriz A:")
+        self.imprimir_matriz(A, es_aumentada=False)
+        print("\nMatriz B:")
+        self.imprimir_matriz(B, es_aumentada=False)
+
+        if option == '+': C = [[A[i][j] + B[i][j] for j in range(len(columnas_A))] for i in range(filas_A)]
+        elif option == '-': C = [[A[i][j] - B[i][j] for j in range(len(columnas_A))] for i in range(filas_A)]
+
+        print(f"\nMatriz A {option} B:")
+        self.imprimir_matriz(C, es_aumentada=False)
+        input("\nPresione cualquier tecla para continuar...")
+        return C
+
+    def mult_matrices(self) -> Mat:
+        A, B = self.seleccionar_matriz()
+        filas_A = len(A)
+        filas_B = len(B)
+        columnas_A = len(A[0])
+        columnas_B = len(B[0])
+
+        if columnas_A != filas_B:
+            input("\nError: El número de columnas de A debe ser igual al número de filas de B!")
+            return None
+
+        limpiar_pantalla()
+        print("\nMatriz A:")
+        self.imprimir_matriz(A, es_aumentada=False)
+        print("\nMatriz B:")
+        self.imprimir_matriz(B, es_aumentada=False)
+
+        C = [[0 for _ in range(len(columnas_B))] for _ in range(filas_A)]
+        for i in range(filas_A):
+            for j in range(len(columnas_B)):
+                for k in range(filas_A):
+                    C[i][j] += A[i][k] * B[k][j]
+
+        print("\nA * B:")
+        self.imprimir_matriz(C, es_aumentada=False)
+        input("\nPresione cualquier tecla para continuar...")
+        return C
