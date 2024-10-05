@@ -31,7 +31,9 @@ class SistemaEcuaciones:
         if test_inicial != -1:
             self.imprimir_soluciones(M, unica=False, libres=[], validacion=(False, test_inicial))
             return None
-        elif self.vals.validar_escalonada_reducida(M): return M
+        elif self.vals.validar_escalonada_reducida(M):
+            print("\nMatriz ya esta en su forma escalonada reducida!")
+            return M
 
         print("\nMatriz inicial:")
         self.mat.imprimir_matriz(M)

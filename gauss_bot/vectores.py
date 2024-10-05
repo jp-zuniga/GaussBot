@@ -91,7 +91,7 @@ class Vector:
     def agregar_vector(self) -> DictVectores:
         try:
             limpiar_pantalla()
-            nombre = input("Ingrese el nombre del vector (una letra minúscula): ").strip().lower()
+            nombre = input("\nIngrese el nombre del vector (una letra minúscula): ").strip().lower()
             if not nombre.isalpha() or len(nombre) != 1: raise NameError
             if nombre in self.vecs_ingresados: raise KeyError
             longitud = int(input(f"¿Cuántas dimensiones tendrá el vector? ").strip())

@@ -1,6 +1,6 @@
 from fractions import Fraction
-from typing import List
 from copy import deepcopy
+from typing import List
 from utils import Mat, DictMatrices, limpiar_pantalla
 
 # funciones para realizar operaciones con matrices
@@ -81,21 +81,21 @@ class Matriz:
                     continue
                 case 2:
                     from sistemas_ecuaciones import SistemaEcuaciones
-                    nombre_mat = self.seleccionar_matriz(es_sistema=True)
-                    nombre_mat_resuelta = f"{nombre_mat}(r)"
+                    nombre_mat = self.seleccionar_matriz('r')
+                    nombre_mat_resuelta = f"{nombre_mat}_r"
                     M = deepcopy(self.mats_ingresadas[nombre_mat][0])
                     M = SistemaEcuaciones().resolver_sistema(M)
-                    if M is not None: self.mats_ingresadas[nombre_mat_resuelta] = [M, True]
+
+                    matriz_existe = any(M == mat[0] for mat in self.mats_ingresadas.values())
+                    if not matriz_existe:
+                        self.mats_ingresadas[nombre_mat_resuelta] = [M, True]
+
                     match input("\n¿Desea resolver otra matriz? (s/n) ").strip().lower():
                         case 's': continue
-                        case 'n':
-                            input("De acuerdo! Regresando al menú de matrices...")
-                            option = self.menu_matrices()
-                            continue
-                        case _:
-                            input("Opción inválida! Regresando al menú de matrices...")
-                            option = self.menu_matrices()
-                            continue
+                        case 'n': input("De acuerdo! Regresando al menú de matrices...")
+                        case _: input("Opción inválida! Regresando al menú de matrices...")
+                    option = self.menu_matrices()
+                    continue
                 case 3:
                     limpiar_pantalla()
                     self.suma_resta_matrices()
@@ -106,7 +106,19 @@ class Matriz:
                     self.mult_matrices()
                     option = self.menu_matrices()
                     continue
-                case 5: break
+                case 5:
+                    nombre_mat = self.seleccionar_matriz('t')
+                    nombre_mat_resuelta = f"{nombre_mat}_t"
+                    copia = deepcopy(self.mats_ingresadas[nombre_mat])
+                    M = self.transponer(copia[0], copia[1])
+
+                    matriz_existe = any(M == mat[0] for mat in self.mats_ingresadas.values())
+                    if not matriz_existe:
+                        self.mats_ingresadas[nombre_mat_resuelta] = [M, copia[1]]
+
+                    input("\nPresione cualquier tecla para continuar...")
+                    option = self.menu_matrices()
+                    continue
                 case 6: break
                 case _:
                     input("Opción inválida! Por favor, intente de nuevo...")
@@ -118,7 +130,7 @@ class Matriz:
     def agregar_matriz(self) -> DictMatrices:
         try:
             limpiar_pantalla()
-            nombre = input("Ingrese el nombre de la matriz (una letra mayúscula): ").strip().upper()
+            nombre = input("\nIngrese el nombre de la matriz (una letra mayúscula): ").strip().upper()
             if not nombre.isalpha() or len(nombre) != 1: raise NameError
             if nombre in self.mats_ingresadas: raise KeyError
             match input("¿Se ingresará una matriz aumentada? (s/n) ").strip().lower():
@@ -180,33 +192,45 @@ class Matriz:
 
         return M
 
-    def seleccionar_matriz(self, es_sistema=False) -> List[str] | None:
+    def seleccionar_matriz(self, operacion: str) -> List[str] | None:
         if not self.vals.validar_mats(self.mats_ingresadas): return None
+        es_sistema = transponer = mult_suma_resta = False
+        if operacion == 'r': es_sistema = True
+        elif operacion == 't': transponer = True
+        elif operacion == "msr": mult_suma_resta = True
+
+        mensaje = ""
         if es_sistema: mensaje = "\n¿Cuál matriz desea resolver? "
-        else: mensaje = "\n¿Cuáles matrices desea seleccionar? (nombres separados por comas) "
+        elif transponer: mensaje = "\n¿Cuál matriz desea transponer? "
+        elif mult_suma_resta: mensaje = "\n¿Cuáles matrices desea seleccionar? (nombres separados por comas) "
 
         try:
             limpiar_pantalla()
             self.imprimir_matrices()
             input_mats = input(mensaje).strip().split(',')
-            mat = next((mat for mat in input_mats if mat not in self.mats_ingresadas), None)
-            if mat is not None: raise KeyError(mat)
             aumentadas = all(self.mats_ingresadas[mat][1] for mat in input_mats)
-            
-            if not es_sistema and len(input_mats) != 2: raise ValueError("Error: Debe seleccionar dos matrices!")
-            elif es_sistema and len(input_mats) != 1: raise ValueError("Error: Solo debe seleccionar una matriz!")
-            elif es_sistema and not aumentadas: raise ValueError("Error: La matriz seleccionada no es aumentada!")
+            mat = next((mat for mat in input_mats if mat not in self.mats_ingresadas), None)
+
+            if mat is not None:
+                raise KeyError(mat)
+            elif mult_suma_resta and len(input_mats) != 2:
+                raise ValueError("Error: Debe seleccionar dos matrices!")
+            elif (es_sistema or transponer) and len(input_mats) != 1:
+                raise ValueError("Error: Solo debe seleccionar una matriz!")
+            elif es_sistema and not aumentadas:
+                raise ValueError("Error: La matriz seleccionada no es aumentada!")
         except KeyError as k:
             input(f"Error: La matriz {k} no existe!")
-            return self.seleccionar_matriz(es_sistema)
+            return self.seleccionar_matriz(operacion)
         except ValueError as v:
             input(v)
-            return self.seleccionar_matriz(es_sistema)
-        if es_sistema: return input_mats[0]
+            return self.seleccionar_matriz(operacion)
+        
+        if es_sistema or transponer: return input_mats[0]
         else: return input_mats
 
     def suma_resta_matrices(self) -> Mat:
-        inputs = self.seleccionar_matriz()
+        inputs = self.seleccionar_matriz("msr")
         A, B = self.mats_ingresadas[inputs[0]][0], self.mats_ingresadas[inputs[1]][0]
         filas_A = len(A)
         filas_B = len(B)
@@ -217,34 +241,34 @@ class Matriz:
             input("\nError: Las matrices deben tener las mismas dimensiones!")
             return None
         
-        option = input("\n¿Desea sumar o restar las matrices? (+/-) ").strip()
-        if option not in ('+', '-'):
+        operacion = input("\n¿Desea sumar o restar las matrices? (+/-) ").strip()
+        if operacion not in ('+', '-'):
             input("Error: Ingrese un operador válido!")
             return None
         
         limpiar_pantalla()
-        print("\nMatriz A:")
+        print(f"\n{inputs[0]}:")
         self.imprimir_matriz(A, es_aumentada=False)
-        print("\nMatriz B:")
+        print(f"\n{inputs[1]}:")
         self.imprimir_matriz(B, es_aumentada=False)
 
-        if option == '+': C = [[A[i][j] + B[i][j] for j in range(columnas_A)] for i in range(filas_A)]
-        elif option == '-': C = [[A[i][j] - B[i][j] for j in range(columnas_A)] for i in range(filas_A)]
+        if operacion == '+': C = [[A[i][j] + B[i][j] for j in range(columnas_A)] for i in range(filas_A)]
+        elif operacion == '-': C = [[A[i][j] - B[i][j] for j in range(columnas_A)] for i in range(filas_A)]
 
-        print(f"\nMatriz A {option} B:")
+        print(f"\nM{inputs[0]} {operacion} {inputs[1]}:")
         self.imprimir_matriz(C, es_aumentada=False)
         input("\nPresione cualquier tecla para continuar...")
         return C
 
     def mult_matrices(self) -> Mat:
-        inputs = self.seleccionar_matriz()
+        inputs = self.seleccionar_matriz("msr")
         A, B = self.mats_ingresadas[inputs[0]][0], self.mats_ingresadas[inputs[1]][0]
         filas_A = len(A)
         filas_B = len(B)
         columnas_A = len(A[0])
         columnas_B = len(B[0])
 
-        if columnas_A != filas_B:
+        if columnas_A != filas_B or columnas_B != filas_A:
             input(f"\nError: El número de columnas de {inputs[0]} debe ser igual al número de filas de {inputs[1]}!")
             return None
 
@@ -257,10 +281,23 @@ class Matriz:
         C = [[0 for _ in range(columnas_B)] for _ in range(filas_A)]
         for i in range(filas_A):
             for j in range(columnas_B):
-                for k in range(filas_A):
+                for k in range(columnas_A):
                     C[i][j] += A[i][k] * B[k][j]
 
         print(f"\n{inputs[0]} * {inputs[1]}:")
         self.imprimir_matriz(C, es_aumentada=False)
         input("\nPresione cualquier tecla para continuar...")
         return C
+    
+    def transponer(self, M: Mat, es_aumentada: bool) -> Mat:
+        filas = len(M)
+        columnas = len(M[0])
+
+        M_t = [[0 for _ in range(filas)] for _ in range(columnas)]
+        for i in range(filas):
+            for j in range(columnas):
+                M_t[j][i] = M[i][j]
+
+        print(f"\nTransposición:")
+        self.imprimir_matriz(M_t, es_aumentada)
+        return M_t

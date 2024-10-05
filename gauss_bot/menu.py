@@ -7,9 +7,9 @@ from utils import limpiar_pantalla
 
 def imprimir_menu() -> int:
     limpiar_pantalla()
-    print("\n######################")
-    print("### Menú Principal ###")
-    print("######################\n")
+    print("\n################")
+    print("### GaussBot ###")
+    print("################\n")
     print("1. Operaciones de matrices")
     print("2. Operaciones de vectores")
     print("3. Cerrar programa")
