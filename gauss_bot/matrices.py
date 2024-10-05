@@ -16,25 +16,26 @@ class Matriz:
         filas = len(M)
         columnas = len(M[0])
 
-        # calcular la longitud maxima de los elementos para alinearlos y siempre mantener el formato:
-        # - crear una lista de las longitudes de todos los elementos de la matriz
-        # - encontrar la longitud maxima en esa lista con max()
+        # calcular la longitud maxima de los elementos para alinearlos
         max_len = max(len(str(M[i][j].limit_denominator(100))) for i in range(filas) for j in range(columnas))
         for i in range(filas):
             for j in range(columnas):
-                # convertir el elemento actual a un string y ajustarlo a la derecha de la longitud maxima
+                # convertir el elemento actual a un string y centrarlo la longitud maxima
                 elemento = str(M[i][j].limit_denominator(100)).center(max_len)
 
-                # si es el primer elemento, imprimir el ( y una coma despues del elemento
-                if j == 0: print(f"( {elemento}, ", end='')
+                # si es el primer y ultimo elemento abrir y cerrar parentesis
+                if j == 0 and j == columnas-1: print(f"( {elemento} )")
 
-                # si es aumentada y j es el penultimo elemento, imprimir el | para separar las columnas
+                # si solo es el primer elemento, imprimir el ( y una coma
+                elif j == 0: print(f"( {elemento}, ", end='')
+
+                # si j es el penultimo elemento y la matriz es aumentada, imprimir un | para separar las columnas
                 elif j == columnas-2 and es_aumentada: print(f"{elemento} |", end=' ')
 
                 # si el es el ultimo elemento, cerrar el )
                 elif j == columnas-1: print(f"{elemento} )")
 
-                # si es un elemento en medio, solo imprimir la coma despues del elemento    
+                # si es un elemento en medio, solo imprimir la coma  
                 else: print(f"{elemento}, ", end='')
 
         return None
@@ -173,7 +174,6 @@ class Matriz:
         
         fila_actual = 0
         if es_aumentada: columnas += 1
-
         while fila_actual < filas:
             columna_actual = 0
             fila = []
@@ -268,7 +268,7 @@ class Matriz:
         columnas_A = len(A[0])
         columnas_B = len(B[0])
 
-        if columnas_A != filas_B or columnas_B != filas_A:
+        if columnas_A != filas_B:
             input(f"\nError: El número de columnas de {inputs[0]} debe ser igual al número de filas de {inputs[1]}!")
             return None
 

@@ -17,7 +17,7 @@ class SistemaEcuaciones:
         
         libres = self.vals.encontrar_variables_libres(M)
         if self.vals.validar_escalonada_reducida(M) and not libres: # solucion unica:
-            self.imprimir_soluciones(M, unica=True, libres=None, validacion=(True, None))
+            self.imprimir_soluciones(M, unica=True, libres=[], validacion=(True, None))
             return M
         
         # solucion general:
@@ -145,18 +145,13 @@ class SistemaEcuaciones:
         if solucion and unica and not libres:
             solucion_trivial = all(M[i][-1] == 0 for i in range(filas))
 
+        mensaje_solucion = "trivial" if solucion_trivial else "no trivial"
         if not solucion:
             print(f"\n| En F{fila_inconsistente+1}: 0 != {str(M[fila_inconsistente][-1].limit_denominator(100))}")
             input("| Sistema es inconsistente!")
             return None
-        elif unica and not solucion_trivial:
-            print("\n| Solución no trivial encontrada:")
-            for i in range(filas):
-                if all(x == 0 for x in M[i]): continue
-                print(f"| X{i+1} = {str(M[i][-1].limit_denominator(100))}")
-            return None
-        elif unica and solucion_trivial:
-            print("\n| Solución trivial encontrada:")
+        elif unica:
+            print(f"\n| Solución {mensaje_solucion} encontrada:")
             for i in range(filas):
                 if all(x == 0 for x in M[i]): continue
                 print(f"| X{i+1} = {str(M[i][-1].limit_denominator(100))}")

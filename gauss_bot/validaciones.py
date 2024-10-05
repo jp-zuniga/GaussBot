@@ -22,7 +22,7 @@ class Validaciones:
         return True
 
     @staticmethod
-    def encontrar_variables_libres(M: Mat) -> List[int | None]:
+    def encontrar_variables_libres(M: Mat) -> List[int]:
         filas = len(M)
         columnas = len(M[0])
         entradas = []
