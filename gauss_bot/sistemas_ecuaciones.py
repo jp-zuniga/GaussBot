@@ -1,3 +1,4 @@
+from fractions import Fraction
 from utils import List, Mat, Validacion, limpiar_pantalla
 
 # funciones para resolver sistemas de ecuaciones con matrices
@@ -10,18 +11,18 @@ class SistemaEcuaciones:
         self.mat = Matriz()
         self.vals = Validaciones()
 
-    def resolver_sistema(self, M: Mat) -> Mat:
+    def resolver_sistema(self, M: Mat) -> Mat | None:
         limpiar_pantalla()
         M = self.reducir_matriz(M)
         if not M: return None
         
         libres = self.vals.encontrar_variables_libres(M)
         if self.vals.validar_escalonada_reducida(M) and not libres: # solucion unica:
-            self.imprimir_soluciones(M, unica=True, libres=[], validacion=(True, None))
+            self.imprimir_soluciones(M, unica=True, libres=[], validacion=(True, -1))
             return M
         
         # solucion general:
-        self.imprimir_soluciones(M, unica=False, libres=libres, validacion=(True, None))
+        self.imprimir_soluciones(M, unica=False, libres=libres, validacion=(True, -1))
         return M
 
     def reducir_matriz(self, M: Mat) -> Mat:
@@ -30,7 +31,7 @@ class SistemaEcuaciones:
         test_inicial = self.vals.validar_matriz(M)
         if test_inicial != -1:
             self.imprimir_soluciones(M, unica=False, libres=[], validacion=(False, test_inicial))
-            return None
+            return []
         elif self.vals.validar_escalonada_reducida(M):
             print("\nMatriz ya esta en su forma escalonada reducida!")
             return M
@@ -43,7 +44,7 @@ class SistemaEcuaciones:
         fila_actual = 0
         for j in range(columnas-1):
             fila_pivote = None
-            maximo = 0
+            maximo = Fraction(0)
 
             # buscar la entrada con el valor mas grande para usarla como pivote
             for i in range(fila_actual, filas):
@@ -105,15 +106,15 @@ class SistemaEcuaciones:
         test_final = self.vals.validar_matriz(M)
         if test_final != -1:
             self.imprimir_soluciones(M, unica=False, libres=[], validacion=(False, test_inicial))
-            return None
+            return []
         return M
 
     def despejar_variables(self, M: Mat, libres: List[int]) -> List[str]:
         filas = len(M)
         columnas = len(M[0])
         ecuaciones = []
-        for variable in libres:
-            ecuaciones.append(f"| X{variable+1} es libre")
+        for x in libres:
+            ecuaciones.append(f"| X{x+1} es libre")
         
         for i in range(filas):
             for j in range(columnas-1):
@@ -139,14 +140,14 @@ class SistemaEcuaciones:
         ecuaciones.sort(key=lambda x: x[3])
         return ecuaciones
 
-    def imprimir_soluciones(self, M: Mat, unica: bool, libres: List[int | None], validacion: Validacion) -> None:
+    def imprimir_soluciones(self, M: Mat, unica: bool, libres: List[int], validacion: Validacion) -> None:
         filas = len(M)
         solucion, fila_inconsistente = validacion
         if solucion and unica and not libres:
             solucion_trivial = all(M[i][-1] == 0 for i in range(filas))
 
         mensaje_solucion = "trivial" if solucion_trivial else "no trivial"
-        if not solucion:
+        if not solucion and fila_inconsistente != -1:
             print(f"\n| En F{fila_inconsistente+1}: 0 != {str(M[fila_inconsistente][-1].limit_denominator(100))}")
             input("| Sistema es inconsistente!")
             return None

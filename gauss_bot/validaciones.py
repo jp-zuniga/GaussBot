@@ -49,7 +49,7 @@ class Validaciones:
             if [0 for _ in range(len(M[0]) - 1)] == M[i][:-1] and M[i][-1] != 0:
                 return (False, i) # tambien retornar el indice de la fila para imprimir el mensaje de error
 
-        return (True, None) # si no se ha retornado False, entonces la matriz es consistente
+        return (True, -1) # si no se ha retornado False, entonces la matriz es consistente
 
     @staticmethod
     def validar_escalonada(M: Mat) -> bool:

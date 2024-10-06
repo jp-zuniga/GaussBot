@@ -173,7 +173,7 @@ class Vector:
         input(f"\n{vec1}.{vec2} = {str(producto_punto)}")
         return self.vecs_ingresados
 
-    def input_suma_resta(self, option: bool, es_matricial=False) -> None:
+    def input_suma_resta(self, option: bool, es_matricial=False) -> List[str]:
         if not self.vals.validar_vecs(self.vecs_ingresados): return self.vecs_ingresados
         try:
             limpiar_pantalla()
@@ -210,10 +210,10 @@ class Vector:
             else: mensaje += i
 
         input(f"\n{mensaje} = {[str(num.limit_denominator(100)) for num in resultado]}")
-        return None
+        return []
 
     def sumar_vectores(self, input_vecs: List[str]) -> Vec:
-        suma_vecs = [0 for _ in self.vecs_ingresados[input_vecs[0]]]
+        suma_vecs = [Fraction(0) for _ in self.vecs_ingresados[input_vecs[0]]]
         for i in range(len(suma_vecs)):
             for j in input_vecs:
                 suma_vecs[i] += self.vecs_ingresados[j][i]
@@ -229,7 +229,7 @@ class Vector:
         return resta_vecs
 
     def matriz_por_suma_vectores(self) -> Mat:
-        if not self.vals.validar_vecs(self.vecs_ingresados): return None
+        if not self.vals.validar_vecs(self.vecs_ingresados): return []
         A = self.mat.pedir_matriz(es_aumentada=False, nombre='A')
         limpiar_pantalla()
         input_vecs = self.input_suma_resta(option=True, es_matricial=True) # pedir los vectores

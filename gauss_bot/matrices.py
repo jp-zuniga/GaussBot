@@ -180,9 +180,9 @@ class Matriz:
             print(f"\nFila {fila_actual+1}:")
             while columna_actual < columnas: 
                 try:
-                    if not es_aumentada or columna_actual != columnas-1: mensaje = f"-> X{columna_actual+1} = "
-                    else: mensaje = "-> b = "
-                    elemento = Fraction(input(mensaje).strip()).limit_denominator(100)
+                    if not es_aumentada or columna_actual != columnas-1: valor = f"-> X{columna_actual+1} = "
+                    else: valor = "-> b = "
+                    elemento = Fraction(input(valor).strip()).limit_denominator(100)
                     fila.append(elemento)
                     columna_actual += 1
                 except ValueError: input("\nError: Ingrese un número real!"); print()
@@ -192,8 +192,8 @@ class Matriz:
 
         return M
 
-    def seleccionar_matriz(self, operacion: str) -> List[str] | None:
-        if not self.vals.validar_mats(self.mats_ingresadas): return None
+    def seleccionar_matriz(self, operacion: str) -> str | List[str]:
+        if not self.vals.validar_mats(self.mats_ingresadas): return []
         es_sistema = transponer = mult_suma_resta = False
         if operacion == 'r': es_sistema = True
         elif operacion == 't': transponer = True
@@ -229,7 +229,7 @@ class Matriz:
         if es_sistema or transponer: return input_mats[0]
         else: return input_mats
 
-    def suma_resta_matrices(self) -> Mat:
+    def suma_resta_matrices(self) -> Mat | None:
         inputs = self.seleccionar_matriz("msr")
         A, B = self.mats_ingresadas[inputs[0]][0], self.mats_ingresadas[inputs[1]][0]
         filas_A = len(A)
@@ -260,7 +260,7 @@ class Matriz:
         input("\nPresione cualquier tecla para continuar...")
         return C
 
-    def mult_matrices(self) -> Mat:
+    def mult_matrices(self) -> Mat | None:
         inputs = self.seleccionar_matriz("msr")
         A, B = self.mats_ingresadas[inputs[0]][0], self.mats_ingresadas[inputs[1]][0]
         filas_A = len(A)
@@ -278,7 +278,7 @@ class Matriz:
         print(f"\n{inputs[1]}:")
         self.imprimir_matriz(B, es_aumentada=False)
 
-        C = [[0 for _ in range(columnas_B)] for _ in range(filas_A)]
+        C = [[Fraction(0) for _ in range(columnas_B)] for _ in range(filas_A)]
         for i in range(filas_A):
             for j in range(columnas_B):
                 for k in range(columnas_A):
@@ -293,7 +293,7 @@ class Matriz:
         filas = len(M)
         columnas = len(M[0])
 
-        M_t = [[0 for _ in range(filas)] for _ in range(columnas)]
+        M_t = [[Fraction(0) for _ in range(filas)] for _ in range(columnas)]
         for i in range(filas):
             for j in range(columnas):
                 M_t[j][i] = M[i][j]

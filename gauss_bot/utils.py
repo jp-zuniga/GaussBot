@@ -7,7 +7,7 @@ Vec = List[Fraction]
 Mat = List[List[Fraction]]
 DictMatrices = Dict[str, Tuple[Mat, bool]]
 DictVectores = Dict[str, Vec]
-Validacion = Tuple[bool, int | None]
+Validacion = Tuple[bool, int]
 
 # esta funcion se ocupa en todos los modulos
 def limpiar_pantalla() -> None:
