@@ -293,7 +293,7 @@ class Vector:
             return None
 
         # calcular Ax
-        resultado = [[0 for _ in range(len(x))] for _ in range(len(A))]
+        resultado = [[Fraction(0) for _ in range(len(x))] for _ in range(len(A))]
         for i in range(len(A)):
             for j in range(len(x)):
                 resultado[i][j] += A[i][j] * x[j]

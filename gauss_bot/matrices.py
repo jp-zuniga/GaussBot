@@ -1,10 +1,10 @@
 from fractions import Fraction
-from typing import List, Tuple
+from typing import Callable, Tuple, List
 from copy import deepcopy
 
 from utils import Mat, DictMatrices, limpiar_pantalla
-from sistemas_ecuaciones import resolver_sistema
-from validaciones import validar_mats
+from sistemas_ecuaciones import reducir_matriz, imprimir_soluciones
+from validaciones import validar_mats, validar_escalonada_reducida, encontrar_variables_libres
 
 
 class Matriz:
@@ -86,15 +86,7 @@ class Matriz:
                     option = self.menu_matrices()
                     continue
                 case 2:
-                    nombre_mat = self.seleccionar_matriz("r")
-                    nombre_mat_resuelta = f"{nombre_mat}_r"
-                    M = deepcopy(self.mats_ingresadas[nombre_mat][0])
-                    M = resolver_sistema(M)
-
-                    matriz_existe = any(M == mat[0] for mat in self.mats_ingresadas.values())
-                    if not matriz_existe:
-                        self.mats_ingresadas[nombre_mat_resuelta] = (M, True)
-
+                    self.procesar_operacion("r", self.resolver_sistema)
                     match input("\n¿Desea resolver otra matriz? (s/n) ").strip().lower():
                         case "s":
                             continue
@@ -105,24 +97,15 @@ class Matriz:
                     option = self.menu_matrices()
                     continue
                 case 3:
-                    self.suma_resta_matrices()
+                    self.procesar_operacion("msr", self.suma_resta_matrices)
                     option = self.menu_matrices()
                     continue
                 case 4:
-                    self.mult_matrices()
+                    self.procesar_operacion("msr", self.mult_matrices)
                     option = self.menu_matrices()
                     continue
                 case 5:
-                    nombre_mat = self.seleccionar_matriz("t")
-                    nombre_mat_resuelta = f"{nombre_mat}_t"
-                    copia = deepcopy(self.mats_ingresadas[nombre_mat])
-                    M = self.transponer(copia[0], copia[1])
-
-                    matriz_existe = any(M == mat[0] for mat in self.mats_ingresadas.values())
-                    if not matriz_existe:
-                        self.mats_ingresadas[nombre_mat_resuelta] = (M, copia[1])
-
-                    input("\nPresione cualquier tecla para continuar...")
+                    self.procesar_operacion("t", self.transponer)
                     option = self.menu_matrices()
                     continue
                 case 6:
@@ -276,6 +259,44 @@ class Matriz:
             return input_mats[0]
         else:
             return input_mats
+
+
+    def procesar_operacion(self, operacion: str, func: Callable) -> None:
+        match operacion:
+            case "msr":
+                func()
+                return None
+            case "r":
+                nombre_mat = self.seleccionar_matriz("r")
+                nombre_mat_modded = f"{nombre_mat}_r"
+            case "t":
+                nombre_mat = self.seleccionar_matriz("t")
+                nombre_mat_modded = f"{nombre_mat}_t"
+
+        copia = deepcopy(self.mats_ingresadas[nombre_mat])
+        modded_copia = func(copia[0], copia[1])
+
+        matriz_existe = any(modded_copia == mat[0] for mat in self.mats_ingresadas.values())
+        if not matriz_existe:
+            self.mats_ingresadas[nombre_mat_modded] = (modded_copia, copia[1])
+
+        input("\nPresione cualquier tecla para continuar...")
+        return None
+
+
+    def resolver_sistema(self, M: Mat, es_aumentada=True) -> Mat | None:
+        M = reducir_matriz(M)
+        if not M:
+            return None
+
+        libres = encontrar_variables_libres(M)
+        if validar_escalonada_reducida(M) and not libres:  # solucion unica:
+            imprimir_soluciones(M, unica=True, libres=[], validacion=(True, -1))
+            return M
+
+        # solucion general:
+        imprimir_soluciones(M, unica=False, libres=libres, validacion=(True, -1))
+        return M
 
 
     def suma_resta_matrices(self) -> Mat | None:

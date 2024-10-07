@@ -1,26 +1,7 @@
 from fractions import Fraction
 
 from utils import List, Mat, Validacion
-from validaciones import (
-    validar_matriz,
-    validar_escalonada_reducida,
-    encontrar_variables_libres,
-)
-
-
-def resolver_sistema(M: Mat) -> Mat | None:
-    M = reducir_matriz(M)
-    if not M:
-        return None
-
-    libres = encontrar_variables_libres(M)
-    if validar_escalonada_reducida(M) and not libres:  # solucion unica:
-        imprimir_soluciones(M, unica=True, libres=[], validacion=(True, -1))
-        return M
-
-    # solucion general:
-    imprimir_soluciones(M, unica=False, libres=libres, validacion=(True, -1))
-    return M
+from validaciones import validar_matriz, validar_escalonada_reducida
 
 
 def reducir_matriz(M: Mat) -> Mat:
