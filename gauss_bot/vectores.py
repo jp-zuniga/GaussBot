@@ -1,5 +1,6 @@
 from fractions import Fraction
 from typing import List
+from validaciones import validar_vecs
 from utils import Mat, Vec, DictVectores, limpiar_pantalla
 
 # funciones para realizar operaciones con vectores
@@ -8,13 +9,11 @@ from utils import Mat, Vec, DictVectores, limpiar_pantalla
 class Vector:
     def __init__(self):
         from matrices import Matriz
-        from validaciones import Validaciones
         self.mat = Matriz()
-        self.vals = Validaciones()
         self.vecs_ingresados = {}
 
     def imprimir_vectores(self, es_matricial=False) -> None:
-        if not self.vals.validar_vecs(self.vecs_ingresados): return None
+        if not validar_vecs(self.vecs_ingresados): return None
         mensaje = "seleccionados" if es_matricial else "ingresados"
         print(f"\nVectores {mensaje}:")
         print("---------------------------------------------")
@@ -126,7 +125,7 @@ class Vector:
         return vec
 
     def mult_escalar(self) -> DictVectores:
-        if not self.vals.validar_vecs(self.vecs_ingresados): return self.vecs_ingresados
+        if not validar_vecs(self.vecs_ingresados): return self.vecs_ingresados
         try:
             limpiar_pantalla()
             self.imprimir_vectores()
@@ -149,7 +148,7 @@ class Vector:
         return self.vecs_ingresados
 
     def mult_vectorial(self) -> DictVectores:
-        if not self.vals.validar_vecs(self.vecs_ingresados): return self.vecs_ingresados
+        if not validar_vecs(self.vecs_ingresados): return self.vecs_ingresados
         try:
             limpiar_pantalla()
             self.imprimir_vectores()
@@ -174,7 +173,7 @@ class Vector:
         return self.vecs_ingresados
 
     def input_suma_resta(self, option: bool, es_matricial=False) -> List[str]:
-        if not self.vals.validar_vecs(self.vecs_ingresados): return self.vecs_ingresados
+        if not validar_vecs(self.vecs_ingresados): return self.vecs_ingresados
         try:
             limpiar_pantalla()
             self.imprimir_vectores()
@@ -229,7 +228,7 @@ class Vector:
         return resta_vecs
 
     def matriz_por_suma_vectores(self) -> Mat:
-        if not self.vals.validar_vecs(self.vecs_ingresados): return []
+        if not validar_vecs(self.vecs_ingresados): return []
         A = self.mat.pedir_matriz(es_aumentada=False, nombre='A')
         limpiar_pantalla()
         input_vecs = self.input_suma_resta(option=True, es_matricial=True) # pedir los vectores

@@ -1,6 +1,7 @@
 from fractions import Fraction
 from copy import deepcopy
 from typing import List
+from validaciones import validar_mats
 from utils import Mat, DictMatrices, limpiar_pantalla
 
 # funciones para realizar operaciones con matrices
@@ -8,8 +9,6 @@ from utils import Mat, DictMatrices, limpiar_pantalla
 
 class Matriz:
     def __init__(self):
-        from validaciones import Validaciones
-        self.vals = Validaciones()
         self.mats_ingresadas = {}
 
     def imprimir_matriz(self, M: Mat, es_aumentada=True) -> None:
@@ -41,7 +40,7 @@ class Matriz:
         return None
 
     def imprimir_matrices(self) -> None:
-        if not self.vals.validar_mats(self.mats_ingresadas): return None
+        if not validar_mats(self.mats_ingresadas): return None
         print("\nMatrices guardadas:")
         print("---------------------------------------------", end='')
         for nombre, mat in self.mats_ingresadas.items():
@@ -193,7 +192,7 @@ class Matriz:
         return M
 
     def seleccionar_matriz(self, operacion: str) -> str | List[str]:
-        if not self.vals.validar_mats(self.mats_ingresadas): return []
+        if not validar_mats(self.mats_ingresadas): return []
         es_sistema = transponer = mult_suma_resta = False
         if operacion == 'r': es_sistema = True
         elif operacion == 't': transponer = True

@@ -1,4 +1,5 @@
 from fractions import Fraction
+from validaciones import validar_matriz, validar_escalonada_reducida, encontrar_variables_libres
 from utils import List, Mat, Validacion, limpiar_pantalla
 
 # funciones para resolver sistemas de ecuaciones con matrices
@@ -7,17 +8,15 @@ from utils import List, Mat, Validacion, limpiar_pantalla
 class SistemaEcuaciones:
     def __init__(self):
         from matrices import Matriz
-        from validaciones import Validaciones
         self.mat = Matriz()
-        self.vals = Validaciones()
 
     def resolver_sistema(self, M: Mat) -> Mat | None:
         limpiar_pantalla()
         M = self.reducir_matriz(M)
         if not M: return None
         
-        libres = self.vals.encontrar_variables_libres(M)
-        if self.vals.validar_escalonada_reducida(M) and not libres: # solucion unica:
+        libres = encontrar_variables_libres(M)
+        if validar_escalonada_reducida(M) and not libres: # solucion unica:
             self.imprimir_soluciones(M, unica=True, libres=[], validacion=(True, -1))
             return M
         
@@ -28,11 +27,11 @@ class SistemaEcuaciones:
     def reducir_matriz(self, M: Mat) -> Mat:
         filas = len(M)
         columnas = len(M[0])
-        test_inicial = self.vals.validar_matriz(M)
+        test_inicial = validar_matriz(M)
         if test_inicial != -1:
             self.imprimir_soluciones(M, unica=False, libres=[], validacion=(False, test_inicial))
             return []
-        elif self.vals.validar_escalonada_reducida(M):
+        elif validar_escalonada_reducida(M):
             print("\nMatriz ya esta en su forma escalonada reducida!")
             return M
 
@@ -103,7 +102,7 @@ class SistemaEcuaciones:
                 self.mat.imprimir_matriz(M)
 
         # validar si la matriz resultante es consistente
-        test_final = self.vals.validar_matriz(M)
+        test_final = validar_matriz(M)
         if test_final != -1:
             self.imprimir_soluciones(M, unica=False, libres=[], validacion=(False, test_inicial))
             return []
