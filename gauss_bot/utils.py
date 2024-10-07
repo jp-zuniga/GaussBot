@@ -11,6 +11,6 @@ Validacion = Tuple[bool, int]
 
 # esta funcion se ocupa en todos los modulos
 def limpiar_pantalla() -> None:
-    command = "cls" if os.name == "nt" else "clear"
-    os.system(command)
-    return None
+	command = "cls" if os.name == "nt" else "clear"
+	os.system(command)
+	return None
