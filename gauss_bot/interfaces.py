@@ -1,11 +1,10 @@
-from os import path
 from PyQt6.QtWidgets import (
     QApplication, QMainWindow,
     QWidget, QVBoxLayout,
-    QPushButton, QLabel,
+    QPushButton, QLabel, QStackedWidget
 )
 
-from PyQt6.QtGui import QFont, QIcon
+from PyQt6.QtGui import QFont
 from PyQt6.QtCore import Qt
 
 from matrices import OperacionesMatrices
@@ -32,7 +31,6 @@ STYLESHEET = """
     }
 """
 
-
 class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
@@ -40,14 +38,27 @@ class MainWindow(QMainWindow):
         self.setWindowTitle("GaussBot")
         self.setGeometry(100, 100, 800, 600)
 
-        central_widget = QWidget()
-        self.setCentralWidget(central_widget)
+        self.central_widget = QStackedWidget()
+        self.setCentralWidget(self.central_widget)
 
-        layout = QVBoxLayout()
-        central_widget.setLayout(layout)
+        self.main_menu_widget = MainMenuWidget(self)
+        self.menu_matriz = MenuMatriz(self)
+        self.menu_vector = MenuVector(self)
 
-        main_menu_widget = MainMenuWidget()
-        layout.addWidget(main_menu_widget)
+        self.central_widget.addWidget(self.main_menu_widget)
+        self.central_widget.addWidget(self.menu_matriz)
+        self.central_widget.addWidget(self.menu_vector)
+
+        self.central_widget.setCurrentWidget(self.main_menu_widget)
+
+    def show_main_menu(self):
+        self.central_widget.setCurrentWidget(self.main_menu_widget)
+
+    def show_menu_matriz(self):
+        self.central_widget.setCurrentWidget(self.menu_matriz)
+
+    def show_menu_vector(self):
+        self.central_widget.setCurrentWidget(self.menu_vector)
 
 
 class MainMenuWidget(QWidget):
@@ -66,34 +77,19 @@ class MainMenuWidget(QWidget):
         layout.addWidget(title_label)
 
         matrices_button = QPushButton("Menú de Matrices")
-        # matrices_button.setIcon(QIcon(path.join('gauss_bot', 'icons', 'matrices.png')))
         matrices_button.setStyleSheet("QPushButton { font-size: 18px; padding: 10px; }")
-        matrices_button.clicked.connect(self.operaciones_matrices)
+        matrices_button.clicked.connect(parent.show_menu_matriz)
         layout.addWidget(matrices_button)
 
         vectores_button = QPushButton("Menú de Vectores")
-        # vectores_button.setIcon(QIcon(path.join('gauss_bot', 'icons', 'vectores.png')))
         vectores_button.setStyleSheet("QPushButton { font-size: 18px; padding: 10px; }")
-        vectores_button.clicked.connect(self.operaciones_vectores)
+        vectores_button.clicked.connect(parent.show_menu_vector)
         layout.addWidget(vectores_button)
 
         close_button = QPushButton("Cerrar")
-        # close_button.setIcon(QIcon(path.join('gauss_bot', 'icons', 'close.png')))
         close_button.setStyleSheet("QPushButton { font-size: 18px; padding: 10px; }")
-        close_button.clicked.connect(self.close_program)
+        close_button.clicked.connect(parent.close)
         layout.addWidget(close_button)
-
-
-    def operaciones_matrices(self):
-        self.menu_matriz = MenuMatriz()
-        self.menu_matriz.show()
-
-    def operaciones_vectores(self):
-        self.menu_vector = MenuVector()
-        self.menu_vector.show()
-
-    def close_program(self):
-        self.close()
 
 
 class MenuMatriz(QWidget):
@@ -112,7 +108,6 @@ class MenuMatriz(QWidget):
         label.setAlignment(Qt.AlignmentFlag.AlignCenter)
         layout.addWidget(label)
 
-        # Add buttons for matrix operations
         operations = [
             ("Mostrar matrices", self.op_mats.imprimir_matrices),
             ("Agregar matriz", self.op_mats.agregar_matriz),
@@ -120,7 +115,7 @@ class MenuMatriz(QWidget):
             ("Suma y resta de matrices", self.op_mats.suma_resta_matrices),
             ("Multiplicación de matrices", self.op_mats.mult_matrices),
             ("Transposición de matrices", self.op_mats.transponer),
-            ("Regresar al menú principal", self.close)
+            ("Regresar al menú principal", parent.show_main_menu)
         ]
 
         for op_name, op_method in operations:
@@ -153,7 +148,7 @@ class MenuVector(QWidget):
             ("Multiplicación escalar", self.op_vecs.mult_escalar),
             ("Producto punto", self.op_vecs.mult_vectorial),
             ("Producto matriz-vector", self.op_vecs.mult_matriz_vector),
-            ("Regresar al menú principal", self.close)
+            ("Regresar al menú principal", parent.show_main_menu)
         ]
 
         for op_name, op_method in operations:
