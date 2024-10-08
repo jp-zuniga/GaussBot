@@ -1,22 +1,22 @@
-from matrices import Matriz
-from vectores import Vector
+from matrices import OperacionesMatrices
+from vectores import OperacionesVectores
 
 from utils import limpiar_pantalla
 
 
 def main() -> None:
-    mat = Matriz()
-    vec = Vector()
+    mat = OperacionesMatrices()
+    vec = OperacionesVectores()
     option = main_menu()
 
     while option != 4:
         match option:
             case 1:
-                mat.main_matriciales()
+                mat.main_matrices()
                 option = main_menu()
                 continue
             case 2:
-                vec.main_vectoriales()
+                vec.main_vectores()
                 option = main_menu()
                 continue
             case 3:

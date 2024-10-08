@@ -8,8 +8,8 @@ from PyQt6.QtWidgets import (
 from PyQt6.QtGui import QFont, QIcon
 from PyQt6.QtCore import Qt
 
-from matrices import Matriz
-from vectores import Vector
+from matrices import OperacionesMatrices
+from vectores import OperacionesVectores
 
 class MainWindow(QMainWindow):
     def __init__(self):
@@ -35,7 +35,7 @@ class MainMenuWidget(QWidget):
     def __init__(self, parent=None):
         super().__init__(parent)
 
-        self.setWindowTitle("GaussBot Main Menu")
+        self.setWindowTitle("Menu Principal")
         self.setGeometry(100, 100, 400, 300)
 
         layout = QVBoxLayout()
@@ -86,23 +86,23 @@ class MainMenuWidget(QWidget):
         """)
 
     def matrices_operations(self):
-        self.matrix_menu = MatrixMenu()
+        self.matrix_menu = MenuMatriz()
         self.matrix_menu.show()
 
     def vectores_operations(self):
-        self.vector_menu = VectorMenu()
+        self.vector_menu = MenuVector()
         self.vector_menu.show()
 
     def close_program(self):
         self.close()
 
-class MatrixMenu(QWidget):
+class MenuMatriz(QWidget):
     def __init__(self, parent=None):
         super().__init__(parent)
         self.setWindowTitle("Matrix Operations")
         self.setGeometry(150, 150, 600, 400)
 
-        self.mat = Matriz()
+        self.op_mat = OperacionesMatrices()
 
         layout = QVBoxLayout()
         self.setLayout(layout)
@@ -115,7 +115,7 @@ class MatrixMenu(QWidget):
         # Add buttons for matrix operations
         operations = [
             ("Agregar matriz", self.mat.agregar_matriz),
-            #("Resolver sistema de ecuaciones", self.mat.resolver_sistema),
+            ("Resolver sistema de ecuaciones", self.mat.resolver_sistema),
             ("Suma y resta de matrices", self.mat.suma_resta_matrices),
             ("Multiplicación de matrices", self.mat.mult_matrices),
             ("Transposición de matrices", self.mat.transponer),
@@ -148,18 +148,18 @@ class MatrixMenu(QWidget):
         """)
 
 
-class VectorMenu(QWidget):
+class MenuVector(QWidget):
     def __init__(self, parent=None):
         super().__init__(parent)
-        self.setWindowTitle("Vector Operations")
+        self.setWindowTitle("Operaciones Vectoriales")
         self.setGeometry(150, 150, 600, 400)
 
-        self.vec = Vector()
+        self.vec = OperacionesVectores()
 
         layout = QVBoxLayout()
         self.setLayout(layout)
 
-        label = QLabel("Vector Operations Menu")
+        label = QLabel("Menu Operaciones Vectoriales")
         label.setFont(QFont("Nunito", 20))
         label.setAlignment(Qt.AlignmentFlag.AlignCenter)
         layout.addWidget(label)

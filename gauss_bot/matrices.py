@@ -8,6 +8,79 @@ from validaciones import validar_mats, validar_escalonada_reducida, encontrar_va
 
 
 class Matriz:
+    def __init__(self, aumentada: bool, filas: int, columnas: int, valores: List[List[Fraction]] = []):
+        self.aumentada = aumentada
+        self.filas = filas
+        self.columnas = columnas
+
+        if not valores:
+            self.valores = [[Fraction(0) for _ in range(columnas)] for _ in range(filas)]
+        else:
+            self.valores = valores
+
+    def __getitem__(self, indices: Tuple[int, int]) -> Fraction:
+        fila, columna = indices
+        return self.valores[fila][columna]
+
+    def __setitem__(self, indices: Tuple[int, int], value: Fraction) -> None:
+        fila, columna = indices
+        self.valores[fila][columna] = value
+
+    def matriz_str(self) -> List[str]:
+        max_len = max(
+            len(str(self.valores[i][j].limit_denominator(100)))
+            for i in range(self.filas)
+            for j in range(self.columnas)
+        )
+
+        output: List[str] = []
+        for i in range(self.filas):
+            fila = ""
+            for j in range(self.columnas):
+                var = str(self.valores[i][j].limit_denominator(100)).center(max_len)
+                if j == 0 and j == self.columnas - 1:  # para matrices de m x 1
+                    fila += f"( {var} )"
+                elif j == 0:
+                    fila += f"( {var}, "
+                elif j == self.columnas - 2 and self.aumentada:  # para separar la columna aumentada
+                    fila += f"{var} |"
+                elif j == self.columnas - 1:
+                    fila += f"{var} )"
+                else:
+                    fila += f"{var}, "
+            output.append(fila)
+        return output
+
+    def agregar_fila(self, fila: List[Fraction]) -> None:
+        if len(fila) != self.columnas:
+            raise ValueError("La longitud de la fila debe coincidir con el número de columnas")
+        self.valores.append(fila)
+        self.filas += 1
+
+    def agregar_columna(self, columna: List[Fraction]) -> None:
+        if len(columna) != self.filas:
+            raise ValueError("La longitud de la columna debe coincidir con el número de filas")
+        for i in range(self.filas):
+            self.valores[i].append(columna[i])
+        self.columnas += 1
+
+    def eliminar_fila(self, indice_fila: int) -> None:
+        if 0 <= indice_fila < self.filas:
+            self.valores.pop(indice_fila)
+            self.filas -= 1
+        else:
+            raise IndexError("Índice de fila fuera de rango")
+
+    def eliminar_columna(self, indice_columna: int) -> None:
+        if 0 <= indice_columna < self.columnas:
+            for fila in self.valores:
+                fila.pop(indice_columna)
+            self.columnas -= 1
+        else:
+            raise IndexError("Índice de columna fuera de rango")
+
+
+class OperacionesMatrices:
     def __init__(self, default_mats: DictMatrices = {}) -> None:
         self.mats_ingresadas = default_mats
 
@@ -77,7 +150,7 @@ class Matriz:
         return option
 
 
-    def main_matriciales(self) -> None:
+    def main_matrices(self) -> None:
         option = self.menu_matrices()
         while option != 7:
             match option:
@@ -125,7 +198,7 @@ class Matriz:
             if not nombre.isalpha() or len(nombre) != 1:
                 raise NameError("Error: Ingrese solamente una letra mayúscula!")
             if nombre in self.mats_ingresadas:
-                raise KeyError(f"Error: Ya hay un vector con el nombre {nombre}!")
+                raise KeyError(f"Error: Ya hay una matriz con el nombre {nombre}!")
 
             match input("¿Se ingresará una matriz aumentada? (s/n) ").strip().lower():
                 case "s":
@@ -212,53 +285,63 @@ class Matriz:
         return M
 
 
-    def seleccionar_matriz(self, operacion: str) -> str | List[str]:
+    def seleccionar_matriz(self, operacion: str) -> str:
+        if operacion not in ("r", "t"):
+            return ""
         if not validar_mats(self.mats_ingresadas):
-            return []
+            return ""
 
-        es_sistema = transponer = mult_suma_resta = False
         match operacion:
             case "r":
-                es_sistema = True
+                mensaje = "resolver"
             case "t":
-                transponer = True
-            case "msr":
-                mult_suma_resta = True
+                mensaje = "transponer"
 
-        if es_sistema:
-            mensaje = "\n¿Cuál matriz desea resolver? "
-        elif transponer:
-            mensaje = "\n¿Cuál matriz desea transponer? "
-        elif mult_suma_resta:
-            mensaje = "\n¿Cuáles matrices desea seleccionar? (nombres separados por comas) "
-
+        mensaje = f"\n¿Cuál matriz desea {mensaje}? "
         try:
             limpiar_pantalla()
             self.imprimir_matrices()
-            input_mats = input(mensaje).strip().split(",")
-            aumentadas = all(self.mats_ingresadas[mat][1] for mat in input_mats)
-            mat = next((mat for mat in input_mats if mat not in self.mats_ingresadas), None)
+            input_mat = input(mensaje).strip()
 
-            if mat is not None:
-                raise KeyError(f"Error: La matriz {mat} no existe!")
-            elif mult_suma_resta and len(input_mats) != 2:
-                raise ValueError("Error: Debe seleccionar dos matrices!")
-            elif (es_sistema or transponer) and len(input_mats) != 1:
-                raise ValueError("Error: Solo debe seleccionar una matriz!")
-            elif es_sistema and not aumentadas:
-                raise ValueError("Error: La matriz seleccionada no es aumentada!")
+            if input_mat not in self.mats_ingresadas:
+                raise KeyError(f"Error: La matriz {input_mat} no existe!")
+            elif operacion == "r" and not self.mats_ingresadas[input_mat[0]][1]:
+                raise TypeError("Error: La matriz seleccionada no es aumentada!")
 
         except KeyError as k:
             input(k)
             return self.seleccionar_matriz(operacion)
-        except ValueError as v:
+        except TypeError as v:
             input(v)
             return self.seleccionar_matriz(operacion)
 
-        if es_sistema or transponer:
-            return input_mats[0]
-        else:
-            return input_mats
+        return input_mat
+
+
+    def seleccionar_matrices(self) -> List[str]:
+        if not validar_mats(self.mats_ingresadas):
+            return []
+
+        mensaje = "\n¿Cuáles matrices desea seleccionar? (separadas por comas) "
+        try:
+            limpiar_pantalla()
+            self.imprimir_matrices()
+            input_mats = input(mensaje).strip().split(",")
+            mat = next((mat for mat in input_mats if mat not in self.mats_ingresadas), None)
+
+            if mat is not None:
+                raise KeyError(f"Error: La matriz {mat} no existe!")
+            elif len(input_mats) != 2:
+                raise ValueError("Error: Debe seleccionar dos matrices!")
+
+        except KeyError as k:
+            input(k)
+            return self.seleccionar_matrices()
+        except ValueError as v:
+            input(v)
+            return self.seleccionar_matrices()
+
+        return input_mats
 
 
     def procesar_operacion(self, operacion: str, func: Callable) -> None:
@@ -276,8 +359,8 @@ class Matriz:
         copia = deepcopy(self.mats_ingresadas[nombre_mat])
         modded_copia = func(copia[0], copia[1])
 
-        matriz_existe = any(modded_copia == mat[0] for mat in self.mats_ingresadas.values())
-        if not matriz_existe:
+        mat_existe = any(modded_copia == mat[0] for mat in self.mats_ingresadas.values())
+        if not mat_existe:
             self.mats_ingresadas[nombre_mat_modded] = (modded_copia, copia[1])
 
         input("\nPresione cualquier tecla para continuar...")

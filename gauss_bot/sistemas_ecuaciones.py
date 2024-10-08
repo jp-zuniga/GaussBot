@@ -1,6 +1,7 @@
 from fractions import Fraction
+from typing import List
 
-from utils import List, Mat, Validacion
+from utils import Mat, Validacion
 from validaciones import validar_matriz, validar_escalonada_reducida
 
 
@@ -13,8 +14,8 @@ def reducir_matriz(M: Mat) -> Mat:
         print("\nMatriz ya esta en su forma escalonada reducida!")
         return M
 
-    from matrices import Matriz  # para Matriz.imprimir_matriz()
-    mat = Matriz()
+    from matrices import OperacionesMatrices  # para OperacionesMatrices.imprimir_matriz()
+    mat = OperacionesMatrices()
     filas = len(M)
     columnas = len(M[0])
 

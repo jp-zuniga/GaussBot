@@ -6,6 +6,41 @@ from utils import Vec, DictVectores, limpiar_pantalla
 
 
 class Vector:
+    def __init__(self, componentes: List[Fraction]) -> None:
+        self.componentes = componentes
+
+    def __len__(self) -> int:
+        return len(self.componentes)
+
+    def __getitem__(self, indice: int) -> Fraction:
+        return self.componentes[indice]
+
+    def __setitem__(self, indice: int, value: Fraction) -> None:
+        self.componentes[indice] = value
+
+    def __str__(self) -> str:
+        return f"[{', '.join(str(c) for c in self.componentes)}]"
+
+    def __add__(self, vec2: 'Vector') -> 'Vector':
+        if len(self) != len(vec2):
+            raise ValueError("Vectors must be of the same length")
+        return Vector([a + b for a, b in zip(self.componentes, vec2.componentes)])
+
+    def __sub__(self, vec2: 'Vector') -> 'Vector':
+        if len(self) != len(vec2):
+            raise ValueError("Vectors must be of the same length")
+        return Vector([a - b for a, b in zip(self.componentes, vec2.componentes)])
+
+    def mult_escalar(self, escalar: Fraction) -> 'Vector':
+        return Vector([escalar * c for c in self.componentes])
+
+    def prod_punto(self, vec2: 'Vector') -> Fraction:
+        if len(self) != len(vec2):
+            raise ValueError("Vectors must be of the same length")
+        return Fraction(sum(a * b for a, b in zip(self.componentes, vec2.componentes)))
+
+
+class OperacionesVectores:
     def __init__(self, default_vecs: DictVectores = {}) -> None:
         self.vecs_ingresados = default_vecs
 
@@ -49,7 +84,7 @@ class Vector:
         return option
 
 
-    def main_vectoriales(self) -> None:
+    def main_vectores(self) -> None:
         option = self.menu_vectores()
         while option != 7:
             match option:
@@ -145,57 +180,57 @@ class Vector:
         return vec
 
 
-    def seleccionar_vector(self, operacion: str) -> str | List[str]:
+    def seleccionar_vector(self, operacion: str) -> str:
+        if operacion not in ("e", "mv"):
+            return ""
         if not validar_vecs(self.vecs_ingresados):
             return ""
 
-        escalar = vectorial = suma_resta = matriz_vector = False
         match operacion:
             case "e":
-                escalar = True
-            case "v":
-                vectorial = True
-            case "sr":
-                suma_resta = True
+                mensaje = "multiplicar escalarmente"
             case "mv":
-                matriz_vector = True
+                mensaje = "multiplicar por la matriz"
 
-        if escalar:
-            mensaje = "multiplicar escalarmente"
-        elif vectorial or suma_resta:
-            mensaje = "seleccionar"
-        elif matriz_vector:
-            mensaje = "multiplicar por la matriz"
-
-        if escalar or matriz_vector:
-            mensaje = f"\n¿Cuál vector desea {mensaje}? "
-        elif vectorial or suma_resta:
-            mensaje = f"\n¿Cuáles vectores desea {mensaje}? (separados por comas): "
-
+        mensaje = f"\n¿Cuál vector desea {mensaje}? "
         try:
             limpiar_pantalla()
             self.imprimir_vectores()
-            input_vecs = input(mensaje).strip().split(",")
-            vec = next((vec for vec in input_vecs if vec not in self.vecs_ingresados), None)
-
-            if vec is not None:
-                raise KeyError(f"Error: El vector '{vec}' no existe!")
-            elif (escalar or matriz_vector) and len(input_vecs) != 1:
-                raise ValueError("Error: Solo debe ingresar un vector!")
-            elif (vectorial or suma_resta) and len(input_vecs) != 2:
-                raise ValueError("Error: Debe ingresar dos vectores!")
+            input_vec = input(mensaje).strip()
+            if input_vec not in self.vecs_ingresados:
+                raise KeyError(f"Error: El vector '{input_vec}' no existe!")
 
         except KeyError as k:
             input(k)
             return self.seleccionar_vector(operacion)
+
+        return input_vec
+
+
+    def seleccionar_vectores(self) -> List[str]:
+        if not validar_vecs(self.vecs_ingresados):
+            return []
+
+        mensaje = "\n¿Cuáles vectores desea seleccionar? (separados por comas)"
+        try:
+            limpiar_pantalla()
+            self.imprimir_vectores()
+            input_vecs = input(mensaje).strip().split(",")
+            vec_existe = next((vec for vec in input_vecs if vec not in self.vecs_ingresados), None)
+
+            if vec_existe is not None:
+                raise KeyError(f"Error: El vector '{vec_existe}' no existe!")
+            if len(input_vecs) != 2:
+                raise ValueError("Error: Solamente debe ingresar dos vectores!")
+
+        except KeyError as k:
+            input(k)
+            return self.seleccionar_vectores()
         except ValueError as v:
             input(v)
-            return self.seleccionar_vector(operacion)
+            return self.seleccionar_vectores()
 
-        if escalar or matriz_vector:
-            return input_vecs[0]
-        else:
-            return input_vecs
+        return input_vecs
 
 
     def mult_escalar(self) -> None:
@@ -232,7 +267,7 @@ class Vector:
         if not validar_vecs(self.vecs_ingresados):
             return None
 
-        vec1, vec2 = self.seleccionar_vector("v")
+        vec1, vec2 = self.seleccionar_vectores()
         if len(self.vecs_ingresados[vec1]) != len(self.vecs_ingresados[vec2]):
             input("Error: Los vectores deben tener la misma longitud!")
             return self.mult_vectorial()
@@ -251,7 +286,7 @@ class Vector:
         if not validar_vecs(self.vecs_ingresados):
             return []
 
-        vec1, vec2 = self.seleccionar_vector("v")
+        vec1, vec2 = self.seleccionar_vectores()
         if len(self.vecs_ingresados[vec1]) != len(self.vecs_ingresados[vec2]):
             input("Error: Los vectores deben tener la misma longitud!")
             return self.suma_resta_vectores()
@@ -277,8 +312,8 @@ class Vector:
 
 
     def mult_matriz_vector(self) -> None:
-        from matrices import Matriz
-        mat = Matriz()
+        from matrices import OperacionesMatrices
+        mat = OperacionesMatrices()
 
         if not validar_vecs(self.vecs_ingresados):
             return None
