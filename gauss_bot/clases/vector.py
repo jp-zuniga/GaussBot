@@ -1,5 +1,5 @@
 from fractions import Fraction
-from typing import List
+from typing import List, overload
 
 class Vector():
     def __init__(self, componentes: List[Fraction] = []) -> None:
@@ -17,20 +17,28 @@ class Vector():
     def __str__(self) -> str:
         return f"[{', '.join(str(c) for c in self.componentes)}]"
 
-    def __add__(self, vec2: 'Vector') -> 'Vector':
+    def __add__(self, vec2: "Vector") -> "Vector":
         if len(self) != len(vec2):
-            raise ValueError("Vectores deben tener la misma longitud")
+            raise ArithmeticError("Vectores deben tener la misma longitud")
         return Vector([a + b for a, b in zip(self.componentes, vec2.componentes)])
 
-    def __sub__(self, vec2: 'Vector') -> 'Vector':
+    def __sub__(self, vec2: "Vector") -> "Vector":
         if len(self) != len(vec2):
-            raise ValueError("Vectores deben tener la misma longitud")
+            raise ArithmeticError("Vectores deben tener la misma longitud")
         return Vector([a - b for a, b in zip(self.componentes, vec2.componentes)])
 
-    def __mul__(self, vec2: 'Vector') -> Fraction:
-        if len(self) != len(vec2):
-            raise ValueError("Vectores deben tener la misma longitud")
-        return Fraction(sum(a * b for a, b in zip(self.componentes, vec2.componentes)))
+    @overload
+    def __mul__(self, vec2: "Vector") -> Fraction: ...
 
-    def mult_escalar(self, escalar: Fraction) -> 'Vector':
-        return Vector([escalar * c for c in self.componentes])
+    @overload
+    def __mul__(self, escalar: Fraction) -> "Vector": ...
+
+    def __mul__(self, multiplicador: "Vector" | Fraction) -> Fraction | "Vector":
+        if isinstance(multiplicador, Vector):
+            if len(self) != len(multiplicador):
+                raise ArithmeticError("Vectores deben tener la misma longitud")
+            return Fraction(sum(a * b for a, b in zip(self.componentes, multiplicador.componentes)))
+        elif isinstance(multiplicador, Fraction):
+            return Vector([c * multiplicador for c in self.componentes])
+        else:
+            raise TypeError("Tipo de dato inválido")

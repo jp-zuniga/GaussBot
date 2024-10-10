@@ -1,4 +1,6 @@
-from gauss_bot.menu import main
+from gauss_bot.operaciones import OpsManager, MatricesManager, VectoresManager
 
 if __name__ == "__main__":
-    main()
+    manager = OpsManager(MatricesManager(), VectoresManager())
+    manager.start_exec_loop()
+    input("Cerrando programa...")
