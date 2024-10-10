@@ -1,44 +1,10 @@
 from fractions import Fraction
-from typing import List
+from typing import List, Dict
 
-from validaciones import validar_vecs
-from utils import Vec, DictVectores, limpiar_pantalla
+from gauss_bot.vectores.vector import Vector
+from gauss_bot.utils import limpiar_pantalla
 
-
-class Vector:
-    def __init__(self, componentes: List[Fraction]) -> None:
-        self.componentes = componentes
-
-    def __len__(self) -> int:
-        return len(self.componentes)
-
-    def __getitem__(self, indice: int) -> Fraction:
-        return self.componentes[indice]
-
-    def __setitem__(self, indice: int, value: Fraction) -> None:
-        self.componentes[indice] = value
-
-    def __str__(self) -> str:
-        return f"[{', '.join(str(c) for c in self.componentes)}]"
-
-    def __add__(self, vec2: 'Vector') -> 'Vector':
-        if len(self) != len(vec2):
-            raise ValueError("Vectors must be of the same length")
-        return Vector([a + b for a, b in zip(self.componentes, vec2.componentes)])
-
-    def __sub__(self, vec2: 'Vector') -> 'Vector':
-        if len(self) != len(vec2):
-            raise ValueError("Vectors must be of the same length")
-        return Vector([a - b for a, b in zip(self.componentes, vec2.componentes)])
-
-    def mult_escalar(self, escalar: Fraction) -> 'Vector':
-        return Vector([escalar * c for c in self.componentes])
-
-    def prod_punto(self, vec2: 'Vector') -> Fraction:
-        if len(self) != len(vec2):
-            raise ValueError("Vectors must be of the same length")
-        return Fraction(sum(a * b for a, b in zip(self.componentes, vec2.componentes)))
-
+DictVectores = Dict[str, Vector]
 
 class OperacionesVectores:
     def __init__(self, default_vecs: DictVectores = {}) -> None:
@@ -46,7 +12,7 @@ class OperacionesVectores:
 
 
     def imprimir_vectores(self, es_matricial=False) -> None:
-        if not validar_vecs(self.vecs_ingresados):
+        if not self._validar_vecs_ingresados():
             return None
 
         mensaje = "seleccionados" if es_matricial else "ingresados"
@@ -158,7 +124,7 @@ class OperacionesVectores:
         return None
 
 
-    def ingresar_vector(self, longitud: int) -> Vec:
+    def ingresar_vector(self, longitud: int) -> Vector:
         try:
             vec = [
                 Fraction(x).limit_denominator(100)
@@ -183,7 +149,7 @@ class OperacionesVectores:
     def seleccionar_vector(self, operacion: str) -> str:
         if operacion not in ("e", "mv"):
             return ""
-        if not validar_vecs(self.vecs_ingresados):
+        if not self._validar_vecs_ingresados():
             return ""
 
         match operacion:
@@ -208,7 +174,7 @@ class OperacionesVectores:
 
 
     def seleccionar_vectores(self) -> List[str]:
-        if not validar_vecs(self.vecs_ingresados):
+        if not self._validar_vecs_ingresados():
             return []
 
         mensaje = "\n¿Cuáles vectores desea seleccionar? (separados por comas)"
@@ -233,8 +199,8 @@ class OperacionesVectores:
         return input_vecs
 
 
-    def mult_escalar(self) -> None:
-        if not validar_vecs(self.vecs_ingresados):
+    """ def mult_escalar(self) -> None:
+        if not self._validar_vecs_ingresados():
             return None
 
         vec_nombre = self.seleccionar_vector("e")
@@ -264,7 +230,7 @@ class OperacionesVectores:
 
 
     def mult_vectorial(self) -> None:
-        if not validar_vecs(self.vecs_ingresados):
+        if not self._validar_vecs_ingresados():
             return None
 
         vec1, vec2 = self.seleccionar_vectores()
@@ -282,8 +248,8 @@ class OperacionesVectores:
         return None
 
 
-    def suma_resta_vectores(self) -> Vec:
-        if not validar_vecs(self.vecs_ingresados):
+    def suma_resta_vectores(self) -> Vector:
+        if not self._validar_vecs_ingresados():
             return []
 
         vec1, vec2 = self.seleccionar_vectores()
@@ -315,7 +281,7 @@ class OperacionesVectores:
         from matrices import OperacionesMatrices
         mat = OperacionesMatrices()
 
-        if not validar_vecs(self.vecs_ingresados):
+        if not self._validar_vecs_ingresados():
             return None
 
         limpiar_pantalla()
@@ -340,4 +306,11 @@ class OperacionesVectores:
         mat.imprimir_matriz(resultado, es_aumentada=False)
 
         input("\nPresione cualquier tecla para continuar...")
-        return None
+        return None """
+
+
+    def _validar_vecs_ingresados(self) -> bool:
+        if self.vecs_ingresados == {}:
+            input("\nNo hay vectores ingresados!")
+            return False
+        return True

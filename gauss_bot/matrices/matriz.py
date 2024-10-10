@@ -6,14 +6,38 @@ Validacion = Tuple[bool, int]
 
 class Matriz:
     def __init__(self, aumentada: bool, filas: int, columnas: int, valores: List[List[Fraction]] = []):
-        self.aumentada = aumentada
-        self.filas = filas
-        self.columnas = columnas
+        self._aumentada = aumentada
+        self._filas = filas
+        self._columnas = columnas
 
         if valores == []:
-            self.valores = [[Fraction(0) for _ in range(columnas)] for _ in range(filas)]
+            self._valores = [[Fraction(0) for _ in range(columnas)] for _ in range(filas)]
         else:
-            self.valores = valores
+            self._valores = valores
+
+    @property
+    def aumentada(self) -> bool:
+        return self._aumentada
+
+    @property
+    def filas(self) -> int:
+        return self._filas
+
+    @filas.setter
+    def filas(self, value: int) -> None:
+        self._filas = value
+
+    @property
+    def columnas(self) -> int:
+        return self._columnas
+
+    @columnas.setter
+    def columnas(self, value: int) -> None:
+        self._columnas = value
+
+    @property
+    def valores(self) -> List[List[Fraction]]:
+        return self._valores
 
     @overload
     def __getitem__(self, indice_fila: int) -> List[Fraction]: ...
@@ -21,7 +45,7 @@ class Matriz:
     @overload
     def __getitem__(self, indices: Tuple[int, int]) -> Fraction: ...
 
-    def __getitem__(self, indice):
+    def __getitem__(self, indice: int | Tuple[int, int]) -> List[Fraction] | Fraction:
         if isinstance(indice, int):
             return self.valores[indice]
         elif isinstance(indice, tuple) and len(indice) == 2:
