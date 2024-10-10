@@ -1,7 +1,7 @@
 from fractions import Fraction
 from typing import Tuple, List
 
-from matriz import Matriz
+from gauss_bot.matrices.matriz import Matriz
 
 # type annotations:
 Validacion = Tuple[bool, int]

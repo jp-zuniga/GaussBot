@@ -1,5 +1,5 @@
-from matrices.ops_matrices import OperacionesMatrices
-from utils import limpiar_pantalla
+from gauss_bot.matrices.ops_matrices import OperacionesMatrices
+from gauss_bot.utils import limpiar_pantalla
 
 
 def main() -> None:

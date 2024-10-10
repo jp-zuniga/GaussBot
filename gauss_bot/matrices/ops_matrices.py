@@ -7,7 +7,7 @@ from gauss_bot.matrices.sistema_ecuaciones import SistemaEcuaciones
 from gauss_bot.utils import limpiar_pantalla
 
 # type annotations:
-DictMatrices = Dict[str, "Matriz"]
+DictMatrices = Dict[str, Matriz]
 
 class OperacionesMatrices:
     def __init__(self, default_mats: DictMatrices = {}) -> None:
