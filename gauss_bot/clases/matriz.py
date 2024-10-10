@@ -1,6 +1,7 @@
 from fractions import Fraction
-from typing import Tuple, List, overload
+from typing import Union, Tuple, List, Dict, overload
 
+DictMatrices = Dict[str, "Matriz"]
 Validacion = Tuple[bool, int]
 
 class Matriz:
@@ -102,7 +103,7 @@ class Matriz:
     @overload
     def __mul__(self, escalar: Fraction) -> "Matriz": ...
 
-    def __mul__(self, multiplicador: "Matriz" | Fraction) -> "Matriz":
+    def __mul__(self, multiplicador: Union["Matriz", Fraction]) -> "Matriz":
         if isinstance(multiplicador, Matriz):
             if self.columnas != multiplicador.filas:
                 raise ArithmeticError("El número de columnas de la primera matriz debe ser igual al número de filas de la segunda matriz")

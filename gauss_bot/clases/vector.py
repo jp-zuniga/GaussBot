@@ -1,5 +1,7 @@
 from fractions import Fraction
-from typing import List, overload
+from typing import Union, List, Dict, overload
+
+DictVectores = Dict[str, "Vector"]
 
 class Vector():
     def __init__(self, componentes: List[Fraction] = []) -> None:
@@ -33,7 +35,7 @@ class Vector():
     @overload
     def __mul__(self, escalar: Fraction) -> "Vector": ...
 
-    def __mul__(self, multiplicador: "Vector" | Fraction) -> Fraction | "Vector":
+    def __mul__(self, multiplicador: Union["Vector", Fraction]) -> Union[Fraction, "Vector"]:
         if isinstance(multiplicador, Vector):
             if len(self) != len(multiplicador):
                 raise ArithmeticError("Vectores deben tener la misma longitud")
