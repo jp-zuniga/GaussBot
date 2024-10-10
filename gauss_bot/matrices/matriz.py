@@ -1,11 +1,10 @@
 from fractions import Fraction
 from typing import Tuple, List, overload
 
-# type annotations:
 Validacion = Tuple[bool, int]
 
 class Matriz:
-    def __init__(self, aumentada: bool, filas: int, columnas: int, valores: List[List[Fraction]] = []):
+    def __init__(self, aumentada: bool, filas: int, columnas: int, valores: List[List[Fraction]] = []) -> None:
         self._aumentada = aumentada
         self._filas = filas
         self._columnas = columnas
@@ -116,7 +115,7 @@ class Matriz:
     def validar_consistencia(self) -> Validacion:
         if self.valores == [] or self.es_matriz_cero():
             return (True, -1)
-        
+
         for i in range(self.filas):
             # validar forma de 0 = b (donde b != 0)
             if [0 for _ in range(len(self.valores[0]) - 1)] == self.valores[i][:-1] and self.valores[i][-1] != 0:
@@ -192,7 +191,7 @@ class Matriz:
             for j in range(mat2.columnas):
                 for k in range(self.columnas):
                     M_mult[i][j] += self.valores[i][k] * mat2.valores[k][j]
-        
+
         return Matriz(self.aumentada, self.filas, mat2.columnas, M_mult)
 
     def transponer(self) -> "Matriz":

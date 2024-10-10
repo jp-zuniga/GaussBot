@@ -3,163 +3,16 @@ from typing import Tuple, List, Dict, overload
 from copy import deepcopy
 
 from gauss_bot.matrices.matriz import Matriz
+from gauss_bot.matrices.vector import Vector
 from gauss_bot.matrices.sistema_ecuaciones import SistemaEcuaciones
-from gauss_bot.utils import limpiar_pantalla
+from gauss_bot.utils import limpiar_pantalla, match_input
 
-# type annotations:
 DictMatrices = Dict[str, Matriz]
+DictVectores = Dict[str, Vector]
 
-class OperacionesMatrices:
-    def __init__(self, default_mats: DictMatrices = {}) -> None:
-        self.mats_ingresadas = default_mats
-
-    def main_matrices(self) -> None:
-        option = self.menu_matrices()
-        while option != 7:
-            match option:
-                case 1:  # agregar
-                    self.agregar_matriz()
-                    option = self.menu_matrices()
-                    continue
-                case 2:  # resolver sistema de ecuaciones
-                    respuesta, procedimiento, mat_resultante = self.procesar_operacion("se")
-                    print("\n---------------------------------------------")
-                    print("\nSistema de ecuaciones resuelto:")
-                    for linea in mat_resultante.get_mat_str():
-                        print(linea, end="")
-                    for linea in respuesta:
-                        print(linea, end="")
-
-                    print("\n---------------------------------------------")
-                    mostrar_procedimiento = self._match_input("\n¿Desea ver el procedimiento? (s/n) ")
-                    if mostrar_procedimiento:
-                        limpiar_pantalla()
-                        for linea in procedimiento:
-                            print(linea, end="")
-                        for linea in respuesta:
-                            print(linea, end="")
-                    elif not mostrar_procedimiento:
-                        print("\nDe acuerdo!")
-                    else:
-                        print("\nOpción inválida!")
-
-                    resolver_otra = self._match_input("¿Desea resolver otra matriz? (s/n) ")
-                    if resolver_otra:
-                        continue
-                    elif not resolver_otra:
-                        input("De acuerdo! Regresando al menú de matrices...")
-                    else:
-                        input("Opción inválida! Regresando al menú de matrices...")
-
-                    option = self.menu_matrices()
-                    continue
-                case 3:  # sumar matrices
-                    mats_seleccionadas, resultado = self.procesar_operacion("s")
-                    mat1, mat2 = self.mats_ingresadas[mats_seleccionadas[0]], self.mats_ingresadas[mats_seleccionadas[1]]
-                    
-                    limpiar_pantalla()
-                    print(f"\n{mats_seleccionadas[0]}:")
-                    for linea in mat1.get_mat_str():
-                        print(linea, end="")
-                    
-                    print(f"\n{mats_seleccionadas[1]}:")
-                    for linea in mat2.get_mat_str():
-                        print(linea, end="")
-
-                    print(f"\n{mats_seleccionadas[0]} + {mats_seleccionadas[1]}:")
-                    for linea in resultado.get_mat_str():
-                        print(linea, end="")
-
-                    input("\nPresione cualquier tecla para continuar...")
-                    option = self.menu_matrices()
-                    continue
-                case 4:  # restar matrices
-                    mats_seleccionadas, resultado = self.procesar_operacion("r")
-                    mat1, mat2 = self.mats_ingresadas[mats_seleccionadas[0]], self.mats_ingresadas[mats_seleccionadas[1]]
-                    
-                    limpiar_pantalla()
-                    print(f"\n{mats_seleccionadas[0]}:")
-                    for linea in mat1.get_mat_str():
-                        print(linea, end="")
-                    
-                    print(f"\n{mats_seleccionadas[1]}:")
-                    for linea in mat2.get_mat_str():
-                        print(linea, end="")
-
-                    print(f"\n{mats_seleccionadas[0]} - {mats_seleccionadas[1]}:")
-                    for linea in resultado.get_mat_str():
-                        print(linea, end="")
-
-                    input("\nPresione cualquier tecla para continuar...")
-                    option = self.menu_matrices()
-                    continue
-                case 5:  # multiplicar matrices
-                    mats_seleccionadas, resultado = self.procesar_operacion("m")
-                    mat1, mat2 = self.mats_ingresadas[mats_seleccionadas[0]], self.mats_ingresadas[mats_seleccionadas[1]]
-                    
-                    limpiar_pantalla()
-                    print(f"\n{mats_seleccionadas[0]}:")
-                    for linea in mat1.get_mat_str():
-                        print(linea, end="")
-                    
-                    print(f"\n{mats_seleccionadas[1]}:")
-                    for linea in mat2.get_mat_str():
-                        print(linea, end="")
-
-                    print(f"\n{mats_seleccionadas[0]} * {mats_seleccionadas[1]}:")
-                    for linea in resultado.get_mat_str():
-                        print(linea, end="")
-
-                    input("\nPresione cualquier tecla para continuar...")
-                    option = self.menu_matrices()
-                    continue
-                case 6:  # transponer matriz
-                    mat_seleccionada, resultado = self.procesar_operacion("t")
-                    mat_original = self.mats_ingresadas[mat_seleccionada]
-                    
-                    limpiar_pantalla()
-                    print(f"\n{mat_seleccionada}:")
-                    for linea in mat_original.get_mat_str():
-                        print(linea, end="")
-
-                    print(f"\n{mat_seleccionada}_t:")
-                    for linea in resultado.get_mat_str():
-                        print(linea, end="")
-
-                    input("\nPresione cualquier tecla para continuar...")
-                    option = self.menu_matrices()
-                    continue
-                case 7:
-                    input("Regresando al menú principal...")
-                    break
-                case _:
-                    input("Opción inválida! Por favor, intente de nuevo...")
-                    continue
-        return None
-
-    def menu_matrices(self) -> int:
-        limpiar_pantalla()
-        print("\n###############################")
-        print("### Operaciones Matriciales ###")
-        print("###############################")
-        self._imprimir_matrices()
-        print("\n1. Agregar una matriz")
-        print("2. Resolver sistema de ecuaciones")
-        print("3. Suma de matrices")
-        print("4. Resta de matrices")
-        print("5. Multiplicación de matrices")
-        print("6. Transposición de una matriz")
-        print("7. Regresar al menú principal")
-
-        try:
-            option = int(input("\nSeleccione una opción: ").strip())
-            if option < 1 or option > 7:
-                raise ValueError
-        except ValueError:
-            input("\nError: Ingrese una opción válida!")
-            return self.menu_matrices()
-
-        return option
+class MatricesManager:
+    def __init__(self, mats_ingresadas: DictMatrices = {}):
+        self.mats_ingresadas = mats_ingresadas
 
     def agregar_matriz(self) -> None:
         try:
@@ -170,13 +23,13 @@ class OperacionesMatrices:
             if nombre in self.mats_ingresadas:
                 raise KeyError(f"Error: Ya hay una matriz con el nombre {nombre}!")
 
-            match input("¿Se ingresará una matriz aumentada? (s/n) ").strip().lower():
-                case "s":
-                    es_aumentada = True
-                case "n":
-                    es_aumentada = False
-                case _:
-                    raise ValueError("Error: Ingrese una opción válida!")
+            ingresar_aumentada = match_input("¿Se ingresará una matriz aumentada? (s/n) ")
+            if ingresar_aumentada:
+                es_aumentada = True
+            elif not ingresar_aumentada:
+                es_aumentada = False
+            else:
+                raise ValueError("Error: Ingrese una opción válida!")
 
         except NameError as n:
             input(n)
@@ -191,14 +44,13 @@ class OperacionesMatrices:
         self.mats_ingresadas[nombre] = self.pedir_matriz(nombre, es_aumentada)
         print("\nMatriz agregada exitosamente!")
 
-        match input("¿Desea agregar otra matriz? (s/n) ").strip().lower():
-            case "s":
-                return self.agregar_matriz()
-            case "n":
-                input("Regresando al menú de matrices...")
-            case _:
-                input("Opción inválida! Regresando al menú de matrices...")
-
+        ingresar_otra = match_input("¿Se ingresará una matriz aumentada? (s/n) ")
+        if ingresar_otra:
+            return self.agregar_matriz()
+        elif not ingresar_otra:
+            input("Regresando al menú de matrices...")
+        else:
+            input("Opción inválida! Regresando al menú de matrices...")
         return None
 
     def pedir_matriz(self, nombre="M", es_aumentada=True) -> Matriz:
@@ -381,12 +233,166 @@ class OperacionesMatrices:
         print("---------------------------------------------")
 
         return None
-    
-    @staticmethod
-    def _match_input(pregunta: str) -> int:
-        opciones = ("s", "n")
-        input_usuario = input(pregunta).strip().lower()
-        if input_usuario not in opciones:
-            return -1
-        return 1 if input_usuario == "s" else 0
 
+
+class VectoresManager: ...
+
+class OpsManager:
+    def __init__(self, manager_mats: MatricesManager, manager_vecs: VectoresManager) -> None:
+        self.manager_mats = manager_mats
+        self.manager_vecs = manager_vecs
+
+    def main(self) -> None:
+        option = self.menu_operaciones()
+        while option != 7:
+            match option:
+                case 1:  # agregar
+                    self.manager_mats.agregar_matriz()
+                    option = self.menu_operaciones()
+                    continue
+                case 2:  # resolver sistema de ecuaciones
+                    respuesta, procedimiento, mat_resultante = self.manager_mats.procesar_operacion("se")
+                    print("\n---------------------------------------------")
+                    print("\nSistema de ecuaciones resuelto:")
+                    for linea in mat_resultante.get_mat_str():
+                        print(linea, end="")
+                    for linea in respuesta:
+                        print(linea, end="")
+
+                    print("\n---------------------------------------------")
+                    mostrar_procedimiento = match_input("\n¿Desea ver el procedimiento? (s/n) ")
+                    if mostrar_procedimiento:
+                        limpiar_pantalla()
+                        for linea in procedimiento:
+                            print(linea, end="")
+                        for linea in respuesta:
+                            print(linea, end="")
+                    elif not mostrar_procedimiento:
+                        print("\nDe acuerdo!")
+                    else:
+                        print("\nOpción inválida!")
+
+                    resolver_otra = match_input("¿Desea resolver otra matriz? (s/n) ")
+                    if resolver_otra:
+                        continue
+                    elif not resolver_otra:
+                        input("De acuerdo! Regresando al menú de matrices...")
+                    else:
+                        input("Opción inválida! Regresando al menú de matrices...")
+
+                    option = self.menu_operaciones()
+                    continue
+                case 3:  # sumar matrices
+                    mats_seleccionadas, resultado = self.manager_mats.procesar_operacion("s")
+                    mat1, mat2 = self.manager_mats.mats_ingresadas[mats_seleccionadas[0]], self.manager_mats.mats_ingresadas[mats_seleccionadas[1]]
+
+                    limpiar_pantalla()
+                    print(f"\n{mats_seleccionadas[0]}:")
+                    for linea in mat1.get_mat_str():
+                        print(linea, end="")
+
+                    print(f"\n{mats_seleccionadas[1]}:")
+                    for linea in mat2.get_mat_str():
+                        print(linea, end="")
+
+                    print(f"\n{mats_seleccionadas[0]} + {mats_seleccionadas[1]}:")
+                    for linea in resultado.get_mat_str():
+                        print(linea, end="")
+
+                    input("\nPresione cualquier tecla para continuar...")
+                    option = self.menu_operaciones()
+                    continue
+                case 4:  # restar matrices
+                    mats_seleccionadas, resultado = self.manager_mats.procesar_operacion("r")
+                    mat1, mat2 = self.manager_mats.mats_ingresadas[mats_seleccionadas[0]], self.manager_mats.mats_ingresadas[mats_seleccionadas[1]]
+
+                    limpiar_pantalla()
+                    print(f"\n{mats_seleccionadas[0]}:")
+                    for linea in mat1.get_mat_str():
+                        print(linea, end="")
+
+                    print(f"\n{mats_seleccionadas[1]}:")
+                    for linea in mat2.get_mat_str():
+                        print(linea, end="")
+
+                    print(f"\n{mats_seleccionadas[0]} - {mats_seleccionadas[1]}:")
+                    for linea in resultado.get_mat_str():
+                        print(linea, end="")
+
+                    input("\nPresione cualquier tecla para continuar...")
+                    option = self.menu_operaciones()
+                    continue
+                case 5:  # multiplicar matrices
+                    mats_seleccionadas, resultado = self.manager_mats.procesar_operacion("m")
+                    mat1, mat2 = self.manager_mats.mats_ingresadas[mats_seleccionadas[0]], self.manager_mats.mats_ingresadas[mats_seleccionadas[1]]
+
+                    limpiar_pantalla()
+                    print(f"\n{mats_seleccionadas[0]}:")
+                    for linea in mat1.get_mat_str():
+                        print(linea, end="")
+
+                    print(f"\n{mats_seleccionadas[1]}:")
+                    for linea in mat2.get_mat_str():
+                        print(linea, end="")
+
+                    print(f"\n{mats_seleccionadas[0]} * {mats_seleccionadas[1]}:")
+                    for linea in resultado.get_mat_str():
+                        print(linea, end="")
+
+                    input("\nPresione cualquier tecla para continuar...")
+                    option = self.menu_operaciones()
+                    continue
+                case 6:  # transponer matriz
+                    mat_seleccionada, resultado = self.manager_mats.procesar_operacion("t")
+                    mat_original = self.manager_mats.mats_ingresadas[mat_seleccionada]
+
+                    limpiar_pantalla()
+                    print(f"\n{mat_seleccionada}:")
+                    for linea in mat_original.get_mat_str():
+                        print(linea, end="")
+
+                    print(f"\n{mat_seleccionada}_t:")
+                    for linea in resultado.get_mat_str():
+                        print(linea, end="")
+
+                    input("\nPresione cualquier tecla para continuar...")
+                    option = self.menu_operaciones()
+                    continue
+                case 7:
+                    input("Regresando al menú principal...")
+                    break
+                case _:
+                    input("Opción inválida! Por favor, intente de nuevo...")
+                    continue
+        return None
+
+    def menu_operaciones(self) -> int:
+        limpiar_pantalla()
+        print("\n###########################")
+        print("### Menú de Operaciones ###")
+        print("###########################")
+        self.manager_mats._imprimir_matrices()
+        print("\n1. Agregar una matriz")
+        print("2. Agregar un vector\n")
+        print("3. Mostrar matrices")
+        print("4. Mostrar vectores\n")
+        print("5. Resolver sistema de ecuaciones")
+        print("6. Sumar matrices")
+        print("7. Restar matrices")
+        print("8. Multiplicar matriz por escalar")
+        print("9. Multiplicar matrices")
+        print("10. Transponer matriz\n")
+        print("11. Sumar vectores")
+        print("12. Restar vectores")
+        print("13. Multiplicar vector por escalar")
+        print("14. Multiplicar vectores")
+        print("\n15. Multiplicar matriz por vector")
+        print("\n16. Regresar al menú principal")
+        try:
+            option = int(input("\nSeleccione una opción: ").strip())
+            if option < 1 or option > 16:
+                raise ValueError
+        except ValueError:
+            input("\nError: Ingrese una opción válida!")
+            return self.menu_operaciones()
+        return option

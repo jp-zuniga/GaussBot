@@ -1,10 +1,7 @@
 from fractions import Fraction
-from typing import Tuple, List
+from typing import List
 
-from gauss_bot.matrices.matriz import Matriz
-
-# type annotations:
-Validacion = Tuple[bool, int]
+from gauss_bot.matrices.matriz import Matriz, Validacion
 
 class SistemaEcuaciones:
     def __init__(self, matriz: Matriz) -> None:
