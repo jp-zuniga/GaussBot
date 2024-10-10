@@ -9,16 +9,16 @@ class SistemaEcuaciones:
         self.filas = matriz.filas
         self.columnas = matriz.columnas
 
-        self.respuesta: List[str] = []
-        self.procedimiento: List[str] = []
+        self.respuesta = ""
+        self.procedimiento  = ""
 
     def resolver_sistema(self) -> None:
-        self.reducir_matriz()
         if self.matriz.es_matriz_cero():
             return None
+        self.reducir_matriz()
 
         libres = self.encontrar_variables_libres()
-        if self.matriz.validar_escalonada_reducida() and not libres:  # solucion unica:
+        if self.validar_escalonada_reducida() and not libres:  # solucion unica:
             self.imprimir_soluciones(unica=True, libres=[], validacion=(True, -1))
             return None
 
@@ -27,17 +27,17 @@ class SistemaEcuaciones:
         return None
 
     def reducir_matriz(self) -> None:
-        test_inicial = self.matriz.validar_consistencia()
+        test_inicial = self.validar_consistencia()
         if not test_inicial[0]:
             self.imprimir_soluciones(unica=False, libres=[], validacion=test_inicial)
             return None
-        elif self.matriz.validar_escalonada_reducida():
-            self.procedimiento.append("\nMatriz ya esta en su forma escalonada reducida!\n")
+        elif self.validar_escalonada_reducida():
+            self.procedimiento += ("\nMatriz ya esta en su forma escalonada reducida!\n")
             return None
 
-        self.procedimiento.append("\nMatriz inicial:\n")
-        self.procedimiento.append(self.matriz.get_mat_str())
-        self.procedimiento.append("\nReduciendo la matriz a su forma escalonada:\n")
+        self.procedimiento += ("\nMatriz inicial:\n")
+        self.procedimiento += (str(self.matriz))
+        self.procedimiento += ("\nReduciendo la matriz a su forma escalonada:\n")
 
         fila_actual = 0
         for j in range(self.columnas - 1):  # encontrar pivotes y eliminar elementos debajo
@@ -57,19 +57,19 @@ class SistemaEcuaciones:
             # siempre trabajar con la fila pivote
             if fila_pivote != fila_actual:
                 self.matriz.valores[fila_actual], self.matriz.valores[fila_pivote] = self.matriz.valores[fila_pivote], self.matriz.valores[fila_actual]
-                self.procedimiento.append(f"\nF{fila_actual+1} <==> F{fila_pivote+1}\n")
-                self.procedimiento.append(self.matriz.get_mat_str())
+                self.procedimiento += (f"\nF{fila_actual+1} <==> F{fila_pivote+1}\n")
+                self.procedimiento += (str(self.matriz))
 
             pivote = self.matriz[fila_actual][j]
             if pivote != 1 and pivote != 0:  # hacer el pivote igual a 1
                 for k in range(self.columnas):
                     self.matriz[fila_actual][k] /= pivote
                 if pivote == -1:
-                    self.procedimiento.append(f"\nF{fila_actual+1} => -F{fila_actual+1}\n")
+                    self.procedimiento += (f"\nF{fila_actual+1} => -F{fila_actual+1}\n")
                 else:
-                    self.procedimiento.append(f"\nF{fila_actual+1} => F{fila_actual+1} / {str(pivote.limit_denominator(100))}\n")
+                    self.procedimiento += (f"\nF{fila_actual+1} => F{fila_actual+1} / {str(pivote.limit_denominator(100))}\n")
 
-                self.procedimiento.append(self.matriz.get_mat_str())
+                self.procedimiento += (str(self.matriz))
 
             # eliminar los elementos debajo del pivote
             for f in range(fila_actual + 1, self.filas):
@@ -79,8 +79,8 @@ class SistemaEcuaciones:
                 for k in range(self.columnas):
                     self.matriz[f][k] -= factor * self.matriz[fila_actual][k]
 
-                self.procedimiento.append(f"\nF{fila_actual+1} => F{fila_actual+1} - ({str(factor.limit_denominator(100))} * F{fila_pivote+1})\n")
-                self.procedimiento.append(self.matriz.get_mat_str())
+                self.procedimiento += (f"\nF{fila_actual+1} => F{fila_actual+1} - ({str(factor.limit_denominator(100))} * F{fila_pivote+1})\n")
+                self.procedimiento += (str(self.matriz))
 
             fila_actual += 1
 
@@ -100,10 +100,10 @@ class SistemaEcuaciones:
                 for k in range(self.columnas):
                     self.matriz[f][k] -= factor * self.matriz[i][k]
 
-                self.procedimiento.append(f"\nF{f+1} => F{f+1} - ({str(factor.limit_denominator(100))} * F{i+1})\n")
-                self.procedimiento.append(self.matriz.get_mat_str())
+                self.procedimiento += (f"\nF{f+1} => F{f+1} - ({str(factor.limit_denominator(100))} * F{i+1})\n")
+                self.procedimiento += (str(self.matriz))
 
-        test_final = self.matriz.validar_consistencia()
+        test_final = self.validar_consistencia()
         if not test_final[0]:
             self.imprimir_soluciones(unica=False, libres=[], validacion=test_final)
             return None
@@ -162,28 +162,82 @@ class SistemaEcuaciones:
         ecuaciones.sort(key=lambda x: x[3])
         return ecuaciones
 
+    def validar_consistencia(self) -> Validacion:
+        if self.matriz.valores == [] or self.matriz.es_matriz_cero():
+            return (True, -1)
+
+        for i in range(self.filas):
+            # validar forma de 0 = b (donde b != 0)
+            if [0 for _ in range(len(self.matriz.valores[0]) - 1)] == self.matriz.valores[i][:-1] and self.matriz.valores[i][-1] != 0:
+                return (False, i)
+
+        return (True, -1)
+
+    def validar_escalonada(self) -> bool:
+        fila_cero = [0 for _ in range(self.columnas)]
+        entrada_anterior = -1
+
+        if self.matriz.valores == [] or self.matriz.es_matriz_cero():
+            return False
+
+        # buscar filas no-cero despues de una fila cero, significa que no es escalonada
+        for i in range(self.filas):
+            if self.matriz.valores[i] != fila_cero:
+                continue
+            if any(self.matriz.valores[j] != fila_cero for j in range(i + 1, self.filas)):
+                return False
+
+        # validar entradas principales
+        for i in range(self.filas):
+            try:
+                entrada_actual = next(j for j in range(self.columnas - 1) if self.matriz.valores[i][j] != 0)
+            except StopIteration:
+                continue
+            if entrada_actual <= entrada_anterior:
+                return False
+            if any(self.matriz.valores[k][entrada_actual] != 0 for k in range(i + 1, self.filas)):
+                return False
+            entrada_anterior = entrada_actual
+
+        return True
+
+    def validar_escalonada_reducida(self) -> bool:
+        if not self.validar_escalonada():  # si no es escalonada, no puede ser escalonada reducida
+            return False
+
+        # validar entradas principales
+        for i in range(self.filas):
+            try:
+                entrada_principal = next(j for j in range(self.columnas - 1) if self.matriz.valores[i][j] == 1)
+            except StopIteration:
+                continue
+            if any(self.matriz.valores[k][entrada_principal] != 0 and k != i for k in range(self.filas)):
+                return False
+
+        return True
+
     def imprimir_soluciones(self, unica: bool, libres: List[int], validacion: Validacion) -> None:
         solucion, fila_inconsistente = validacion
         if not solucion and fila_inconsistente != -1:
-            self.respuesta.append(f"\n| En F{fila_inconsistente+1}: 0 != {str(self.matriz[fila_inconsistente, -1].limit_denominator(100))}\n")
-            self.respuesta.append("| Sistema es inconsistente!\n")
+            self.respuesta += (f"\n| En F{fila_inconsistente+1}: 0 != {str(self.matriz[fila_inconsistente, -1].limit_denominator(100))}\n")
+            self.respuesta += ("| Sistema es inconsistente!\n")
             return None
 
         elif unica:
             solucion_trivial = all(self.matriz[i, -1] == 0 for i in range(self.filas))
             mensaje_solucion = "trivial" if solucion_trivial else "no trivial"
 
-            self.respuesta.append(f"\n| Solución {mensaje_solucion} encontrada:\n")
+            self.respuesta += (f"\n| Solución {mensaje_solucion} encontrada:\n")
             for i in range(self.filas):
                 if all(x == 0 for x in self.matriz[i]):
                     continue
-                self.respuesta.append(f"| X{i+1} = {str(self.matriz[i, -1].limit_denominator(100))}\n")
+                self.respuesta += (f"| X{i+1} = {str(self.matriz[i, -1].limit_denominator(100))}\n")
             return None
 
         ecuaciones = self.despejar_variables(libres)
-        self.respuesta.append("\n| Sistema no tiene solución única!\n")
-        self.respuesta.append("| Solución general encontrada:\n")
+        self.respuesta += ("\n| Sistema no tiene solución única!\n")
+        self.respuesta += ("| Solución general encontrada:\n")
         for linea in ecuaciones:
-            self.respuesta.append(linea)
+            self.respuesta += (linea)
 
         return None

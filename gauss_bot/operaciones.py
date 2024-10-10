@@ -90,7 +90,6 @@ class MatricesManager:
 
     def pedir_dimensiones(self, nombre: str, es_aumentada: bool) -> Tuple[int, int]:
             palabras = ["ecuaciones", "variables"] if es_aumentada else ["filas", "columnas"]
-
             try:
                 print(f"\nDatos de matriz {nombre}:")
                 print("----------------------------")
@@ -100,7 +99,6 @@ class MatricesManager:
                 columnas = int(input(f"Ingrese el número de {palabras[1]}: "))
                 if columnas <= 0:
                     raise ValueError("Error: Ingrese un número entero positivo!")
-
             except ValueError as v:
                 input(v)
                 return self.pedir_dimensiones(nombre, es_aumentada)
@@ -124,11 +122,11 @@ class MatricesManager:
             mat1, mat2 = self.mats_ingresadas[nombres_mats[0]], self.mats_ingresadas[nombres_mats[1]]
             match operacion:
                 case "m":
-                    mat_resultante = mat1.mult_matrices(mat2)
+                    mat_resultante = mat1 * mat2
                 case "s":
-                    mat_resultante = mat1.sumar_mats(mat2)
+                    mat_resultante = mat1 + mat2
                 case "r":
-                    mat_resultante = mat1.restar_mats(mat2)
+                    mat_resultante = mat1 - mat2
             return (nombres_mats, mat_resultante)
 
         elif operacion == "t" or operacion == "se":
@@ -146,9 +144,7 @@ class MatricesManager:
                     nombre_mat_modded = f"{nombre_mat}_r"
                     resolver = SistemaEcuaciones(mat_copia)
                     resolver.resolver_sistema()
-                    respuesta = resolver.respuesta
-                    procedimiento = resolver.procedimiento
-                    mat_copia_modded = resolver.matriz
+                    respuesta, procedimiento, mat_copia_modded = resolver.respuesta, resolver.procedimiento, resolver.matriz
 
                     if nombre_mat_modded not in self.mats_ingresadas.keys():
                         self.mats_ingresadas[nombre_mat_modded] = mat_copia_modded
@@ -228,8 +224,7 @@ class MatricesManager:
         print("---------------------------------------------", end="")
         for nombre, mat in self.mats_ingresadas.items():
             print(f"\n{nombre}:")
-            for linea in mat.get_mat_str():
-                print(linea, end="")
+            print(mat)
         print("---------------------------------------------")
 
         return None
@@ -242,7 +237,7 @@ class OpsManager:
         self.manager_mats = manager_mats
         self.manager_vecs = manager_vecs
 
-    def main(self) -> None:
+    def start(self) -> None:
         option = self.menu_operaciones()
         while option != 7:
             match option:
@@ -254,19 +249,15 @@ class OpsManager:
                     respuesta, procedimiento, mat_resultante = self.manager_mats.procesar_operacion("se")
                     print("\n---------------------------------------------")
                     print("\nSistema de ecuaciones resuelto:")
-                    for linea in mat_resultante.get_mat_str():
-                        print(linea, end="")
-                    for linea in respuesta:
-                        print(linea, end="")
+                    print(mat_resultante)
+                    print(respuesta)
 
                     print("\n---------------------------------------------")
                     mostrar_procedimiento = match_input("\n¿Desea ver el procedimiento? (s/n) ")
                     if mostrar_procedimiento:
                         limpiar_pantalla()
-                        for linea in procedimiento:
-                            print(linea, end="")
-                        for linea in respuesta:
-                            print(linea, end="")
+                        print(procedimiento)
+                        print(respuesta)
                     elif not mostrar_procedimiento:
                         print("\nDe acuerdo!")
                     else:
@@ -288,16 +279,11 @@ class OpsManager:
 
                     limpiar_pantalla()
                     print(f"\n{mats_seleccionadas[0]}:")
-                    for linea in mat1.get_mat_str():
-                        print(linea, end="")
-
+                    print(mat1)
                     print(f"\n{mats_seleccionadas[1]}:")
-                    for linea in mat2.get_mat_str():
-                        print(linea, end="")
-
+                    print(mat2)
                     print(f"\n{mats_seleccionadas[0]} + {mats_seleccionadas[1]}:")
-                    for linea in resultado.get_mat_str():
-                        print(linea, end="")
+                    print(resultado)
 
                     input("\nPresione cualquier tecla para continuar...")
                     option = self.menu_operaciones()
@@ -308,16 +294,11 @@ class OpsManager:
 
                     limpiar_pantalla()
                     print(f"\n{mats_seleccionadas[0]}:")
-                    for linea in mat1.get_mat_str():
-                        print(linea, end="")
-
+                    print(mat1)
                     print(f"\n{mats_seleccionadas[1]}:")
-                    for linea in mat2.get_mat_str():
-                        print(linea, end="")
-
+                    print(mat2)
                     print(f"\n{mats_seleccionadas[0]} - {mats_seleccionadas[1]}:")
-                    for linea in resultado.get_mat_str():
-                        print(linea, end="")
+                    print(resultado)
 
                     input("\nPresione cualquier tecla para continuar...")
                     option = self.menu_operaciones()
@@ -328,16 +309,11 @@ class OpsManager:
 
                     limpiar_pantalla()
                     print(f"\n{mats_seleccionadas[0]}:")
-                    for linea in mat1.get_mat_str():
-                        print(linea, end="")
-
+                    print(mat1)
                     print(f"\n{mats_seleccionadas[1]}:")
-                    for linea in mat2.get_mat_str():
-                        print(linea, end="")
-
+                    print(mat2)
                     print(f"\n{mats_seleccionadas[0]} * {mats_seleccionadas[1]}:")
-                    for linea in resultado.get_mat_str():
-                        print(linea, end="")
+                    print(resultado)
 
                     input("\nPresione cualquier tecla para continuar...")
                     option = self.menu_operaciones()
@@ -348,12 +324,9 @@ class OpsManager:
 
                     limpiar_pantalla()
                     print(f"\n{mat_seleccionada}:")
-                    for linea in mat_original.get_mat_str():
-                        print(linea, end="")
-
+                    print(mat_original)
                     print(f"\n{mat_seleccionada}_t:")
-                    for linea in resultado.get_mat_str():
-                        print(linea, end="")
+                    print(resultado)
 
                     input("\nPresione cualquier tecla para continuar...")
                     option = self.menu_operaciones()

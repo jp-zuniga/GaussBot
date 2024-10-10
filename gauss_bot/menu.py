@@ -7,7 +7,7 @@ def main() -> None:
     while option != 3:
         match option:
             case 1:
-                manager.main()
+                manager.start()
                 option = main_menu()
                 continue
             case 2:
