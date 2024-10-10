@@ -1,5 +1,4 @@
-from matrices import OperacionesMatrices
-
+from matrices.ops_matrices import OperacionesMatrices
 from utils import limpiar_pantalla
 
 

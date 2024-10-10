@@ -1,14 +1,13 @@
-from os import path
 from PyQt6.QtWidgets import (
     QApplication, QMainWindow,
     QWidget, QVBoxLayout,
     QPushButton, QLabel,
 )
 
-from PyQt6.QtGui import QFont, QIcon
+from PyQt6.QtGui import QFont
 from PyQt6.QtCore import Qt
 
-from matrices import OperacionesMatrices
+from matrices.ops_matrices import OperacionesMatrices
 from vectores import OperacionesVectores
 
 STYLESHEET = """
