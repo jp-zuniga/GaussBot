@@ -1,7 +1,7 @@
 from fractions import Fraction
 from typing import List, Dict
 
-from gauss_bot.matrices.vector import Vector
+from gauss_bot.clases.vector import Vector
 from gauss_bot.utils import limpiar_pantalla
 
 DictVectores = Dict[str, Vector]

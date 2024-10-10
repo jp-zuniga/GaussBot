@@ -2,9 +2,9 @@ from fractions import Fraction
 from typing import Tuple, List, Dict, overload
 from copy import deepcopy
 
-from gauss_bot.matrices.matriz import Matriz
-from gauss_bot.matrices.vector import Vector
-from gauss_bot.matrices.sistema_ecuaciones import SistemaEcuaciones
+from gauss_bot.clases.matriz import Matriz
+from gauss_bot.clases.vector import Vector
+from gauss_bot.clases.sistema_ecuaciones import SistemaEcuaciones
 from gauss_bot.utils import limpiar_pantalla, match_input
 
 DictMatrices = Dict[str, Matriz]

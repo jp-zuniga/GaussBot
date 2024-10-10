@@ -1,7 +1,7 @@
 from fractions import Fraction
 from typing import List
 
-from gauss_bot.matrices.matriz import Matriz, Validacion
+from gauss_bot.clases.matriz import Matriz, Validacion
 
 class SistemaEcuaciones:
     def __init__(self, matriz: Matriz) -> None:
