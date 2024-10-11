@@ -3,7 +3,7 @@ from gauss_bot.managers.vecs_manager import VectoresManager
 from gauss_bot.utils import limpiar_pantalla
 
 # TODO: mejorar .procesar_operacion() en MatricesManager y VectoresManager
-# TODO implementer producto matriz-vector en ambos menus
+# TODO implementer producto matriz-vector OpsManager
 
 class OpsManager:
     def __init__(self, mat_manager: MatricesManager, vec_manager: VectoresManager) -> None:
@@ -15,9 +15,9 @@ class OpsManager:
             option = self.main_menu()
             match option:
                 case 1:
-                    self.mat_manager._imprimir_matrices(necesita_aumentada = -1)
+                    self.mat_manager._mostrar_matrices(necesita_aumentada = -1)
                 case 2:
-                    self.vec_manager._imprimir_vectores()
+                    self.vec_manager._mostrar_vectores()
                 case 3:
                     self.mat_manager.menu_matrices()
                 case 4:

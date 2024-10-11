@@ -1,6 +1,6 @@
 from fractions import Fraction
 from copy import deepcopy
-from typing import Tuple, List, overload
+from typing import Tuple, List, Any, overload
 
 from gauss_bot.clases.matriz import Matriz, DictMatrices
 from gauss_bot.clases.sistema_ecuaciones import SistemaEcuaciones
@@ -46,19 +46,19 @@ class MatricesManager:
             case 2:
                 self._mostrar_matrices(necesita_aumentada = -1)
             case 3:
-                self.procesar_operacion("se")
+                self.mostrar_resultado("se", self.procesar_operacion("se"))
             case 4:
-                self.procesar_operacion("s")
+                self.mostrar_resultado("s", self.procesar_operacion("s"))
             case 5:
-                self.procesar_operacion("r")
+                self.mostrar_resultado("r", self.procesar_operacion("r"))
             case 6:
-                self.procesar_operacion("me")
+                self.mostrar_resultado("me", self.procesar_operacion("me"))
             case 7:
-                self.procesar_operacion("m")
+                self.mostrar_resultado("m", self.procesar_operacion("m"))
             case 8:
                 ...  # TODO: producto matriz-vector
             case 9:
-                self.procesar_operacion("t")
+                self.mostrar_resultado("t", self.procesar_operacion("t"))
         return None
 
     def agregar_matriz(self) -> None:
@@ -150,13 +150,18 @@ class MatricesManager:
                 return self.pedir_dimensiones(nombre, es_aumentada)
             return (filas, columnas)
 
-    def procesar_operacion(self, operacion: str):
+    def procesar_operacion(self, operacion: str) -> Any:
         """
-        ? operacion:
+        * toma un codigo de operacion
+        * selecciona las matrices necesarias
+        * retorna una tupla con lo que selecciono el usuario y los resultados de la operacion
+
+        codigos validos de operacion:
         * "se": resolver sistema de ecuaciones
-        * "m": multiplicar matrices
         * "s": sumar matrices
         * "r": restar matrices
+        * "me": multiplicar matriz por escalar
+        * "m": multiplicar matrices
         * "t": transponer matriz
         """
 
@@ -189,7 +194,7 @@ class MatricesManager:
                     return (respuesta, procedimiento, mat_copia_modded)
                 case "me":
                     escalar = Fraction(input("Ingrese el escalar: ").strip())
-                    return (nombre_mat, mat_copia * escalar)
+                    return (nombre_mat, escalar, mat_copia * escalar)
                 case "t":
                     nombre_mat_modded = f"{nombre_mat}_t"
                     mat_copia_modded = mat_copia.transponer()
@@ -197,6 +202,118 @@ class MatricesManager:
                     if nombre_mat_modded not in self.mats_ingresadas.keys():
                         self.mats_ingresadas[nombre_mat_modded] = mat_copia_modded
                     return (nombre_mat, mat_copia_modded)
+
+    def mostrar_resultado(self, operacion: str, resultado: Any) -> None:
+        """
+        * operacion: el codigo de operacion usada en .procesar_operacion()
+        * resultado: la tupla retornada por .procesar_operacion()
+
+        codigos validos de operacion:
+        * "se": resolver sistema de ecuaciones
+        * "s": sumar matrices
+        * "r": restar matrices
+        * "me": multiplicar matriz por escalar
+        * "m": multiplicar matrices
+        * "t": transponer matriz
+        """
+
+        if operacion not in ("se", "s", "r", "me", "m", "t"):
+            return None
+
+        match operacion:
+            case "se":  # ? resolver sistema de ecuaciones
+                respuesta, procedimiento, mat_resultante = self.procesar_operacion("se")
+                print("\n---------------------------------------------")
+                print("\nSistema de ecuaciones resuelto:")
+                print(mat_resultante)
+                print(respuesta)
+                print("\n---------------------------------------------")
+
+                mostrar_procedimiento = match_input("\n¿Desea ver el procedimiento? (s/n) ")
+                if mostrar_procedimiento:
+                    limpiar_pantalla()
+                    print(procedimiento)
+                    print(respuesta)
+                elif not mostrar_procedimiento:
+                    print("\nDe acuerdo!")
+                else:
+                    print("\nOpción inválida!")
+
+                resolver_otra = match_input("¿Desea resolver otra matriz? (s/n) ")
+                if resolver_otra:
+                    return self.mostrar_resultado("se", self.procesar_operacion("se"))
+                elif not resolver_otra:
+                    input("De acuerdo! Regresando al menú de matrices...")
+                else:
+                    input("Opción inválida! Regresando al menú de matrices...")
+                return None
+            case "s":   # ? sumar matrices
+                mats_seleccionadas, mat_sumada = self.procesar_operacion("s")
+                mat1, mat2 = self.mats_ingresadas[mats_seleccionadas[0]], self.mats_ingresadas[mats_seleccionadas[1]]
+
+                limpiar_pantalla()
+                print(f"\n{mats_seleccionadas[0]}:")
+                print(mat1)
+                print(f"\n{mats_seleccionadas[1]}:")
+                print(mat2)
+                print(f"\n{mats_seleccionadas[0]} + {mats_seleccionadas[1]}:")
+                print(mat_sumada)
+
+                input("\nPresione cualquier tecla para continuar...")
+                return None
+            case "r":   # ? restar matrices
+                mats_seleccionadas, mat_restada = self.procesar_operacion("r")
+                mat1, mat2 = self.mats_ingresadas[mats_seleccionadas[0]], self.mats_ingresadas[mats_seleccionadas[1]]
+
+                limpiar_pantalla()
+                print(f"\n{mats_seleccionadas[0]}:")
+                print(mat1)
+                print(f"\n{mats_seleccionadas[1]}:")
+                print(mat2)
+                print(f"\n{mats_seleccionadas[0]} - {mats_seleccionadas[1]}:")
+                print(mat_restada)
+
+                input("\nPresione cualquier tecla para continuar...")
+                return None
+            case "me":  # ? multiplicar matriz por escalar
+                mat_seleccionada, escalar, mat_multiplicado = self.procesar_operacion("me")
+                mat = self.mats_ingresadas[mat_seleccionada]
+
+                limpiar_pantalla()
+                print(f"\n{mat_seleccionada}:")
+                print(mat)
+                print(f"\n{mat_seleccionada} * {escalar}:")
+                print(mat_multiplicado)
+
+                input("\nPresione cualquier tecla para continuar...")
+                return None
+            case "m":   # ? multiplicar matrices
+                mats_seleccionadas, mat_restada = self.procesar_operacion("m")
+                mat1, mat2 = self.mats_ingresadas[mats_seleccionadas[0]], self.mats_ingresadas[mats_seleccionadas[1]]
+
+                limpiar_pantalla()
+                print(f"\n{mats_seleccionadas[0]}:")
+                print(mat1)
+                print(f"\n{mats_seleccionadas[1]}:")
+                print(mat2)
+                print(f"\n{mats_seleccionadas[0]} * {mats_seleccionadas[1]}:")
+                print(mat_restada)
+
+                input("\nPresione cualquier tecla para continuar...")
+                return None
+            case "t":   # ? transponer matriz
+                mat_seleccionada, mat_transpuesta = self.procesar_operacion("t")
+                mat_original = self.mats_ingresadas[mat_seleccionada]
+
+                limpiar_pantalla()
+                print(f"\n{mat_seleccionada}:")
+                print(mat_original)
+                print(f"\n{mat_seleccionada}_t:")
+                print(mat_transpuesta)
+
+                input("\nPresione cualquier tecla para continuar...")
+                return None
+        return None
 
     @overload
     def seleccionar(self, operacion: str) -> str: ...

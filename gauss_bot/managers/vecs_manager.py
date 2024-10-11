@@ -1,6 +1,6 @@
 from fractions import Fraction
 from copy import deepcopy
-from typing import List, overload
+from typing import List, Any, overload
 
 from gauss_bot.clases.vector import Vector, DictVectores
 from gauss_bot.utils import limpiar_pantalla, match_input
@@ -43,13 +43,13 @@ class VectoresManager:
             case 2:
                 self._mostrar_vectores()
             case 3:
-                self.procesar_operacion("s")
+                self.mostrar_resultado("s", self.procesar_operacion("s"))
             case 4:
-                self.procesar_operacion("r")
+                self.mostrar_resultado("r", self.procesar_operacion("r"))
             case 5:
-                self.procesar_operacion("ve")
+                self.mostrar_resultado("ve", self.procesar_operacion("ve"))
             case 6:
-                self.procesar_operacion("m")
+                self.mostrar_resultado("m", self.procesar_operacion("m"))
             case 7:
                 ...  # TODO: producto matriz-vector
         return None
@@ -112,15 +112,18 @@ class VectoresManager:
 
     def procesar_operacion(self, operacion: str):
         """
-        ? operacion:
+        * toma un codigo de operacion
+        * selecciona los vectores necesarios
+        * retorna una tupla con lo que selecciono el usuario y los resultados de la operacion
+
+        codigos validos de operacion:
         * "s": sumar vectores
         * "r": restar vectores
         * "ve": multiplicar vector por escalar
         * "m": multiplicar vectores
-        * "mv": multiplicar matriz por vector
         """
 
-        if operacion not in ("s", "r", "ve", "m", "mv"):
+        if operacion not in ("s", "r", "ve", "m"):
             return None
 
         if operacion in ("s", "r", "m"):
@@ -139,8 +142,67 @@ class VectoresManager:
             vec_copia = deepcopy(self.vecs_ingresados[nombre_vec])
             escalar = Fraction(input("Ingrese el escalar: ").strip())
             return (nombre_vec, vec_copia * escalar)
-        elif operacion == "mv":
-            ...  # TODO: producto matriz-vector
+
+    def mostrar_resultado(self, operacion: str, resultado: Any) -> None:
+        """
+        * operacion: el codigo de operacion usada en .procesar_operacion()
+        * resultado: la tupla retornada por .procesar_operacion()
+
+        codigos validos de operacion:
+        * "s": sumar vectores
+        * "r": restar vectores
+        * "ve": multiplicar vector por escalar
+        * "m": multiplicar vectores
+        """
+
+        if operacion not in ("s", "r", "ve", "m"):
+            return None
+
+        match operacion:
+            case "s":   # ? sumar vectores
+                vecs_seleccionados, vec_sumado = self.procesar_operacion("s")
+                vec1, vec2 = self.vecs_ingresados[vecs_seleccionados[0]], self.vecs_ingresados[vecs_seleccionados[1]]
+
+                limpiar_pantalla()
+                print(f"\n{vecs_seleccionados[0]} = {vec1}")
+                print(f"\n{vecs_seleccionados[1]} = {vec2}")
+                print(f"\n{vecs_seleccionados[0]} + {vecs_seleccionados[1]} = {vec_sumado}")
+
+                input("\nPresione cualquier tecla para continuar...")
+                return None
+            case "r":   # ? restar vectores
+                vecs_seleccionados, vec_restado = self.procesar_operacion("r")
+                vec1, vec2 = self.vecs_ingresados[vecs_seleccionados[0]], self.vecs_ingresados[vecs_seleccionados[1]]
+
+                limpiar_pantalla()
+                print(f"\n{vecs_seleccionados[0]} = {vec1}")
+                print(f"\n{vecs_seleccionados[1]} = {vec2}")
+                print(f"\n{vecs_seleccionados[0]} - {vecs_seleccionados[1]} = {vec_restado}")
+
+                input("\nPresione cualquier tecla para continuar...")
+                return None
+            case "me":  # ? multiplicar vectores por escalar
+                vec_seleccionado, escalar, vec_multiplicado = self.procesar_operacion("me")
+                vec = self.vecs_ingresados[vec_seleccionado]
+
+                limpiar_pantalla()
+                print(f"\n{vec_seleccionado} = {vec}")
+                print(f"\n{vec_seleccionado} * {escalar} = {vec_multiplicado}")
+
+                input("\nPresione cualquier tecla para continuar...")
+                return None
+            case "m":   # ? multiplicar vectores
+                vecs_seleccionados, vec_multiplicado = self.procesar_operacion("m")
+                vec1, vec2 = self.vecs_ingresados[vecs_seleccionados[0]], self.vecs_ingresados[vecs_seleccionados[1]]
+
+                limpiar_pantalla()
+                print(f"\n{vecs_seleccionados[0]} = {vec1}")
+                print(f"\n{vecs_seleccionados[1]} = {vec2}")
+                print(f"\n{vecs_seleccionados[0]}.{vecs_seleccionados[1]} = {vec_multiplicado}")
+
+                input("\nPresione cualquier tecla para continuar...")
+                return None
+        return None
 
     @overload
     def seleccionar(self, operacion: str) -> str: ...
