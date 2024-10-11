@@ -8,6 +8,7 @@ from gauss_bot.utils import limpiar_pantalla
 # ? implementar metodo de analizar matriz en MatricesManager
 # ? mejorar .procesar_operacion() en MatricesManager y VectoresManager
 # ? implementar metodo de producto matriz-vector en OpsManager
+# ? implementar opcion de mostrar procedimiento de todas las operaciones en MatricesManager y VectoresManager
 
 class OpsManager:
     def __init__(self, mat_manager=None, vec_manager=None) -> None:

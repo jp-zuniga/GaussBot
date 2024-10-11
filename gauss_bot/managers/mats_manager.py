@@ -89,7 +89,7 @@ class MatricesManager:
             if not nombre.isalpha() or len(nombre) != 1:
                 raise NameError("Error: Ingrese solamente una letra mayúscula!")
             if nombre in self.mats_ingresadas:
-                raise KeyError(f"Error: Ya hay una matriz con el nombre {nombre}!")
+                raise KeyError(f"Error: Ya hay una matriz con el nombre '{nombre}'!")
 
             ingresar_aumentada = match_input("¿Se ingresará una matriz aumentada? (s/n) ")
             if ingresar_aumentada == 1:
@@ -193,6 +193,9 @@ class MatricesManager:
 
         if operacion in ("s", "r", "m"):
             nombres_mats = self.seleccionar_mats(operacion)
+            if nombres_mats == []:
+                return ()
+
             mat1, mat2 = self.mats_ingresadas[nombres_mats[0]], self.mats_ingresadas[nombres_mats[1]]
             match operacion:
                 case "s":
@@ -204,6 +207,9 @@ class MatricesManager:
 
         elif operacion in ("se", "me", "t"):
             nombre_mat = self.seleccionar_mat(operacion)
+            if nombre_mat == "":
+                return ()
+
             mat_copia = deepcopy(self.mats_ingresadas[nombre_mat])
             match operacion:
                 case "se":
@@ -249,7 +255,7 @@ class MatricesManager:
         """
 
         limpiar_pantalla()
-        if operacion not in ("se", "s", "r", "me", "m", "t"):
+        if operacion not in ("se", "s", "r", "me", "m", "t") or resultado == ():
             return None
 
         match operacion:
@@ -364,7 +370,7 @@ class MatricesManager:
                 self._validar_input_mat(input_mat, operacion)
             except (KeyError, TypeError) as e:
                 input(e)
-                return self.seleccionar_mat(operacion)
+                return ""
             return input_mat
         else:
             return ""
@@ -377,7 +383,7 @@ class MatricesManager:
                 self._validar_input_mats(input_mats, operacion)
             except (KeyError, ArithmeticError) as e:
                 input(e)
-                return self.seleccionar_mats(operacion)
+                return []
             return input_mats
         else:
             return []
@@ -401,14 +407,14 @@ class MatricesManager:
 
     def _validar_input_mat(self, input_mat: str, operacion: str) -> None:
         if input_mat not in self.mats_ingresadas:
-            raise KeyError(f"Error: La matriz {input_mat} no existe!")
+            raise KeyError(f"Error: La matriz '{input_mat}' no existe!")
         elif operacion == "se" and not self.mats_ingresadas[input_mat].aumentada:
-            raise TypeError("Error: La matriz seleccionada no es aumentada!")
+            raise TypeError(f"Error: La matriz '{input_mat}' no es aumentada!")
 
     def _validar_input_mats(self, input_mats: List[str], operacion: str) -> None:
         mat = next((mat for mat in input_mats if mat not in self.mats_ingresadas), None)
         if mat is not None:
-            raise KeyError(f"Error: La matriz {mat} no existe!")
+            raise KeyError(f"Error: La matriz '{mat}' no existe!")
         elif len(input_mats) != 2:
             raise ArithmeticError("Error: Debe seleccionar dos matrices!")
         elif operacion in ("s", "r"):
