@@ -1,19 +1,25 @@
 from fractions import Fraction
-from typing import Union, List, Dict, overload
-
-DictVectores = Dict[str, "Vector"]
+from typing import Union, List, overload
 
 class Vector():
     def __init__(self, componentes: List[Fraction] = []) -> None:
-        self.componentes = componentes
+        self._componentes = componentes
+    
+    @property
+    def componentes(self) -> List[Fraction]:
+        return self._componentes
 
     def __len__(self) -> int:
         return len(self.componentes)
 
     def __getitem__(self, indice: int) -> Fraction:
+        if indice >= len(self):
+            raise IndexError("Índice inválido")
         return self.componentes[indice]
 
     def __setitem__(self, indice: int, valor: Fraction) -> None:
+        if indice >= len(self):
+            raise IndexError("Índice inválido")
         self.componentes[indice] = valor
 
     def __str__(self) -> str:

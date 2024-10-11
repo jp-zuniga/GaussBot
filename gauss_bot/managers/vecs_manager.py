@@ -1,12 +1,12 @@
 from fractions import Fraction
-from copy import deepcopy
-from typing import List, Any, overload
+from typing import Union, Tuple, List, Dict, overload
 
-from gauss_bot.clases.vector import Vector, DictVectores
+from gauss_bot.clases.vector import Vector
 from gauss_bot.utils import limpiar_pantalla, match_input
 
 class VectoresManager:
-    def __init__(self, vecs_ingresados: DictVectores = {}) -> None:
+    def __init__(self, parent=None, vecs_ingresados: Dict[str, Vector] = {}) -> None:
+        self.parent = None
         self.vecs_ingresados = vecs_ingresados
 
     def menu_vectores(self) -> None:
@@ -16,22 +16,22 @@ class VectoresManager:
             print("### Operaciones de Vectores ###")
             print("###############################")
             print("\n1. Agregar un vector")
-            print("2. Mostrar vectores")
+            print("2. Mostrar vectores\n")
             print("3. Sumar vectores")
             print("4. Restar vectores")
             print("5. Multiplicar vector por escalar")
             print("6. Multiplicar vectores")
-            print("7. Multiplicar matriz por vector")
+            print("7. Multiplicar matriz por vector\n")
             print("8. Regresar al menú principal")
             try:
-                option = int(input("\nSeleccione una opción: ").strip())
+                option = int(input("\n=> Seleccione una opción: ").strip())
                 if option < 1 or option > 8:
                     raise ValueError
             except ValueError:
-                input("\nError: Ingrese una opción válida!")
+                input("=> Error: Ingrese una opción válida!")
                 continue
             if option == 8:
-                input("Regresando a menú principal...")
+                input("=> Regresando a menú principal...")
                 break
             self.procesar_menu(option)
         return None
@@ -40,18 +40,32 @@ class VectoresManager:
         match opcion:
             case 1:
                 self.agregar_vector()
+                return None
             case 2:
                 self._mostrar_vectores()
             case 3:
-                self.mostrar_resultado("s", self.procesar_operacion("s"))
+                resultado = self.procesar_operacion("s")
+                if resultado is not None:
+                    self.mostrar_resultado("s", resultado)
+                    return None
             case 4:
-                self.mostrar_resultado("r", self.procesar_operacion("r"))
+                resultado = self.procesar_operacion("r")
+                if resultado is not None:
+                    self.mostrar_resultado("r", resultado)
+                    return None
             case 5:
-                self.mostrar_resultado("ve", self.procesar_operacion("ve"))
+                resultado = self.procesar_operacion("ve")
+                if resultado is not None:
+                    self.mostrar_resultado("ve", resultado)
+                    return None
             case 6:
-                self.mostrar_resultado("m", self.procesar_operacion("m"))
+                resultado = self.procesar_operacion("m")
+                if resultado is not None:
+                    self.mostrar_resultado("m", resultado)
+                    return None
             case 7:
                 ...  # TODO: producto matriz-vector
+        input("Presione cualquier tecla para regresar al menú de vectores...")
         return None
 
     def agregar_vector(self) -> None:
@@ -77,13 +91,13 @@ class VectoresManager:
 
         self.vecs_ingresados[nombre] = self.pedir_vector(longitud)
         print("\nMatriz agregada exitosamente!")
-        ingresar_otro = match_input("¿Desea ingresar otro vector? (s/n) ")
+        ingresar_otro = match_input("\n¿Desea ingresar otro vector? (s/n) ")
         if ingresar_otro:
             return self.agregar_vector()
         elif not ingresar_otro:
-            input("Regresando al menú de vectores...")
+            input("Presione cualquier tecla para regresar al menú de vectores...")
         else:
-            input("Opción inválida! Regresando al menú de vectores...")
+            input("Opción inválida!\nPresione cualquier tecla para regresar al menú de vectores...")
         return None
 
     def pedir_vector(self, longitud: int) -> Vector:
@@ -110,7 +124,7 @@ class VectoresManager:
 
         return Vector(componentes)
 
-    def procesar_operacion(self, operacion: str):
+    def procesar_operacion(self, operacion: str) -> Tuple:
         """
         * toma un codigo de operacion
         * selecciona los vectores necesarios
@@ -123,8 +137,9 @@ class VectoresManager:
         * "m": multiplicar vectores
         """
 
-        if operacion not in ("s", "r", "ve", "m"):
-            return None
+        limpiar_pantalla()
+        if operacion not in ("s", "r", "ve", "m") or not self._validar_vecs_ingresados():
+            return ()
 
         if operacion in ("s", "r", "m"):
             nombres_vecs = self.seleccionar(None)
@@ -139,11 +154,19 @@ class VectoresManager:
 
         elif operacion == "ve":
             nombre_vec = self.seleccionar(operacion)
-            vec_copia = deepcopy(self.vecs_ingresados[nombre_vec])
-            escalar = Fraction(input("Ingrese el escalar: ").strip())
-            return (nombre_vec, vec_copia * escalar)
+            vec_seleccionado = self.vecs_ingresados[nombre_vec]
+            try:
+                escalar = Fraction(input("Ingrese el escalar: ").strip()).limit_denominator(100)
+            except ValueError:
+                input("Error: Ingrese un número real!")
+                return ()
+            except ZeroDivisionError:
+                input("Error: El denominador no puede ser cero!")
+                return ()
+            return (nombre_vec, vec_seleccionado * escalar)
+        return ()
 
-    def mostrar_resultado(self, operacion: str, resultado: Any) -> None:
+    def mostrar_resultado(self, operacion: str, resultado: Tuple) -> None:
         """
         * operacion: el codigo de operacion usada en .procesar_operacion()
         * resultado: la tupla retornada por .procesar_operacion()
@@ -155,12 +178,13 @@ class VectoresManager:
         * "m": multiplicar vectores
         """
 
+        limpiar_pantalla()
         if operacion not in ("s", "r", "ve", "m"):
             return None
 
         match operacion:
             case "s":   # ? sumar vectores
-                vecs_seleccionados, vec_sumado = self.procesar_operacion("s")
+                vecs_seleccionados, vec_sumado = resultado
                 vec1, vec2 = self.vecs_ingresados[vecs_seleccionados[0]], self.vecs_ingresados[vecs_seleccionados[1]]
 
                 limpiar_pantalla()
@@ -171,7 +195,7 @@ class VectoresManager:
                 input("\nPresione cualquier tecla para continuar...")
                 return None
             case "r":   # ? restar vectores
-                vecs_seleccionados, vec_restado = self.procesar_operacion("r")
+                vecs_seleccionados, vec_restado = resultado
                 vec1, vec2 = self.vecs_ingresados[vecs_seleccionados[0]], self.vecs_ingresados[vecs_seleccionados[1]]
 
                 limpiar_pantalla()
@@ -182,7 +206,7 @@ class VectoresManager:
                 input("\nPresione cualquier tecla para continuar...")
                 return None
             case "me":  # ? multiplicar vectores por escalar
-                vec_seleccionado, escalar, vec_multiplicado = self.procesar_operacion("me")
+                vec_seleccionado, escalar, vec_multiplicado = resultado
                 vec = self.vecs_ingresados[vec_seleccionado]
 
                 limpiar_pantalla()
@@ -192,7 +216,7 @@ class VectoresManager:
                 input("\nPresione cualquier tecla para continuar...")
                 return None
             case "m":   # ? multiplicar vectores
-                vecs_seleccionados, vec_multiplicado = self.procesar_operacion("m")
+                vecs_seleccionados, vec_multiplicado = resultado
                 vec1, vec2 = self.vecs_ingresados[vecs_seleccionados[0]], self.vecs_ingresados[vecs_seleccionados[1]]
 
                 limpiar_pantalla()
@@ -210,7 +234,7 @@ class VectoresManager:
     @overload
     def seleccionar(self, operacion: None) -> List[str]: ...
 
-    def seleccionar(self, operacion: str | None) -> str | List[str]:
+    def seleccionar(self, operacion: Union[str, None]) -> Union[str, List[str]]:
         if operacion not in ("ve", "mv", None):
             return "" if operacion else []
 
@@ -220,12 +244,12 @@ class VectoresManager:
         if operacion is not None:
             mensaje = self._get_mensaje(operacion)
             input_vec = self._get_input(mensaje, operacion)
-            self._validate_input_vec(input_vec, operacion)
+            self._validar_input_vec(input_vec, operacion)
             return input_vec
         else:
             mensaje = "\n¿Cuáles vectores desea seleccionar? (separados por comas) "
             input_vecs = self._get_input(mensaje, operacion).split(",")
-            self._validate_input_vecs(input_vecs)
+            self._validar_input_vecs(input_vecs)
             return input_vecs
 
     def _get_mensaje(self, operacion: str) -> str:
@@ -237,16 +261,16 @@ class VectoresManager:
             case _:
                 return ""
 
-    def _get_input(self, mensaje: str, operacion: str | None) -> str:
+    def _get_input(self, mensaje: str, operacion: Union[str, None]) -> str:
         limpiar_pantalla()
         self._mostrar_vectores()
         return input(mensaje).strip()
 
-    def _validate_input_vec(self, input_vec: str, operacion: str) -> None:
+    def _validar_input_vec(self, input_vec: str, operacion: str) -> None:
         if input_vec not in self.vecs_ingresados:
             raise KeyError("Error: El vector no existe.")
 
-    def _validate_input_vecs(self, input_vecs: List[str]) -> None:
+    def _validar_input_vecs(self, input_vecs: List[str]) -> None:
         vec = next((vec for vec in input_vecs if vec not in self.vecs_ingresados), None)
         if vec is not None:
             raise KeyError(f"Error: El vector {vec} no existe.")
@@ -255,11 +279,12 @@ class VectoresManager:
 
     def _validar_vecs_ingresados(self) -> bool:
         if self.vecs_ingresados == {}:
-            input("\nNo hay vectores ingresados!")
+            print("\nNo hay vectores ingresados!")
             return False
         return True
 
     def _mostrar_vectores(self) -> None:
+        limpiar_pantalla()
         if not self._validar_vecs_ingresados():
             return None
 
@@ -268,6 +293,4 @@ class VectoresManager:
         for nombre, vec in self.vecs_ingresados.items():
             print(f"{nombre}: {vec}")
         print("---------------------------------------------")
-
-        input("\nPresione cualquier tecla para regresar al menú de vectores...")
         return None

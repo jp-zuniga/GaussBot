@@ -7,34 +7,43 @@ class SistemaEcuaciones:
     def __init__(self, matriz: Matriz) -> None:
         self.matriz = matriz
         self.respuesta = ""
-        self.procedimiento  = ""
+        self.procedimiento = ""
 
     def resolver_sistema(self) -> None:
         if self.matriz.es_matriz_cero():
             return None
 
-        self._reducir_matriz()
+        test_inicial = self._validar_consistencia()
+        if not test_inicial[0]:
+            if self._validar_escalonada_reducida():
+                self.procedimiento += "\nMatriz ya esta en su forma escalonada reducida!\n\n"
+                self.procedimiento += str(self.matriz)
+            self._get_soluciones(unica=False, libres=[], validacion=test_inicial)
+            return None
+        
+        if self._validar_escalonada_reducida():
+            self.procedimiento += "\nMatriz ya esta en su forma escalonada reducida!\n\n"
+            self.procedimiento += str(self.matriz)
+        else:
+            self._reducir_matriz()
+            test_final = self._validar_consistencia()
+            if not test_final[0]:
+                self._get_soluciones(unica=False, libres=[], validacion=test_final)
+                return None
+
         libres = self._encontrar_variables_libres()
-        solucion_unica = self._validar_escalonada_reducida() and not libres
+        solucion_unica = self._validar_escalonada_reducida() and libres == []
         if solucion_unica:
-            self._imprimir_soluciones(unica=True, libres=[], validacion=(True, -1))
+            self._get_soluciones(unica=True, libres=[], validacion=(True, -1))
             return None
         else:
-            self._imprimir_soluciones(unica=False, libres=libres, validacion=(True, -1))
+            self._get_soluciones(unica=False, libres=libres, validacion=(True, -1))
             return None
 
     def _reducir_matriz(self) -> None:
-        test_inicial = self._validar_consistencia()
-        if not test_inicial[0]:
-            self._imprimir_soluciones(unica=False, libres=[], validacion=test_inicial)
-            return None
-        elif self._validar_escalonada_reducida():
-            self.procedimiento += ("\nMatriz ya esta en su forma escalonada reducida!\n")
-            return None
-
-        self.procedimiento += ("\nMatriz inicial:\n")
-        self.procedimiento += (str(self.matriz))
-        self.procedimiento += ("\nReduciendo la matriz a su forma escalonada:\n")
+        self.procedimiento += "\nMatriz inicial:\n"
+        self.procedimiento += str(self.matriz)
+        self.procedimiento += "\nReduciendo la matriz a su forma escalonada:\n"
 
         fila_actual: int = 0
         for j in range(self.matriz.columnas - 1):
@@ -51,8 +60,8 @@ class SistemaEcuaciones:
 
             if fila_pivote != fila_actual:
                 self.matriz.valores[fila_actual], self.matriz.valores[fila_pivote] = self.matriz.valores[fila_pivote], self.matriz.valores[fila_actual]
-                self.procedimiento += (f"\nF{fila_actual+1} <==> F{fila_pivote+1}\n")
-                self.procedimiento += (str(self.matriz))
+                self.procedimiento += f"\nF{fila_actual+1} <==> F{fila_pivote+1}\n"
+                self.procedimiento += str(self.matriz)
 
             pivote = self.matriz[fila_actual, j]
             if pivote != 1 and pivote != 0:
@@ -60,11 +69,11 @@ class SistemaEcuaciones:
                     self.matriz[fila_actual, k] /= pivote
 
                 if pivote == -1:
-                    self.procedimiento += (f"\nF{fila_actual+1} => -F{fila_actual+1}\n")
+                    self.procedimiento += f"\nF{fila_actual+1} => -F{fila_actual+1}\n"
                 else:
-                    self.procedimiento += (f"\nF{fila_actual+1} => F{fila_actual+1} / {str(pivote.limit_denominator(100))}\n")
+                    self.procedimiento += f"\nF{fila_actual+1} => F{fila_actual+1} / {str(pivote.limit_denominator(100))}\n"
 
-                self.procedimiento += (str(self.matriz))
+                self.procedimiento += str(self.matriz)
 
             for f in range(fila_actual + 1, self.matriz.filas):
                 factor = self.matriz[f, j]
@@ -73,8 +82,8 @@ class SistemaEcuaciones:
                 for k in range(self.matriz.columnas):
                     self.matriz[f, k] -= factor * self.matriz[fila_actual, k]
 
-                self.procedimiento += (f"\nF{fila_actual+1} => F{fila_actual+1} - ({str(factor.limit_denominator(100))} * F{fila_pivote+1})\n")
-                self.procedimiento += (str(self.matriz))
+                self.procedimiento += f"\nF{fila_actual+1} => F{fila_actual+1} - ({str(factor.limit_denominator(100))} * F{fila_pivote+1})\n"
+                self.procedimiento += str(self.matriz)
 
             fila_actual += 1
 
@@ -93,13 +102,9 @@ class SistemaEcuaciones:
                 for k in range(self.matriz.columnas):
                     self.matriz[f, k] -= factor * self.matriz[i, k]
 
-                self.procedimiento += (f"\nF{f+1} => F{f+1} - ({str(factor.limit_denominator(100))} * F{i+1})\n")
-                self.procedimiento += (str(self.matriz))
+                self.procedimiento += f"\nF{f+1} => F{f+1} - ({str(factor.limit_denominator(100))} * F{i+1})\n"
+                self.procedimiento += str(self.matriz)
 
-        test_final = self._validar_consistencia()
-        if not test_final[0]:
-            self._imprimir_soluciones(unica=False, libres=[], validacion=test_final)
-            return None
         return None
 
     def _encontrar_variables_libres(self) -> List[int]:
@@ -194,7 +199,7 @@ class SistemaEcuaciones:
                 return False
         return True
 
-    def _imprimir_soluciones(self, unica: bool, libres: List[int], validacion: Validacion) -> None:
+    def _get_soluciones(self, unica: bool, libres: List[int], validacion: Validacion) -> None:
         solucion, fila_inconsistente = validacion
         if not solucion and fila_inconsistente != -1:
             self.respuesta += (f"\n| En F{fila_inconsistente+1}: 0 != {str(self.matriz[fila_inconsistente, -1].limit_denominator(100))}\n")

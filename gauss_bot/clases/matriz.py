@@ -1,7 +1,6 @@
 from fractions import Fraction
-from typing import Union, Tuple, List, Dict, overload
+from typing import Union, Tuple, List, overload
 
-DictMatrices = Dict[str, "Matriz"]
 Validacion = Tuple[bool, int]
 
 class Matriz:
@@ -29,6 +28,11 @@ class Matriz:
     @property
     def valores(self) -> List[List[Fraction]]:
         return self._valores
+    
+    def __eq__(self, mat2) -> bool:
+        if self.filas != mat2.filas or self.columnas != mat2.columnas:
+            return False
+        return all(a == b for fila1, fila2 in zip(self.valores, mat2.valores) for a, b in zip(fila1, fila2))
 
     @overload
     def __getitem__(self, indices: Tuple[int, int]) -> Fraction: ...
@@ -36,14 +40,14 @@ class Matriz:
     @overload
     def __getitem__(self, indice_fila: int) -> List[Fraction]: ...
 
-    def __getitem__(self, indice: int | Tuple[int, int]) -> Fraction | List[Fraction]:
+    def __getitem__(self, indice: Union[int, Tuple[int, int]]) -> Union[Fraction, List[Fraction]]:
         if isinstance(indice, int):
             if indice < 0 or indice >= self.filas:
                 raise IndexError("Índice inválido")
             return self.valores[indice]
         elif isinstance(indice, tuple) and len(indice) == 2:
             fila, columna = indice
-            if fila < 0 or columna < 0 or fila >= self.filas or columna >= self.columnas:
+            if fila >= self.filas or columna >= self.columnas:
                 raise IndexError("Índice inválido")
             return self.valores[fila][columna]
         else:
@@ -65,17 +69,17 @@ class Matriz:
         matriz = ""
         for i in range(self.filas):
             for j in range(self.columnas):
-                var = str(self.valores[i][j].limit_denominator(100)).center(max_len)
+                valor = str(self.valores[i][j].limit_denominator(100)).center(max_len)
                 if j == 0 and j == self.columnas - 1:
-                    matriz += f"( {var} )"
+                    matriz += f"( {valor} )"
                 elif j == 0:
-                    matriz += f"( {var}, "
+                    matriz += f"( {valor}, "
                 elif j == self.columnas - 2 and self.aumentada:
-                    matriz += f"{var} | "
+                    matriz += f"{valor} | "
                 elif j == self.columnas - 1:
-                    matriz += f"{var} )"
+                    matriz += f"{valor} )"
                 else:
-                    matriz += f"{var}, "
+                    matriz += f"{valor}, "
             matriz += "\n"
         return matriz
 

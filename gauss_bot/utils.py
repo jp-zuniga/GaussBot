@@ -6,8 +6,12 @@ def limpiar_pantalla() -> None:
     return None
 
 def match_input(pregunta: str) -> int:
-        opciones = ("s", "n")
-        input_usuario = input(pregunta).strip().lower()
-        if input_usuario not in opciones:
-            return -1
-        return 1 if input_usuario == "s" else 0
+    opciones = ("s", "n")
+    input_usuario = input(pregunta).strip().lower()
+    if input_usuario not in opciones:
+        return -1
+    elif input_usuario == "s":
+        return 1
+    elif input_usuario == "n":
+        return 0
+    return 0
