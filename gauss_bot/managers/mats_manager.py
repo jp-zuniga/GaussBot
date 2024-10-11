@@ -73,7 +73,7 @@ class MatricesManager:
                     self.mostrar_resultado("m", resultado)
                     return None
             case 8:
-                ...  # TODO: producto matriz-vector
+                self.parent.producto_matriz_vector()
             case 9:
                 resultado = self.procesar_operacion("t")
                 if resultado is not None:
@@ -363,7 +363,7 @@ class MatricesManager:
         return None
 
     def seleccionar_mat(self, operacion: str) -> str:
-        if operacion in ("se", "me", "t") and self._validar_mats_ingresadas():
+        if operacion in ("se", "me", "mv", "t") and self._validar_mats_ingresadas():
             mensaje = self._get_mensaje(operacion)
             input_mat = self._get_input(mensaje, operacion)
             try:
@@ -394,6 +394,8 @@ class MatricesManager:
                 return "\n¿Cuál matriz desea resolver? "
             case "me":
                 return "\n¿Cuál matriz desea multiplicar por un escalar? "
+            case "mv":
+                return "\n¿Cuál matriz desea multiplicar por un vector? "
             case "t":
                 return "\n¿Cuál matriz desea transponer? "
             case _:
@@ -444,6 +446,15 @@ class MatricesManager:
 
         limpiar_pantalla()
         if not self._validar_mats_ingresadas() or necesita_aumentada not in (1, 0, -1):
+            return None
+
+        solo_aumentadas = all(mat.aumentada for mat in self.mats_ingresadas.values())
+        solo_no_aumentadas = all(not mat.aumentada for mat in self.mats_ingresadas.values())
+        if necesita_aumentada == 1 and solo_no_aumentadas:
+            print("\nNo hay matrices aumentadas ingresadas!")
+            return None
+        elif necesita_aumentada == 0 and solo_aumentadas:
+            print("\nNo hay matrices no aumentadas ingresadas!")
             return None
 
         adj = "aumentadas " if necesita_aumentada == 1 else "no aumentadas "

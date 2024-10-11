@@ -28,9 +28,11 @@ class Matriz:
     @property
     def valores(self) -> List[List[Fraction]]:
         return self._valores
-    
-    def __eq__(self, mat2) -> bool:
-        if self.filas != mat2.filas or self.columnas != mat2.columnas:
+
+    def __eq__(self, mat2: object) -> bool:
+        if not isinstance(mat2, Matriz):
+            return False
+        elif self.filas != mat2.filas or self.columnas != mat2.columnas:
             return False
         return all(a == b for fila1, fila2 in zip(self.valores, mat2.valores) for a, b in zip(fila1, fila2))
 

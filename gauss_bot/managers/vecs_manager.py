@@ -64,7 +64,7 @@ class VectoresManager:
                     self.mostrar_resultado("m", resultado)
                     return None
             case 7:
-                ...  # TODO: producto matriz-vector
+                self.parent.producto_matriz_vector()
         input("Presione cualquier tecla para regresar al menú de vectores...")
         return None
 
@@ -208,7 +208,7 @@ class VectoresManager:
 
                 input("\nPresione cualquier tecla para continuar...")
                 return None
-            
+
             case "r":   # ? restar vectore
                 vecs_seleccionados, vec_restado = resultado
                 vec1, vec2 = self.vecs_ingresados[vecs_seleccionados[0]], self.vecs_ingresados[vecs_seleccionados[1]]
@@ -223,7 +223,7 @@ class VectoresManager:
 
                 input("\nPresione cualquier tecla para continuar...")
                 return None
-            
+
             case "ve":  # ? multiplicar vector por escalar
                 vec_seleccionado, escalar, vec_multiplicado = resultado
                 vec = self.vecs_ingresados[vec_seleccionado]
@@ -240,7 +240,7 @@ class VectoresManager:
 
                 input("\nPresione cualquier tecla para continuar...")
                 return None
-            
+
             case "m":   # ? multiplicar vectores
                 vecs_seleccionados, vec_multiplicado = resultado
                 vec1, vec2 = self.vecs_ingresados[vecs_seleccionados[0]], self.vecs_ingresados[vecs_seleccionados[1]]
@@ -264,23 +264,22 @@ class VectoresManager:
     def seleccionar(self, operacion: None) -> List[str]: ...
 
     def seleccionar(self, operacion: Union[str, None]) -> Union[str, List[str]]:
-        if operacion not in ("ve", None):
+        if operacion not in ("ve", "mv", None):
             return "" if operacion is not None else []
 
         elif not self._validar_vecs_ingresados():
             return "" if operacion is not None else []
 
-        if operacion == "ve":
-            mensaje = "\n¿Cuál vector desea multiplicar por un escalar? "
+        mensaje = self._get_mensaje(operacion)
+        if operacion in ("ve", "mv"):
             input_vec = self._get_input(mensaje, operacion)
             try:
-                self._validar_input_vec(input_vec, operacion)
+                self._validar_input_vec(input_vec)
             except KeyError as k:
                 input(k)
                 return ""
             return input_vec
         elif operacion is None:
-            mensaje = "\n¿Cuáles vectores desea seleccionar? (separados por comas) "
             input_vecs = self._get_input(mensaje, operacion).split(",")
             try:
                 self._validar_input_vecs(input_vecs)
@@ -295,7 +294,18 @@ class VectoresManager:
         self._mostrar_vectores()
         return input(mensaje).strip()
 
-    def _validar_input_vec(self, input_vec: str, operacion: str) -> None:
+    def _get_mensaje(self, operacion: Union[str, None]) -> str:
+        match operacion:
+            case "ve":
+                return "\n¿Cuál vector desea multiplicar por un escalar? "
+            case "mv":
+                return "\n¿Cuál vector desea multiplicar por una matriz? "
+            case None:
+                return "\n¿Cuáles vectores desea seleccionar? (separados por comas) "
+            case _:
+                return ""
+
+    def _validar_input_vec(self, input_vec: str) -> None:
         if input_vec not in self.vecs_ingresados:
             raise KeyError(f"Error: El vector '{input_vec}' no existe!")
 

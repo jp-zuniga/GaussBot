@@ -4,10 +4,17 @@ from typing import Union, List, overload
 class Vector():
     def __init__(self, componentes: List[Fraction] = []) -> None:
         self._componentes = componentes
-    
+
     @property
     def componentes(self) -> List[Fraction]:
         return self._componentes
+
+    def __eq__(self, vec2: object) -> bool:
+        if not isinstance(vec2, Vector):
+            return False
+        elif len(self) != len(vec2):
+            return False
+        return all(a == b for a, b in zip(self.componentes, vec2.componentes))
 
     def __len__(self) -> int:
         return len(self.componentes)

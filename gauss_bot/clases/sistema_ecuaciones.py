@@ -20,7 +20,7 @@ class SistemaEcuaciones:
                 self.procedimiento += str(self.matriz)
             self._get_soluciones(unica=False, libres=[], validacion=test_inicial)
             return None
-        
+
         if self._validar_escalonada_reducida():
             self.procedimiento += "\nMatriz ya esta en su forma escalonada reducida!\n\n"
             self.procedimiento += str(self.matriz)

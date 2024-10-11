@@ -1,3 +1,6 @@
+from fractions import Fraction
+
+from gauss_bot.clases.matriz import Matriz
 from gauss_bot.managers.mats_manager import MatricesManager
 from gauss_bot.managers.vecs_manager import VectoresManager
 from gauss_bot.utils import limpiar_pantalla
@@ -5,10 +8,8 @@ from gauss_bot.utils import limpiar_pantalla
 # TODO implementar calculo de determinantes en MatricesManager
 # TODO implementar calculo de inversas en MatricesManager
 
-# ? implementar metodo de analizar matriz en MatricesManager
 # ? mejorar .procesar_operacion() en MatricesManager y VectoresManager
-# ? implementar metodo de producto matriz-vector en OpsManager
-# ? implementar opcion de mostrar procedimiento de todas las operaciones en MatricesManager y VectoresManager
+# ? implementar opcion de mostrar procedimiento para todas las operaciones en MatricesManager y VectoresManager
 
 class OpsManager:
     def __init__(self, mat_manager=None, vec_manager=None) -> None:
@@ -52,3 +53,35 @@ class OpsManager:
             input("=> Error: Ingrese una opción válida!")
             return self.main_menu()
         return option
+
+    def producto_matriz_vector(self) -> None:
+        limpiar_pantalla()
+        nombre_mat = self.mat_manager.seleccionar_mat("mv")
+        if nombre_mat == "":
+            return None
+
+        nombre_vec = self.vec_manager.seleccionar("mv")
+        if nombre_vec == "":
+            return None
+
+        mat, vec = self.mat_manager.mats_ingresadas[nombre_mat], self.vec_manager.vecs_ingresados[nombre_vec]
+        if mat.columnas != len(vec):
+            input("Error: El número de columnas de la matriz debe ser igual al número de componentes del vector!")
+            return None
+
+        limpiar_pantalla()
+        resultado = [[Fraction(0) for _ in range(len(vec))] for _ in range(mat.filas)]
+        for i in range(mat.filas):
+            for j in range(len(vec)):
+                resultado[i][j] += mat[i, j] * vec[j]
+
+        mat_resultante = Matriz(False, mat.filas, len(vec), resultado)
+        print("\n---------------------------------------------")
+        print(f"{nombre_mat}:")
+        print(mat_resultante)
+        print(f"{nombre_vec} = {vec}")
+        print("---------------------------------------------")
+        print(f"\n{nombre_mat}{nombre_vec}:")
+        print(mat_resultante)
+
+        return None
