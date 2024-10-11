@@ -2,8 +2,11 @@ from gauss_bot.managers.mats_manager import MatricesManager
 from gauss_bot.managers.vecs_manager import VectoresManager
 from gauss_bot.utils import limpiar_pantalla
 
-# TODO: mejorar .procesar_operacion() en MatricesManager y VectoresManager
-# TODO implementer producto matriz-vector OpsManager
+# TODO implementar calculo de determinantes en MatricesManager
+# TODO implementar calculo de inversas en MatricesManager
+
+# ? mejorar .procesar_operacion() en MatricesManager y VectoresManager
+# ? implementer producto matriz-vector OpsManager
 
 class OpsManager:
     def __init__(self, mat_manager: MatricesManager, vec_manager: VectoresManager) -> None:
