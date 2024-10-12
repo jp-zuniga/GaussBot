@@ -1,5 +1,5 @@
 from fractions import Fraction
-from typing import overload
+from typing import Union, overload
 
 from gauss_bot.clases.vector import Vector
 from gauss_bot.utils import limpiar_pantalla, match_input
@@ -263,7 +263,7 @@ class VectoresManager:
     @overload
     def seleccionar(self, operacion: None) -> list[str]: ...
 
-    def seleccionar(self, operacion: str | None) -> str | list[str]:
+    def seleccionar(self, operacion: Union[str, None]) -> Union[str, list[str]]:
         if operacion not in ("ve", "mv", None):
             return "" if operacion is not None else []
 
@@ -291,12 +291,12 @@ class VectoresManager:
             return input_vecs
         return ""
 
-    def _get_input(self, mensaje: str, operacion: str | None) -> str:
+    def _get_input(self, mensaje: str, operacion: Union[str, None]) -> str:
         limpiar_pantalla()
         self._mostrar_vectores()
         return input(mensaje).strip()
 
-    def _get_mensaje(self, operacion: str | None) -> str:
+    def _get_mensaje(self, operacion: Union[str, None]) -> str:
         match operacion:
             case "ve":
                 return "\n¿Cuál vector desea multiplicar por un escalar? "

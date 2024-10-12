@@ -1,5 +1,5 @@
 from fractions import Fraction
-from typing import overload
+from typing import Union, overload
 
 Validacion = tuple[bool, int]
 
@@ -42,7 +42,7 @@ class Matriz:
     @overload
     def __getitem__(self, indices: tuple[int, int]) -> Fraction: ...
 
-    def __getitem__(self, indice: int | tuple[int, int]) -> list[Fraction] | Fraction:
+    def __getitem__(self, indice: Union[int, tuple[int, int]]) -> Union[list[Fraction], Fraction]:
         if isinstance(indice, int):
             if indice < 0 or indice >= self.filas:
                 raise IndexError("Índice inválido!")
@@ -109,7 +109,7 @@ class Matriz:
     @overload
     def __mul__(self, escalar: Fraction) -> "Matriz": ...
 
-    def __mul__(self, multiplicador: "Matriz" | Fraction) -> "Matriz":
+    def __mul__(self, multiplicador: Union["Matriz", Fraction]) -> "Matriz":
         if isinstance(multiplicador, Matriz):
             if self.columnas != multiplicador.filas:
                 raise ArithmeticError("El número de columnas de la primera matriz debe ser igual al número de filas de la segunda matriz!")
