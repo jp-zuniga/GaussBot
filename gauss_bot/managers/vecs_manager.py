@@ -6,9 +6,9 @@ from gauss_bot.utils import limpiar_pantalla, match_input
 
 
 class VectoresManager:
-    def __init__(self, parent=None, vecs_ingresados: dict[str, Vector] = {}) -> None:
-        self.parent = parent
+    def __init__(self, vecs_ingresados: dict[str, Vector], parent=None) -> None:
         self.vecs_ingresados = vecs_ingresados
+        self.parent = parent
 
     def menu_vectores(self) -> None:
         while True:
@@ -288,12 +288,12 @@ class VectoresManager:
         if operacion not in ("ve", "mv", None):
             return "" if operacion is not None else []
 
-        elif not self._validar_vecs_ingresados():
+        if not self._validar_vecs_ingresados():
             return "" if operacion is not None else []
 
         mensaje = self._get_mensaje(operacion)
         if operacion in ("ve", "mv"):
-            input_vec = self._get_input(mensaje, operacion)
+            input_vec = self._get_input(mensaje)
             try:
                 self._validar_input_vec(input_vec)
             except KeyError as k:
@@ -301,8 +301,8 @@ class VectoresManager:
                 input("Presione cualquier tecla para regresar al menú de vectores...")
                 return ""
             return input_vec
-        elif operacion is None:
-            input_vecs = self._get_input(mensaje, operacion).split(",")
+        if operacion is None:
+            input_vecs = self._get_input(mensaje).split(",")
             try:
                 self._validar_input_vecs(input_vecs)
             except (KeyError, ValueError, ArithmeticError) as e:
@@ -312,7 +312,7 @@ class VectoresManager:
             return input_vecs
         return ""
 
-    def _get_input(self, mensaje: str, operacion: Union[str, None]) -> str:
+    def _get_input(self, mensaje: str) -> str:
         limpiar_pantalla()
         self._mostrar_vectores()
         return input(mensaje).strip()
@@ -336,7 +336,7 @@ class VectoresManager:
         vec = next((vec for vec in input_vecs if vec not in self.vecs_ingresados), None)
         if vec is not None:
             raise KeyError(f"Error: El vector '{vec}' no existe!")
-        elif len(input_vecs) != 2:
+        if len(input_vecs) != 2:
             raise ValueError("Error: Debe seleccionar exactamente dos vectores!")
         vec1, vec2 = input_vecs
         if len(vec1) != len(vec2):

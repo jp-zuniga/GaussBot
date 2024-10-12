@@ -3,8 +3,11 @@ from typing import Union, overload
 
 
 class Vector:
-    def __init__(self, componentes: list[Fraction] = []) -> None:
-        self._componentes = componentes
+    def __init__(self, componentes: Union[list[Fraction], None]) -> None:
+        if componentes is None:
+            self._componentes = []
+        else:
+            self._componentes = componentes
 
     @property
     def componentes(self) -> list[Fraction]:
@@ -13,7 +16,7 @@ class Vector:
     def __eq__(self, vec2: object) -> bool:
         if not isinstance(vec2, Vector):
             return False
-        elif len(self) != len(vec2):
+        if len(self) != len(vec2):
             return False
         return all(a == b for a, b in zip(self.componentes, vec2.componentes))
 
@@ -54,7 +57,6 @@ class Vector:
             if len(self) != len(multiplicador):
                 raise ArithmeticError("Vectores deben tener la misma longitud!")
             return Fraction(sum(a * b for a, b in zip(self.componentes, multiplicador.componentes)))
-        elif isinstance(multiplicador, Fraction):
+        if isinstance(multiplicador, Fraction):
             return Vector([c * multiplicador for c in self.componentes])
-        else:
-            raise TypeError("Tipo de dato inválido")
+        raise TypeError("Tipo de dato inválido")

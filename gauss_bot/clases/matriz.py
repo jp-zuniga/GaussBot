@@ -1,3 +1,4 @@
+from copy import deepcopy
 from fractions import Fraction
 from typing import Union, overload
 
@@ -5,11 +6,11 @@ Validacion = tuple[bool, int]
 
 
 class Matriz:
-    def __init__(self, aumentada: bool, filas: int, columnas: int, valores: list[list[Fraction]] = []) -> None:
+    def __init__(self, aumentada: bool, filas: int, columnas: int, valores: Union[list[list[Fraction]], None] = None) -> None:
         self._aumentada = aumentada
         self._filas = filas
         self._columnas = columnas
-        if valores == []:
+        if valores is None:
             self._valores = [[Fraction(0) for _ in range(columnas)] for _ in range(filas)]
         else:
             self._valores = valores
@@ -33,7 +34,7 @@ class Matriz:
     def __eq__(self, mat2: object) -> bool:
         if not isinstance(mat2, Matriz):
             return False
-        elif self.filas != mat2.filas or self.columnas != mat2.columnas:
+        if self.filas != mat2.filas or self.columnas != mat2.columnas:
             return False
         return all(
             a == b
@@ -52,7 +53,7 @@ class Matriz:
             if indice < 0 or indice >= self.filas:
                 raise IndexError("Índice inválido!")
             return self.valores[indice]
-        elif isinstance(indice, tuple) and len(indice) == 2:
+        if isinstance(indice, tuple) and len(indice) == 2:
             fila, columna = indice
             if fila >= self.filas or columna >= self.columnas:
                 raise IndexError("Índice inválido!")
@@ -130,11 +131,10 @@ class Matriz:
                         mat_multiplicada[i][j] += self.valores[i][k] * multiplicador.valores[k][j]
 
             return Matriz(self.aumentada, self.filas, multiplicador.columnas, mat_multiplicada)
-        elif isinstance(multiplicador, Fraction):
+        if isinstance(multiplicador, Fraction):
             mat_multiplicada = [[multiplicador * valor for valor in fila] for fila in self.valores]
             return Matriz(self.aumentada, self.filas, self.columnas, mat_multiplicada)
-        else:
-            raise TypeError("Tipo de dato inválido!")
+        raise TypeError("Tipo de dato inválido!")
 
     def es_matriz_cero(self) -> bool:
         return all(all(x == Fraction(0) for x in fila) for fila in self.valores)
@@ -155,10 +155,10 @@ class Matriz:
             raise ArithmeticError("La matriz debe ser cuadrada para convertirla en una matriz triangular superior!")
 
         intercambios = False
-        mat_triangular = [fila for fila in self.valores]
+        mat_triangular = deepcopy(self.valores)
 
         for i in range(self.filas):
-            max_f = max(range(i, self.filas), key=lambda r: abs(mat_triangular[r][i]))
+            max_f = max(range(i, self.filas), key=lambda j, i=i: abs(mat_triangular[j][i]))  # type: ignore
             if mat_triangular[max_f][i] == 0:
                 continue
 

@@ -6,12 +6,13 @@ from gauss_bot.managers.vecs_manager import VectoresManager
 from gauss_bot.utils import limpiar_pantalla
 
 # TODO: implementar opcion de mostrar procedimiento para todas las operaciones en MatricesManager y VectoresManager
+# TODO: simplificar ._despejar_variables()
 
 
 class OpsManager:
     def __init__(self, mat_manager=None, vec_manager=None) -> None:
-        self.mat_manager = MatricesManager(self) if mat_manager is None else mat_manager
-        self.vec_manager = VectoresManager(self) if vec_manager is None else vec_manager
+        self.mat_manager = MatricesManager({}, self) if mat_manager is None else mat_manager
+        self.vec_manager = VectoresManager({}, self) if vec_manager is None else vec_manager
 
     def exec(self) -> None:
         while True:
@@ -62,8 +63,8 @@ class OpsManager:
         limpiar_pantalla()
         resultado = [[Fraction(0) for _ in range(len(vec))] for _ in range(mat.filas)]
         for i in range(mat.filas):
-            for j in range(len(vec)):
-                resultado[i][j] += mat[i, j] * vec[j]
+            for j, componente in enumerate(vec):
+                resultado[i][j] += mat[i, j] * componente
 
         mat_resultante = Matriz(False, mat.filas, len(vec), resultado)
         print("\n---------------------------------------------")
