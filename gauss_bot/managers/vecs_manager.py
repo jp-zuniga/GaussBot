@@ -73,25 +73,25 @@ class VectoresManager:
             limpiar_pantalla()
             nombre = input("\nIngrese el nombre del vector (una letra minúscula): ").strip().lower()
             if not nombre.isalpha() or len(nombre) != 1:
-                raise NameError("Error: Ingrese solamente una letra minúscula!")
+                raise NameError
             if nombre in self.vecs_ingresados:
-                raise KeyError(f"Error: Ya hay un vector con el nombre '{nombre}'!")
+                raise KeyError
 
             longitud = int(input(f"¿Cuántas dimensiones tendrá el vector '{nombre}'? ").strip())
             if longitud <= 0:
-                raise ArithmeticError("Error: La longitud del vector debe ser un número entero positivo!")
+                raise ArithmeticError
 
-        except NameError as n:
-            input(n)
+        except NameError:
+            input("Error: Ingrese solamente una letra minúscula!")
             return self.agregar_vector()
-        except KeyError as k:
-            input(k)
+        except KeyError:
+            input(f"Error: Ya hay un vector con el nombre '{nombre}'!")
             return self.agregar_vector()
         except ValueError:
             input("Error: Ingrese un número entero!")
             return self.agregar_vector()
-        except ArithmeticError as a:
-            input(a)
+        except ArithmeticError:
+            input("Error: La longitud del vector debe ser un número entero positivo!")
             return self.agregar_vector()
 
         self.vecs_ingresados[nombre] = self.pedir_vector(nombre, longitud)
@@ -115,16 +115,16 @@ class VectoresManager:
             ]
 
             if len(componentes) != longitud:
-                raise TypeError("Error: El vector no tiene las dimensiones correctas!")
+                raise TypeError
 
-        except TypeError as t:
-            input(t)
-            return self.pedir_vector(nombre, longitud)
         except ValueError:
             input("Error: Ingrese un número real!")
             return self.pedir_vector(nombre, longitud)
         except ZeroDivisionError:
             input("Error: El denominador no puede ser cero!")
+            return self.pedir_vector(nombre, longitud)
+        except TypeError:
+            input("Error: El vector no tiene las dimensiones correctas!")
             return self.pedir_vector(nombre, longitud)
 
         return Vector(componentes)
@@ -276,7 +276,8 @@ class VectoresManager:
             try:
                 self._validar_input_vec(input_vec)
             except KeyError as k:
-                input(k)
+                print(k)
+                input("Presione cualquier tecla para regresar al menú de vectores...")
                 return ""
             return input_vec
         elif operacion is None:
@@ -284,7 +285,8 @@ class VectoresManager:
             try:
                 self._validar_input_vecs(input_vecs)
             except (KeyError, ValueError, ArithmeticError) as e:
-                input(e)
+                print(e)
+                input("Presione cualquier tecla para regresar al menú de vectores...")
                 return []
             return input_vecs
         return ""

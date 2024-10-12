@@ -94,9 +94,9 @@ class MatricesManager:
             limpiar_pantalla()
             nombre = input("\nIngrese el nombre de la matriz (una letra mayúscula): ").strip().upper()
             if not nombre.isalpha() or len(nombre) != 1:
-                raise NameError("Error: Ingrese solamente una letra mayúscula!")
+                raise NameError
             if nombre in self.mats_ingresadas:
-                raise KeyError(f"Error: Ya hay una matriz con el nombre '{nombre}'!")
+                raise KeyError
 
             ingresar_aumentada = match_input("¿Se ingresará una matriz aumentada? (s/n) ")
             if ingresar_aumentada == 1:
@@ -104,16 +104,16 @@ class MatricesManager:
             elif ingresar_aumentada == 0:
                 es_aumentada = False
             else:
-                raise ValueError("Error: Ingrese una opción válida!")
+                raise ValueError
 
-        except NameError as n:
-            input(n)
+        except NameError:
+            input("Error: Ingrese solamente una letra mayúscula!")
             return self.agregar_matriz()
-        except KeyError as k:
-            input(k)
+        except KeyError:
+            input(f"Error: Ya hay una matriz con el nombre '{nombre}'!")
             return self.agregar_matriz()
-        except ValueError as v:
-            input(v)
+        except ValueError:
+            input("Error: Ingrese una opción válida!")
             return self.agregar_matriz()
 
         self.mats_ingresadas[nombre] = self.pedir_matriz(nombre, es_aumentada)
@@ -170,12 +170,12 @@ class MatricesManager:
                 print("----------------------------")
                 filas = int(input(f"Ingrese el número de {palabras[0]}: "))
                 if filas <= 0:
-                    raise ValueError("Error: Ingrese un número entero positivo!")
+                    raise ValueError
                 columnas = int(input(f"Ingrese el número de {palabras[1]}: "))
                 if columnas <= 0:
-                    raise ValueError("Error: Ingrese un número entero positivo!")
-            except ValueError as v:
-                input(v)
+                    raise ValueError
+            except ValueError:
+                input("Error: Ingrese un número entero positivo!")
                 return self.pedir_dimensiones(nombre, es_aumentada)
             return (filas, columnas)
 
@@ -405,7 +405,8 @@ class MatricesManager:
             try:
                 self._validar_input_mat(input_mat, operacion)
             except (KeyError, TypeError, ArithmeticError) as e:
-                input(e)
+                print(e)
+                input("Presione cualquier tecla para regresar al menú de matrices...")
                 return ""
             return input_mat
         else:
@@ -418,7 +419,8 @@ class MatricesManager:
             try:
                 self._validar_input_mats(input_mats, operacion)
             except (KeyError, ArithmeticError) as e:
-                input(e)
+                print(e)
+                input("Presione cualquier tecla para regresar al menú de matrices...")
                 return []
             return input_mats
         else:
