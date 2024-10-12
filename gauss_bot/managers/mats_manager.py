@@ -1,6 +1,5 @@
 from fractions import Fraction
 from copy import deepcopy
-from typing import Tuple, List, Dict
 
 from gauss_bot.clases.matriz import Matriz
 from gauss_bot.clases.sistema_ecuaciones import SistemaEcuaciones
@@ -9,7 +8,7 @@ from gauss_bot.utils import limpiar_pantalla, match_input
 # TODO implementar calculo de inversas
 
 class MatricesManager:
-    def __init__(self, parent=None, mats_ingresadas: Dict[str, Matriz] = {}) -> None:
+    def __init__(self, parent=None, mats_ingresadas: dict[str, Matriz] = {}) -> None:
         self.parent = parent
         self.mats_ingresadas = mats_ingresadas
 
@@ -163,7 +162,7 @@ class MatricesManager:
         mat = Matriz(es_aumentada, filas, columnas, valores)
         return mat
 
-    def pedir_dimensiones(self, nombre: str, es_aumentada: bool) -> Tuple[int, int]:
+    def pedir_dimensiones(self, nombre: str, es_aumentada: bool) -> tuple[int, int]:
             palabras = ["ecuaciones", "variables"] if es_aumentada else ["filas", "columnas"]
             try:
                 limpiar_pantalla()
@@ -180,7 +179,7 @@ class MatricesManager:
                 return self.pedir_dimensiones(nombre, es_aumentada)
             return (filas, columnas)
 
-    def procesar_operacion(self, operacion: str) -> Tuple:
+    def procesar_operacion(self, operacion: str) -> tuple:
         """
         * toma un codigo de operacion
         * selecciona las matrices necesarias
@@ -256,7 +255,7 @@ class MatricesManager:
                     return (nombre_mat, mat_triangular, determinante, intercambio)
         return ()
 
-    def mostrar_resultado(self, operacion: str, resultado: Tuple) -> None:
+    def mostrar_resultado(self, operacion: str, resultado: tuple) -> None:
         """
         * operacion: el codigo de operacion usada en .procesar_operacion()
         * resultado: la tupla retornada por .procesar_operacion()
@@ -412,7 +411,7 @@ class MatricesManager:
         else:
             return ""
 
-    def seleccionar_mats(self, operacion: str) -> List[str]:
+    def seleccionar_mats(self, operacion: str) -> list[str]:
         if operacion in ("s", "r", "m") and self._validar_mats_ingresadas():
             mensaje = "\n¿Cuáles matrices desea seleccionar? (separadas por comas) "
             input_mats = self._get_input(mensaje, operacion).split(",")
@@ -455,7 +454,7 @@ class MatricesManager:
             raise ArithmeticError(f"Error: La matriz '{input_mat}' no es cuadrada!")
         return None
 
-    def _validar_input_mats(self, input_mats: List[str], operacion: str) -> None:
+    def _validar_input_mats(self, input_mats: list[str], operacion: str) -> None:
         mat = next((mat for mat in input_mats if mat not in self.mats_ingresadas), None)
         if mat is not None:
             raise KeyError(f"Error: La matriz '{mat}' no existe!")

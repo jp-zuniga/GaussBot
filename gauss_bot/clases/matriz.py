@@ -1,10 +1,10 @@
 from fractions import Fraction
-from typing import Union, Tuple, List, overload
+from typing import overload
 
-Validacion = Tuple[bool, int]
+Validacion = tuple[bool, int]
 
 class Matriz:
-    def __init__(self, aumentada: bool, filas: int, columnas: int, valores: List[List[Fraction]] = []) -> None:
+    def __init__(self, aumentada: bool, filas: int, columnas: int, valores: list[list[Fraction]] = []) -> None:
         self._aumentada = aumentada
         self._filas = filas
         self._columnas = columnas
@@ -26,7 +26,7 @@ class Matriz:
         return self._columnas
 
     @property
-    def valores(self) -> List[List[Fraction]]:
+    def valores(self) -> list[list[Fraction]]:
         return self._valores
 
     def __eq__(self, mat2: object) -> bool:
@@ -37,12 +37,12 @@ class Matriz:
         return all(a == b for fila1, fila2 in zip(self.valores, mat2.valores) for a, b in zip(fila1, fila2))
 
     @overload
-    def __getitem__(self, indices: Tuple[int, int]) -> Fraction: ...
+    def __getitem__(self, indice: int) -> list[Fraction]: ...
 
     @overload
-    def __getitem__(self, indice_fila: int) -> List[Fraction]: ...
+    def __getitem__(self, indices: tuple[int, int]) -> Fraction: ...
 
-    def __getitem__(self, indice: Union[int, Tuple[int, int]]) -> Union[Fraction, List[Fraction]]:
+    def __getitem__(self, indice: int | tuple[int, int]) -> list[Fraction] | Fraction:
         if isinstance(indice, int):
             if indice < 0 or indice >= self.filas:
                 raise IndexError("Índice inválido!")
@@ -55,7 +55,7 @@ class Matriz:
         else:
             raise TypeError("Índice inválido!")
 
-    def __setitem__(self, indices: Tuple[int, int], valor: Fraction) -> None:
+    def __setitem__(self, indices: tuple[int, int], valor: Fraction) -> None:
         fila, columna = indices
         if fila < 0 or columna < 0 or fila >= self.filas or columna >= self.columnas:
             raise IndexError("Índice inválido!")
@@ -109,7 +109,7 @@ class Matriz:
     @overload
     def __mul__(self, escalar: Fraction) -> "Matriz": ...
 
-    def __mul__(self, multiplicador: Union["Matriz", Fraction]) -> "Matriz":
+    def __mul__(self, multiplicador: "Matriz" | Fraction) -> "Matriz":
         if isinstance(multiplicador, Matriz):
             if self.columnas != multiplicador.filas:
                 raise ArithmeticError("El número de columnas de la primera matriz debe ser igual al número de filas de la segunda matriz!")
@@ -140,7 +140,7 @@ class Matriz:
         mat_transpuesta = [[self.valores[j][i] for j in range(self.filas)] for i in range(self.columnas)]
         return Matriz(self.aumentada, self.columnas, self.filas, mat_transpuesta)
 
-    def hacer_triangular_superior(self) -> Tuple["Matriz", int]:
+    def hacer_triangular_superior(self) -> tuple["Matriz", int]:
         if self.filas != self.columnas:
             raise ArithmeticError("La matriz debe ser cuadrada para convertirla en una matriz triangular superior!")
 

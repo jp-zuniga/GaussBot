@@ -1,5 +1,4 @@
 from fractions import Fraction
-from typing import List
 
 from gauss_bot.clases.matriz import Matriz, Validacion
 
@@ -107,7 +106,7 @@ class SistemaEcuaciones:
 
         return None
 
-    def _encontrar_variables_libres(self) -> List[int]:
+    def _encontrar_variables_libres(self) -> list[int]:
         entradas_principales = []
         for i in range(self.matriz.filas):
             try:
@@ -116,7 +115,7 @@ class SistemaEcuaciones:
                 continue
         return [x for x in range(self.matriz.columnas - 1) if x not in entradas_principales]
 
-    def _despejar_variables(self, libres: List[int]) -> List[str]:
+    def _despejar_variables(self, libres: list[int]) -> list[str]:
         ecuaciones = [f"| X{x+1} es libre\n" for x in libres]
         for i in range(self.matriz.filas):
             for j in range(self.matriz.columnas - 1):
@@ -199,7 +198,7 @@ class SistemaEcuaciones:
                 return False
         return True
 
-    def _get_soluciones(self, unica: bool, libres: List[int], validacion: Validacion) -> None:
+    def _get_soluciones(self, unica: bool, libres: list[int], validacion: Validacion) -> None:
         solucion, fila_inconsistente = validacion
         if not solucion and fila_inconsistente != -1:
             self.respuesta += (f"\n| En F{fila_inconsistente+1}: 0 != {str(self.matriz[fila_inconsistente, -1].limit_denominator(100))}\n")

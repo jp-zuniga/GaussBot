@@ -1,12 +1,12 @@
 from fractions import Fraction
-from typing import Union, List, overload
+from typing import overload
 
 class Vector():
-    def __init__(self, componentes: List[Fraction] = []) -> None:
+    def __init__(self, componentes: list[Fraction] = []) -> None:
         self._componentes = componentes
 
     @property
-    def componentes(self) -> List[Fraction]:
+    def componentes(self) -> list[Fraction]:
         return self._componentes
 
     def __eq__(self, vec2: object) -> bool:
@@ -48,7 +48,7 @@ class Vector():
     @overload
     def __mul__(self, escalar: Fraction) -> "Vector": ...
 
-    def __mul__(self, multiplicador: Union["Vector", Fraction]) -> Union[Fraction, "Vector"]:
+    def __mul__(self, multiplicador: "Vector" | Fraction) -> Fraction | "Vector":
         if isinstance(multiplicador, Vector):
             if len(self) != len(multiplicador):
                 raise ArithmeticError("Vectores deben tener la misma longitud")

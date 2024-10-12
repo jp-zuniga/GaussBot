@@ -1,11 +1,11 @@
 from fractions import Fraction
-from typing import Union, Tuple, List, Dict, overload
+from typing import overload
 
 from gauss_bot.clases.vector import Vector
 from gauss_bot.utils import limpiar_pantalla, match_input
 
 class VectoresManager:
-    def __init__(self, parent=None, vecs_ingresados: Dict[str, Vector] = {}) -> None:
+    def __init__(self, parent=None, vecs_ingresados: dict[str, Vector] = {}) -> None:
         self.parent = parent
         self.vecs_ingresados = vecs_ingresados
 
@@ -129,7 +129,7 @@ class VectoresManager:
 
         return Vector(componentes)
 
-    def procesar_operacion(self, operacion: str) -> Tuple:
+    def procesar_operacion(self, operacion: str) -> tuple:
         """
         * toma un codigo de operacion
         * selecciona los vectores necesarios
@@ -177,7 +177,7 @@ class VectoresManager:
             return (nombre_vec, escalar, vec_seleccionado * escalar)
         return ()
 
-    def mostrar_resultado(self, operacion: str, resultado: Tuple) -> None:
+    def mostrar_resultado(self, operacion: str, resultado: tuple) -> None:
         """
         * operacion: el codigo de operacion usada en .procesar_operacion()
         * resultado: la tupla retornada por .procesar_operacion()
@@ -261,9 +261,9 @@ class VectoresManager:
     def seleccionar(self, operacion: str) -> str: ...
 
     @overload
-    def seleccionar(self, operacion: None) -> List[str]: ...
+    def seleccionar(self, operacion: None) -> list[str]: ...
 
-    def seleccionar(self, operacion: Union[str, None]) -> Union[str, List[str]]:
+    def seleccionar(self, operacion: str | None) -> str | list[str]:
         if operacion not in ("ve", "mv", None):
             return "" if operacion is not None else []
 
@@ -289,12 +289,12 @@ class VectoresManager:
             return input_vecs
         return ""
 
-    def _get_input(self, mensaje: str, operacion: Union[str, None]) -> str:
+    def _get_input(self, mensaje: str, operacion: str | None) -> str:
         limpiar_pantalla()
         self._mostrar_vectores()
         return input(mensaje).strip()
 
-    def _get_mensaje(self, operacion: Union[str, None]) -> str:
+    def _get_mensaje(self, operacion: str | None) -> str:
         match operacion:
             case "ve":
                 return "\n¿Cuál vector desea multiplicar por un escalar? "
@@ -309,7 +309,7 @@ class VectoresManager:
         if input_vec not in self.vecs_ingresados:
             raise KeyError(f"Error: El vector '{input_vec}' no existe!")
 
-    def _validar_input_vecs(self, input_vecs: List[str]) -> None:
+    def _validar_input_vecs(self, input_vecs: list[str]) -> None:
         vec = next((vec for vec in input_vecs if vec not in self.vecs_ingresados), None)
         if vec is not None:
             raise KeyError(f"Error: El vector '{vec}' no existe!")
