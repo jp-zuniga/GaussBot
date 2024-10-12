@@ -6,6 +6,8 @@ from gauss_bot.clases.matriz import Matriz
 from gauss_bot.clases.sistema_ecuaciones import SistemaEcuaciones
 from gauss_bot.utils import limpiar_pantalla, match_input
 
+# TODO implementar calculo de inversas
+
 class MatricesManager:
     def __init__(self, parent=None, mats_ingresadas: Dict[str, Matriz] = {}) -> None:
         self.parent = parent
@@ -25,16 +27,17 @@ class MatricesManager:
             print("6. Multiplicar matriz por escalar")
             print("7. Multiplicar matrices")
             print("8. Multiplicar matriz por vector")
-            print("9. Transponer matriz\n")
-            print("10. Regresar al menú principal")
+            print("9. Transponer matriz")
+            print("10. Calcular determinante de una matriz\n")
+            print("11. Regresar al menú principal")
             try:
                 option = int(input("\n=> Seleccione una opción: ").strip())
-                if option < 1 or option > 10:
+                if option < 1 or option > 11:
                     raise ValueError
             except ValueError:
                 input("=> Error: Ingrese una opción válida!")
                 continue
-            if option == 10:
+            if option == 11:
                 input("=> Regresando a menú principal...")
                 break
             self.procesar_menu(option)
@@ -78,6 +81,11 @@ class MatricesManager:
                 resultado = self.procesar_operacion("t")
                 if resultado is not None:
                     self.mostrar_resultado("t", resultado)
+                    return None
+            case 10:
+                resultado = self.procesar_operacion("d")
+                if resultado is not None:
+                    self.mostrar_resultado("d", resultado)
                     return None
         input("Presione cualquier tecla para regresar al menú de matrices...")
         return None
@@ -185,10 +193,11 @@ class MatricesManager:
         * "me": multiplicar matriz por escalar
         * "m": multiplicar matrices
         * "t": transponer matriz
+        * "d": calcular determinante
         """
 
         limpiar_pantalla()
-        if operacion not in ("se", "s", "r", "me", "m", "t") or not self._validar_mats_ingresadas():
+        if operacion not in ("se", "s", "r", "me", "m", "t", "d") or not self._validar_mats_ingresadas():
             return ()
 
         if operacion in ("s", "r", "m"):
@@ -205,7 +214,7 @@ class MatricesManager:
                 case "m":
                     return (nombres_mats, mat1 * mat2)
 
-        elif operacion in ("se", "me", "t"):
+        elif operacion in ("se", "me", "t", "d"):
             nombre_mat = self.seleccionar_mat(operacion)
             if nombre_mat == "":
                 return ()
@@ -238,6 +247,13 @@ class MatricesManager:
                         self.mats_ingresadas[nombre_mat_modded] = mat_copia_modded
 
                     return (nombre_mat, mat_copia_modded)
+                case "d":
+                    mat_triangular, intercambio = mat_copia.hacer_triangular_superior()
+                    determinante = Fraction(1)
+                    for i in range(mat_triangular.filas):
+                        determinante *= mat_triangular[i, i]
+
+                    return (nombre_mat, mat_triangular, determinante, intercambio)
         return ()
 
     def mostrar_resultado(self, operacion: str, resultado: Tuple) -> None:
@@ -252,10 +268,11 @@ class MatricesManager:
         * "me": multiplicar matriz por escalar
         * "m": multiplicar matrices
         * "t": transponer matriz
+        * "d": calcular determinante
         """
 
         limpiar_pantalla()
-        if operacion not in ("se", "s", "r", "me", "m", "t") or resultado == ():
+        if operacion not in ("se", "s", "r", "me", "m", "t", "d") or resultado == ():
             return None
 
         match operacion:
@@ -294,10 +311,10 @@ class MatricesManager:
 
                 limpiar_pantalla()
                 print("\nMatriz seleccionadas:")
-                print("---------------------------------------------", end="")
+                print("---------------------------------------------")
                 print(f"\n{mats_seleccionadas[0]}:")
-                print(mat1, end="")
-                print(f"\n{mats_seleccionadas[1]}:")
+                print(mat1)
+                print(f"\{mats_seleccionadas[1]}:")
                 print(mat2, end="")
                 print("---------------------------------------------")
                 print(f"\n{mats_seleccionadas[0]} + {mats_seleccionadas[1]}:")
@@ -309,10 +326,10 @@ class MatricesManager:
 
                 limpiar_pantalla()
                 print("\nMatriz seleccionadas:")
-                print("---------------------------------------------", end="")
-                print(f"\n{mats_seleccionadas[0]}:")
-                print(mat1, end="")
-                print(f"\n{mats_seleccionadas[1]}:")
+                print("---------------------------------------------")
+                print(f"{mats_seleccionadas[0]}:")
+                print(mat1)
+                print(f"\{mats_seleccionadas[1]}:")
                 print(mat2, end="")
                 print("---------------------------------------------")
                 print(f"\n{mats_seleccionadas[0]} - {mats_seleccionadas[1]}:")
@@ -330,8 +347,8 @@ class MatricesManager:
 
                 limpiar_pantalla()
                 print(f"\n{mat_seleccionada}:")
-                print(mat, end="")
-                print(f"\n{imprimir_escalar}{mat_seleccionada}:")
+                print(mat)
+                print(f"{imprimir_escalar}{mat_seleccionada}:")
                 print(mat_multiplicada, end="")
 
             case "m":   # ? multiplicar matrices
@@ -340,10 +357,10 @@ class MatricesManager:
 
                 limpiar_pantalla()
                 print("\nMatriz seleccionadas:")
-                print("---------------------------------------------", end="")
+                print("---------------------------------------------")
                 print(f"\n{mats_seleccionadas[0]}:")
-                print(mat1, end="")
-                print(f"\n{mats_seleccionadas[1]}:")
+                print(mat1)
+                print(f"{mats_seleccionadas[1]}:")
                 print(mat2, end="")
                 print("---------------------------------------------")
                 print(f"\n{mats_seleccionadas[0]} * {mats_seleccionadas[1]}:")
@@ -355,20 +372,40 @@ class MatricesManager:
 
                 limpiar_pantalla()
                 print(f"\n{mat_seleccionada}:")
-                print(mat_original, end="")
-                print(f"\nTransposición de {mat_seleccionada}:")
+                print(mat_original)
+                print(f"Transposición de {mat_seleccionada}:")
                 print(mat_transpuesta, end="")
+
+            case "d":   # ? calcular determinante
+                mat_seleccionada, mat_triangular, determinante, intercambio = resultado
+                mat_original = self.mats_ingresadas[mat_seleccionada]
+
+                limpiar_pantalla()
+                print("\n---------------------------------------------")
+                print(f"{mat_seleccionada}:")
+                print(mat_original)
+                print(f"Matriz triangular superior a partir de {mat_seleccionada}:")
+                print(mat_triangular, end="")
+                print("---------------------------------------------\n")
+                diagonales = [mat_triangular[i, i] for i in range(mat_triangular.filas)]
+                print(f"| {mat_seleccionada} | = {" * ".join(str(d) for d in diagonales)}")
+                print(f"| {mat_seleccionada} | = {determinante}")
+
+                cambiar_signo = intercambio is True and determinante != 0
+                if cambiar_signo:
+                    print("\nComo hubo un número impar de intercambios de filas al crear la matriz triangular superior, el signo del determinante se invierte:")
+                    print(f"-| {mat_seleccionada} | = {determinante}")
 
         input("\nPresione cualquier tecla para regresar al menú de matrices...")
         return None
 
     def seleccionar_mat(self, operacion: str) -> str:
-        if operacion in ("se", "me", "mv", "t") and self._validar_mats_ingresadas():
+        if operacion in ("se", "me", "mv", "t", "d") and self._validar_mats_ingresadas():
             mensaje = self._get_mensaje(operacion)
             input_mat = self._get_input(mensaje, operacion)
             try:
                 self._validar_input_mat(input_mat, operacion)
-            except (KeyError, TypeError) as e:
+            except (KeyError, TypeError, ArithmeticError) as e:
                 input(e)
                 return ""
             return input_mat
@@ -398,6 +435,8 @@ class MatricesManager:
                 return "\n¿Cuál matriz desea multiplicar por un vector? "
             case "t":
                 return "\n¿Cuál matriz desea transponer? "
+            case "d":
+                return "\n¿Para cuál matriz desea calcular su determinante? "
             case _:
                 return ""
 
@@ -412,6 +451,9 @@ class MatricesManager:
             raise KeyError(f"Error: La matriz '{input_mat}' no existe!")
         elif operacion == "se" and not self.mats_ingresadas[input_mat].aumentada:
             raise TypeError(f"Error: La matriz '{input_mat}' no es aumentada!")
+        elif operacion == "d" and not self.mats_ingresadas[input_mat].es_cuadrada():
+            raise ArithmeticError(f"Error: La matriz '{input_mat}' no es cuadrada!")
+        return None
 
     def _validar_input_mats(self, input_mats: List[str], operacion: str) -> None:
         mat = next((mat for mat in input_mats if mat not in self.mats_ingresadas), None)
@@ -429,6 +471,7 @@ class MatricesManager:
             dimensiones_validas = mat1.columnas == mat2.filas
             if not dimensiones_validas:
                 raise ArithmeticError("El número de columnas de la primera matriz debe ser igual al número de filas de la segunda matriz")
+        return None
 
     def _validar_mats_ingresadas(self) -> bool:
         if self.mats_ingresadas == {}:
