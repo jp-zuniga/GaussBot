@@ -2,6 +2,7 @@ from fractions import Fraction
 
 from gauss_bot.clases.matriz import Matriz, Validacion
 
+
 class SistemaEcuaciones:
     def __init__(self, matriz: Matriz) -> None:
         self.matriz = matriz
@@ -201,13 +202,16 @@ class SistemaEcuaciones:
     def _get_soluciones(self, unica: bool, libres: list[int], validacion: Validacion) -> None:
         solucion, fila_inconsistente = validacion
         if not solucion and fila_inconsistente != -1:
-            self.respuesta += (f"\n| En F{fila_inconsistente+1}: 0 != {str(self.matriz[fila_inconsistente, -1].limit_denominator(100))}\n")
-            self.respuesta += ("| Sistema es inconsistente!\n")
+            self.respuesta += f"\n| En F{fila_inconsistente+1}: 0 != {str(self.matriz[fila_inconsistente, -1].limit_denominator(100))}\n"
+            self.respuesta += "| Sistema es inconsistente!\n"
             return None
         elif unica:
-            solucion_trivial = all(self.matriz[i, -1] == 0 for i in range(self.matriz.filas))
+            solucion_trivial = all(
+                self.matriz[i, -1] == 0 for i in range(self.matriz.filas)
+            )
+
             mensaje_solucion = "trivial" if solucion_trivial else "no trivial"
-            self.respuesta += (f"\n| Solución {mensaje_solucion} encontrada:\n")
+            self.respuesta += f"\n| Solución {mensaje_solucion} encontrada:\n"
             for i in range(self.matriz.filas):
                 if all(x == 0 for x in self.matriz[i]):
                     continue
@@ -215,8 +219,8 @@ class SistemaEcuaciones:
             return None
 
         ecuaciones = self._despejar_variables(libres)
-        self.respuesta += ("\n| Sistema no tiene solución única!\n")
-        self.respuesta += ("| Solución general encontrada:\n")
+        self.respuesta += "\n| Sistema no tiene solución única!\n"
+        self.respuesta += "| Solución general encontrada:\n"
         for linea in ecuaciones:
-            self.respuesta += (linea)
+            self.respuesta += linea
         return None

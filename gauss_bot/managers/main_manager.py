@@ -5,8 +5,8 @@ from gauss_bot.managers.mats_manager import MatricesManager
 from gauss_bot.managers.vecs_manager import VectoresManager
 from gauss_bot.utils import limpiar_pantalla
 
-# ? mejorar .procesar_operacion() en MatricesManager y VectoresManager
-# ? implementar opcion de mostrar procedimiento para todas las operaciones en MatricesManager y VectoresManager
+# TODO: implementar opcion de mostrar procedimiento para todas las operaciones en MatricesManager y VectoresManager
+
 
 class OpsManager:
     def __init__(self, mat_manager=None, vec_manager=None) -> None:
@@ -53,7 +53,8 @@ class OpsManager:
         if nombre_vec == "":
             return None
 
-        mat, vec = self.mat_manager.mats_ingresadas[nombre_mat], self.vec_manager.vecs_ingresados[nombre_vec]
+        mat = self.mat_manager.mats_ingresadas[nombre_mat]
+        vec = self.vec_manager.vecs_ingresados[nombre_vec]
         if mat.columnas != len(vec):
             input("Error: El número de columnas de la matriz debe ser igual al número de componentes del vector!")
             return None

@@ -1,11 +1,10 @@
-from fractions import Fraction
 from copy import deepcopy
+from fractions import Fraction
 
 from gauss_bot.clases.matriz import Matriz
 from gauss_bot.clases.sistema_ecuaciones import SistemaEcuaciones
 from gauss_bot.utils import limpiar_pantalla, match_input
 
-# TODO implementar calculo de inversas
 
 class MatricesManager:
     def __init__(self, parent=None, mats_ingresadas: dict[str, Matriz] = {}) -> None:
@@ -48,7 +47,7 @@ class MatricesManager:
                 self.agregar_matriz()
                 return None
             case 2:
-                self._mostrar_matrices(necesita_aumentada = -1)
+                self._mostrar_matrices(necesita_aumentada=-1)
             case 3:
                 resultado = self.procesar_operacion("se")
                 if resultado is not None:
@@ -92,13 +91,21 @@ class MatricesManager:
     def agregar_matriz(self) -> None:
         try:
             limpiar_pantalla()
-            nombre = input("\nIngrese el nombre de la matriz (una letra mayúscula): ").strip().upper()
+            nombre = (
+                input("\nIngrese el nombre de la matriz (una letra mayúscula): ")
+                .strip()
+                .upper()
+            )
+
             if not nombre.isalpha() or len(nombre) != 1:
                 raise NameError
             if nombre in self.mats_ingresadas:
                 raise KeyError
 
-            ingresar_aumentada = match_input("¿Se ingresará una matriz aumentada? (s/n) ")
+            ingresar_aumentada = match_input(
+                "¿Se ingresará una matriz aumentada? (s/n) "
+            )
+
             if ingresar_aumentada == 1:
                 es_aumentada = True
             elif ingresar_aumentada == 0:
@@ -163,21 +170,21 @@ class MatricesManager:
         return mat
 
     def pedir_dimensiones(self, nombre: str, es_aumentada: bool) -> tuple[int, int]:
-            palabras = ["ecuaciones", "variables"] if es_aumentada else ["filas", "columnas"]
-            try:
-                limpiar_pantalla()
-                print(f"\nDatos de matriz {nombre}:")
-                print("----------------------------")
-                filas = int(input(f"Ingrese el número de {palabras[0]}: "))
-                if filas <= 0:
-                    raise ValueError
-                columnas = int(input(f"Ingrese el número de {palabras[1]}: "))
-                if columnas <= 0:
-                    raise ValueError
-            except ValueError:
-                input("Error: Ingrese un número entero positivo!")
-                return self.pedir_dimensiones(nombre, es_aumentada)
-            return (filas, columnas)
+        palabras = ["ecuaciones", "variables"] if es_aumentada else ["filas", "columnas"]
+        try:
+            limpiar_pantalla()
+            print(f"\nDatos de matriz {nombre}:")
+            print("----------------------------")
+            filas = int(input(f"Ingrese el número de {palabras[0]}: "))
+            if filas <= 0:
+                raise ValueError
+            columnas = int(input(f"Ingrese el número de {palabras[1]}: "))
+            if columnas <= 0:
+                raise ValueError
+        except ValueError:
+            input("Error: Ingrese un número entero positivo!")
+            return self.pedir_dimensiones(nombre, es_aumentada)
+        return (filas, columnas)
 
     def procesar_operacion(self, operacion: str) -> tuple:
         """
@@ -204,7 +211,11 @@ class MatricesManager:
             if nombres_mats == []:
                 return ()
 
-            mat1, mat2 = self.mats_ingresadas[nombres_mats[0]], self.mats_ingresadas[nombres_mats[1]]
+            mat1, mat2 = (
+                self.mats_ingresadas[nombres_mats[0]],
+                self.mats_ingresadas[nombres_mats[1]],
+            )
+
             match operacion:
                 case "s":
                     return (nombres_mats, mat1 + mat2)
@@ -224,14 +235,19 @@ class MatricesManager:
                     nombre_mat_modded = f"{nombre_mat}_r"
                     sistema = SistemaEcuaciones(mat_copia)
                     sistema.resolver_sistema()
-                    respuesta, procedimiento, mat_copia_modded = sistema.respuesta, sistema.procedimiento, sistema.matriz
+
+                    respuesta = sistema.respuesta
+                    procedimiento = sistema.procedimiento
+                    mat_copia_modded = sistema.matriz
                     if not any(mat_copia_modded == mat for mat in self.mats_ingresadas.values()):
                         self.mats_ingresadas[nombre_mat_modded] = mat_copia_modded
 
                     return (nombre_mat, respuesta, procedimiento, mat_copia_modded)
                 case "me":
                     try:
-                        escalar = Fraction(input("Ingrese el escalar: ").strip()).limit_denominator(100)
+                        escalar = Fraction(
+                            input("Ingrese el escalar: ").strip()
+                        ).limit_denominator(100)
                     except ValueError:
                         input("Error: Ingrese un número real!")
                         return ()
@@ -285,7 +301,10 @@ class MatricesManager:
                 print(respuesta)
                 print("---------------------------------------------")
 
-                mostrar_procedimiento = match_input("\n¿Desea ver el procedimiento? (s/n) ")
+                mostrar_procedimiento = match_input(
+                    "\n¿Desea ver el procedimiento? (s/n) "
+                )
+
                 if mostrar_procedimiento == 1:
                     limpiar_pantalla()
                     print(procedimiento, end="")
@@ -306,7 +325,10 @@ class MatricesManager:
 
             case "s":   # ? sumar matrices
                 mats_seleccionadas, mat_sumada = resultado
-                mat1, mat2 = self.mats_ingresadas[mats_seleccionadas[0]], self.mats_ingresadas[mats_seleccionadas[1]]
+                mat1, mat2 = (
+                    self.mats_ingresadas[mats_seleccionadas[0]],
+                    self.mats_ingresadas[mats_seleccionadas[1]],
+                )
 
                 limpiar_pantalla()
                 print("\nMatriz seleccionadas:")
@@ -321,7 +343,10 @@ class MatricesManager:
 
             case "r":   # ? restar matrices
                 mats_seleccionadas, mat_restada = resultado
-                mat1, mat2 = self.mats_ingresadas[mats_seleccionadas[0]], self.mats_ingresadas[mats_seleccionadas[1]]
+                mat1, mat2 = (
+                    self.mats_ingresadas[mats_seleccionadas[0]],
+                    self.mats_ingresadas[mats_seleccionadas[1]],
+                )
 
                 limpiar_pantalla()
                 print("\nMatriz seleccionadas:")
@@ -352,7 +377,10 @@ class MatricesManager:
 
             case "m":   # ? multiplicar matrices
                 mats_seleccionadas, mat_multiplicada = resultado
-                mat1, mat2 = self.mats_ingresadas[mats_seleccionadas[0]], self.mats_ingresadas[mats_seleccionadas[1]]
+                mat1, mat2 = (
+                    self.mats_ingresadas[mats_seleccionadas[0]],
+                    self.mats_ingresadas[mats_seleccionadas[1]],
+                )
 
                 limpiar_pantalla()
                 print("\nMatriz seleccionadas:")
@@ -462,16 +490,27 @@ class MatricesManager:
             raise KeyError(f"Error: La matriz '{mat}' no existe!")
         elif len(input_mats) != 2:
             raise ArithmeticError("Error: Debe seleccionar dos matrices!")
+
         elif operacion in ("s", "r"):
-            mat1, mat2 = self.mats_ingresadas[input_mats[0]], self.mats_ingresadas[input_mats[1]]
+            mat1, mat2 = (
+                self.mats_ingresadas[input_mats[0]],
+                self.mats_ingresadas[input_mats[1]],
+            )
+
             dimensiones_validas = mat1.filas == mat2.filas and mat1.columnas == mat2.columnas
             if not dimensiones_validas:
                 raise ArithmeticError("Error: Las matrices deben tener las mismas dimensiones!")
+
         elif operacion == "m":
-            mat1, mat2 = self.mats_ingresadas[input_mats[0]], self.mats_ingresadas[input_mats[1]]
+            mat1, mat2 = (
+                self.mats_ingresadas[input_mats[0]],
+                self.mats_ingresadas[input_mats[1]],
+            )
+
             dimensiones_validas = mat1.columnas == mat2.filas
             if not dimensiones_validas:
                 raise ArithmeticError("El número de columnas de la primera matriz debe ser igual al número de filas de la segunda matriz")
+
         return None
 
     def _validar_mats_ingresadas(self) -> bool:
@@ -505,7 +544,8 @@ class MatricesManager:
         print(f"\nMatrices {adj if necesita_aumentada != -1 else " "}guardadas:")
         print("---------------------------------------------", end="")
         for nombre, mat in self.mats_ingresadas.items():
-            if (necesita_aumentada == 1 and not mat.aumentada) or (necesita_aumentada == 0 and mat.aumentada):
+            if (necesita_aumentada == 1 and not mat.aumentada) or (
+                necesita_aumentada == 0 and mat.aumentada):
                 continue
             print(f"\n{nombre}:")
             print(mat, end="")

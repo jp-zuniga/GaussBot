@@ -1,7 +1,8 @@
 from fractions import Fraction
 from typing import Union, overload
 
-class Vector():
+
+class Vector:
     def __init__(self, componentes: list[Fraction] = []) -> None:
         self._componentes = componentes
 

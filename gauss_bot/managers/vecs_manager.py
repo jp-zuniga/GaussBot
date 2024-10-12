@@ -4,6 +4,7 @@ from typing import Union, overload
 from gauss_bot.clases.vector import Vector
 from gauss_bot.utils import limpiar_pantalla, match_input
 
+
 class VectoresManager:
     def __init__(self, parent=None, vecs_ingresados: dict[str, Vector] = {}) -> None:
         self.parent = parent
@@ -71,7 +72,12 @@ class VectoresManager:
     def agregar_vector(self) -> None:
         try:
             limpiar_pantalla()
-            nombre = input("\nIngrese el nombre del vector (una letra minúscula): ").strip().lower()
+            nombre = (
+                input("\nIngrese el nombre del vector (una letra minúscula): ")
+                .strip()
+                .lower()
+            )
+
             if not nombre.isalpha() or len(nombre) != 1:
                 raise NameError
             if nombre in self.vecs_ingresados:
@@ -151,7 +157,11 @@ class VectoresManager:
             if nombres_vecs == []:
                 return ()
 
-            vec1, vec2 = self.vecs_ingresados[nombres_vecs[0]], self.vecs_ingresados[nombres_vecs[1]]
+            vec1, vec2 = (
+                self.vecs_ingresados[nombres_vecs[0]],
+                self.vecs_ingresados[nombres_vecs[1]],
+            )
+
             match operacion:
                 case "s":
                     return (nombres_vecs, vec1 + vec2)
@@ -167,7 +177,9 @@ class VectoresManager:
 
             vec_seleccionado = self.vecs_ingresados[nombre_vec]
             try:
-                escalar = Fraction(input("Ingrese el escalar: ").strip()).limit_denominator(100)
+                escalar = Fraction(
+                    input("Ingrese el escalar: ").strip()
+                ).limit_denominator(100)
             except ValueError:
                 input("Error: Ingrese un número real!")
                 return ()
@@ -196,7 +208,10 @@ class VectoresManager:
         match operacion:
             case "s":   # ? sumar vectores
                 vecs_seleccionados, vec_sumado = resultado
-                vec1, vec2 = self.vecs_ingresados[vecs_seleccionados[0]], self.vecs_ingresados[vecs_seleccionados[1]]
+                vec1, vec2 = (
+                    self.vecs_ingresados[vecs_seleccionados[0]],
+                    self.vecs_ingresados[vecs_seleccionados[1]],
+                )
 
                 limpiar_pantalla()
                 print("\nVectores seleccionados:")
@@ -211,7 +226,10 @@ class VectoresManager:
 
             case "r":   # ? restar vectore
                 vecs_seleccionados, vec_restado = resultado
-                vec1, vec2 = self.vecs_ingresados[vecs_seleccionados[0]], self.vecs_ingresados[vecs_seleccionados[1]]
+                vec1, vec2 = (
+                    self.vecs_ingresados[vecs_seleccionados[0]],
+                    self.vecs_ingresados[vecs_seleccionados[1]],
+                )
 
                 limpiar_pantalla()
                 print("\nVectores seleccionados:")
@@ -243,7 +261,10 @@ class VectoresManager:
 
             case "m":   # ? multiplicar vectores
                 vecs_seleccionados, vec_multiplicado = resultado
-                vec1, vec2 = self.vecs_ingresados[vecs_seleccionados[0]], self.vecs_ingresados[vecs_seleccionados[1]]
+                vec1, vec2 = (
+                    self.vecs_ingresados[vecs_seleccionados[0]],
+                    self.vecs_ingresados[vecs_seleccionados[1]],
+                )
 
                 limpiar_pantalla()
                 print("\nVectores seleccionados:")

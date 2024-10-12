@@ -3,6 +3,7 @@ from typing import Union, overload
 
 Validacion = tuple[bool, int]
 
+
 class Matriz:
     def __init__(self, aumentada: bool, filas: int, columnas: int, valores: list[list[Fraction]] = []) -> None:
         self._aumentada = aumentada
@@ -34,7 +35,11 @@ class Matriz:
             return False
         elif self.filas != mat2.filas or self.columnas != mat2.columnas:
             return False
-        return all(a == b for fila1, fila2 in zip(self.valores, mat2.valores) for a, b in zip(fila1, fila2))
+        return all(
+            a == b
+            for fila1, fila2 in zip(self.valores, mat2.valores)
+            for a, b in zip(fila1, fila2)
+        )
 
     @overload
     def __getitem__(self, indice: int) -> list[Fraction]: ...
@@ -114,7 +119,11 @@ class Matriz:
             if self.columnas != multiplicador.filas:
                 raise ArithmeticError("El número de columnas de la primera matriz debe ser igual al número de filas de la segunda matriz!")
 
-            mat_multiplicada = [[Fraction(0) for _ in range(multiplicador.columnas)] for _ in range(self.filas)]
+            mat_multiplicada = [
+                [Fraction(0) for _ in range(multiplicador.columnas)]
+                for _ in range(self.filas)
+            ]
+
             for i in range(self.filas):
                 for j in range(multiplicador.columnas):
                     for k in range(self.columnas):
@@ -134,7 +143,8 @@ class Matriz:
         return self.filas == self.columnas
 
     def es_identidad(self) -> bool:
-        return self.es_cuadrada() and all(self.valores[i][i] == Fraction(1) for i in range(self.filas))
+        diagonales_son_1 = all(self.valores[i][i] == Fraction(1) for i in range(self.filas))
+        return self.es_cuadrada() and diagonales_son_1
 
     def transponer(self) -> "Matriz":
         mat_transpuesta = [[self.valores[j][i] for j in range(self.filas)] for i in range(self.columnas)]
