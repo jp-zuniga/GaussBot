@@ -251,11 +251,12 @@ class Matriz:
 
     def encontrar_adjunta(self) -> "Matriz":
         """
-        Encuentra la matriz de cofactores de la instancia.
+        Encuentra la adjunta de la instancia.
+        * ArithmeticError: si la matriz no es cuadrada
         """
 
         if not self.es_cuadrada():
-            raise ArithmeticError("La matriz debe ser cuadrada para encontrar la matriz de cofactores!")
+            raise ArithmeticError("La matriz debe ser cuadrada para su adjunta!")
 
         mat_cofactores = []
         for i in range(self.filas):
@@ -273,18 +274,21 @@ class Matriz:
 
         adjunta = Matriz(self.aumentada, self.filas, self.columnas, mat_cofactores).transponer()
         return adjunta
-    
-    def invertir(self) -> "Matriz":
+
+    def invertir(self) -> tuple["Matriz", "Matriz", Fraction]:
         """
         Encuentra la inversa de la instancia.
         * ArithmeticError: si la matriz no es cuadrada
-        * ArithmeticError: si la matriz no es invertible
+        * ArithmeticError: si el determinante de la matriz es 0
         """
+
+        if not self.es_cuadrada():
+            raise ArithmeticError("La matriz debe ser cuadrada para ser invertible!")
 
         det, _, _ = self.calcular_det()
         if det == 0:
-            raise ArithmeticError("La matriz no es invertible!")
+            raise ArithmeticError("El determinante de la matriz es 0; no es invertible!")
 
         adjunta = self.encontrar_adjunta()
         inversa = adjunta * (1 / det)
-        return inversa
+        return (inversa, adjunta, det)

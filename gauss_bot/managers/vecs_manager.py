@@ -269,10 +269,8 @@ class VectoresManager:
                     print(f"\n{vecs_seleccionados[0]} - {vecs_seleccionados[1]} = {vec_resultante}")
                 case "m":
                     print(f"\n{vecs_seleccionados[0]}.{vecs_seleccionados[1]} = {vec_resultante}")
-            input("\nPresione cualquier tecla para continuar...")
-            return
 
-        if operacion == "ve":  # ? multiplicar vector por escalar
+        elif operacion == "ve":  # ? multiplicar vector por escalar
             vec_seleccionado, escalar, vec_resultante = resultado
             vec = self.vecs_ingresados[vec_seleccionado]
             if escalar in (1, -1):
@@ -285,8 +283,8 @@ class VectoresManager:
             limpiar_pantalla()
             print(f"\n{vec_seleccionado} = {vec}")
             print(f"\n{imprimir_escalar}{vec_seleccionado} = {vec_resultante}")
-            input("\nPresione cualquier tecla para continuar...")
-            return
+
+        input("\nPresione cualquier tecla para continuar...")
 
     @overload
     def seleccionar(self, operacion: str) -> str: ...

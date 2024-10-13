@@ -31,8 +31,8 @@ class MatricesManager:
         * "t": transponer matriz
         * "d": calcular determinante
         """
-        self.ops_validas = ("se", "s", "r", "me", "m", "mv", "t", "d")
-        self.ops_con_una = ("se", "me", "mv", "t", "d")
+        self.ops_validas = ("se", "s", "r", "me", "m", "mv", "t", "d", "i")
+        self.ops_con_una = ("se", "me", "mv", "t", "d", "i")
         self.ops_con_dos = ("s", "r", "m")
 
     def menu_matrices(self) -> None:
@@ -54,16 +54,17 @@ class MatricesManager:
             print("7. Multiplicar matrices")
             print("8. Multiplicar matriz por vector")
             print("9. Transponer matriz")
-            print("10. Calcular determinante de una matriz\n")
-            print("11. Regresar al menú principal")
+            print("10. Calcular determinante de una matriz")
+            print("11. Encontrar la inversa una matriz\n")
+            print("12. Regresar al menú principal")
             try:
                 option = int(input("\n=> Seleccione una opción: ").strip())
-                if option < 1 or option > 11:
+                if option < 1 or option > 12:
                     raise ValueError
             except ValueError:
                 input("=> Error: Ingrese una opción válida!")
                 continue
-            if option == 11:
+            if option == 12:
                 input("=> Regresando a menú principal...")
                 break
             self.procesar_menu(option)
@@ -75,8 +76,6 @@ class MatricesManager:
         """
 
         match opcion:
-            # siempre retornar despues de mostrar_resultado()
-            # para no mostrar el input() message al final innecesariamente
             case 1:
                 self.agregar_matriz()
                 return
@@ -118,6 +117,11 @@ class MatricesManager:
                 resultado = self.procesar_operacion("d")
                 if resultado is not None:
                     self.mostrar_resultado("d", resultado)
+                    return
+            case 11:
+                resultado = self.procesar_operacion("i")
+                if resultado is not None:
+                    self.mostrar_resultado("i", resultado)
                     return
         input("Presione cualquier tecla para regresar al menú de matrices...")
 
@@ -248,6 +252,7 @@ class MatricesManager:
         * "m": multiplicar matrices
         * "t": transponer matriz
         * "d": calcular determinante
+        * "i": encontrar la inversa de una matriz
         """
 
         limpiar_pantalla()
@@ -288,11 +293,11 @@ class MatricesManager:
             mat_copia = deepcopy(self.mats_ingresadas[nombre_mat])
             match operacion:
                 case "se":  # ? resolver sistema
-                    nombre_mat_modded = f"{nombre_mat}_r"
+                    nombre_resultado = f"{nombre_mat}_r"
                     sistema = SistemaEcuaciones(mat_copia)
                     sistema.resolver_sistema()
                     if not any(sistema.matriz == mat for mat in self.mats_ingresadas.values()):
-                        self.mats_ingresadas[nombre_mat_modded] = sistema.matriz
+                        self.mats_ingresadas[nombre_resultado] = sistema.matriz
 
                     return (nombre_mat, sistema.matriz)
 
@@ -310,15 +315,28 @@ class MatricesManager:
                     return (nombre_mat, escalar, mat_copia * escalar)
 
                 case "t":  # ? transponer matriz
-                    nombre_mat_modded = f"{nombre_mat}_t"
-                    mat_copia_modded = mat_copia.transponer()
-                    if not any(mat_copia_modded == mat for mat in self.mats_ingresadas.values()):
-                        self.mats_ingresadas[nombre_mat_modded] = mat_copia_modded
+                    nombre_resultado = f"{nombre_mat}_t"
+                    transpuesta = mat_copia.transponer()
+                    if not any(transpuesta == mat for mat in self.mats_ingresadas.values()):
+                        self.mats_ingresadas[nombre_resultado] = transpuesta
 
-                    return (nombre_mat, mat_copia_modded)
+                    return (nombre_mat, transpuesta)
 
                 case "d":  # ? calcular determinante
                     return (nombre_mat, mat_copia.calcular_det())
+
+                case "i":  # ? encontrar inversa
+                    nombre_resultado = f"{nombre_mat}_i"
+                    try:
+                        inversa, adjunta, det = mat_copia.invertir()
+                    except ArithmeticError as e:
+                        print(e)
+                        input("Presione cualquier tecla para regresar al menú de matrices...")
+                        return ()
+
+                    if not any(inversa == mat for mat in self.mats_ingresadas.values()):
+                        self.mats_ingresadas[nombre_resultado] = inversa
+                    return (nombre_mat, inversa, adjunta, det)
         return ()
 
     def mostrar_resultado(self, operacion: str, resultado: tuple) -> None:
@@ -334,6 +352,7 @@ class MatricesManager:
         * "m": multiplicar matrices
         * "t": transponer matriz
         * "d": calcular determinante
+        * "i": encontrar la inversa de una matriz
         """
 
         limpiar_pantalla()
@@ -365,7 +384,6 @@ class MatricesManager:
                 case "m":
                     print(f"\n{mats_seleccionadas[0]} * {mats_seleccionadas[1]}:")
             print(mat_resultante, end="")
-            return
 
         # manejar operaciones de una matriz:
         match operacion:
@@ -390,15 +408,6 @@ class MatricesManager:
                     print("De acuerdo!")
                 else:
                     print("Opción inválida!")
-
-                resolver_otra = match_input("\n¿Desea resolver otra matriz? (s/n) ")
-                if resolver_otra == 1:
-                    return self.mostrar_resultado("se", self.procesar_operacion("se"))
-                if resolver_otra == 0:
-                    input("De acuerdo! Regresando al menú de matrices...")
-                else:
-                    input("Opción inválida! Regresando al menú de matrices...")
-                return
 
             case "me":  # ? multiplicar matriz por escalar
                 mat_seleccionada, escalar, mat_multiplicada = resultado
@@ -446,6 +455,22 @@ class MatricesManager:
                     print("\nComo hubo un número impar de intercambios de filas al", end=" ")
                     print("crear la matriz triangular superior, el signo del determinante se invierte:")
                     print(f"-| {mat_seleccionada} | = {det}")
+
+            case "i":   # ? encontrar inversa
+                mat_seleccionada, inversa, adjunta, det = resultado
+                mat_original = self.mats_ingresadas[mat_seleccionada]
+
+                limpiar_pantalla()
+                print("\n---------------------------------------------")
+                print(f"{mat_seleccionada}:")
+                print(mat_original)
+                print(f"adj({mat_seleccionada}):")
+                print(adjunta)
+                print(f"| {mat_seleccionada} | = {det}")
+                print("---------------------------------------------")
+                print(f"\n{mat_seleccionada}_i = (1 / {det}) * adj({mat_seleccionada})")
+                print("A_i =")
+                print(inversa, end="")
 
         input("\nPresione cualquier tecla para regresar al menú de matrices...")
 
@@ -507,6 +532,8 @@ class MatricesManager:
                 return "\n¿Cuál matriz desea transponer? "
             case "d":
                 return "\n¿Para cuál matriz desea calcular su determinante? "
+            case "i":
+                return "\n¿Para cuál matriz desea encontrar su inversa? "
             case _:
                 return ""
 
@@ -532,7 +559,7 @@ class MatricesManager:
             raise KeyError(f"Error: La matriz '{input_mat}' no existe!")
         if operacion == "se" and not self.mats_ingresadas[input_mat].aumentada:
             raise TypeError(f"Error: La matriz '{input_mat}' no es aumentada!")
-        if operacion == "d" and not self.mats_ingresadas[input_mat].es_cuadrada():
+        if operacion in ("d", "i") and not self.mats_ingresadas[input_mat].es_cuadrada():
             raise ArithmeticError(f"Error: La matriz '{input_mat}' no es cuadrada!")
 
     def _validar_input_mats(self, input_mats: list[str], operacion: str) -> None:
