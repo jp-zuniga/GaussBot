@@ -318,12 +318,7 @@ class MatricesManager:
                     return (nombre_mat, mat_copia_modded)
 
                 case "d":  # ? calcular determinante
-                    mat_triangular, intercambio = mat_copia.hacer_triangular_superior()
-                    determinante = Fraction(1)
-                    for i in range(mat_triangular.filas):
-                        determinante *= mat_triangular[i, i]
-
-                    return (nombre_mat, mat_triangular, intercambio, determinante)
+                    return (nombre_mat, mat_copia.calcular_det())
         return ()
 
     def mostrar_resultado(self, operacion: str, resultado: tuple) -> None:
@@ -432,8 +427,10 @@ class MatricesManager:
                 print(mat_transpuesta, end="")
 
             case "d":   # ? calcular determinante
-                mat_seleccionada, mat_triangular, determinante, intercambio = resultado
+                mat_seleccionada, det, mat_triangular, intercambio = resultado
                 mat_original = self.mats_ingresadas[mat_seleccionada]
+                diagonales = [mat_triangular[i, i] for i in range(mat_triangular.filas)]
+                cambiar_signo = intercambio and det != 0
 
                 limpiar_pantalla()
                 print("\n---------------------------------------------")
@@ -442,14 +439,13 @@ class MatricesManager:
                 print(f"Matriz triangular superior a partir de {mat_seleccionada}:")
                 print(mat_triangular, end="")
                 print("---------------------------------------------\n")
-                diagonales = [mat_triangular[i, i] for i in range(mat_triangular.filas)]
                 print(f"| {mat_seleccionada} | = {" * ".join(str(d) for d in diagonales)}")
-                print(f"| {mat_seleccionada} | = {determinante}")
+                print(f"| {mat_seleccionada} | = {det if not cambiar_signo else -det}")
 
-                cambiar_signo = intercambio and determinante != 0
                 if cambiar_signo:
-                    print("\nComo hubo un número impar de intercambios de filas al crear la matriz triangular superior, el signo del determinante se invierte:")
-                    print(f"-| {mat_seleccionada} | = {determinante}")
+                    print("\nComo hubo un número impar de intercambios de filas al", end=" ")
+                    print("crear la matriz triangular superior, el signo del determinante se invierte:")
+                    print(f"-| {mat_seleccionada} | = {det}")
 
         input("\nPresione cualquier tecla para regresar al menú de matrices...")
 

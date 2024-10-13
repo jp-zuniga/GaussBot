@@ -109,7 +109,7 @@ class Matriz:
         Para sumar matrices de la forma Matriz() + Matriz()
         * ArithmeticError: si las matrices no tienen las mismas dimensiones
         """
-        
+
         if self.filas != mat2.filas or self.columnas != mat2.columnas:
             raise ArithmeticError("Las matrices deben tener las mismas dimensiones!")
         mat_sumada = [
@@ -124,7 +124,7 @@ class Matriz:
         Para restar matrices de la forma Matriz() - Matriz()
         * ArithmeticError: si las matrices no tienen las mismas dimensiones
         """
-        
+
         if self.filas != mat2.filas or self.columnas != mat2.columnas:
             raise ArithmeticError("Las matrices deben tener las mismas dimensiones!")
         mat_restada = [
@@ -148,7 +148,7 @@ class Matriz:
         * TypeError: si el tipo de dato no es válido
         * ArithmeticError: si las dimensiones de las matrices son inválidas
         """
-        
+
         if isinstance(multiplicador, Matriz):
             if self.columnas != multiplicador.filas:
                 raise ArithmeticError("El número de columnas de la primera matriz debe ser igual al número de filas de la segunda matriz!")
@@ -195,15 +195,6 @@ class Matriz:
         resto_son_cero = all(self.valores[i][j] == Fraction(0) for i in range(self.filas) for j in range(self.columnas) if i != j)
         return self.es_cuadrada() and diagonales_son_1 and resto_son_cero
 
-    def transponer(self) -> "Matriz":
-        """
-        Crea una nueva lista bidimensional con los valores de la instancia transpuestos,
-        y la retorna como un nuevo objeto Matriz()
-        """
-
-        mat_transpuesta = [[self.valores[j][i] for j in range(self.filas)] for i in range(self.columnas)]
-        return Matriz(self.aumentada, self.columnas, self.filas, mat_transpuesta)
-
     def hacer_triangular_superior(self) -> tuple["Matriz", bool]:
         """
         Usada para calcular determinantes. Realiza operaciones de fila
@@ -230,3 +221,70 @@ class Matriz:
                     mat_triangular[j][k] -= factor * mat_triangular[i][k]
 
         return (Matriz(self.aumentada, self.filas, self.columnas, mat_triangular), intercambio)
+
+    def transponer(self) -> "Matriz":
+        """
+        Crea una nueva lista bidimensional con los valores de la instancia transpuestos,
+        y la retorna como un nuevo objeto Matriz()
+        """
+
+        mat_transpuesta = [[self.valores[j][i] for j in range(self.filas)] for i in range(self.columnas)]
+        return Matriz(self.aumentada, self.columnas, self.filas, mat_transpuesta)
+
+    def calcular_det(self) -> tuple[Fraction, "Matriz", bool]:
+        """
+        Calcula el determinante de la instancia.
+        * ArithmeticError: si la matriz no es cuadrada
+        """
+
+        if not self.es_cuadrada():
+            raise ArithmeticError("El determinante solo esta definido para matrices cuadradas!")
+
+        mat_triangular, intercambio = self.hacer_triangular_superior()
+        det = Fraction(1)
+        for i in range(mat_triangular.filas):
+            det *= mat_triangular[i, i]
+
+        if intercambio:
+            det *= -1
+        return (det, mat_triangular, intercambio)
+
+    def encontrar_adjunta(self) -> "Matriz":
+        """
+        Encuentra la matriz de cofactores de la instancia.
+        """
+
+        if not self.es_cuadrada():
+            raise ArithmeticError("La matriz debe ser cuadrada para encontrar la matriz de cofactores!")
+
+        mat_cofactores = []
+        for i in range(self.filas):
+            fila = []
+            for j in range(self.columnas):
+                minor = [
+                    [self.valores[m][n] for n in range(self.columnas) if n != j]
+                    for m in range(self.filas) if m != i
+                ]
+
+                det_submatriz, _, _ = Matriz(False, self.filas - 1, self.columnas - 1, minor).calcular_det()
+                cofactor = (-1) ** (i + j) * det_submatriz
+                fila.append(cofactor)
+            mat_cofactores.append(fila)
+
+        adjunta = Matriz(self.aumentada, self.filas, self.columnas, mat_cofactores).transponer()
+        return adjunta
+    
+    def invertir(self) -> "Matriz":
+        """
+        Encuentra la inversa de la instancia.
+        * ArithmeticError: si la matriz no es cuadrada
+        * ArithmeticError: si la matriz no es invertible
+        """
+
+        det, _, _ = self.calcular_det()
+        if det == 0:
+            raise ArithmeticError("La matriz no es invertible!")
+
+        adjunta = self.encontrar_adjunta()
+        inversa = adjunta * (1 / det)
+        return inversa
