@@ -79,7 +79,7 @@ class MatricesManager:
             # para no mostrar el input() message al final innecesariamente
             case 1:
                 self.agregar_matriz()
-                return None
+                return
             case 2:
                 self._mostrar_matrices(necesita_aumentada=-1)
             case 3:
@@ -119,7 +119,6 @@ class MatricesManager:
                 if resultado is not None:
                     self.mostrar_resultado("d", resultado)
                     return
-        # mostrar cuando procesar_operacion() retorna None y solo se imprime el mensaje de error:
         input("Presione cualquier tecla para regresar al menú de matrices...")
 
     def agregar_matriz(self) -> None:
@@ -212,8 +211,7 @@ class MatricesManager:
                     print()
             i += 1
             valores.append(fila)
-        mat = Matriz(es_aumentada, filas, columnas, valores)
-        return mat
+        return Matriz(es_aumentada, filas, columnas, valores)
 
     def pedir_dimensiones(self, nombre: str, es_aumentada: bool) -> tuple[int, int]:
         """
@@ -240,7 +238,7 @@ class MatricesManager:
     def procesar_operacion(self, operacion: str) -> tuple:
         """
         Recibe un código de operación, selecciona las matrices necesarias
-        para esa operación, y retorna una tupla con el resultado de la operación.
+        para esa operación, y retorna una tupla con el resultado.
 
         Códigos válidos de operación:
         * "se": resolver sistema de ecuaciones
@@ -331,7 +329,7 @@ class MatricesManager:
     def mostrar_resultado(self, operacion: str, resultado: tuple) -> None:
         """
         Recibe el código de operación recibido por procesar_operacion(),
-        y la tupla retornada por el
+        y la tupla retornada por el.
 
         Códigos válidos de operación:
         * "se": resolver sistema de ecuaciones
@@ -345,9 +343,9 @@ class MatricesManager:
 
         limpiar_pantalla()
         if operacion not in self.ops_validas or resultado == ():
-            return None
+            return
 
-        # manejar suma, resta y multiplicacion, ya que se imprimen igual:
+        # manejar operaciones con dos matrices:
         if operacion in self.ops_con_dos:
             mats_seleccionadas, mat_resultante = resultado
             mat1, mat2 = (
@@ -372,7 +370,7 @@ class MatricesManager:
                 case "m":
                     print(f"\n{mats_seleccionadas[0]} * {mats_seleccionadas[1]}:")
             print(mat_resultante, end="")
-            return None
+            return
 
         # manejar operaciones de una matriz:
         match operacion:
@@ -405,7 +403,7 @@ class MatricesManager:
                     input("De acuerdo! Regresando al menú de matrices...")
                 else:
                     input("Opción inválida! Regresando al menú de matrices...")
-                return None
+                return
 
             case "me":  # ? multiplicar matriz por escalar
                 mat_seleccionada, escalar, mat_multiplicada = resultado
@@ -448,7 +446,7 @@ class MatricesManager:
                 print(f"| {mat_seleccionada} | = {" * ".join(str(d) for d in diagonales)}")
                 print(f"| {mat_seleccionada} | = {determinante}")
 
-                cambiar_signo = intercambio is True and determinante != 0
+                cambiar_signo = intercambio and determinante != 0
                 if cambiar_signo:
                     print("\nComo hubo un número impar de intercambios de filas al crear la matriz triangular superior, el signo del determinante se invierte:")
                     print(f"-| {mat_seleccionada} | = {determinante}")
@@ -489,7 +487,7 @@ class MatricesManager:
             input_mats = self._get_input(mensaje, operacion).split(",")
             try:
                 self._validar_input_mats(input_mats, operacion)
-            except (KeyError, TypeError, ArithmeticError) as e:
+            except (KeyError, ValueError, ArithmeticError) as e:
                 print(e)
                 input("Presione cualquier tecla para regresar al menú de matrices...")
                 return []
@@ -545,7 +543,7 @@ class MatricesManager:
         """
         Valida las matrices seleccionadas por el usuario.
         * KeyError: si una de las matrices seleccionadas no existe
-        * TypeError: si no se seleccionan dos matrices
+        * TValueError: si no se seleccionan dos matrices
         * ArithmeticError: si las matrices no tienen las dimensiones válidas para la operación
         """
 
@@ -553,7 +551,7 @@ class MatricesManager:
         if mat is not None:
             raise KeyError(f"Error: La matriz '{mat}' no existe!")
         if len(input_mats) != 2:
-            raise TypeError("Error: Debe seleccionar dos matrices!")
+            raise ValueError("Error: Debe seleccionar dos matrices!")
 
         if operacion in ("s", "r"):
             mat1, mat2 = (

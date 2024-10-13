@@ -34,7 +34,7 @@ class SistemaEcuaciones:
         """
 
         if self.matriz.es_matriz_cero():
-            return None
+            return
 
         test_inicial = self._validar_consistencia()
         if not test_inicial[0]:
@@ -42,26 +42,27 @@ class SistemaEcuaciones:
                 self.procedimiento += "\nMatriz ya esta en su forma escalonada reducida!\n\n"
             self.procedimiento += str(self.matriz)
             self._obtener_soluciones(unica=False, libres=[], validacion=test_inicial)
-            return None
+            return
 
         if self._validar_escalonada_reducida():
             self.procedimiento += "\nMatriz ya esta en su forma escalonada reducida!\n\n"
             self.procedimiento += str(self.matriz)
-        else:  # reducir si no esta escalonada - validar reduccion:
+        else:
             self.reducir_matriz()
-            test_final = self._validar_consistencia()
-            if not test_final[0]:
-                self._obtener_soluciones(unica=False, libres=[], validacion=test_final)
-                return None
+
+        test_final = self._validar_consistencia()
+        if not test_final[0]:
+            self._obtener_soluciones(unica=False, libres=[], validacion=test_final)
+            return
 
         libres = self._encontrar_variables_libres()
         solucion_unica = self._validar_escalonada_reducida() and libres == []
         if solucion_unica:
             self._obtener_soluciones(unica=True, libres=[], validacion=(True, -1))
-            return None
-        else:
-            self._obtener_soluciones(unica=False, libres=libres, validacion=(True, -1))
-            return None
+            return
+
+        # solucion general:
+        self._obtener_soluciones(unica=False, libres=libres, validacion=(True, -1))
 
     def reducir_matriz(self) -> None:
         """
@@ -96,14 +97,14 @@ class SistemaEcuaciones:
                 self.procedimiento += str(self.matriz)
 
             pivote = self.matriz[fila_actual, j]
-            if pivote != 1 and pivote != 0:  # normalizar fila pivote (convertir elemento pivote en 1)
+            if pivote not in (1, 0):  # normalizar fila pivote (convertir elemento pivote en 1)
                 for k in range(self.matriz.columnas):
                     self.matriz[fila_actual, k] /= pivote
 
                 if pivote == -1:
                     self.procedimiento += f"\nF{fila_actual+1} => -F{fila_actual+1}\n"
                 else:
-                    self.procedimiento += f"\nF{fila_actual+1} => F{fila_actual+1} / {str(pivote.limit_denominator(100))}\n"
+                    self.procedimiento += f"\nF{fila_actual+1} => F{fila_actual+1} / {str(pivote)}\n"
                 self.procedimiento += str(self.matriz)
 
             # eliminar elementos debajo del pivote
@@ -114,7 +115,7 @@ class SistemaEcuaciones:
                 for k in range(self.matriz.columnas):
                     self.matriz[f, k] -= factor * self.matriz[fila_actual, k]
 
-                self.procedimiento += f"\nF{fila_actual+1} => F{fila_actual+1} - ({str(factor.limit_denominator(100))} * F{fila_pivote+1})\n"
+                self.procedimiento += f"\nF{fila_actual+1} => F{fila_actual+1} - ({str(factor)} * F{fila_pivote+1})\n"
                 self.procedimiento += str(self.matriz)
             fila_actual += 1
 
@@ -132,9 +133,8 @@ class SistemaEcuaciones:
                 for k in range(self.matriz.columnas):
                     self.matriz[f, k] -= factor * self.matriz[i, k]
 
-                self.procedimiento += f"\nF{f+1} => F{f+1} - ({str(factor.limit_denominator(100))} * F{i+1})\n"
+                self.procedimiento += f"\nF{f+1} => F{f+1} - ({str(factor)} * F{i+1})\n"
                 self.procedimiento += str(self.matriz)
-        return None
 
     def _encontrar_variables_libres(self) -> list[int]:
         """
@@ -221,7 +221,7 @@ class SistemaEcuaciones:
             variables_actuales = self.matriz.valores[i][:-1]
 
             # si la fila tiene la forma 0 = b (donde b != 0), es inconsistente
-            if variables_actuales == variables_0 and constante_es_0 is False:
+            if variables_actuales == variables_0 and not constante_es_0:
                 return (False, i)
         return (True, -1)
 
@@ -316,9 +316,9 @@ class SistemaEcuaciones:
 
         if not solucion and fila_inconsistente != -1:  # señalar fila inconsistente
             self.solucion += f"\n| En F{fila_inconsistente+1}: 0 != "
-            self.solucion += f"{str(self.matriz[fila_inconsistente, -1].limit_denominator(100))}\n"
+            self.solucion += f"{str(self.matriz[fila_inconsistente, -1])}\n"
             self.solucion += "| Sistema es inconsistente!\n"
-            return None
+            return
 
         if unica:
             solucion_trivial = all(
@@ -330,12 +330,12 @@ class SistemaEcuaciones:
             for i in range(self.matriz.filas):
                 if all(x == 0 for x in self.matriz[i]):
                     continue
-                self.solucion += (f"| X{i+1} = {str(self.matriz[i, -1].limit_denominator(100))}\n")
-            return None
+                self.solucion += (f"| X{i+1} = {str(self.matriz[i, -1])}\n")
+            return
 
         ecuaciones = self._despejar_variables(libres)
         self.solucion += "\n| Sistema no tiene solución única!\n"
         self.solucion += "| Solución general encontrada:\n"
         for linea in ecuaciones:
             self.solucion += linea
-        return None
+        return

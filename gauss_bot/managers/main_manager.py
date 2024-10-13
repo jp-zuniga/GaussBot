@@ -25,7 +25,7 @@ class OpsManager:
                 case 3:
                     input("=> Cerrando programa...")
                     break
-        return None
+        return
 
     def main_menu(self) -> int:
         limpiar_pantalla()
@@ -48,17 +48,17 @@ class OpsManager:
         limpiar_pantalla()
         nombre_mat = self.mat_manager.seleccionar_mat("mv")
         if nombre_mat == "":
-            return None
+            return
 
         nombre_vec = self.vec_manager.seleccionar("mv")
         if nombre_vec == "":
-            return None
+            return
 
         mat = self.mat_manager.mats_ingresadas[nombre_mat]
         vec = self.vec_manager.vecs_ingresados[nombre_vec]
         if mat.columnas != len(vec):
             input("Error: El número de columnas de la matriz debe ser igual al número de componentes del vector!")
-            return None
+            return
 
         limpiar_pantalla()
         resultado = [[Fraction(0) for _ in range(len(vec))] for _ in range(mat.filas)]
@@ -75,4 +75,4 @@ class OpsManager:
         print(f"\n{nombre_mat}{nombre_vec}:")
         print(mat_resultante)
 
-        return None
+        return
