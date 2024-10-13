@@ -1,16 +1,25 @@
 import os
-from fractions import Fraction
-from typing import Tuple, List, Dict
 
-
-# anotaciones de tipo para identificar argumentos de funciones y tipos de return
-Vec = List[Fraction]
-Mat = List[List[Fraction]]
-DictMatrices = Dict[str, Tuple[Mat, bool]]
-DictVectores = Dict[str, Vec]
-Validacion = Tuple[bool, int]
 
 def limpiar_pantalla() -> None:
+    """
+    Llama os.system() con el comando necesario para limpiar la pantalla.
+    """
+
     command = "cls" if os.name == "nt" else "clear"
     os.system(command)
-    return None
+
+
+def match_input(pregunta: str) -> int:
+    """
+    Recibe una pregunta de sí o no, y retorna el input.
+    * return 1: si el input es "s"
+    * return 0: si el input es "n"
+    * return -1: si el input no es válido
+    """
+
+    opciones = {"s": 1, "n": 0}
+    input_usuario = input(pregunta).strip().lower()
+    if input_usuario in opciones:
+        return opciones[input_usuario]
+    return -1
