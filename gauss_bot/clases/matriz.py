@@ -105,6 +105,11 @@ class Matriz:
         return matriz
 
     def __add__(self, mat2: "Matriz") -> "Matriz":
+        """
+        Para sumar matrices de la forma Matriz() + Matriz()
+        * ArithmeticError: si las matrices no tienen las mismas dimensiones
+        """
+        
         if self.filas != mat2.filas or self.columnas != mat2.columnas:
             raise ArithmeticError("Las matrices deben tener las mismas dimensiones!")
         mat_sumada = [
@@ -115,6 +120,11 @@ class Matriz:
         return Matriz(self.aumentada, self.filas, self.columnas, mat_sumada)
 
     def __sub__(self, mat2: "Matriz") -> "Matriz":
+        """
+        Para restar matrices de la forma Matriz() - Matriz()
+        * ArithmeticError: si las matrices no tienen las mismas dimensiones
+        """
+        
         if self.filas != mat2.filas or self.columnas != mat2.columnas:
             raise ArithmeticError("Las matrices deben tener las mismas dimensiones!")
         mat_restada = [
@@ -131,6 +141,14 @@ class Matriz:
     def __mul__(self, escalar: Fraction) -> "Matriz": ...
 
     def __mul__(self, multiplicador: Union["Matriz", Fraction]) -> "Matriz":
+        """
+        Overloads para multiplicar matrices o multiplicar matriz por escalar:
+        * Matriz() * Matriz() -> Matriz()
+        * Matriz() * Fraction() -> Matriz()
+        * TypeError: si el tipo de dato no es válido
+        * ArithmeticError: si las dimensiones de las matrices son inválidas
+        """
+        
         if isinstance(multiplicador, Matriz):
             if self.columnas != multiplicador.filas:
                 raise ArithmeticError("El número de columnas de la primera matriz debe ser igual al número de filas de la segunda matriz!")

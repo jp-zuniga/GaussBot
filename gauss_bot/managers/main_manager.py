@@ -5,16 +5,27 @@ from gauss_bot.managers.mats_manager import MatricesManager
 from gauss_bot.managers.vecs_manager import VectoresManager
 from gauss_bot.utils import limpiar_pantalla
 
-# TODO: implementar opcion de mostrar procedimiento para todas las operaciones en MatricesManager y VectoresManager
-# TODO: simplificar ._despejar_variables()
+# TODO: implementar calculo de inversas
+# TODO: implementar opcion de mostrar procedimiento para todas las operaciones
 
 
 class OpsManager:
+    """
+    Manager principal de la aplicación, encargado de gestionar todas las operaciones.
+    Se encarga de llamar a los managers de matrices y vectores, para mostrar sus menus.
+    También se encarga de realizar las operaciones de producto matriz-vector, ya que
+    se requiere acceso a los diccionarios de matrices y de vectores para seleccionar.
+    """
+
     def __init__(self, mat_manager=None, vec_manager=None) -> None:
         self.mat_manager = MatricesManager({}, self) if mat_manager is None else mat_manager
         self.vec_manager = VectoresManager({}, self) if vec_manager is None else vec_manager
 
     def exec(self) -> None:
+        """
+        Loop principal del programa, que muestra el menú principal y llama a los managers de matrices y vectores.
+        """
+        
         while True:
             option = self.main_menu()
             match option:
@@ -28,6 +39,10 @@ class OpsManager:
         return
 
     def main_menu(self) -> int:
+        """
+        Imprime las opciones del menú principal, y se encarga validar y retornar la opción seleccionada.
+        """
+        
         limpiar_pantalla()
         print("\n################")
         print("### GaussBot ###")
@@ -45,6 +60,10 @@ class OpsManager:
         return option
 
     def producto_matriz_vector(self) -> None:
+        """
+        Realiza la multiplicación de una matriz por un vector, seleccionando ambos de los diccionarios de matrices y vectores.
+        """
+        
         limpiar_pantalla()
         nombre_mat = self.mat_manager.seleccionar_mat("mv")
         if nombre_mat == "":
@@ -74,5 +93,4 @@ class OpsManager:
         print("---------------------------------------------")
         print(f"\n{nombre_mat}{nombre_vec}:")
         print(mat_resultante)
-
         return
