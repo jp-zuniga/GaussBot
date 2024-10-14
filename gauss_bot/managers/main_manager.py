@@ -92,7 +92,7 @@ class OpsManager:
         mat_resultante = Matriz(False, mat.filas, len(vec), resultado)
         print("\n---------------------------------------------")
         print(f"{nombre_mat}:")
-        print(mat_resultante)
+        print(mat)
         print(f"{nombre_vec} = {vec}")
         print("---------------------------------------------")
         print(f"\n{nombre_mat}{nombre_vec}:")
