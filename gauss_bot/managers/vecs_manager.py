@@ -72,7 +72,8 @@ class VectoresManager:
                 self.agregar_vector()
                 return
             case 2:
-                self.mostrar_vectores()
+                limpiar_pantalla()
+                print(self.mostrar_vectores())
             case 3:
                 resultado = self.procesar_operacion("s")
                 if resultado is not None:
@@ -196,7 +197,7 @@ class VectoresManager:
         if operacion not in self.ops_validas or not self._validar_vecs_ingresados():
             return ()
 
-        if operacion in self.ops_con_una:
+        if operacion in self.ops_con_dos:
             nombres_vecs = self.seleccionar(None)
 
             # si hubo un error en seleccionar():
@@ -357,7 +358,7 @@ class VectoresManager:
         """
 
         limpiar_pantalla()
-        self.mostrar_vectores()
+        print(self.mostrar_vectores())
         return input(mensaje).strip()
 
     def _validar_input_vec(self, input_vec: str) -> None:
@@ -401,7 +402,6 @@ class VectoresManager:
         Imprime los vectores ingresados por el usuario.
         """
 
-        limpiar_pantalla()
         if not self._validar_vecs_ingresados():
             return "\nNo hay vectores ingresados!"
 

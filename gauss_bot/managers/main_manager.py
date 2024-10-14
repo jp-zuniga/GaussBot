@@ -64,12 +64,12 @@ class OpsManager:
         """
         
         limpiar_pantalla()
-        if not self.mat_manager._validar_mats_ingresadas():
+        if not self.mats_manager._validar_mats_ingresadas():
             return
-        if not self.vec_manager._validar_vecs_ingresados():
+        if not self.vecs_manager._validar_vecs_ingresados():
             return
         
-        nombre_mat = self.mat_manager.seleccionar_mat("mv")
+        nombre_mat = self.mats_manager.seleccionar_mat("mv")
         if nombre_mat == "":
             return
 

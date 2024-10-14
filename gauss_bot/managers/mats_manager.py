@@ -80,7 +80,8 @@ class MatricesManager:
                 self.agregar_matriz()
                 return
             case 2:
-                self.mostrar_matrices(necesita_aumentada=-1)
+                limpiar_pantalla()
+                print(self.mostrar_matrices(necesita_aumentada=-1), end="")
             case 3:
                 resultado = self.procesar_operacion("se")
                 if resultado is not None:
@@ -542,7 +543,7 @@ class MatricesManager:
 
         limpiar_pantalla()
         necesita_aumentada = operacion == "se"
-        self.mostrar_matrices(necesita_aumentada)
+        print(self.mostrar_matrices(necesita_aumentada), end="")
         return input(mensaje).strip()
 
     def _validar_input_mat(self, input_mat: str, operacion: str) -> None:
@@ -612,6 +613,7 @@ class MatricesManager:
         *  0: solo mostrar matrices no aumentadas
         * -1: mostrar todas las matrices ingresadas
         """
+
         if necesita_aumentada not in (1, 0, -1):
             return "\nArgumento inválido!"
         if not self._validar_mats_ingresadas():
