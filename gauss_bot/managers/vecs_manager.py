@@ -116,23 +116,28 @@ class VectoresManager:
                 raise NameError
             if nombre in self.vecs_ingresados:
                 raise KeyError
-
+            
+            # convertir a int puede tirar ValueError
             longitud = int(input(f"¿Cuántas dimensiones tendrá el vector '{nombre}'? ").strip())
             if longitud <= 0:
                 raise ArithmeticError
 
         except NameError:
-            input("Error: Ingrese solamente una letra minúscula!")
-            return self.agregar_vector()
+            print("\nError: Ingrese solamente una letra minúscula!")
+            input("Presione cualquier tecla para regresar al menú de vectores...")
+            return
         except KeyError:
-            input(f"Error: Ya hay un vector con el nombre '{nombre}'!")
-            return self.agregar_vector()
+            print(f"\nError: Ya hay un vector con el nombre '{nombre}'!")
+            input("Presione cualquier inputa para regresar al menú de vectores...")
+            return
         except ValueError:
-            input("Error: Ingrese un número entero!")
-            return self.agregar_vector()
+            print("\nError: Ingrese un número entero!")
+            input("Presione cualquier tecla para regresar al menú de vectores...")
+            return
         except ArithmeticError:
-            input("Error: Las dimensiones del vector deben ser un número entero positivo!")
-            return self.agregar_vector()
+            print("\nError: Las dimensiones del vector deben ser un número entero positivo!")
+            input("Presione cualquier tecla para regresar al menú de vectores...")
+            return
 
         self.vecs_ingresados[nombre] = self.pedir_vector(nombre, longitud)
         print("\nVector agregado exitosamente!")
@@ -151,24 +156,27 @@ class VectoresManager:
         """
 
         try:
+            limpiar_pantalla()
             componentes = [
                 Fraction(x).limit_denominator(100) for x in
                 input(f"Ingrese los componentes del vector '{nombre}' (separados por comas): ")
-                .strip()
-                .split(",")
+                .strip().split(",")
             ]
 
             if len(componentes) != longitud:
                 raise TypeError
 
         except ValueError:
-            input("Error: Ingrese un número real!")
+            input("\nError: Ingrese un número real!")
+            print()
             return self.pedir_vector(nombre, longitud)
         except ZeroDivisionError:
-            input("Error: El denominador no puede ser cero!")
+            input("\nError: El denominador no puede ser cero!")
+            print()
             return self.pedir_vector(nombre, longitud)
         except TypeError:
-            input("Error: El vector no tiene las dimensiones correctas!")
+            input("\nError: El vector no tiene las dimensiones correctas!")
+            print()
             return self.pedir_vector(nombre, longitud)
         return Vector(componentes)
 
@@ -200,7 +208,7 @@ class VectoresManager:
                 self.vecs_ingresados[nombres_vecs[1]],
             )
 
-             # retornar vectores seleccionados y resultado de operacion:
+            # retornar vectores seleccionados y resultado de operacion:
             match operacion:
                 case "s":  # ? suma
                     return (nombres_vecs, vec1 + vec2)

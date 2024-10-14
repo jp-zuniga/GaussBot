@@ -489,7 +489,6 @@ class MatricesManager:
                 self._validar_input_mat(input_mat, operacion)
             except (KeyError, TypeError, ArithmeticError) as e:
                 print(e)
-                input("Presione cualquier tecla para regresar al menú de matrices...")
                 return ""
             return input_mat
         return ""
@@ -510,7 +509,6 @@ class MatricesManager:
                 self._validar_input_mats(input_mats, operacion)
             except (KeyError, ValueError, ArithmeticError) as e:
                 print(e)
-                input("Presione cualquier tecla para regresar al menú de matrices...")
                 return []
             return input_mats
         return []
