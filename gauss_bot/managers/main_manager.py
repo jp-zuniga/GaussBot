@@ -5,7 +5,6 @@ from gauss_bot.managers.mats_manager import MatricesManager
 from gauss_bot.managers.vecs_manager import VectoresManager
 from gauss_bot.utils import limpiar_pantalla
 
-# TODO: implementar calculo de inversas
 # TODO: implementar opcion de mostrar procedimiento para todas las operaciones
 
 
@@ -17,9 +16,9 @@ class OpsManager:
     se requiere acceso a los diccionarios de matrices y de vectores para seleccionar.
     """
 
-    def __init__(self, mat_manager=None, vec_manager=None) -> None:
-        self.mat_manager = MatricesManager({}, self) if mat_manager is None else mat_manager
-        self.vec_manager = VectoresManager({}, self) if vec_manager is None else vec_manager
+    def __init__(self, mats_manager=None, vecs_manager=None) -> None:
+        self.mats_manager = MatricesManager({}, self) if mats_manager is None else mats_manager
+        self.vecs_manager = VectoresManager({}, self) if vecs_manager is None else vecs_manager
 
     def exec(self) -> None:
         """
@@ -30,9 +29,9 @@ class OpsManager:
             option = self.main_menu()
             match option:
                 case 1:
-                    self.mat_manager.menu_matrices()
+                    self.mats_manager.menu_matrices()
                 case 2:
-                    self.vec_manager.menu_vectores()
+                    self.vecs_manager.menu_vectores()
                 case 3:
                     input("=> Cerrando programa...")
                     break
@@ -74,12 +73,12 @@ class OpsManager:
         if nombre_mat == "":
             return
 
-        nombre_vec = self.vec_manager.seleccionar("mv")
+        nombre_vec = self.vecs_manager.seleccionar("mv")
         if nombre_vec == "":
             return
 
-        mat = self.mat_manager.mats_ingresadas[nombre_mat]
-        vec = self.vec_manager.vecs_ingresados[nombre_vec]
+        mat = self.mats_manager.mats_ingresadas[nombre_mat]
+        vec = self.vecs_manager.vecs_ingresados[nombre_vec]
         if mat.columnas != len(vec):
             input("Error: El número de columnas de la matriz debe ser igual al número de componentes del vector!")
             return
