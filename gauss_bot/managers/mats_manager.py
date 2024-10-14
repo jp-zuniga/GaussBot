@@ -436,7 +436,8 @@ class MatricesManager:
                 print(mat_transpuesta, end="")
 
             case "d":   # ? calcular determinante
-                mat_seleccionada, det, mat_triangular, intercambio = resultado
+                mat_seleccionada, resultado_det = resultado
+                det, mat_triangular, intercambio = resultado_det
                 mat_original = self.mats_ingresadas[mat_seleccionada]
                 diagonales = [mat_triangular[i, i] for i in range(mat_triangular.filas)]
                 cambiar_signo = intercambio and det != 0
@@ -452,8 +453,7 @@ class MatricesManager:
                 print(f"| {mat_seleccionada} | = {det if not cambiar_signo else -det}")
 
                 if cambiar_signo:
-                    print("\nComo hubo un número impar de intercambios de filas al", end=" ")
-                    print("crear la matriz triangular superior, el signo del determinante se invierte:")
+                    print("\nComo hubo un número impar de intercambios, el signo se invierte:")
                     print(f"-| {mat_seleccionada} | = {det}")
 
             case "i":   # ? encontrar inversa
