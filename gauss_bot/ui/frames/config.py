@@ -15,11 +15,29 @@ class ConfigFrame(ctkFrame):
         super().__init__(master, corner_radius=0, fg_color="transparent")
         self.app = app
 
-        self.modos = ["Oscuro", "Claro", "Sistema"]
-        self.temas = [
-            "Marsh", "Autumn", "Breeze", "Coffee", "Lavender",
-            "Metal", "Midnight", "Rime", "Sky", "Violet"
-        ]
+        self.temas_json = {
+            "Autumn": path.join(THEMES_PATH, "autumn.json"),
+            "Breeze": path.join(THEMES_PATH, "breeze.json"),
+            "Cherry": path.join(THEMES_PATH, "cherry.json"),
+            "Carrot": path.join(THEMES_PATH, "carrot.json"),
+            "Coffee": path.join(THEMES_PATH, "coffee.json"),
+            "Lavender": path.join(THEMES_PATH, "lavender.json"),
+            "Marsh": path.join(THEMES_PATH, "marsh.json"),
+            "Metal": path.join(THEMES_PATH, "metal.json"),
+            "Midnight": path.join(THEMES_PATH, "midnight.json"),
+            "Orange": path.join(THEMES_PATH, "orange.json"),
+            "Patina": path.join(THEMES_PATH, "patina.json"),
+            "Pink": path.join(THEMES_PATH, "pink.json"),
+            "Red": path.join(THEMES_PATH, "red.json"),
+            "Rime": path.join(THEMES_PATH, "rime.json"),
+            "Rose": path.join(THEMES_PATH, "rose.json"),
+            "Sky": path.join(THEMES_PATH, "sky.json"),
+            "Violet": path.join(THEMES_PATH, "violet.json"),
+            "Yellow": path.join(THEMES_PATH, "yellow.json"),
+        }
+
+        self.temas = list(self.temas_json.keys())
+        self.modos = ["Claro", "Oscuro", "Sistema"]
 
         self.temas_label = ctkLabel(self, text="Tema:")
         self.temas_label.grid(row=0, column=0, padx=20, pady=10)
@@ -32,27 +50,7 @@ class ConfigFrame(ctkFrame):
         self.desplegar_modos.grid(row=1, column=1, padx=20, pady=10)
 
     def cambiar_tema(self, tema_seleccionado):
-        match tema_seleccionado:
-            case "Marsh":
-                set_default_color_theme(path.join(THEMES_PATH, "marsh.json"))
-            case "Autumn":
-                set_default_color_theme(path.join(THEMES_PATH, "autumn.json"))
-            case "Breeze":
-                set_default_color_theme(path.join(THEMES_PATH, "breeze.json"))
-            case "Coffee":
-                set_default_color_theme(path.join(THEMES_PATH, "coffee.json"))
-            case "Lavender":
-                set_default_color_theme(path.join(THEMES_PATH, "lavender.json"))
-            case "Metal":
-                set_default_color_theme(path.join(THEMES_PATH, "metal.json"))
-            case "Midnight":
-                set_default_color_theme(path.join(THEMES_PATH, "midnight.json"))
-            case "Rime":
-                set_default_color_theme(path.join(THEMES_PATH, "rime.json"))
-            case "Sky":
-                set_default_color_theme(path.join(THEMES_PATH, "sky.json"))
-            case "Violet":
-                set_default_color_theme(path.join(THEMES_PATH, "violet.json"))
+        set_default_color_theme(self.temas_json[tema_seleccionado])
         
     def light_dark(self, modo_seleccionado):
         match modo_seleccionado:

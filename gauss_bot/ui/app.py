@@ -41,7 +41,7 @@ ops.vecs_manager = test_vecs
 class App(ctk):
     def __init__(self):
         super().__init__()
-        set_default_color_theme(path.join(THEMES_PATH, "marsh.json"))
+        set_default_color_theme(path.join(THEMES_PATH, "metal.json"))
         set_appearance_mode("dark")
 
         self.title("GaussBot")
