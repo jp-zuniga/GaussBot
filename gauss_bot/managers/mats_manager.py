@@ -80,7 +80,7 @@ class MatricesManager:
                 self.agregar_matriz()
                 return
             case 2:
-                self._mostrar_matrices(necesita_aumentada=-1)
+                self.mostrar_matrices(necesita_aumentada=-1)
             case 3:
                 resultado = self.procesar_operacion("se")
                 if resultado is not None:
@@ -544,7 +544,7 @@ class MatricesManager:
 
         limpiar_pantalla()
         necesita_aumentada = operacion == "se"
-        self._mostrar_matrices(necesita_aumentada)
+        self.mostrar_matrices(necesita_aumentada)
         return input(mensaje).strip()
 
     def _validar_input_mat(self, input_mat: str, operacion: str) -> None:
@@ -605,7 +605,7 @@ class MatricesManager:
             return False
         return True
 
-    def _mostrar_matrices(self, necesita_aumentada: int) -> None:
+    def mostrar_matrices(self, necesita_aumentada: int) -> str:
         """
         Imprime las matrices ingresadas en self.mats_ingresadas.
 
@@ -614,29 +614,30 @@ class MatricesManager:
         *  0: solo mostrar matrices no aumentadas
         * -1: mostrar todas las matrices ingresadas
         """
-
-        limpiar_pantalla()
-        if not self._validar_mats_ingresadas() or necesita_aumentada not in (1, 0, -1):
-            return
+        if necesita_aumentada not in (1, 0, -1):
+            return "\nArgumento inválido!"
+        if not self._validar_mats_ingresadas():
+            return "\nNo hay matrices ingresadas!"
 
         solo_aumentadas = all(mat.aumentada for mat in self.mats_ingresadas.values())
         solo_no_aumentadas = all(not mat.aumentada for mat in self.mats_ingresadas.values())
 
         # verificar si no hay matrices que cumplan con el filtro dado:
         if necesita_aumentada == 1 and solo_no_aumentadas:
-            print("\nNo hay matrices aumentadas ingresadas!")
-            return
+            return "\nNo hay matrices aumentadas ingresadas!"
         if necesita_aumentada == 0 and solo_aumentadas:
-            print("\nNo hay matrices no aumentadas ingresadas!")
-            return
+            return "\nNo hay matrices no aumentadas ingresadas!"
 
+        matrices = ""
         adj = "aumentadas " if necesita_aumentada == 1 else "no aumentadas "
-        print(f"\nMatrices {adj if necesita_aumentada != -1 else " "}guardadas:")
-        print("---------------------------------------------", end="")
+
+        matrices += f"\nMatrices {adj if necesita_aumentada != -1 else " "}guardadas:\n"
+        matrices += "---------------------------------------------"
         for nombre, mat in self.mats_ingresadas.items():
             if (necesita_aumentada == 1 and not mat.aumentada) or (
                 necesita_aumentada == 0 and mat.aumentada):
                 continue
-            print(f"\n{nombre}:")
-            print(mat, end="")
-        print("---------------------------------------------")
+            matrices += f"\n{nombre}:\n"
+            matrices += str(mat)
+        matrices += "---------------------------------------------\n"
+        return matrices

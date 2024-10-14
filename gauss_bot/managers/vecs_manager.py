@@ -72,7 +72,7 @@ class VectoresManager:
                 self.agregar_vector()
                 return
             case 2:
-                self._mostrar_vectores()
+                self.mostrar_vectores()
             case 3:
                 resultado = self.procesar_operacion("s")
                 if resultado is not None:
@@ -349,7 +349,7 @@ class VectoresManager:
         """
 
         limpiar_pantalla()
-        self._mostrar_vectores()
+        self.mostrar_vectores()
         return input(mensaje).strip()
 
     def _validar_input_vec(self, input_vec: str) -> None:
@@ -388,18 +388,19 @@ class VectoresManager:
             return False
         return True
 
-    def _mostrar_vectores(self) -> None:
+    def mostrar_vectores(self) -> str:
         """
         Imprime los vectores ingresados por el usuario.
         """
 
         limpiar_pantalla()
         if not self._validar_vecs_ingresados():
-            return
+            return "\nNo hay vectores ingresados!"
 
-        print("\nVectores ingresados:")
-        print("---------------------------------------------")
+        vectores = ""
+        vectores += "\nVectores ingresados:\n"
+        vectores += "---------------------------------------------\n"
         for nombre, vec in self.vecs_ingresados.items():
-            print(f"{nombre}: {vec}")
-        print("---------------------------------------------")
-        return
+            vectores += f"{nombre}: {vec}\n"
+        vectores += "---------------------------------------------"
+        return vectores
