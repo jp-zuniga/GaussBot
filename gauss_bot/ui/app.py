@@ -3,13 +3,18 @@ from json import dump, load
 from os import path
 
 from customtkinter import CTk as ctk
-from customtkinter import set_widget_scaling, set_default_color_theme, set_appearance_mode
+from customtkinter import (
+    set_widget_scaling,
+    set_default_color_theme,
+    set_appearance_mode,
+)
 
 from gauss_bot.clases.matriz import Matriz
 from gauss_bot.clases.vector import Vector
 from gauss_bot.managers.main_manager import OpsManager
 from gauss_bot.managers.mats_manager import MatricesManager
 from gauss_bot.managers.vecs_manager import VectoresManager
+
 from gauss_bot.ui.frames.config import ConfigFrame, CONFIG_PATH
 from gauss_bot.ui.frames.matrices import MatricesFrame
 from gauss_bot.ui.frames.nav import NavFrame
@@ -62,8 +67,6 @@ class App(ctk):
             "matrices": self.nav_frame.matrices_button,
             "vectores": self.nav_frame.vectores_button
         }
-
-        self.seleccionar_frame("config")
     
     def load_config(self):
         with open(CONFIG_PATH, "r") as config_file:

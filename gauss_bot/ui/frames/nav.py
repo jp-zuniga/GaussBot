@@ -19,10 +19,14 @@ class NavFrame(ctkFrame):
         self.grid_rowconfigure(4, weight=1)
 
         self.ctk_logo = ctkImage(Image.open(path.join(IMAGE_PATH, "ctk_logo.png")))
-        self.matriz_icon = ctkImage(light_image=Image.open(path.join(IMAGE_PATH, "matriz_icon.png")))
-        self.vector_icon = ctkImage(light_image=Image.open(path.join(IMAGE_PATH, "vector_icon.png")))
-        self.config_icon = ctkImage(light_image=Image.open(path.join(IMAGE_PATH, "config_icon.png")))
-        self.quit_icon = ctkImage(light_image=Image.open(path.join(IMAGE_PATH, "quit_icon.png")))
+        self.matriz_icon = ctkImage(dark_image=Image.open(path.join(IMAGE_PATH, "light_matriz_icon.png")),
+                                    light_image=Image.open(path.join(IMAGE_PATH, "dark_matriz_icon.png")))
+        self.vector_icon = ctkImage(dark_image=Image.open(path.join(IMAGE_PATH, "light_vector_icon.png")),
+                                    light_image=Image.open(path.join(IMAGE_PATH, "dark_vector_icon.png")))
+        self.config_icon = ctkImage(dark_image=Image.open(path.join(IMAGE_PATH, "light_config_icon.png")),
+                                    light_image=Image.open(path.join(IMAGE_PATH, "dark_config_icon.png")))
+        self.quit_icon = ctkImage(dark_image=Image.open(path.join(IMAGE_PATH, "light_quit_icon.png")),
+                                  light_image=Image.open(path.join(IMAGE_PATH, "dark_quit_icon.png")))
 
         self.navigation_frame_label = ctkLabel(self, text="  GaussBot", image=self.ctk_logo,
                                                compound="left", font=ctkFont(size=20, weight="bold"))

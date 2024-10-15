@@ -145,9 +145,7 @@ class ResolverTab(ctkFrame):
         self.mat_seleccionada.configure(values=self.nombres_matrices)
 
     def resolver_sistema(self):
-        selected_matrix_name = self.mat_seleccionada.get()
-        if selected_matrix_name:
-            pass
+        pass
 
 
 class SumaRestaTab(ctkFrame):
@@ -156,40 +154,38 @@ class SumaRestaTab(ctkFrame):
         self.app = app
         self.mats_manager = mats_manager
 
-        label = ctkLabel(self, text="Seleccione las matrices para sumar o restar:")
+        self.tabview = ctkTabview(self, width=250)
+        self.tabview.pack(padx=20, pady=10, fill="both", expand=True)
+
+        self.tab_sumar = self.tabview.add("Sumar")
+        self.tab_restar = self.tabview.add("Restar")
+
+        self.setup_tab(self.tab_sumar, "Sumar")
+        self.setup_tab(self.tab_restar, "Restar")
+
+    def setup_tab(self, tab, operacion):
+        label = ctkLabel(tab, text=f"Seleccione las matrices para {operacion.lower()}:")
         label.pack(pady=5, padx=5)
 
         self.nombres_matrices = list(self.mats_manager.mats_ingresadas.keys())
-        self.mat1 = ctkOptionMenu(self, values=self.nombres_matrices)
-        self.mat1.pack(pady=5, padx=5)
+        mat1 = ctkOptionMenu(tab, values=self.nombres_matrices)
+        mat1.pack(pady=5, padx=5)
 
-        self.mat2 = ctkOptionMenu(self, values=self.nombres_matrices)
-        self.mat2.pack(pady=5, padx=5)
+        mat2 = ctkOptionMenu(tab, values=self.nombres_matrices)
+        mat2.pack(pady=5, padx=5)
 
-        self.checkbox_sumar = ctkCheckBox(self, text="Sumar")
-        self.checkbox_sumar.pack(pady=5, padx=5)
-
-        self.checkbox_restar = ctkCheckBox(self, text="Restar")
-        self.checkbox_restar.pack(pady=5, padx=5)
-
-        button = ctkButton(self, text="Ejecutar", command=self.ejecutar_operacion)
+        button = ctkButton(tab, text=operacion, command=lambda: self.ejecutar_operacion(operacion, mat1, mat2))
         button.pack(pady=5, padx=5)
 
     def update_nombres_matrices(self):
         self.nombres_matrices = list(self.mats_manager.mats_ingresadas.keys())
-        self.mat1.configure(values=self.nombres_matrices)
-        self.mat2.configure(values=self.nombres_matrices)
+        for tab in [self.tab_sumar, self.tab_restar]:
+            for widget in tab.winfo_children():
+                if isinstance(widget, ctkOptionMenu):
+                    widget.configure(values=self.nombres_matrices)
 
-    def ejecutar_operacion(self):
-        nombre_mat1 = self.mat1.get()
-        nombre_mat2 = self.mat2.get()
-        if nombre_mat1 and nombre_mat2:
-            matriz1 = self.mats_manager.mats_ingresadas[nombre_mat1]
-            matriz2 = self.mats_manager.mats_ingresadas[nombre_mat2]
-            if self.checkbox_sumar.get():
-                self.sumar_matrices(matriz1, matriz2)
-            if self.checkbox_restar.get():
-                self.restar_matrices(matriz1, matriz2)
+    def ejecutar_operacion(self, operacion, mat1, mat2):
+        pass
 
     def sumar_matrices(self, matriz1, matriz2):
         pass
@@ -221,18 +217,18 @@ class MultiplicacionTab(ctkFrame):
         button_escalar = ctkButton(tab_escalar, text="Multiplicar", command=self.multiplicar_por_escalar)
         button_escalar.pack(pady=5, padx=5)
 
-        tab_matrix = tabview.add("Multiplicación de Matrices")
-        label_matrix = ctkLabel(tab_matrix, text="Seleccione las matrices para multiplicar:")
-        label_matrix.pack(pady=5, padx=5)
+        tab_matriz = tabview.add("Multiplicación de Matrices")
+        label_matriz = ctkLabel(tab_matriz, text="Seleccione las matrices para multiplicar:")
+        label_matriz.pack(pady=5, padx=5)
 
-        self.mat1 = ctkOptionMenu(tab_matrix, values=self.nombres_matrices)
+        self.mat1 = ctkOptionMenu(tab_matriz, values=self.nombres_matrices)
         self.mat1.pack(pady=5, padx=5)
 
-        self.mat2 = ctkOptionMenu(tab_matrix, values=self.nombres_matrices)
+        self.mat2 = ctkOptionMenu(tab_matriz, values=self.nombres_matrices)
         self.mat2.pack(pady=5, padx=5)
 
-        button_matrix = ctkButton(tab_matrix, text="Multiplicar", command=self.multiplicar_matrices)
-        button_matrix.pack(pady=5, padx=5)
+        button_matriz = ctkButton(tab_matriz, text="Multiplicar", command=self.multiplicar_matrices)
+        button_matriz.pack(pady=5, padx=5)
 
     def update_nombres_matrices(self):
         self.nombres_matrices = list(self.mats_manager.mats_ingresadas.keys())
@@ -268,10 +264,7 @@ class TransposicionTab(ctkFrame):
         self.mat_seleccionada.configure(values=self.nombres_matrices)
 
     def transponer(self):
-        selected_matrix_name = self.mat_seleccionada.get()
-        if selected_matrix_name:
-            # matriz = self.mats_manager.mats_ingresadas[selected_matrix_name]
-            pass
+        pass
 
 
 class DeterminanteTab(ctkFrame):

@@ -5,8 +5,7 @@ from customtkinter import (
     CTkTabview as ctkTabview,
     CTkLabel as ctkLabel,
     CTkEntry as ctkEntry,
-    # CTkCheckBox as ctkCheckBox,
-    # CTkOptionMenu as ctkOptionMenu,
+    CTkOptionMenu as ctkOptionMenu,
 )
 
 from gauss_bot.clases.vector import Vector
@@ -25,6 +24,8 @@ class VectoresFrame(ctkFrame):
         tabs = [
             ("Mostrar vectores", MostrarTab),
             ("Agregar vector", AgregarTab),
+            ("Sumar y restar vectores", SumaRestaTab),
+            ("Multiplicación", MultiplicacionTab),
         ]
 
         for nombre, clase in tabs:
@@ -87,3 +88,92 @@ class AgregarTab(ctkFrame):
 
         vector = Vector(nombre, dim, valores)
         self.vecs_manager.vectores_ingresados[nombre] = vector
+
+
+class SumaRestaTab(ctkFrame):
+    def __init__(self, master, app, vecs_manager: VectoresManager):
+        super().__init__(master, corner_radius=0, fg_color="transparent")
+        self.app = app
+        self.vecs_manager = vecs_manager
+
+        self.tabview = ctkTabview(self, width=250)
+        self.tabview.pack(padx=20, pady=10, fill="both", expand=True)
+
+        self.tab_sumar = self.tabview.add("Sumar")
+        self.tab_restar = self.tabview.add("Restar")
+
+        self.setup_tab(self.tab_sumar, "Sumar")
+        self.setup_tab(self.tab_restar, "Restar")
+
+    def setup_tab(self, tab, operacion):
+        label = ctkLabel(tab, text=f"Seleccione los vectores para {operacion.lower()}:")
+        label.pack(pady=5, padx=5)
+
+        self.nombres_vectores = list(self.vecs_manager.vecs_ingresados.keys())
+        vec1 = ctkOptionMenu(tab, values=self.nombres_vectores)
+        vec1.pack(pady=5, padx=5)
+
+        vec2 = ctkOptionMenu(tab, values=self.nombres_vectores)
+        vec2.pack(pady=5, padx=5)
+
+        button = ctkButton(tab, text=operacion, command=lambda: self.ejecutar_operacion(operacion, vec1, vec2))
+        button.pack(pady=5, padx=5)
+
+    def update_nombres_vectores(self):
+        self.nombres_vectores = list(self.vecs_manager.vecs_ingresados.keys())
+        for tab in [self.tab_sumar, self.tab_restar]:
+            for widget in tab.winfo_children():
+                if isinstance(widget, ctkOptionMenu):
+                    widget.configure(values=self.nombres_vectores)
+    
+    def ejecutar_operacion(self):
+        pass
+
+
+class MultiplicacionTab(ctkFrame):
+    def __init__(self, master, app, vecs_manager: VectoresManager):
+        super().__init__(master, corner_radius=0, fg_color="transparent")
+        self.app = app
+        self.vecs_manager = vecs_manager
+        self.nombres_vectores = list(self.vecs_manager.vecs_ingresados.keys())
+
+        tabview = ctkTabview(self)
+        tabview.pack(expand=True, fill='both')
+
+        tab_escalar = tabview.add("Multiplicación Escalar")
+        label_escalar = ctkLabel(tab_escalar, text="Seleccione el vector e ingrese el escalar:")
+        label_escalar.pack(pady=5, padx=5)
+
+        self.vec_seleccionado = ctkOptionMenu(tab_escalar, values=self.nombres_vectores)
+        self.vec_seleccionado.pack(pady=5, padx=5)
+
+        self.entry_escalar = ctkEntry(tab_escalar)
+        self.entry_escalar.pack(pady=5, padx=5)
+
+        button_escalar = ctkButton(tab_escalar, text="Multiplicar", command=self.multiplicar_por_escalar)
+        button_escalar.pack(pady=5, padx=5)
+
+        tab_vector = tabview.add("Multiplicación de Vectores")
+        label_vector = ctkLabel(tab_vector, text="Seleccione los vectores para multiplicar:")
+        label_vector.pack(pady=5, padx=5)
+
+        self.vec1 = ctkOptionMenu(tab_vector, values=self.nombres_vectores)
+        self.vec1.pack(pady=5, padx=5)
+
+        self.vec2 = ctkOptionMenu(tab_vector, values=self.nombres_vectores)
+        self.vec2.pack(pady=5, padx=5)
+
+        button_vector = ctkButton(tab_vector, text="Multiplicar", command=self.multiplicar_vectores)
+        button_vector.pack(pady=5, padx=5)
+
+    def update_nombres_vectores(self):
+        self.nombres_vectores = list(self.vecs_manager.vecs_ingresados.keys())
+        self.vec_seleccionado.configure(values=self.nombres_vectores)
+        self.vec1.configure(values=self.nombres_vectores)
+        self.vec2.configure(values=self.nombres_vectores)
+
+    def multiplicar_por_escalar(self):
+        pass
+
+    def multiplicar_vectores(self):
+        pass
