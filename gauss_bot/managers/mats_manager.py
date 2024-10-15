@@ -84,44 +84,44 @@ class MatricesManager:
                 print(self.mostrar_matrices(necesita_aumentada=-1), end="")
             case 3:
                 resultado = self.procesar_operacion("se")
-                if resultado is not None:
+                if resultado != ():
                     self.mostrar_resultado("se", resultado)
                     return
             case 4:
                 resultado = self.procesar_operacion("s")
-                if resultado is not None:
+                if resultado != ():
                     self.mostrar_resultado("s", resultado)
                     return
             case 5:
                 resultado = self.procesar_operacion("r")
-                if resultado is not None:
+                if resultado != ():
                     self.mostrar_resultado("r", resultado)
                     return
             case 6:
                 resultado = self.procesar_operacion("me")
-                if resultado is not None:
+                if resultado != ():
                     self.mostrar_resultado("me", resultado)
                     return
             case 7:
                 resultado = self.procesar_operacion("m")
-                if resultado is not None:
+                if resultado != ():
                     self.mostrar_resultado("m", resultado)
                     return
             case 8:
                 self.parent.producto_matriz_vector()
             case 9:
                 resultado = self.procesar_operacion("t")
-                if resultado is not None:
+                if resultado != ():
                     self.mostrar_resultado("t", resultado)
                     return
             case 10:
                 resultado = self.procesar_operacion("d")
-                if resultado is not None:
+                if resultado != ():
                     self.mostrar_resultado("d", resultado)
                     return
             case 11:
                 resultado = self.procesar_operacion("i")
-                if resultado is not None:
+                if resultado != ():
                     self.mostrar_resultado("i", resultado)
                     return
         input("Presione cualquier tecla para regresar al menú de matrices...")
