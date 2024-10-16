@@ -47,24 +47,25 @@ class MatricesManager:
             print("###############################")
             print("\n1. Agregar una matriz")
             print("2. Mostrar matrices\n")
-            print("3. Resolver sistema de ecuaciones")
-            print("4. Sumar matrices")
-            print("5. Restar matrices")
-            print("6. Multiplicar matriz por escalar")
-            print("7. Multiplicar matrices")
-            print("8. Multiplicar matriz por vector")
-            print("9. Transponer matriz")
-            print("10. Calcular determinante de una matriz")
-            print("11. Encontrar la inversa una matriz\n")
-            print("12. Regresar al menú principal")
+            print("3. Resolver sistema por el método de Gauss-Jordan")
+            print("4. Resolver sistema con la Regla de Cramer\n")
+            print("5. Sumar matrices")
+            print("6. Restar matrices")
+            print("7. Multiplicar matriz por escalar")
+            print("8. Multiplicar matrices")
+            print("9. Multiplicar matriz por vector")
+            print("10. Transponer matriz")
+            print("11. Calcular determinante de una matriz")
+            print("12. Encontrar la inversa una matriz\n")
+            print("13. Regresar al menú principal")
             try:
                 option = int(input("\n=> Seleccione una opción: ").strip())
-                if option < 1 or option > 12:
+                if option < 1 or option > 13:
                     raise ValueError
             except ValueError:
                 input("=> Error: Ingrese una opción válida!")
                 continue
-            if option == 12:
+            if option == 13:
                 input("=> Regresando a menú principal...")
                 break
             self.procesar_menu(option)
@@ -81,45 +82,72 @@ class MatricesManager:
                 return
             case 2:
                 limpiar_pantalla()
-                print(self.mostrar_matrices(necesita_aumentada=-1), end="")
+                print(self.mostrar_matrices(necesita_aumentada=-1))
             case 3:
                 resultado = self.procesar_operacion("se")
                 if resultado != ():
                     self.mostrar_resultado("se", resultado)
                     return
             case 4:
+                nombre_mat = self.seleccionar_mat("se")
+                if nombre_mat == "":
+                    return
+
+                mat_seleccionada = self.mats_ingresadas[nombre_mat]
+                try:
+                    mat_seleccionada.resolver_cramer(nombre_mat)
+                    input("\nPresione cualquier tecla para regresar al menú de matrices...")
+                    return
+                except (TypeError, ArithmeticError) as e:
+                    print(e)
+                except ValueError as v:
+                    print("\n" + str(v))
+                    resolver_gauss = match_input("\n¿Desea resolver el sistema con Gauss-Jordan? (s/n) ")
+                    if resolver_gauss == 1:
+                        mat_copia = deepcopy(mat_seleccionada)
+                        sistema = SistemaEcuaciones(mat_copia)
+                        sistema.resolver_sistema()
+                        self.mostrar_resultado("se", (nombre_mat, sistema))
+                        if not any(sistema.matriz == mat for mat in self.mats_ingresadas.values()):
+                            self.mats_ingresadas[f"{nombre_mat}_r"] = sistema.matriz
+                        return
+                    elif resolver_gauss == 0:
+                        print("\nDe acuerdo!")
+                    else:
+                        print("\nOpción inválida!")
+            case 5:
                 resultado = self.procesar_operacion("s")
                 if resultado != ():
                     self.mostrar_resultado("s", resultado)
                     return
-            case 5:
+            case 6:
                 resultado = self.procesar_operacion("r")
                 if resultado != ():
                     self.mostrar_resultado("r", resultado)
                     return
-            case 6:
+            case 7:
                 resultado = self.procesar_operacion("me")
                 if resultado != ():
                     self.mostrar_resultado("me", resultado)
                     return
-            case 7:
+            case 8:
                 resultado = self.procesar_operacion("m")
                 if resultado != ():
                     self.mostrar_resultado("m", resultado)
                     return
-            case 8:
-                self.parent.producto_matriz_vector()
             case 9:
+                self.parent.producto_matriz_vector()
+            case 10:
                 resultado = self.procesar_operacion("t")
                 if resultado != ():
                     self.mostrar_resultado("t", resultado)
                     return
-            case 10:
+            case 11:
                 resultado = self.procesar_operacion("d")
                 if resultado != ():
                     self.mostrar_resultado("d", resultado)
                     return
-            case 11:
+            case 12:
                 resultado = self.procesar_operacion("i")
                 if resultado != ():
                     self.mostrar_resultado("i", resultado)
@@ -480,7 +508,7 @@ class MatricesManager:
         Selecciona una sola matriz para realizar la operación especificada.
         Usa _validar_input_mat() para verificar que la matriz seleccionada
         es valida para la operación a realizar. Si ocurre alguna excepción,
-        returna un string vacío.
+        retorna un string vacío.
         """
 
         if operacion in self.ops_con_una and self._validar_mats_ingresadas():
