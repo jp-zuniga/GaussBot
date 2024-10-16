@@ -1,4 +1,4 @@
-from fractions import Fraction
+# from fractions import Fraction
 
 from customtkinter import (
     CTkFrame as ctkFrame,
@@ -9,9 +9,10 @@ from customtkinter import (
     CTkEntry as ctkEntry,
     CTkCheckBox as ctkCheckBox,
     CTkOptionMenu as ctkOptionMenu,
+    BooleanVar as BoolVar,
 )
 
-from gauss_bot.clases.matriz import Matriz
+# from gauss_bot.clases.matriz import Matriz
 from gauss_bot.managers.mats_manager import MatricesManager
 
 
@@ -106,22 +107,7 @@ class AgregarTab(ctkFrame):
         agregar_button.grid(row=5, column=0, columnspan=3, padx=5, pady=5)
 
     def agregar_matriz(self):
-        nombre = self.entry_nombre.get()
-        filas = int(self.entry_filas.get())
-        columnas = int(self.entry_columnas.get())
-        if self.aumentada:
-            columnas += 1
-
-        valores = []
-        for i in range(filas):
-            fila = []
-            for j in range(columnas):
-                valor = Fraction(self.input_entries[i][j].get())
-                fila.append(valor)
-            valores.append(fila)
-
-        matriz = Matriz(self.aumentada, filas, columnas, valores)
-        self.mats_manager.mats_ingresadas[nombre] = matriz
+        pass
 
 
 class ResolverTab(ctkFrame):
@@ -129,16 +115,31 @@ class ResolverTab(ctkFrame):
         super().__init__(master, corner_radius=0, fg_color="transparent")
         self.app = app
         self.mats_manager = mats_manager
+        self.columnconfigure(0, weight=1)
+        self.columnconfigure(1, weight=1)
 
         label = ctkLabel(self, text="Seleccione la matriz a resolver:")
-        label.pack(pady=5, padx=5)
+        label.grid(row=0, column=0, columnspan=2, pady=5, padx=5, sticky="ew")
 
         self.nombres_matrices = list(self.mats_manager.mats_ingresadas.keys())
         self.mat_seleccionada = ctkOptionMenu(self, values=self.nombres_matrices)
-        self.mat_seleccionada.pack(pady=5, padx=5)
+        self.mat_seleccionada.grid(row=1, column=0, columnspan=2, pady=5, padx=5)
+
+        self.gauss_jordan_var = BoolVar()
+        self.cramer_var = BoolVar()
+
+        self.gauss_jordan_checkbox = ctkCheckBox(self, text="", variable=self.gauss_jordan_var)
+        self.gauss_jordan_checkbox.grid(row=2, column=1, pady=5, padx=5, sticky="w")
+        self.gauss_jordan_label = ctkLabel(self, text="Método Gauss-Jordan")
+        self.gauss_jordan_label.grid(row=2, column=0, pady=5, padx=5, sticky="e")
+
+        self.cramer_checkbox = ctkCheckBox(self, text="", variable=self.cramer_var)
+        self.cramer_checkbox.grid(row=3, column=1, pady=5, padx=5, sticky="w")
+        self.cramer_label = ctkLabel(self, text="Regla de Cramer")
+        self.cramer_label.grid(row=3, column=0, pady=5, padx=5, sticky="e")
 
         button = ctkButton(self, text="Resolver", command=self.resolver_sistema)
-        button.pack(pady=5, padx=5)
+        button.grid(row=4, column=0, columnspan=2, pady=5, padx=5)
 
     def update_nombres(self):
         self.nombres_matrices = list(self.mats_manager.mats_ingresadas.keys())
@@ -200,35 +201,56 @@ class MultiplicacionTab(ctkFrame):
         self.app = app
         self.mats_manager = mats_manager
         self.nombres_matrices = list(self.mats_manager.mats_ingresadas.keys())
+        self.nombres_vectores = list(self.app.vecs_manager.vecs_ingresados.keys())
 
         tabview = ctkTabview(self)
         tabview.pack(expand=True, fill='both')
 
         tab_escalar = tabview.add("Multiplicación Escalar")
-        label_escalar = ctkLabel(tab_escalar, text="Seleccione la matriz e ingrese el escalar:")
+        tab_matriz = tabview.add("Multiplicación de Matrices")
+        tab_matriz_vector = tabview.add("Producto Matriz-Vector")
+        self.setup_escalar_tab(tab_escalar)
+        self.setup_mult_matrices_tab(tab_matriz)
+        self.setup_matriz_vector_tab(tab_matriz_vector)
+
+    def setup_escalar_tab(self, tab):
+        label_escalar = ctkLabel(tab, text="Seleccione la matriz e ingrese el escalar:")
         label_escalar.pack(pady=5, padx=5)
 
-        self.mat_seleccionada = ctkOptionMenu(tab_escalar, values=self.nombres_matrices)
+        self.mat_seleccionada = ctkOptionMenu(tab, values=self.nombres_matrices)
         self.mat_seleccionada.pack(pady=5, padx=5)
 
-        self.entry_escalar = ctkEntry(tab_escalar)
+        self.entry_escalar = ctkEntry(tab)
         self.entry_escalar.pack(pady=5, padx=5)
 
-        button_escalar = ctkButton(tab_escalar, text="Multiplicar", command=self.multiplicar_por_escalar)
-        button_escalar.pack(pady=5, padx=5)
+        button_matriz = ctkButton(tab, text="Multiplicar", command=self.multiplicar_matrices)
+        button_matriz.pack(pady=5, padx=5)
 
-        tab_matriz = tabview.add("Multiplicación de Matrices")
-        label_matriz = ctkLabel(tab_matriz, text="Seleccione las matrices para multiplicar:")
+    def setup_mult_matrices_tab(self, tab):
+        label_matriz = ctkLabel(tab, text="Seleccione las matrices para multiplicar:")
         label_matriz.pack(pady=5, padx=5)
 
-        self.mat1 = ctkOptionMenu(tab_matriz, values=self.nombres_matrices)
+        self.mat1 = ctkOptionMenu(tab, values=self.nombres_matrices)
         self.mat1.pack(pady=5, padx=5)
 
-        self.mat2 = ctkOptionMenu(tab_matriz, values=self.nombres_matrices)
+        self.mat2 = ctkOptionMenu(tab, values=self.nombres_matrices)
         self.mat2.pack(pady=5, padx=5)
 
-        button_matriz = ctkButton(tab_matriz, text="Multiplicar", command=self.multiplicar_matrices)
+        button_matriz = ctkButton(tab, text="Multiplicar", command=self.multiplicar_matrices)
         button_matriz.pack(pady=5, padx=5)
+
+    def setup_matriz_vector_tab(self, tab):
+        label_matriz_vector = ctkLabel(tab, text="Seleccione la matriz y el vector para multiplicar:")
+        label_matriz_vector.pack(pady=5, padx=5)
+
+        self.mat_seleccionada = ctkOptionMenu(tab, values=self.nombres_matrices)
+        self.mat_seleccionada.pack(pady=5, padx=5)
+
+        self.entry_vector = ctkOptionMenu(tab, values=self.nombres_vectores)
+        self.entry_vector.pack(pady=5, padx=5)
+
+        button_matriz_vector = ctkButton(tab, text="Multiplicar", command=self.multiplicar_por_escalar)
+        button_matriz_vector.pack(pady=5, padx=5)
 
     def update_nombres_matrices(self):
         self.nombres_matrices = list(self.mats_manager.mats_ingresadas.keys())

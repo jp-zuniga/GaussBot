@@ -52,10 +52,12 @@ class App(ctk):
         self.grid_columnconfigure(1, weight=1)
 
         self.ops_manager = ops
+        self.mats_manager = ops.mats_manager
+        self.vecs_manager = ops.vecs_manager
         self.nav_frame = NavFrame(self, self)
         self.config_frame = ConfigFrame(self, self)
-        self.matrices = MatricesFrame(self, self, self.ops_manager.mats_manager)
-        self.vectores = VectoresFrame(self, self, self.ops_manager.vecs_manager)
+        self.matrices = MatricesFrame(self, self, self.mats_manager)
+        self.vectores = VectoresFrame(self, self, self.vecs_manager)
 
         self.frames = {
             "matrices": self.matrices,
@@ -67,6 +69,9 @@ class App(ctk):
             "matrices": self.nav_frame.matrices_button,
             "vectores": self.nav_frame.vectores_button
         }
+    
+    def matriz_vector(self):
+        pass
     
     def load_config(self):
         with open(CONFIG_PATH, "r") as config_file:

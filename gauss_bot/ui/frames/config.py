@@ -84,17 +84,14 @@ class ConfigFrame(ctkFrame):
     def cambiar_escala(self, escala_seleccionada):
         self.app.escala_actual = self.escalas_float[escala_seleccionada]
         set_widget_scaling(self.app.escala_actual)
-        self.app.save_config()
 
     def cambiar_tema(self, tema_seleccionado):
         self.app.tema_actual = self.temas_json[tema_seleccionado]
         set_default_color_theme(self.app.tema_actual)
-        self.app.save_config()
 
     def light_dark(self, modo_seleccionado):
         self.app.modo_actual = self.modos_dict[modo_seleccionado]
         set_appearance_mode(self.app.modo_actual)
-        self.app.save_config()
 
     def get_dict_key(self, dict, tema):
         for key, value in dict.items():

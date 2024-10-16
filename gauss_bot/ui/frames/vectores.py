@@ -125,7 +125,7 @@ class SumaRestaTab(ctkFrame):
             for widget in tab.winfo_children():
                 if isinstance(widget, ctkOptionMenu):
                     widget.configure(values=self.nombres_vectores)
-    
+
     def ejecutar_operacion(self):
         pass
 
@@ -136,35 +136,57 @@ class MultiplicacionTab(ctkFrame):
         self.app = app
         self.vecs_manager = vecs_manager
         self.nombres_vectores = list(self.vecs_manager.vecs_ingresados.keys())
+        self.nombres_matrices = list(self.app.mats_manager.mats_ingresadas.keys())
 
         tabview = ctkTabview(self)
         tabview.pack(expand=True, fill='both')
 
         tab_escalar = tabview.add("Multiplicación Escalar")
-        label_escalar = ctkLabel(tab_escalar, text="Seleccione el vector e ingrese el escalar:")
+        tab_vector = tabview.add("Multiplicación de Vectores")
+        tab_matriz_vector = tabview.add("Producto Matriz-Vector")
+
+        self.setup_escalar_tab(tab_escalar)
+        self.setup_vector_tab(tab_vector)
+        self.setup_matriz_vector_tab(tab_matriz_vector)
+
+    def setup_escalar_tab(self, tab):
+        label_escalar = ctkLabel(tab, text="Seleccione el vector e ingrese el escalar:")
         label_escalar.pack(pady=5, padx=5)
 
-        self.vec_seleccionado = ctkOptionMenu(tab_escalar, values=self.nombres_vectores)
+        self.vec_seleccionado = ctkOptionMenu(tab, values=self.nombres_vectores)
         self.vec_seleccionado.pack(pady=5, padx=5)
 
-        self.entry_escalar = ctkEntry(tab_escalar)
+        self.entry_escalar = ctkEntry(tab)
         self.entry_escalar.pack(pady=5, padx=5)
 
-        button_escalar = ctkButton(tab_escalar, text="Multiplicar", command=self.multiplicar_por_escalar)
+        button_escalar = ctkButton(tab, text="Multiplicar", command=self.multiplicar_por_escalar)
         button_escalar.pack(pady=5, padx=5)
 
-        tab_vector = tabview.add("Multiplicación de Vectores")
-        label_vector = ctkLabel(tab_vector, text="Seleccione los vectores para multiplicar:")
+    def setup_vector_tab(self, tab):
+        label_vector = ctkLabel(tab, text="Seleccione los vectores para multiplicar:")
         label_vector.pack(pady=5, padx=5)
 
-        self.vec1 = ctkOptionMenu(tab_vector, values=self.nombres_vectores)
+        self.vec1 = ctkOptionMenu(tab, values=self.nombres_vectores)
         self.vec1.pack(pady=5, padx=5)
 
-        self.vec2 = ctkOptionMenu(tab_vector, values=self.nombres_vectores)
+        self.vec2 = ctkOptionMenu(tab, values=self.nombres_vectores)
         self.vec2.pack(pady=5, padx=5)
 
-        button_vector = ctkButton(tab_vector, text="Multiplicar", command=self.multiplicar_vectores)
+        button_vector = ctkButton(tab, text="Multiplicar", command=self.multiplicar_vectores)
         button_vector.pack(pady=5, padx=5)
+
+    def setup_matriz_vector_tab(self, tab):
+        label_matriz_vector = ctkLabel(tab, text="Seleccione la matriz y el vector para multiplicar:")
+        label_matriz_vector.pack(pady=5, padx=5)
+
+        self.mat_seleccionada = ctkOptionMenu(tab, values=self.nombres_matrices)
+        self.mat_seleccionada.pack(pady=5, padx=5)
+
+        self.entry_vector = ctkOptionMenu(tab, values=self.nombres_vectores)
+        self.entry_vector.pack(pady=5, padx=5)
+
+        button_matriz_vector = ctkButton(tab, text="Multiplicar", command=self.multiplicar_por_escalar)
+        button_matriz_vector.pack(pady=5, padx=5)
 
     def update_nombres_vectores(self):
         self.nombres_vectores = list(self.vecs_manager.vecs_ingresados.keys())
