@@ -9,7 +9,7 @@ from customtkinter import (
     CTkImage as ctkImage,
 )
 
-IMAGE_PATH = path.join(path.dirname(path.dirname(path.realpath(__file__))), "assets")
+ASSET_PATH = path.join(path.dirname(path.dirname(path.realpath(__file__))), "assets")
 
 class NavFrame(ctkFrame):
     def __init__(self, master, app):
@@ -18,19 +18,20 @@ class NavFrame(ctkFrame):
         self.grid(row=0, column=0, sticky="nsew")
         self.grid_rowconfigure(4, weight=1)
 
-        self.ctk_logo = ctkImage(Image.open(path.join(IMAGE_PATH, "ctk_logo.png")))
-        self.matriz_icon = ctkImage(dark_image=Image.open(path.join(IMAGE_PATH, "light_matriz_icon.png")),
-                                    light_image=Image.open(path.join(IMAGE_PATH, "dark_matriz_icon.png")))
-        self.vector_icon = ctkImage(dark_image=Image.open(path.join(IMAGE_PATH, "light_vector_icon.png")),
-                                    light_image=Image.open(path.join(IMAGE_PATH, "dark_vector_icon.png")))
-        self.config_icon = ctkImage(dark_image=Image.open(path.join(IMAGE_PATH, "light_config_icon.png")),
-                                    light_image=Image.open(path.join(IMAGE_PATH, "dark_config_icon.png")))
-        self.quit_icon = ctkImage(dark_image=Image.open(path.join(IMAGE_PATH, "light_quit_icon.png")),
-                                  light_image=Image.open(path.join(IMAGE_PATH, "dark_quit_icon.png")))
+        self.logo = ctkImage(dark_image=Image.open(path.join(ASSET_PATH, "light_logo.png")),
+                                 light_image=Image.open(path.join(ASSET_PATH, "dark_logo.png")))
+        self.matriz_icon = ctkImage(dark_image=Image.open(path.join(ASSET_PATH, "light_matriz_icon.png")),
+                                    light_image=Image.open(path.join(ASSET_PATH, "dark_matriz_icon.png")))
+        self.vector_icon = ctkImage(dark_image=Image.open(path.join(ASSET_PATH, "light_vector_icon.png")),
+                                    light_image=Image.open(path.join(ASSET_PATH, "dark_vector_icon.png")))
+        self.config_icon = ctkImage(dark_image=Image.open(path.join(ASSET_PATH, "light_config_icon.png")),
+                                    light_image=Image.open(path.join(ASSET_PATH, "dark_config_icon.png")))
+        self.quit_icon = ctkImage(dark_image=Image.open(path.join(ASSET_PATH, "light_quit_icon.png")),
+                                  light_image=Image.open(path.join(ASSET_PATH, "dark_quit_icon.png")))
 
-        self.navigation_frame_label = ctkLabel(self, text="  GaussBot", image=self.ctk_logo,
-                                               compound="left", font=ctkFont(size=20, weight="bold"))
-        self.navigation_frame_label.grid(row=0, column=0, padx=20, pady=20)
+        self.nav_frame_label = ctkLabel(self, text="  GaussBot", image=self.logo,
+                                               compound="left", font=ctkFont(size=16, weight="bold"))
+        self.nav_frame_label.grid(row=0, column=0, padx=20, pady=20)
 
         self.matrices_button = ctkButton(self, corner_radius=0, height=40, border_spacing=10, text="Menú de Matrices",
                                          fg_color="transparent", text_color=("gray10", "gray90"), hover_color=("gray70", "gray30"),
@@ -47,7 +48,7 @@ class NavFrame(ctkFrame):
                                          image=self.config_icon, anchor="w", command=self.app.config_button_event)
         self.settings_button.grid(row=5, column=0, sticky="ew")
 
-        self.cerrar_button = ctkButton(self, corner_radius=0, height=40, border_spacing=10, text="Cerrar",
+        self.quit_button = ctkButton(self, corner_radius=0, height=40, border_spacing=10, text="Cerrar",
                                        fg_color="transparent", text_color=("gray10", "gray90"), hover_color=("gray70", "gray30"),
                                        image=self.quit_icon, anchor="w", command=self.app.quit_event)
-        self.cerrar_button.grid(row=6, column=0, sticky="ew")
+        self.quit_button.grid(row=6, column=0, sticky="ew")

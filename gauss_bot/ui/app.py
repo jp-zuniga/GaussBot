@@ -15,12 +15,10 @@ from gauss_bot.managers.main_manager import OpsManager
 from gauss_bot.managers.mats_manager import MatricesManager
 from gauss_bot.managers.vecs_manager import VectoresManager
 
-from gauss_bot.ui.frames.config import ConfigFrame, CONFIG_PATH
+from gauss_bot.ui.frames.config import ConfigFrame, THEMES_PATH, CONFIG_PATH
 from gauss_bot.ui.frames.matrices import MatricesFrame
-from gauss_bot.ui.frames.nav import NavFrame
+from gauss_bot.ui.frames.nav import NavFrame, ASSET_PATH
 from gauss_bot.ui.frames.vectores import VectoresFrame
-
-THEMES_PATH = path.join(path.dirname(path.realpath(__file__)), "themes")
 
 matrices_dict = {
     "A": Matriz(aumentada=False, filas=2, columnas=2, valores=[[Fraction(1), Fraction(2)], [Fraction(3), Fraction(4)]]),
@@ -47,6 +45,7 @@ class App(ctk):
         self.load_config()
 
         self.title("GaussBot")
+        self.set_icon(self.modo_actual)
         self.geometry("1200x600")
         self.grid_rowconfigure(0, weight=1)
         self.grid_columnconfigure(1, weight=1)
@@ -90,6 +89,12 @@ class App(ctk):
         self.config["modo"] = self.modo_actual
         with open(CONFIG_PATH, "w") as config_file:
             dump(self.config, config_file, indent=4)
+    
+    def set_icon(self, modo):
+        if modo == "light":
+            self.iconbitmap(path.join(ASSET_PATH, "dark_logo.ico"))
+        elif modo == "dark":
+            self.iconbitmap(path.join(ASSET_PATH, "light_logo.ico"))
 
     def seleccionar_frame(self, nombre):
         for nombre_frame, button in self.buttons.items():

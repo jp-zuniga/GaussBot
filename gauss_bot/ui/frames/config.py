@@ -92,6 +92,7 @@ class ConfigFrame(ctkFrame):
     def light_dark(self, modo_seleccionado):
         self.app.modo_actual = self.modos_dict[modo_seleccionado]
         set_appearance_mode(self.app.modo_actual)
+        self.app.set_icon(self.app.modo_actual)
 
     def get_dict_key(self, dict, tema):
         for key, value in dict.items():
