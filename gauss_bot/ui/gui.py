@@ -1,4 +1,4 @@
-from fractions import Fraction
+# from fractions import Fraction
 from json import dump, load
 from os import path
 
@@ -9,11 +9,11 @@ from customtkinter import (
     set_appearance_mode,
 )
 
-from gauss_bot.models.matriz import Matriz
-from gauss_bot.models.vector import Vector
-from gauss_bot.managers.main_manager import OpsManager
-from gauss_bot.managers.mats_manager import MatricesManager
-from gauss_bot.managers.vecs_manager import VectoresManager
+# from gauss_bot.models.matriz import Matriz
+# from gauss_bot.models.vector import Vector
+from gauss_bot.managers.ops_manager import OpsManager
+# from gauss_bot.managers.mats_manager import MatricesManager
+# from gauss_bot.managers.vecs_manager import VectoresManager
 
 from gauss_bot.ui.frames.nav import NavFrame, ASSET_PATH
 from gauss_bot.ui.frames.matrices import MatricesFrame
@@ -21,23 +21,23 @@ from gauss_bot.ui.frames.vectores import VectoresFrame
 from gauss_bot.ui.frames.ecuaciones import EcuacionesFrame
 from gauss_bot.ui.frames.config import ConfigFrame, THEMES_PATH, CONFIG_PATH
 
-matrices_dict = {
-    "A": Matriz(aumentada=False, filas=2, columnas=2, valores=[[Fraction(1), Fraction(2)], [Fraction(3), Fraction(4)]]),
-    "B": Matriz(aumentada=False, filas=2, columnas=2, valores=[[Fraction(5), Fraction(6)], [Fraction(7), Fraction(8)]]),
-    "C": Matriz(aumentada=False, filas=2, columnas=2, valores=[[Fraction(9), Fraction(10)], [Fraction(11), Fraction(12)]])
-}
+# matrices_dict = {
+#     "A": Matriz(aumentada=False, filas=2, columnas=2, valores=[[Fraction(1), Fraction(2)], [Fraction(3), Fraction(4)]]),
+#     "B": Matriz(aumentada=False, filas=2, columnas=2, valores=[[Fraction(5), Fraction(6)], [Fraction(7), Fraction(8)]]),
+#     "C": Matriz(aumentada=False, filas=2, columnas=2, valores=[[Fraction(9), Fraction(10)], [Fraction(11), Fraction(12)]])
+# }
 
-vectores_dict = {
-    "a": Vector([Fraction(1), Fraction(2), Fraction(3)]),
-    "b": Vector([Fraction(4), Fraction(5), Fraction(6)]),
-    "c": Vector([Fraction(7), Fraction(8), Fraction(9)])
-}
+# vectores_dict = {
+#     "a": Vector([Fraction(1), Fraction(2), Fraction(3)]),
+#     "b": Vector([Fraction(4), Fraction(5), Fraction(6)]),
+#     "c": Vector([Fraction(7), Fraction(8), Fraction(9)])
+# }
 
-ops = OpsManager()
-test_mats = MatricesManager(matrices_dict, ops)
-test_vecs = VectoresManager(vectores_dict, ops)
-ops.mats_manager = test_mats
-ops.vecs_manager = test_vecs
+# ops = OpsManager()
+# test_mats = MatricesManager(matrices_dict, ops)
+# test_vecs = VectoresManager(vectores_dict, ops)
+# ops.mats_manager = test_mats
+# ops.vecs_manager = test_vecs
 
 
 class GaussUI(ctk):
@@ -52,9 +52,9 @@ class GaussUI(ctk):
         self.grid_rowconfigure(0, weight=1)
         self.grid_columnconfigure(1, weight=1)
 
-        self.ops_manager = ops
-        self.mats_manager = ops.mats_manager
-        self.vecs_manager = ops.vecs_manager
+        self.ops_manager = OpsManager()
+        self.mats_manager = self.ops_manager.mats_manager
+        self.vecs_manager = self.ops_manager.vecs_manager
         self.nav_frame = NavFrame(self, self)
         self.matrices = MatricesFrame(self, self, self.mats_manager)
         self.vectores = VectoresFrame(self, self, self.vecs_manager)

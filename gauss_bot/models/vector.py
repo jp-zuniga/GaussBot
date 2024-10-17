@@ -70,7 +70,7 @@ class Vector:
 
         if isinstance(multiplicador, Vector):
             if len(self) != len(multiplicador):
-                raise ArithmeticError("Vectores deben tener la misma longitud!")
+                raise ArithmeticError("Los vectores deben tener la misma longitud!")
             return Fraction(sum(a * b for a, b in zip(self.componentes, multiplicador.componentes)))
         if isinstance(multiplicador, Fraction):
             return Vector([c * multiplicador for c in self.componentes])

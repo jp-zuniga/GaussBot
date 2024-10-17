@@ -151,7 +151,9 @@ class Matriz:
 
         if isinstance(multiplicador, Matriz):
             if self.columnas != multiplicador.filas:
-                raise ArithmeticError("El número de columnas de la primera matriz debe ser igual al número de filas de la segunda matriz!")
+                raise ArithmeticError(
+                    "El número de columnas de la primera matriz debe ser igual al número de filas de la segunda matriz!"
+                )
 
             mat_multiplicada = [
                 [Fraction(0) for _ in range(multiplicador.columnas)]
@@ -178,7 +180,7 @@ class Matriz:
 
     def es_cuadrada(self) -> bool:
         """
-        Verifica si la instancia es una matriz cuadrada.
+        Verifica si la instancia es cuadrada.
         """
 
         return self.filas == self.columnas
@@ -192,7 +194,13 @@ class Matriz:
         """
 
         diagonales_son_1 = all(self.valores[i][i] == Fraction(1) for i in range(self.filas))
-        resto_son_cero = all(self.valores[i][j] == Fraction(0) for i in range(self.filas) for j in range(self.columnas) if i != j)
+        resto_son_cero = all(
+            self.valores[i][j] == Fraction(0)
+            for i in range(self.filas)
+            for j in range(self.columnas)
+            if i != j
+        )
+        
         return self.es_cuadrada() and diagonales_son_1 and resto_son_cero
 
     def hacer_triangular_superior(self) -> tuple["Matriz", bool]:
@@ -256,7 +264,7 @@ class Matriz:
         """
 
         if not self.es_cuadrada():
-            raise ArithmeticError("La matriz debe ser cuadrada para su adjunta!")
+            raise ArithmeticError("La matriz no es cuadrada; su determinante es indefinido!")
 
         mat_cofactores = []
         for i in range(self.filas):
@@ -283,7 +291,7 @@ class Matriz:
         """
 
         if not self.es_cuadrada():
-            raise ArithmeticError("La matriz debe ser cuadrada para ser invertible!")
+            raise ArithmeticError("La matriz no es cuadrada; su determinante es indefinido!")
 
         det, _, _ = self.calcular_det()
         if det == 0:

@@ -1,21 +1,21 @@
 from fractions import Fraction
 
 from gauss_bot.models.matriz import Matriz, Validacion
+from gauss_bot.models.vector import Vector
 
 
 class SistemaEcuaciones:
     """
     Representa un sistema de ecuaciones lineales con una instancia de Matriz() aumentada.
 
-    - resolver_sistema() es el método principal que se encarga de llamar a
-      los otros métodos para encontrar las soluciones del sistema
+    - cramer() y gauss_jordan() son los métodos principales para resolver un sistema.
     - La solución se almacena en el atributo .solucion,
       y el procedimiento realizado en .procedimiento (ambos como strings)
     """
 
     def __init__(self, matriz: Matriz) -> None:
         """
-        * TypeError: ocurre cuando la matriz dada no es aumentada
+        * TypeError: cuando la matriz dada no es aumentada
         """
 
         if not matriz.aumentada:
@@ -23,8 +23,54 @@ class SistemaEcuaciones:
         self.matriz = matriz
         self.solucion = ""
         self.procedimiento = ""
+    
+    def cramer(self, nombre: str) -> None:
+        """
+        Resuelve un sistema de ecuaciones ocupando la Regla de Cramer.
+        """
 
-    def resolver_sistema(self) -> None:
+        if not self.matriz.aumentada:
+            raise TypeError("La matriz no es aumentada; no representa un sistema de ecuaciones!")
+        if not self.matriz.filas == self.matriz.columnas - 1:
+            raise ArithmeticError("La matriz de variables no es cuadrada; su determinante es indefinido!")
+
+        mat_variables = Matriz(
+            False,
+            self.matriz.filas,
+            self.matriz.columnas - 1,
+            [self.matriz.valores[i][:-1] for i in range(self.matriz.filas)],
+        )
+
+        col_aumentada = Vector([self.matriz.valores[i][-1] for i in range(self.matriz.filas)])
+        sub_dets = []
+        soluciones = []
+
+        det, _, _ = mat_variables.calcular_det()
+        if det == 0:
+            raise ValueError("El determinante de la matriz de variables es 0; no se puede resolver el sistema mediante la Regla de Cramer!")
+
+        for i in range(self.matriz.columnas - 1):
+            submat = []
+            for j in range(self.matriz.filas):
+                submat.append([self.matriz.valores[j][k] if k != i else col_aumentada[j] for k in range(self.matriz.columnas - 1)])
+            det_submat, _, _ = Matriz(False, self.matriz.filas, self.matriz.columnas - 1, submat).calcular_det()
+            sub_dets.append(det_submat)
+            soluciones.append(det_submat / det)
+
+        self.solucion += "\n---------------------------------------------"
+        self.solucion += f"Variables de matriz {nombre}:"
+        self.solucion += str(mat_variables)
+        self.solucion += f"Vector b = {col_aumentada}"
+        self.solucion += "---------------------------------------------"
+        self.solucion += f"\nDeterminante de la matriz de variables = {det}"
+        for i, subdet in enumerate(sub_dets):
+            self.solucion += f"Determinante de {nombre}{i+1}(b) = {subdet}"
+        self.solucion += "\n---------------------------------------------\n"
+        self.solucion += "Soluciones:"
+        for i, sol in enumerate(soluciones):
+            self.solucion += f"X{i + 1} = {sol}"
+
+    def gauss_jordan(self) -> None:
         """
         * Valida si la matriz es cero o inconsistente de antemano
         * Valida si la matriz ya esta en su forma escalonada reducida para no hacer operaciones innecesarias
@@ -48,7 +94,7 @@ class SistemaEcuaciones:
             self.procedimiento += "\nMatriz ya esta en su forma escalonada reducida!\n\n"
             self.procedimiento += str(self.matriz)
         else:
-            self.reducir_matriz()
+            self._reducir_matriz()
 
         test_final = self._validar_consistencia()
         if not test_final[0]:
@@ -64,7 +110,7 @@ class SistemaEcuaciones:
         # solucion general:
         self._obtener_soluciones(unica=False, libres=libres, validacion=(True, -1))
 
-    def reducir_matriz(self) -> None:
+    def _reducir_matriz(self) -> None:
         """
         * Reduce la matriz a su forma escalonada usando el método de reducción por filas
         * Actualiza .procedimiento con cada operación realizada
@@ -75,6 +121,7 @@ class SistemaEcuaciones:
         self.procedimiento += "\nReduciendo la matriz a su forma escalonada:\n"
 
         fila_actual: int = 0
+
         # encontrar entradas pivotes maximas, normalizar fila pivote, eliminar elementos debajo del pivote
         for j in range(self.matriz.columnas - 1):
             fila_pivote = None

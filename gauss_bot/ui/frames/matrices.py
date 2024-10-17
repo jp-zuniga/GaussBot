@@ -45,7 +45,7 @@ class MostrarTab(ctkScrollFrame):
         super().__init__(master, corner_radius=0, fg_color="transparent")
         self.app = app
         self.mats_manager = mats_manager
-        label = ctkLabel(self, text=mats_manager.mostrar_matrices(necesita_aumentada=-1))
+        label = ctkLabel(self, text=mats_manager.get_matrices())
         label.pack(pady=5, padx=5, expand=True, fill='both')
 
 
@@ -165,8 +165,8 @@ class MultiplicacionTab(ctkFrame):
         tabview = ctkTabview(self)
         tabview.pack(expand=True, fill='both')
 
-        tab_escalar = tabview.add("Multiplicación Escalar")
-        tab_matriz = tabview.add("Multiplicación de Matrices")
+        tab_escalar = tabview.add("Escalar por Matriz")
+        tab_matriz = tabview.add("Multiplicación Matricial")
         tab_matriz_vector = tabview.add("Producto Matriz-Vector")
         self.setup_escalar_tab(tab_escalar)
         self.setup_mult_matrices_tab(tab_matriz)

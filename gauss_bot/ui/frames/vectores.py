@@ -38,7 +38,7 @@ class MostrarTab(ctkScrollFrame):
         super().__init__(master, corner_radius=0, fg_color="transparent")
         self.app = app
         self.vecs_manager = vecs_manager
-        label = ctkLabel(self, text=vecs_manager.mostrar_vectores())
+        label = ctkLabel(self, text=vecs_manager.get_vectores())
         label.pack(pady=5, padx=5, expand=True, fill='both')
 
 
@@ -57,7 +57,7 @@ class AgregarTab(ctkFrame):
         self.entry_nombre = ctkEntry(self)
         self.entry_nombre.grid(row=0, column=1, padx=5, pady=5, sticky="w")
 
-        label_dim = ctkLabel(self, text="Dimensión del vector:")
+        label_dim = ctkLabel(self, text="Dimensiones del vector:")
         label_dim.grid(row=1, column=0, padx=5, pady=5, sticky="e")
         self.entry_dim = ctkEntry(self)
         self.entry_dim.grid(row=1, column=1, padx=5, pady=5, sticky="w")
@@ -72,8 +72,8 @@ class AgregarTab(ctkFrame):
         for widget in self.vector_frame.winfo_children():
             widget.destroy()
 
-        dim = int(self.entry_dim.get())
-        for i in range(dim):
+        dimension = int(self.entry_dim.get())
+        for i in range(dimension):
             input_entry = ctkEntry(self.vector_frame)
             input_entry.grid(row=i, column=0, padx=5, pady=5)
             self.input_entries.append(input_entry)
@@ -83,10 +83,10 @@ class AgregarTab(ctkFrame):
 
     def agregar_vector(self):
         nombre = self.entry_nombre.get()
-        dim = int(self.entry_dim.get())
+        dimension = int(self.entry_dim.get())
         valores = [float(entry.get()) for entry in self.input_entries]
 
-        vector = Vector(nombre, dim, valores)
+        vector = Vector(nombre, dimension, valores)
         self.vecs_manager.vectores_ingresados[nombre] = vector
 
 
@@ -141,8 +141,8 @@ class MultiplicacionTab(ctkFrame):
         tabview = ctkTabview(self)
         tabview.pack(expand=True, fill='both')
 
-        tab_escalar = tabview.add("Multiplicación Escalar")
-        tab_vector = tabview.add("Multiplicación de Vectores")
+        tab_escalar = tabview.add("Escalar por Vector")
+        tab_vector = tabview.add("Producto Punto")
         tab_matriz_vector = tabview.add("Producto Matriz-Vector")
 
         self.setup_escalar_tab(tab_escalar)
