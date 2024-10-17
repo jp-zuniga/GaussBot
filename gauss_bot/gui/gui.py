@@ -15,11 +15,11 @@ from gauss_bot.managers.ops_manager import OpsManager
 # from gauss_bot.managers.mats_manager import MatricesManager
 # from gauss_bot.managers.vecs_manager import VectoresManager
 
-from gauss_bot.ui.frames.nav import NavFrame, ASSET_PATH
-from gauss_bot.ui.frames.matrices import MatricesFrame
-from gauss_bot.ui.frames.vectores import VectoresFrame
-from gauss_bot.ui.frames.ecuaciones import EcuacionesFrame
-from gauss_bot.ui.frames.config import ConfigFrame, THEMES_PATH, CONFIG_PATH
+from gauss_bot.gui.frames.nav import NavFrame, ASSET_PATH
+from gauss_bot.gui.frames.matrices import MatricesFrame
+from gauss_bot.gui.frames.vectores import VectoresFrame
+from gauss_bot.gui.frames.ecuaciones import EcuacionesFrame
+from gauss_bot.gui.frames.config import ConfigFrame, THEMES_PATH, CONFIG_PATH
 
 # matrices_dict = {
 #     "A": Matriz(aumentada=False, filas=2, columnas=2, valores=[[Fraction(1), Fraction(2)], [Fraction(3), Fraction(4)]]),
