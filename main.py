@@ -1,8 +1,5 @@
-# from gauss_bot.managers.main_manager import OpsManager
-from gauss_bot.ui.app import App
+from gauss_bot.ui.gui import GaussUI
 
 if __name__ == "__main__":
-    # manager = OpsManager()
-    # manager.exec()
-    app = App()
+    app = GaussUI()
     app.mainloop()

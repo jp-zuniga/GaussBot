@@ -9,7 +9,7 @@ from customtkinter import (
     CTkImage as ctkImage,
 )
 
-ASSET_PATH = path.join(path.dirname(path.dirname(path.realpath(__file__))), "assets")
+ASSET_PATH = path.join(path.dirname(path.dirname(path.dirname(path.realpath(__file__)))), "assets")
 
 class NavFrame(ctkFrame):
     def __init__(self, master, app):

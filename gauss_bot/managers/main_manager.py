@@ -1,6 +1,6 @@
 from fractions import Fraction
 
-from gauss_bot.clases.matriz import Matriz
+from gauss_bot.models.matriz import Matriz
 from gauss_bot.managers.mats_manager import MatricesManager
 from gauss_bot.managers.vecs_manager import VectoresManager
 from gauss_bot.utils import limpiar_pantalla
@@ -64,12 +64,12 @@ class OpsManager:
         """
         
         limpiar_pantalla()
-        if not self.mat_manager._validar_mats_ingresadas():
+        if not self.mats_manager._validar_mats_ingresadas():
             return
-        if not self.vec_manager._validar_vecs_ingresados():
+        if not self.vecs_manager._validar_vecs_ingresados():
             return
         
-        nombre_mat = self.mat_manager.seleccionar_mat("mv")
+        nombre_mat = self.mats_manager.seleccionar_mat("mv")
         if nombre_mat == "":
             return
 

@@ -8,7 +8,7 @@ from customtkinter import (
     CTkOptionMenu as ctkOptionMenu,
 )
 
-from gauss_bot.clases.vector import Vector
+from gauss_bot.models.vector import Vector
 from gauss_bot.managers.vecs_manager import VectoresManager
 
 class VectoresFrame(ctkFrame):

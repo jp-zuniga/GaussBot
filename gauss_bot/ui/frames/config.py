@@ -10,8 +10,8 @@ from customtkinter import (
     set_appearance_mode,
 )
 
-THEMES_PATH = path.join(path.dirname(path.dirname(path.realpath(__file__))), "themes")
-CONFIG_PATH = path.join(path.dirname(path.dirname(path.realpath(__file__))), "config.json")
+THEMES_PATH = path.join(path.dirname(path.dirname(path.dirname(path.realpath(__file__)))), "themes")
+CONFIG_PATH = path.join(path.dirname(path.dirname(path.dirname(path.realpath(__file__)))), "data", "config.json")
 
 
 class ConfigFrame(ctkFrame):

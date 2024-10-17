@@ -1,7 +1,7 @@
 from fractions import Fraction
 from typing import Union, overload
 
-from gauss_bot.clases.vector import Vector
+from gauss_bot.models.vector import Vector
 from gauss_bot.utils import limpiar_pantalla, match_input
 
 

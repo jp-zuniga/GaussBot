@@ -1,8 +1,8 @@
 from copy import deepcopy
 from fractions import Fraction
 
-from gauss_bot.clases.matriz import Matriz
-from gauss_bot.clases.sistema_ecuaciones import SistemaEcuaciones
+from gauss_bot.models.matriz import Matriz
+from gauss_bot.models.sistema_ecuaciones import SistemaEcuaciones
 from gauss_bot.utils import limpiar_pantalla, match_input
 
 

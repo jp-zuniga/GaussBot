@@ -1,6 +1,6 @@
 from fractions import Fraction
 
-from gauss_bot.clases.matriz import Matriz, Validacion
+from gauss_bot.models.matriz import Matriz, Validacion
 
 
 class SistemaEcuaciones:

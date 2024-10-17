@@ -9,8 +9,8 @@ from customtkinter import (
     set_appearance_mode,
 )
 
-from gauss_bot.clases.matriz import Matriz
-from gauss_bot.clases.vector import Vector
+from gauss_bot.models.matriz import Matriz
+from gauss_bot.models.vector import Vector
 from gauss_bot.managers.main_manager import OpsManager
 from gauss_bot.managers.mats_manager import MatricesManager
 from gauss_bot.managers.vecs_manager import VectoresManager
@@ -40,7 +40,7 @@ ops.mats_manager = test_mats
 ops.vecs_manager = test_vecs
 
 
-class App(ctk):
+class GaussUI(ctk):
     def __init__(self):
         super().__init__()
         self.load_config()
