@@ -203,14 +203,13 @@ class Matriz:
         Resuelve un sistema de ecuaciones ocupando la Regla de Cramer.
         """
 
-        limpiar_pantalla()
         if not self.aumentada:
             raise TypeError("La matriz no es aumentada; no representa un sistema de ecuaciones!")
         if not self.filas == self.columnas - 1:
             raise ArithmeticError("La matriz de variables no es cuadrada; su determinante es indefinido!")
 
         mat_variables = Matriz(
-            True,
+            False,
             self.filas,
             self.columnas - 1,
             [self.valores[i][:-1] for i in range(self.filas)],
@@ -222,16 +221,17 @@ class Matriz:
 
         det, _, _ = mat_variables.calcular_det()
         if det == 0:
-            raise ValueError("El determinante de la matriz de variables es 0; pueden no haber soluciones o soluciones infinitas!")
+            raise ValueError("El determinante de la matriz de variables es 0; el sistema no tiene solución!")
 
         for i in range(self.columnas - 1):
             submat = []
             for j in range(self.filas):
                 submat.append([self.valores[j][k] if k != i else col_aumentada[j] for k in range(self.columnas - 1)])
-            det_submat, _, _ = Matriz(True, self.filas, self.columnas - 1, submat).calcular_det()
+            det_submat, _, _ = Matriz(False, self.filas, self.columnas - 1, submat).calcular_det()
             sub_dets.append(det_submat)
             soluciones.append(det_submat / det)
 
+        limpiar_pantalla()
         print("\n---------------------------------------------")
         print(f"Variables de matriz {nombre}:")
         print(mat_variables)
@@ -239,7 +239,7 @@ class Matriz:
         print("---------------------------------------------")
         print(f"\nDeterminante de la matriz de variables = {det}")
         for i, subdet in enumerate(sub_dets):
-            print(f"Determinante de {nombre}_i (b) = {subdet}")
+            print(f"Determinante de {nombre}{i+1}(b) = {subdet}")
         print("\n---------------------------------------------\n")
         print("Soluciones:")
         for i, sol in enumerate(soluciones):
