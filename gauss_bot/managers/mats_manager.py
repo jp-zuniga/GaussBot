@@ -102,7 +102,7 @@ class MatricesManager:
                     print(e)
                 except ValueError as v:
                     print("\n" + str(v))
-                    resolver_gauss = match_input("\n¿Desea comprobar el resultado con el método Gauss-Jordan? (s/n) ")
+                    resolver_gauss = match_input("\n¿Desea encontrar la solución con el método Gauss-Jordan? (s/n) ")
                     if resolver_gauss == 1:
                         mat_copia = deepcopy(mat_seleccionada)
                         sistema = SistemaEcuaciones(mat_copia)

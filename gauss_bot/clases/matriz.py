@@ -221,7 +221,7 @@ class Matriz:
 
         det, _, _ = mat_variables.calcular_det()
         if det == 0:
-            raise ValueError("El determinante de la matriz de variables es 0; el sistema no tiene solución!")
+            raise ValueError("El determinante de la matriz de variables es 0; no se puede resolver el sistema mediante la Regla de Cramer!")
 
         for i in range(self.columnas - 1):
             submat = []
