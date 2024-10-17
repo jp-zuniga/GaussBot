@@ -328,7 +328,7 @@ class MatricesManager:
                     if not any(sistema.matriz == mat for mat in self.mats_ingresadas.values()):
                         self.mats_ingresadas[nombre_resultado] = sistema.matriz
 
-                    return (nombre_mat, sistema.matriz)
+                    return (nombre_mat, sistema)
 
                 case "me":  # ? matriz por escalar
                     try:
