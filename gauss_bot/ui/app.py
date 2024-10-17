@@ -15,10 +15,11 @@ from gauss_bot.managers.main_manager import OpsManager
 from gauss_bot.managers.mats_manager import MatricesManager
 from gauss_bot.managers.vecs_manager import VectoresManager
 
-from gauss_bot.ui.frames.config import ConfigFrame, THEMES_PATH, CONFIG_PATH
-from gauss_bot.ui.frames.matrices import MatricesFrame
 from gauss_bot.ui.frames.nav import NavFrame, ASSET_PATH
+from gauss_bot.ui.frames.matrices import MatricesFrame
 from gauss_bot.ui.frames.vectores import VectoresFrame
+from gauss_bot.ui.frames.ecuaciones import EcuacionesFrame
+from gauss_bot.ui.frames.config import ConfigFrame, THEMES_PATH, CONFIG_PATH
 
 matrices_dict = {
     "A": Matriz(aumentada=False, filas=2, columnas=2, valores=[[Fraction(1), Fraction(2)], [Fraction(3), Fraction(4)]]),
@@ -43,9 +44,10 @@ class App(ctk):
     def __init__(self):
         super().__init__()
         self.load_config()
+        self.set_icon(self.modo_actual)
 
         self.title("GaussBot")
-        self.set_icon(self.modo_actual)
+        # self.state("zoomed")
         self.geometry("1200x600")
         self.grid_rowconfigure(0, weight=1)
         self.grid_columnconfigure(1, weight=1)
@@ -54,13 +56,15 @@ class App(ctk):
         self.mats_manager = ops.mats_manager
         self.vecs_manager = ops.vecs_manager
         self.nav_frame = NavFrame(self, self)
-        self.config_frame = ConfigFrame(self, self)
         self.matrices = MatricesFrame(self, self, self.mats_manager)
         self.vectores = VectoresFrame(self, self, self.vecs_manager)
+        self.ecuaciones = EcuacionesFrame(self, self, self.mats_manager)
+        self.config_frame = ConfigFrame(self, self)
 
         self.frames = {
             "matrices": self.matrices,
             "vectores": self.vectores,
+            "ecuaciones": self.ecuaciones,
             "config": self.config_frame
         }
 
@@ -68,13 +72,21 @@ class App(ctk):
             "matrices": self.nav_frame.matrices_button,
             "vectores": self.nav_frame.vectores_button
         }
-    
+
     def matriz_vector(self):
         pass
-    
+
     def load_config(self):
-        with open(CONFIG_PATH, "r") as config_file:
-            self.config = load(config_file)
+        if path.exists(CONFIG_PATH):
+            with open(CONFIG_PATH) as config_file:
+                self.config = load(config_file)
+        else:
+            self.config = {
+                "tema": "metal.json",
+                "escala": 1.0,
+                "modo": "dark"
+            }
+
         self.tema_actual = self.config["tema"]
         self.escala_actual = self.config["escala"]
         self.modo_actual = self.config["modo"]
@@ -89,12 +101,14 @@ class App(ctk):
         self.config["modo"] = self.modo_actual
         with open(CONFIG_PATH, "w") as config_file:
             dump(self.config, config_file, indent=4)
-    
+
     def set_icon(self, modo):
         if modo == "light":
             self.iconbitmap(path.join(ASSET_PATH, "dark_logo.ico"))
         elif modo == "dark":
             self.iconbitmap(path.join(ASSET_PATH, "light_logo.ico"))
+        else:
+            raise ValueError("Input inválido")
 
     def seleccionar_frame(self, nombre):
         for nombre_frame, button in self.buttons.items():
@@ -106,14 +120,14 @@ class App(ctk):
             else:
                 frame.grid_forget()
 
-    def home_button_event(self):
-        self.seleccionar_frame("home")
-
     def matrices_button_event(self):
         self.seleccionar_frame("matrices")
 
     def vectores_button_event(self):
         self.seleccionar_frame("vectores")
+    
+    def ecuaciones_button_event(self):
+        self.seleccionar_frame("ecuaciones")
 
     def config_button_event(self):
         self.seleccionar_frame("config")

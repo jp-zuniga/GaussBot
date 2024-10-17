@@ -43,7 +43,6 @@ class ConfigFrame(ctkFrame):
         self.modos_dict = {
             "Claro": "light",
             "Oscuro": "dark",
-            "Sistema": "system",
         }
 
         self.escalas_float = {
@@ -57,10 +56,15 @@ class ConfigFrame(ctkFrame):
         self.get_tema = self.get_dict_key(self.temas_json, self.app.tema_actual)
         self.get_modo = self.get_dict_key(self.modos_dict, self.app.modo_actual)
         self.get_escala = self.get_dict_key(self.escalas_float, self.app.escala_actual)
-
-        self.first_tema = StringVar(value=self.get_tema.split("\\")[-1])
-        self.first_modo = StringVar(value=self.get_modo)
-        self.first_escala = StringVar(value=self.get_escala)
+        
+        try:
+            self.first_tema = StringVar(value=self.get_tema.split("\\")[-1])
+            self.first_modo = StringVar(value=self.get_modo)
+            self.first_escala = StringVar(value=self.get_escala)
+        except AttributeError:
+            self.first_tema = StringVar(value="Metal")
+            self.first_modo = StringVar(value="Oscuro")
+            self.first_escala = StringVar(value="100%")
 
         self.temas = list(self.temas_json.keys())
         self.escalas = list(self.escalas_float.keys())
