@@ -1,4 +1,3 @@
-# from fractions import Fraction
 from json import dump, load
 from os import path
 
@@ -9,11 +8,7 @@ from customtkinter import (
     set_appearance_mode,
 )
 
-# from gauss_bot.models.matriz import Matriz
-# from gauss_bot.models.vector import Vector
 from gauss_bot.managers.ops_manager import OpsManager
-# from gauss_bot.managers.mats_manager import MatricesManager
-# from gauss_bot.managers.vecs_manager import VectoresManager
 
 from gauss_bot.gui.frames.nav import NavFrame, ASSET_PATH
 from gauss_bot.gui.frames.matrices import MatricesFrame
@@ -21,21 +16,21 @@ from gauss_bot.gui.frames.vectores import VectoresFrame
 from gauss_bot.gui.frames.ecuaciones import EcuacionesFrame
 from gauss_bot.gui.frames.config import ConfigFrame, THEMES_PATH, CONFIG_PATH
 
-# matrices_dict = {
+# matrices_dict: dict[str, Matriz] = {
 #     "A": Matriz(aumentada=False, filas=2, columnas=2, valores=[[Fraction(1), Fraction(2)], [Fraction(3), Fraction(4)]]),
 #     "B": Matriz(aumentada=False, filas=2, columnas=2, valores=[[Fraction(5), Fraction(6)], [Fraction(7), Fraction(8)]]),
 #     "C": Matriz(aumentada=False, filas=2, columnas=2, valores=[[Fraction(9), Fraction(10)], [Fraction(11), Fraction(12)]])
 # }
 
-# vectores_dict = {
+# vectores_dict: dict[str, Vector] = {
 #     "a": Vector([Fraction(1), Fraction(2), Fraction(3)]),
 #     "b": Vector([Fraction(4), Fraction(5), Fraction(6)]),
 #     "c": Vector([Fraction(7), Fraction(8), Fraction(9)])
 # }
 
 # ops = OpsManager()
-# test_mats = MatricesManager(matrices_dict, ops)
-# test_vecs = VectoresManager(vectores_dict, ops)
+# test_mats = MatricesManager(matrices_dict)
+# test_vecs = VectoresManager(vectores_dict)
 # ops.mats_manager = test_mats
 # ops.vecs_manager = test_vecs
 
@@ -55,16 +50,17 @@ class GaussUI(ctk):
         self.ops_manager = OpsManager()
         self.mats_manager = self.ops_manager.mats_manager
         self.vecs_manager = self.ops_manager.vecs_manager
+
         self.nav_frame = NavFrame(self, self)
+        self.ecuaciones = EcuacionesFrame(self, self, self.mats_manager)
         self.matrices = MatricesFrame(self, self, self.mats_manager)
         self.vectores = VectoresFrame(self, self, self.vecs_manager)
-        self.ecuaciones = EcuacionesFrame(self, self, self.mats_manager)
         self.config_frame = ConfigFrame(self, self)
 
         self.frames = {
+            "ecuaciones": self.ecuaciones,
             "matrices": self.matrices,
             "vectores": self.vectores,
-            "ecuaciones": self.ecuaciones,
             "config": self.config_frame
         }
 
@@ -125,7 +121,7 @@ class GaussUI(ctk):
 
     def vectores_button_event(self):
         self.seleccionar_frame("vectores")
-    
+
     def ecuaciones_button_event(self):
         self.seleccionar_frame("ecuaciones")
 
@@ -133,5 +129,7 @@ class GaussUI(ctk):
         self.seleccionar_frame("config")
 
     def quit_event(self):
+        self.ops_manager.save_matrices()
+        self.ops_manager.save_vectores()
         self.save_config()
         self.quit()

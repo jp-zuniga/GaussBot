@@ -1,10 +1,6 @@
 from fractions import Fraction
-from json import load
-from os import path
 
 from gauss_bot.models.vector import Vector
-
-VECTORES_PATH = path.join(path.dirname(path.dirname(path.realpath(__file__))), "data", "vectores.json")
 
 
 class VectoresManager:
@@ -15,23 +11,13 @@ class VectoresManager:
 
     def __init__(self, vecs_ingresados=None) -> None:
         if vecs_ingresados is None:
-            self.vecs_ingresados = self.load_vectores()
-        elif type(vecs_ingresados) is dict[str, Vector]:
+            self.vecs_ingresados: dict[str, Vector] = {}
+        elif (isinstance(vecs_ingresados, dict)
+              and all(isinstance(n, str) for n in vecs_ingresados.keys())
+              and all(isinstance(v, Vector) for v in vecs_ingresados.values())):
             self.vecs_ingresados = vecs_ingresados
         else:
             raise TypeError("Argumento inválido para 'vecs_ingresados'!")
-
-    def load_vectores(self) -> dict[str, Vector]:
-        """
-        Carga los vectores guardados en el archivo vectores.json y los retorna como un diccionario.
-        """
-
-        if not path.exists(VECTORES_PATH):
-            return {}
-
-        with open(VECTORES_PATH) as vectores_file:
-            vectores_dict = load(vectores_file)
-            return {nombre: Vector(componentes) for nombre, componentes in vectores_dict.items()}
 
     def get_vectores(self) -> str:
         """

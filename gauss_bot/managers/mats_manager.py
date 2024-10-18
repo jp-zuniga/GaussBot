@@ -1,12 +1,8 @@
 from copy import deepcopy
 from fractions import Fraction
-from json import load
-from os import path
 
 from gauss_bot.models.matriz import Matriz
 from gauss_bot.models.sistema_ecuaciones import SistemaEcuaciones
-
-MATRICES_PATH = path.join(path.dirname(path.dirname(path.realpath(__file__))), "data", "matrices.json")
 
 
 class MatricesManager:
@@ -17,26 +13,13 @@ class MatricesManager:
 
     def __init__(self, mats_ingresadas=None) -> None:
         if mats_ingresadas is None:
-            self.mats_ingresadas = self.load_matrices()
-        elif type(mats_ingresadas) is dict[str, Matriz]:
+            self.mats_ingresadas: dict[str, Matriz] = {}
+        elif (isinstance(mats_ingresadas, dict)
+              and all(isinstance(n, str) for n in mats_ingresadas.keys())
+              and all(isinstance(m, Matriz) for m in mats_ingresadas.values())):
             self.mats_ingresadas = mats_ingresadas
         else:
             raise TypeError("Argumento inválido para 'mats_ingresadas'!")
-    
-    def load_matrices(self) -> dict[str, Matriz]:
-        """
-        Carga las matrices guardadas en el archivo matrices.json y las retorna como un diccionario.
-        """
-
-        if not path.exists(MATRICES_PATH):
-            return {}
-
-        with open(MATRICES_PATH) as vectores_file:
-            matrices_dict = load(vectores_file)
-            return {
-                nombre: Matriz(aumentada, filas, columnas, valores)
-                for nombre, aumentada, filas, columnas, valores in matrices_dict.items()
-            }
 
     def get_matrices(self) -> str:
         """
@@ -53,7 +36,7 @@ class MatricesManager:
             matrices += str(mat)
         matrices += "---------------------------------------------\n"
         return matrices
-    
+
     def resolver_sistema(self, nombre_mat: str, metodo: str) -> tuple[str, SistemaEcuaciones]:
         mat_copia = deepcopy(self.mats_ingresadas[nombre_mat])
         sistema = SistemaEcuaciones(mat_copia)
@@ -64,10 +47,10 @@ class MatricesManager:
             sistema.cramer(nombre_mat)
         else:
             raise ValueError("Argumento inválido para 'metodo'!")
-        
+
         nombre_sistema = f"{nombre_mat}_r"
         return (nombre_sistema, sistema)
-    
+
     def sumar_matrices(self, nombre_mat1: str, nombre_mat2: str) -> tuple[str, Matriz]:
         mat1 = self.mats_ingresadas[nombre_mat1]
         mat2 = self.mats_ingresadas[nombre_mat2]
