@@ -1,10 +1,8 @@
-# from fractions import Fraction
-
 from customtkinter import (
     CTkFrame as ctkFrame,
     CTkScrollableFrame as ctkScrollFrame,
-    CTkButton as ctkButton,
     CTkTabview as ctkTabview,
+    CTkButton as ctkButton,
     CTkLabel as ctkLabel,
     CTkEntry as ctkEntry,
     CTkCheckBox as ctkCheckBox,
@@ -13,6 +11,8 @@ from customtkinter import (
 
 # from gauss_bot.clases.matriz import Matriz
 from gauss_bot.managers.mats_manager import MatricesManager
+
+from gauss_bot.gui.custom_tk_funcs import ErrorFrame
 
 
 class MatricesFrame(ctkFrame):
@@ -56,6 +56,7 @@ class AgregarTab(ctkFrame):
         self.mats_manager = mats_manager
         self.aumentada = False
         self.input_entries: list[list[ctkEntry]] = []
+        self.error_frame = None
 
         self.columnconfigure(0, weight=1)
         self.columnconfigure(1, weight=1)
@@ -87,9 +88,21 @@ class AgregarTab(ctkFrame):
     def generar_matriz(self):
         for widget in self.matriz_frame.winfo_children():
             widget.destroy()
-
-        filas = int(self.entry_filas.get())
-        columnas = int(self.entry_columnas.get())
+        
+        try:
+            filas = int(self.entry_filas.get())
+            columnas = int(self.entry_columnas.get())
+        except ValueError:
+            if self.error_frame is None:
+                self.error_frame = ErrorFrame(self, "Debe ingresar números enteros positivos como filas y columnas!")
+                self.error_frame.configure(height=30)
+                self.error_frame.grid(row=4, column=0, columnspan=2, sticky="n", padx=5, pady=5)
+            return
+        
+        if self.error_frame is not None:
+            self.error_frame.destroy()
+            self.error_frame = None
+        
         if self.aumentada:
             columnas += 1
 

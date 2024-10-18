@@ -16,24 +16,6 @@ from gauss_bot.gui.frames.vectores import VectoresFrame
 from gauss_bot.gui.frames.ecuaciones import EcuacionesFrame
 from gauss_bot.gui.frames.config import ConfigFrame, THEMES_PATH, CONFIG_PATH
 
-# matrices_dict: dict[str, Matriz] = {
-#     "A": Matriz(aumentada=False, filas=2, columnas=2, valores=[[Fraction(1), Fraction(2)], [Fraction(3), Fraction(4)]]),
-#     "B": Matriz(aumentada=False, filas=2, columnas=2, valores=[[Fraction(5), Fraction(6)], [Fraction(7), Fraction(8)]]),
-#     "C": Matriz(aumentada=False, filas=2, columnas=2, valores=[[Fraction(9), Fraction(10)], [Fraction(11), Fraction(12)]])
-# }
-
-# vectores_dict: dict[str, Vector] = {
-#     "a": Vector([Fraction(1), Fraction(2), Fraction(3)]),
-#     "b": Vector([Fraction(4), Fraction(5), Fraction(6)]),
-#     "c": Vector([Fraction(7), Fraction(8), Fraction(9)])
-# }
-
-# ops = OpsManager()
-# test_mats = MatricesManager(matrices_dict)
-# test_vecs = VectoresManager(vectores_dict)
-# ops.mats_manager = test_mats
-# ops.vecs_manager = test_vecs
-
 
 class GaussUI(ctk):
     def __init__(self):
@@ -42,7 +24,7 @@ class GaussUI(ctk):
         self.set_icon(self.modo_actual)
 
         self.title("GaussBot")
-        # self.state("zoomed")
+        #! self.state("zoomed")
         self.geometry("1200x600")
         self.grid_rowconfigure(0, weight=1)
         self.grid_columnconfigure(1, weight=1)
@@ -104,7 +86,7 @@ class GaussUI(ctk):
         elif modo == "dark":
             self.iconbitmap(path.join(ASSET_PATH, "light_logo.ico"))
         else:
-            raise ValueError("Input inválido")
+            raise ValueError("Input inválido!")
 
     def seleccionar_frame(self, nombre):
         for nombre_frame, button in self.buttons.items():
