@@ -47,6 +47,7 @@ class SistemaEcuaciones:
         if self._validar_escalonada_reducida():
             self.procedimiento += "\nMatriz ya esta en su forma escalonada reducida!\n\n"
             self.procedimiento += str(self.matriz)
+            self.reducir_matriz()
         else:
             self.reducir_matriz()
 
