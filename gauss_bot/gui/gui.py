@@ -51,9 +51,6 @@ class GaussUI(ctk):
             "vectores": self.nav_frame.vectores_button
         }
 
-    def matriz_vector(self):
-        pass
-
     def load_config(self):
         if path.exists(CONFIG_PATH):
             with open(CONFIG_PATH) as config_file:
