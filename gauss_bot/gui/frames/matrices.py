@@ -1,4 +1,4 @@
-# from fractions import Fraction
+from fractions import Fraction
 
 from customtkinter import (
     CTkFrame as ctkFrame,
@@ -11,10 +11,10 @@ from customtkinter import (
     CTkOptionMenu as ctkOptionMenu,
 )
 
-# from gauss_bot.clases.matriz import Matriz
+from gauss_bot.models.matriz import Matriz
 from gauss_bot.managers.mats_manager import MatricesManager
 
-from gauss_bot.gui.custom_tk_funcs import ErrorFrame
+from gauss_bot.gui.custom_frames import ErrorFrame, SuccessFrame
 
 
 class MatricesFrame(ctkFrame):
@@ -29,6 +29,8 @@ class MatricesFrame(ctkFrame):
     def crear_tabview(self):
         self.tabview = ctkTabview(self)
         self.tabview.pack(expand=True, fill='both')
+
+        self.instances = []
         self.tabs = [
             ("Mostrar matrices", MostrarTab),
             ("Agregar matriz", AgregarTab),
@@ -41,10 +43,14 @@ class MatricesFrame(ctkFrame):
 
         for nombre, cls in self.tabs:
             tab = self.tabview.add(nombre)
-            cls(self, tab, self.app, self.mats_manager).pack(expand=True, fill='both')
+            tab_instance = cls(self, tab, self.app, self.mats_manager)
+            tab_instance.pack(expand=True, fill='both')
+            self.instances.append(tab_instance)
 
     def update_matrices(self):
-        for _, tab in self.tabs:
+        self.nombres_matrices = list(self.mats_manager.mats_ingresadas.keys())
+        self.nombres_vectores = list(self.app.vecs_manager.vecs_ingresados.keys())
+        for tab in self.instances:
             tab.update()
 
 
@@ -61,13 +67,13 @@ class MostrarTab(ctkScrollFrame):
         self.label.configure(text=self.mats_manager.get_matrices())
 
 
-class AgregarTab(ctkFrame):
+class AgregarTab(ctkScrollFrame):
     def __init__(self, master_frame, master_tab, app, mats_manager: MatricesManager):
         super().__init__(master_tab, corner_radius=0, fg_color="transparent")
         self.master_frame = master_frame
         self.app = app
         self.mats_manager = mats_manager
-        self.error_frame = None
+        self.message_frame = None
 
         self.aumentada = False
         self.input_entries: list[list[ctkEntry]] = []
@@ -82,12 +88,12 @@ class AgregarTab(ctkFrame):
 
         label_filas = ctkLabel(self, text="Número de filas:")
         label_filas.grid(row=1, column=0, padx=5, pady=5, sticky="e")
-        self.entry_filas = ctkEntry(self, placeholder_text="2")
+        self.entry_filas = ctkEntry(self, width=50, placeholder_text="2")
         self.entry_filas.grid(row=1, column=1, padx=5, pady=5, sticky="w")
 
         label_columnas = ctkLabel(self, text="Número de columnas:")
         label_columnas.grid(row=2, column=0, padx=5, pady=5, sticky="e")
-        self.entry_columnas = ctkEntry(self, placeholder_text="2")
+        self.entry_columnas = ctkEntry(self, width=50, placeholder_text="2")
         self.entry_columnas.grid(row=2, column=1, padx=5, pady=5, sticky="w")
 
         ingresar_button = ctkButton(self, height=30, text="Ingresar datos", command=self.generar_casillas)
@@ -97,7 +103,7 @@ class AgregarTab(ctkFrame):
         aleatoria_button.grid(row=3, column=1, padx=5, pady=5, sticky="w")
 
         self.matriz_frame = ctkFrame(self)
-        self.matriz_frame.grid(row=10, column=0, columnspan=2, padx=5, pady=5, sticky="ns")
+        self.matriz_frame.grid(row=10, column=0, columnspan=2, padx=5, pady=5, sticky="n")
 
     def toggle_aumentada(self):
         self.aumentada = not self.aumentada
@@ -110,15 +116,14 @@ class AgregarTab(ctkFrame):
             filas = int(self.entry_filas.get())
             columnas = int(self.entry_columnas.get())
         except ValueError:
-            if self.error_frame is None:
-                self.error_frame = ErrorFrame(self, "Debe ingresar números enteros positivos como filas y columnas!")
-                self.error_frame.configure(height=30)
-                self.error_frame.grid(row=4, column=0, columnspan=2, sticky="n", padx=5, pady=5)
+            self.message_frame = ErrorFrame(self, "Debe ingresar números enteros positivos como filas y columnas!")
+            self.message_frame.configure(height=30)
+            self.message_frame.grid(row=4, column=0, columnspan=2, sticky="n", padx=5, pady=5)
             return
 
-        if self.error_frame is not None:
-            self.error_frame.destroy()
-            self.error_frame = None
+        if self.message_frame is not None:
+            self.message_frame.destroy()
+            self.message_frame = None
 
         if self.aumentada:
             columnas += 1
@@ -126,18 +131,75 @@ class AgregarTab(ctkFrame):
         for i in range(filas):
             fila_entries = []
             for j in range(columnas):
-                input_entry = ctkEntry(self.matriz_frame)
+                input_entry = ctkEntry(self.matriz_frame, width=50)
                 input_entry.grid(row=i, column=j, padx=5, pady=5)
                 fila_entries.append(input_entry)
             self.input_entries.append(fila_entries)
 
-        agregar_button = ctkButton(self, text="Agregar", command=self.agregar_matriz)
-        agregar_button.grid(row=5, column=0, columnspan=3, padx=5, pady=5)
-    
+        nombre_label = ctkLabel(self, text="Nombre de la matriz:")
+        nombre_label.grid(row=11, column=0, padx=5, pady=5, sticky="e")
+        self.nombre_entry = ctkEntry(self, width=50, placeholder_text="A")
+        self.nombre_entry.grid(row=11, column=1, padx=5, pady=5, sticky="w")
+        self.agregar_button = ctkButton(self, text="Agregar", command=self.agregar_matriz)
+        self.agregar_button.grid(row=12, column=0, padx=5, pady=5, sticky="e")
+        self.limpiar_button = ctkButton(self, text="Limpiar casillas", command=self.generar_casillas)
+        self.limpiar_button.grid(row=12, column=1, padx=5, pady=5, sticky="w")
+
+    def agregar_matriz(self):
+        filas = len(self.input_entries)
+        columnas = len(self.input_entries[0]) if not self.aumentada else len(self.input_entries[0]) - 1
+        if filas != int(self.entry_filas.get()) or columnas != int(self.entry_columnas.get()):
+            self.message_frame = ErrorFrame(
+                self,
+                "Las dimensiones ingresadas son diferentes a las dimensiones ingresadas!\n" +
+                "Debe limpiar los datos y generar nuevas casillas!",
+            )
+            self.message_frame.configure(height=40)
+            self.message_frame.grid(row=13, column=0, columnspan=2, sticky="n", padx=5, pady=5)
+            return
+
+        valores = []
+        for fila_entries in self.input_entries:
+            fila_valores = []
+            for entry in fila_entries:
+                try:
+                    valor = Fraction(entry.get())
+                except ValueError:
+                    if self.message_frame is None:
+                        self.message_frame = ErrorFrame(self, "Todos los valores deben ser números reales!")
+                        self.message_frame.configure(height=30)
+                        self.message_frame.grid(row=13, column=0, columnspan=2, sticky="n", padx=5, pady=5)
+                    return
+                fila_valores.append(valor)
+            valores.append(fila_valores)
+
+        if self.message_frame is not None:
+            self.message_frame.destroy()
+            self.message_frame = None
+
+        nueva_matriz = Matriz(aumentada=self.aumentada, filas=filas, columnas=columnas, valores=valores)
+        nombre_nueva_matriz = self.nombre_entry.get()
+        if not nombre_nueva_matriz.isalpha() or not nombre_nueva_matriz.isupper() or len(nombre_nueva_matriz) != 1:
+            self.message_frame = ErrorFrame(self, "El nombre de la matriz debe ser una letra mayúscula!")
+            self.message_frame.configure(height=30)
+            self.message_frame.grid(row=13, column=0, columnspan=2, sticky="n", padx=5, pady=5)
+            return
+        elif nombre_nueva_matriz in self.mats_manager.mats_ingresadas:
+            self.message_frame = ErrorFrame(self, f"Ya existe una matriz llamada '{nombre_nueva_matriz}'!")
+            self.message_frame.configure(height=30)
+            self.message_frame.grid(row=13, column=0, columnspan=2, sticky="n", padx=5, pady=5)
+            return
+
+        self.mats_manager.mats_ingresadas[nombre_nueva_matriz] = nueva_matriz
+        self.master_frame.update_matrices()
+        self.message_frame = SuccessFrame(self, "La matriz se ha agregado exitosamente!")
+        self.message_frame.configure(height=30)
+        self.message_frame.grid(row=13, column=0, columnspan=2, sticky="n", padx=5, pady=5)
+
     def generar_aleatoria(self):
         pass
 
-    def agregar_matriz(self):
+    def update(self):
         pass
 
 
@@ -148,8 +210,8 @@ class SumaRestaTab(ctkFrame):
         self.app = app
         self.mats_manager = mats_manager
 
-        self.tabview = ctkTabview(self, width=250)
-        self.tabview.pack(padx=20, pady=10, fill="both", expand=True)
+        self.tabview = ctkTabview(self)
+        self.tabview.pack(fill="both", expand=True)
 
         self.tab_sumar = self.tabview.add("Sumar")
         self.tab_restar = self.tabview.add("Restar")
