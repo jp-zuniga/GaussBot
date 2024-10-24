@@ -1,4 +1,5 @@
 from fractions import Fraction
+from random import randint
 
 from customtkinter import (
     CTkFrame as ctkFrame,
@@ -47,7 +48,7 @@ class MatricesFrame(ctkFrame):
             tab_instance.pack(expand=True, fill='both')
             self.instances.append(tab_instance)
 
-    def update_matrices(self):
+    def update_all(self):
         self.nombres_matrices = list(self.mats_manager.mats_ingresadas.keys())
         self.nombres_vectores = list(self.app.vecs_manager.vecs_ingresados.keys())
         for tab in self.instances:
@@ -65,6 +66,7 @@ class MostrarTab(ctkScrollFrame):
 
     def update(self):
         self.label.configure(text=self.mats_manager.get_matrices())
+        self.update_idletasks()
 
 
 class AgregarTab(ctkScrollFrame):
@@ -145,18 +147,50 @@ class AgregarTab(ctkScrollFrame):
         self.limpiar_button = ctkButton(self, text="Limpiar casillas", command=self.generar_casillas)
         self.limpiar_button.grid(row=12, column=1, padx=5, pady=5, sticky="w")
 
+    def generar_aleatoria(self):
+        for widget in self.matriz_frame.winfo_children():
+            widget.destroy()
+
+        try:
+            filas = int(self.entry_filas.get())
+            columnas = int(self.entry_columnas.get())
+        except ValueError:
+            self.message_frame = ErrorFrame(self, "Debe ingresar números enteros positivos como filas y columnas!")
+            self.message_frame.configure(height=30)
+            self.message_frame.grid(row=4, column=0, columnspan=2, sticky="n", padx=5, pady=5)
+            return
+
+        if self.message_frame is not None:
+            self.message_frame.destroy()
+            self.message_frame = None
+
+        if self.aumentada:
+            columnas += 1
+
+        for i in range(filas):
+            fila_entries = []
+            for j in range(columnas):
+                numerador = randint(1, 20)
+                denominador = randint(1, 20)
+                valor_random = Fraction(numerador, denominador)
+                input_entry = ctkEntry(self.matriz_frame, width=50)
+                input_entry.insert(0, str(valor_random))
+                input_entry.grid(row=i, column=j, padx=5, pady=5)
+                fila_entries.append(input_entry)
+            self.input_entries.append(fila_entries)
+
+        nombre_label = ctkLabel(self, text="Nombre de la matriz:")
+        nombre_label.grid(row=11, column=0, padx=5, pady=5, sticky="e")
+        self.nombre_entry = ctkEntry(self, width=50, placeholder_text="A")
+        self.nombre_entry.grid(row=11, column=1, padx=5, pady=5, sticky="w")
+        self.agregar_button = ctkButton(self, text="Agregar", command=self.agregar_matriz)
+        self.agregar_button.grid(row=12, column=0, padx=5, pady=5, sticky="e")
+        self.limpiar_button = ctkButton(self, text="Limpiar casillas", command=self.generar_casillas)
+        self.limpiar_button.grid(row=12, column=1, padx=5, pady=5, sticky="w")
+
     def agregar_matriz(self):
         filas = len(self.input_entries)
-        columnas = len(self.input_entries[0]) if not self.aumentada else len(self.input_entries[0]) - 1
-        if filas != int(self.entry_filas.get()) or columnas != int(self.entry_columnas.get()):
-            self.message_frame = ErrorFrame(
-                self,
-                "Las dimensiones ingresadas son diferentes a las dimensiones ingresadas!\n" +
-                "Debe limpiar los datos y generar nuevas casillas!",
-            )
-            self.message_frame.configure(height=40)
-            self.message_frame.grid(row=13, column=0, columnspan=2, sticky="n", padx=5, pady=5)
-            return
+        columnas = len(self.input_entries[0])
 
         valores = []
         for fila_entries in self.input_entries:
@@ -165,10 +199,14 @@ class AgregarTab(ctkScrollFrame):
                 try:
                     valor = Fraction(entry.get())
                 except ValueError:
-                    if self.message_frame is None:
-                        self.message_frame = ErrorFrame(self, "Todos los valores deben ser números reales!")
-                        self.message_frame.configure(height=30)
-                        self.message_frame.grid(row=13, column=0, columnspan=2, sticky="n", padx=5, pady=5)
+                    self.message_frame = ErrorFrame(self, "Todos los valores deben ser números reales!")
+                    self.message_frame.configure(height=30)
+                    self.message_frame.grid(row=13, column=0, columnspan=2, sticky="n", padx=5, pady=5)
+                    return
+                except ZeroDivisionError:
+                    self.message_frame = ErrorFrame(self, "El denominador no puede ser 0!")
+                    self.message_frame.configure(height=30)
+                    self.message_frame.grid(row=13, column=0, columnspan=2, sticky="n", padx=5, pady=5)
                     return
                 fila_valores.append(valor)
             valores.append(fila_valores)
@@ -191,16 +229,13 @@ class AgregarTab(ctkScrollFrame):
             return
 
         self.mats_manager.mats_ingresadas[nombre_nueva_matriz] = nueva_matriz
-        self.master_frame.update_matrices()
+        self.master_frame.update_all()
         self.message_frame = SuccessFrame(self, "La matriz se ha agregado exitosamente!")
         self.message_frame.configure(height=30)
         self.message_frame.grid(row=13, column=0, columnspan=2, sticky="n", padx=5, pady=5)
 
-    def generar_aleatoria(self):
-        pass
-
     def update(self):
-        pass
+        self.update_idletasks()
 
 
 class SumaRestaTab(ctkFrame):
@@ -244,6 +279,7 @@ class SumaRestaTab(ctkFrame):
     def update(self):
         self.mat1.configure(values=self.master_frame.nombres_matrices)
         self.mat2.configure(values=self.master_frame.nombres_matrices)
+        self.update_idletasks()
 
 
 class MultiplicacionTab(ctkFrame):
@@ -319,6 +355,7 @@ class MultiplicacionTab(ctkFrame):
         self.mat1.configure(values=self.master_frame.nombres_matrices)
         self.mat2.configure(values=self.master_frame.nombres_matrices)
         self.vec_seleccionado.configure(values=self.master_frame.nombres_vectores)
+        self.update_idletasks()
 
 
 class TransposicionTab(ctkFrame):
@@ -342,6 +379,7 @@ class TransposicionTab(ctkFrame):
 
     def update(self):
         self.mat_seleccionada.configure(values=self.master_frame.nombres_matrices)
+        self.update_idletasks()
 
 
 class DeterminanteTab(ctkFrame):
@@ -365,6 +403,7 @@ class DeterminanteTab(ctkFrame):
 
     def update(self):
         self.mat_seleccionada.configure(values=self.master_frame.nombres_matrices)
+        self.update_idletasks()
 
 class InversaTab(ctkFrame):
     def __init__(self, master_frame, master_tab, app, mats_manager: MatricesManager):
@@ -387,3 +426,4 @@ class InversaTab(ctkFrame):
 
     def update(self):
         self.mat_seleccionada.configure(values=self.master_frame.nombres_matrices)
+        self.update_idletasks()
