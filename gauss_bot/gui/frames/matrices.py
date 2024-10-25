@@ -313,10 +313,6 @@ class SumaRestaTab(ctkFrame):
         self.update_select1(self.select_1.get())
         self.update_select2(self.select_2.get())
 
-        if self.mensaje_frame is not None:
-            self.mensaje_frame.destroy()
-            self.mensaje_frame = None
-
         if operacion == "Sumar":
             self.ejecutar_suma(nombre_mat1, nombre_mat2)
             return
@@ -325,6 +321,10 @@ class SumaRestaTab(ctkFrame):
             return
 
     def ejecutar_suma(self, nombre_mat1, nombre_mat2):
+        if self.mensaje_frame is not None:
+            self.mensaje_frame.destroy()
+            self.mensaje_frame = None
+
         try:
             header, resultado = self.mats_manager.sumar_matrices(nombre_mat1, nombre_mat2)
         except ArithmeticError as e:
@@ -340,6 +340,10 @@ class SumaRestaTab(ctkFrame):
         self.mensaje_frame.grid(row=0, column=0, padx=5, pady=5)
 
     def ejecutar_resta(self, nombre_mat1, nombre_mat2):
+        if self.mensaje_frame is not None:
+            self.mensaje_frame.destroy()
+            self.mensaje_frame = None
+
         try:
             header, resultado = self.mats_manager.restar_matrices(nombre_mat1, nombre_mat2)
         except ArithmeticError as e:
@@ -537,21 +541,41 @@ class TransposicionTab(ctkFrame):
         self.app = app
         self.mats_manager = mats_manager
 
-        label = ctkLabel(self, text="Seleccione la matriz para transponer:")
-        label.pack(padx=5, pady=5)
+        self.mensaje_frame = None
+        self.columnconfigure(0, weight=1)
 
-        self.mat_seleccionada = ctkOptionMenu(self, values=self.master_frame.nombres_matrices)
-        self.mat_seleccionada.pack(padx=5, pady=5)
+        instruct_t = ctkLabel(self, text="Seleccione la matriz para transponer:")
+        self.select_tmat = ctkOptionMenu(self, width=60, values=self.master_frame.nombres_matrices, command=self.update_tmat)
+        button = ctkButton(self, text="Transponer", command=lambda: self.encontrar_transpuesta(self.tmat))
+        self.resultado = ctkFrame(self)
+        self.resultado.columnconfigure(0, weight=1)
 
-        button = ctkButton(self, text="Transponer", command=self.encontrar_transpuesta)
-        button.pack(padx=5, pady=5)
+        self.tmat = self.select_tmat.get()
 
-    def encontrar_transpuesta(self):
-        pass
+        instruct_t.grid(row=0, column=0, padx=5, pady=5, sticky="n")
+        self.select_tmat.grid(row=1, column=0, padx=5, pady=5, sticky="n")
+        button.grid(row=2, column=0, padx=5, pady=5, sticky="n")
+        self.resultado.grid(row=3, column=0, padx=5, pady=5, sticky="n")
+
+    def encontrar_transpuesta(self, nombre_tmat):
+        if self.mensaje_frame is not None:
+            self.mensaje_frame.destroy()
+            self.mensaje_frame = None
+
+        nombre_transpuesta, transpuesta = self.mats_manager.transponer_matriz(nombre_tmat)
+        if not any(transpuesta == mat for mat in self.mats_manager.mats_ingresadas.values()):
+            self.mats_manager.mats_ingresadas[nombre_transpuesta] = transpuesta
+            self.master_frame.update_all()
+
+        self.mensaje_frame = ResultadoFrame(self.resultado, header=f"{nombre_transpuesta}:", resultado=str(transpuesta))
+        self.mensaje_frame.grid(row=0, column=0, padx=5, pady=5)
 
     def update(self):
-        self.mat_seleccionada.configure(values=self.master_frame.nombres_matrices)
+        self.select_tmat.configure(values=self.master_frame.nombres_matrices)
         self.update_idletasks()
+
+    def update_tmat(self, valor):
+        self.tmat = valor
 
 
 class DeterminanteTab(ctkFrame):
@@ -561,21 +585,43 @@ class DeterminanteTab(ctkFrame):
         self.app = app
         self.mats_manager = mats_manager
 
-        label = ctkLabel(self, text="Seleccione la matriz para calcular el determinante:")
-        label.pack(padx=5, pady=5)
+        self.mensaje_frame = None
+        self.columnconfigure(0, weight=1)
 
-        self.mat_seleccionada = ctkOptionMenu(self, values=self.master_frame.nombres_matrices)
-        self.mat_seleccionada.pack(padx=5, pady=5)
+        instruct_d = ctkLabel(self, text="Seleccione la matriz para calcular el determinante:")
+        self.select_dmat = ctkOptionMenu(self, width=60, values=self.master_frame.nombres_matrices, command=self.update_dmat)
+        button = ctkButton(self, text="Calcular", command=lambda: self.calcular_determinante(self.dmat))
+        self.resultado = ctkFrame(self)
+        self.resultado.columnconfigure(0, weight=1)
 
-        button = ctkButton(self, text="Calcular", command=self.calcular_determinante)
-        button.pack(padx=5, pady=5)
+        self.dmat = self.select_dmat.get()
 
-    def calcular_determinante(self):
-        pass
+        instruct_d.grid(row=0, column=0, padx=5, pady=5, sticky="n")
+        self.select_dmat.grid(row=1, column=0, padx=5, pady=5, sticky="n")
+        button.grid(row=2, column=0, padx=5, pady=5, sticky="n")
+        self.resultado.grid(row=3, column=0, padx=5, pady=5, sticky="n")
+
+    def calcular_determinante(self, nombre_dmat):
+        if self.mensaje_frame is not None:
+            self.mensaje_frame.destroy()
+            self.mensaje_frame = None
+
+        try:
+            det, _, _ = self.mats_manager.calcular_determinante(nombre_dmat)
+        except ArithmeticError as e:
+            self.mensaje_frame = ErrorFrame(self.resultado, str(e))
+            self.mensaje_frame.grid(row=0, column=0, padx=5, pady=5)
+            return
+
+        self.mensaje_frame = ResultadoFrame(self.resultado, header=f"| {nombre_dmat} | = {det}", resultado=None, solo_header=True)
+        self.mensaje_frame.grid(row=0, column=0, padx=5, pady=5)
 
     def update(self):
-        self.mat_seleccionada.configure(values=self.master_frame.nombres_matrices)
+        self.select_dmat.configure(values=self.master_frame.nombres_matrices)
         self.update_idletasks()
+
+    def update_dmat(self, valor):
+        self.dmat = valor
 
 
 class InversaTab(ctkFrame):
@@ -585,18 +631,44 @@ class InversaTab(ctkFrame):
         self.app = app
         self.mats_manager = mats_manager
 
-        label = ctkLabel(self, text="Seleccione la matriz para encontrar la inversa:")
-        label.pack(padx=5, pady=5)
+        self.mensaje_frame = None
+        self.columnconfigure(0, weight=1)
 
-        self.mat_seleccionada = ctkOptionMenu(self, values=self.master_frame.nombres_matrices)
-        self.mat_seleccionada.pack(padx=5, pady=5)
+        instruct_i = ctkLabel(self, text="Seleccione la matriz para encontrar su inversa:")
+        self.select_imat = ctkOptionMenu(self, width=60, values=self.master_frame.nombres_matrices, command=self.update_imat)
+        button = ctkButton(self, text="Encontrar", command=lambda: self.encontrar_inversa(self.imat))
+        self.resultado = ctkFrame(self)
+        self.resultado.columnconfigure(0, weight=1)
 
-        button = ctkButton(self, text="Encontrar", command=self.encontrar_inversa)
-        button.pack(padx=5, pady=5)
+        self.imat = self.select_imat.get()
 
-    def encontrar_inversa(self):
-        pass
+        instruct_i.grid(row=0, column=0, padx=5, pady=5, sticky="n")
+        self.select_imat.grid(row=1, column=0, padx=5, pady=5, sticky="n")
+        button.grid(row=2, column=0, padx=5, pady=5, sticky="n")
+        self.resultado.grid(row=3, column=0, padx=5, pady=5, sticky="n")
+
+    def encontrar_inversa(self, nombre_imat):
+        if self.mensaje_frame is not None:
+            self.mensaje_frame.destroy()
+            self.mensaje_frame = None
+
+        try:
+            nombre_inversa, inversa, _, _ = self.mats_manager.encontrar_inversa(nombre_imat)
+        except ArithmeticError as e:
+            self.mensaje_frame = ErrorFrame(self.resultado, str(e))
+            self.mensaje_frame.grid(row=0, column=0, padx=5, pady=5)
+            return
+
+        if not any(inversa == mat for mat in self.mats_manager.mats_ingresadas.values()):
+            self.mats_manager.mats_ingresadas[nombre_inversa] = inversa
+            self.master_frame.update_all()
+
+        self.mensaje_frame = ResultadoFrame(self.resultado, header=f"{nombre_inversa}:", resultado=str(inversa))
+        self.mensaje_frame.grid(row=0, column=0, padx=5, pady=5)
 
     def update(self):
-        self.mat_seleccionada.configure(values=self.master_frame.nombres_matrices)
+        self.select_imat.configure(values=self.master_frame.nombres_matrices)
         self.update_idletasks()
+
+    def update_imat(self, valor):
+        self.imat = valor

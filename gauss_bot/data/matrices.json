@@ -159,5 +159,67 @@
                 }
             ]
         ]
+    },
+    "A_t": {
+        "aumentada": false,
+        "filas": 2,
+        "columnas": 2,
+        "valores": [
+            [
+                {
+                    "__type__": "Fraction",
+                    "numerator": 1,
+                    "denominator": 1
+                },
+                {
+                    "__type__": "Fraction",
+                    "numerator": 3,
+                    "denominator": 1
+                }
+            ],
+            [
+                {
+                    "__type__": "Fraction",
+                    "numerator": 2,
+                    "denominator": 1
+                },
+                {
+                    "__type__": "Fraction",
+                    "numerator": 4,
+                    "denominator": 1
+                }
+            ]
+        ]
+    },
+    "H": {
+        "aumentada": false,
+        "filas": 2,
+        "columnas": 2,
+        "valores": [
+            [
+                {
+                    "__type__": "Fraction",
+                    "numerator": 5,
+                    "denominator": 2
+                },
+                {
+                    "__type__": "Fraction",
+                    "numerator": 5,
+                    "denominator": 2
+                }
+            ],
+            [
+                {
+                    "__type__": "Fraction",
+                    "numerator": 18,
+                    "denominator": 5
+                },
+                {
+                    "__type__": "Fraction",
+                    "numerator": 3,
+                    "denominator": 2
+                }
+            ]
+        ]
     }
 }
