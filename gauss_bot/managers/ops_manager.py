@@ -50,7 +50,7 @@ class OpsManager:
         mat = self.mats_manager.mats_ingresadas[nombre_mat]
         vec = self.vecs_manager.vecs_ingresados[nombre_vec]
         if mat.columnas != len(vec):
-            raise ArithmeticError("Error: El número de columnas de la matriz debe ser igual al número de componentes del vector!")
+            raise ArithmeticError("El número de columnas de la matriz debe ser igual al número de componentes del vector!")
 
         multiplicacion = [[Fraction(0) for _ in range(len(vec))] for _ in range(mat.filas)]
         for i in range(mat.filas):

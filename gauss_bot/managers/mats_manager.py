@@ -64,7 +64,7 @@ class MatricesManager:
         mat2 = self.mats_ingresadas[nombre_mat2]
 
         mat_resta = mat1 - mat2
-        nombre_mat_resta = f"{nombre_mat1} - {nombre_mat2}"
+        nombre_mat_resta = f"{nombre_mat1} − {nombre_mat2}"
         return (nombre_mat_resta, mat_resta)
 
     def escalar_por_matriz(self, escalar: Fraction, nombre_mat: str) -> tuple[str, Matriz]:
