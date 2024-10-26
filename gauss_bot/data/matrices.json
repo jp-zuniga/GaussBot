@@ -221,5 +221,36 @@
                 }
             ]
         ]
+    },
+    "R": {
+        "aumentada": false,
+        "filas": 2,
+        "columnas": 2,
+        "valores": [
+            [
+                {
+                    "__type__": "Fraction",
+                    "numerator": 5,
+                    "denominator": 4
+                },
+                {
+                    "__type__": "Fraction",
+                    "numerator": 5,
+                    "denominator": 3
+                }
+            ],
+            [
+                {
+                    "__type__": "Fraction",
+                    "numerator": 2,
+                    "denominator": 1
+                },
+                {
+                    "__type__": "Fraction",
+                    "numerator": 14,
+                    "denominator": 5
+                }
+            ]
+        ]
     }
 }

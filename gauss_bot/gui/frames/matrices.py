@@ -107,7 +107,7 @@ class AgregarTab(ctkScrollFrame):
         aleatoria_button.grid(row=3, column=1, padx=5, pady=5, sticky="w")
 
         self.matriz_frame = ctkFrame(self)
-        self.matriz_frame.grid(row=10, column=0, columnspan=2, padx=5, pady=5, sticky="n")
+        self.matriz_frame.grid(row=4, column=0, columnspan=2, padx=5, pady=5, sticky="n")
 
     def toggle_aumentada(self):
         self.aumentada = not self.aumentada
@@ -141,13 +141,13 @@ class AgregarTab(ctkScrollFrame):
             self.input_entries.append(fila_entries)
 
         nombre_label = ctkLabel(self, text="Nombre de la matriz:")
-        nombre_label.grid(row=11, column=0, padx=5, pady=5, sticky="e")
+        nombre_label.grid(row=5, column=0, padx=5, pady=5, sticky="e")
         self.nombre_entry = ctkEntry(self, width=50, placeholder_text="A")
-        self.nombre_entry.grid(row=11, column=1, padx=5, pady=5, sticky="w")
-        self.agregar_button = ctkButton(self, text="Agregar", command=self.agregar_matriz)
-        self.agregar_button.grid(row=12, column=0, padx=5, pady=5, sticky="e")
-        self.limpiar_button = ctkButton(self, text="Limpiar casillas", command=self.generar_casillas)
-        self.limpiar_button.grid(row=12, column=1, padx=5, pady=5, sticky="w")
+        self.nombre_entry.grid(row=5, column=1, padx=5, pady=5, sticky="w")
+        agregar_button = ctkButton(self, text="Agregar", command=self.agregar_matriz)
+        agregar_button.grid(row=6, column=0, padx=5, pady=5, sticky="e")
+        limpiar_button = ctkButton(self, text="Limpiar casillas", command=self.generar_casillas)
+        limpiar_button.grid(row=6, column=1, padx=5, pady=5, sticky="w")
 
     def generar_aleatoria(self):
         for widget in self.matriz_frame.winfo_children():
@@ -182,13 +182,13 @@ class AgregarTab(ctkScrollFrame):
             self.input_entries.append(fila_entries)
 
         nombre_label = ctkLabel(self, text="Nombre de la matriz:")
-        nombre_label.grid(row=11, column=0, padx=5, pady=5, sticky="e")
+        nombre_label.grid(row=5, column=0, padx=5, pady=5, sticky="e")
         self.nombre_entry = ctkEntry(self, width=50, placeholder_text="A")
-        self.nombre_entry.grid(row=11, column=1, padx=5, pady=5, sticky="w")
-        self.agregar_button = ctkButton(self, text="Agregar", command=self.agregar_matriz)
-        self.agregar_button.grid(row=12, column=0, padx=5, pady=5, sticky="e")
-        self.limpiar_button = ctkButton(self, text="Limpiar casillas", command=self.generar_casillas)
-        self.limpiar_button.grid(row=12, column=1, padx=5, pady=5, sticky="w")
+        self.nombre_entry.grid(row=5, column=1, padx=5, pady=5, sticky="w")
+        agregar_button = ctkButton(self, text="Agregar", command=self.agregar_matriz)
+        agregar_button.grid(row=6, column=0, padx=5, pady=5, sticky="e")
+        limpiar_button = ctkButton(self, text="Limpiar casillas", command=self.generar_casillas)
+        limpiar_button.grid(row=6, column=1, padx=5, pady=5, sticky="w")
 
     def agregar_matriz(self):
         filas = len(self.input_entries)
@@ -202,12 +202,10 @@ class AgregarTab(ctkScrollFrame):
                     valor = Fraction(entry.get())
                 except ValueError:
                     self.mensaje_frame = ErrorFrame(self, "Todos los valores deben ser números racionales!")
-                    self.mensaje_frame.configure(height=30)
                     self.mensaje_frame.grid(row=13, column=0, columnspan=2, sticky="n", padx=5, pady=5)
                     return
                 except ZeroDivisionError:
                     self.mensaje_frame = ErrorFrame(self, "El denominador no puede ser 0!")
-                    self.mensaje_frame.configure(height=30)
                     self.mensaje_frame.grid(row=13, column=0, columnspan=2, sticky="n", padx=5, pady=5)
                     return
                 fila_valores.append(valor)
@@ -221,20 +219,17 @@ class AgregarTab(ctkScrollFrame):
         nombre_nueva_matriz = self.nombre_entry.get()
         if not nombre_nueva_matriz.isalpha() or not nombre_nueva_matriz.isupper() or len(nombre_nueva_matriz) != 1:
             self.mensaje_frame = ErrorFrame(self, "El nombre de la matriz debe ser una letra mayúscula!")
-            self.mensaje_frame.configure(height=30)
-            self.mensaje_frame.grid(row=13, column=0, columnspan=2, sticky="n", padx=5, pady=5)
+            self.mensaje_frame.grid(row=7, column=0, columnspan=2, sticky="n", padx=5, pady=5)
             return
         elif nombre_nueva_matriz in self.mats_manager.mats_ingresadas:
             self.mensaje_frame = ErrorFrame(self, f"Ya existe una matriz llamada '{nombre_nueva_matriz}'!")
-            self.mensaje_frame.configure(height=30)
-            self.mensaje_frame.grid(row=13, column=0, columnspan=2, sticky="n", padx=5, pady=5)
+            self.mensaje_frame.grid(row=7, column=0, columnspan=2, sticky="n", padx=5, pady=5)
             return
 
         self.mats_manager.mats_ingresadas[nombre_nueva_matriz] = nueva_matriz
         self.master_frame.update_all()
         self.mensaje_frame = SuccessFrame(self, "La matriz se ha agregado exitosamente!")
-        self.mensaje_frame.configure(height=30)
-        self.mensaje_frame.grid(row=13, column=0, columnspan=2, sticky="n", padx=5, pady=5)
+        self.mensaje_frame.grid(row=7, column=0, columnspan=2, sticky="n", padx=5, pady=5)
 
     def update(self):
         self.update_idletasks()

@@ -49,5 +49,32 @@
             "numerator": 9,
             "denominator": 1
         }
+    ],
+    "u": [
+        {
+            "__type__": "Fraction",
+            "numerator": 6,
+            "denominator": 1
+        },
+        {
+            "__type__": "Fraction",
+            "numerator": 4,
+            "denominator": 7
+        },
+        {
+            "__type__": "Fraction",
+            "numerator": 3,
+            "denominator": 2
+        },
+        {
+            "__type__": "Fraction",
+            "numerator": 17,
+            "denominator": 4
+        },
+        {
+            "__type__": "Fraction",
+            "numerator": 1,
+            "denominator": 5
+        }
     ]
 }
