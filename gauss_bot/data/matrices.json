@@ -30,11 +30,33 @@
             ]
         ]
     },
-    "C": {
-        "aumentada": false,
+    "B": {
+        "aumentada": true,
         "filas": 3,
-        "columnas": 3,
+        "columnas": 4,
         "valores": [
+            [
+                {
+                    "__type__": "Fraction",
+                    "numerator": 2,
+                    "denominator": 1
+                },
+                {
+                    "__type__": "Fraction",
+                    "numerator": 5,
+                    "denominator": 1
+                },
+                {
+                    "__type__": "Fraction",
+                    "numerator": 4,
+                    "denominator": 7
+                },
+                {
+                    "__type__": "Fraction",
+                    "numerator": 5,
+                    "denominator": 1
+                }
+            ],
             [
                 {
                     "__type__": "Fraction",
@@ -44,211 +66,112 @@
                 {
                     "__type__": "Fraction",
                     "numerator": 2,
+                    "denominator": 3
+                },
+                {
+                    "__type__": "Fraction",
+                    "numerator": 1,
                     "denominator": 1
                 },
                 {
                     "__type__": "Fraction",
-                    "numerator": 3,
-                    "denominator": 1
-                }
-            ],
-            [
-                {
-                    "__type__": "Fraction",
-                    "numerator": 4,
-                    "denominator": 1
-                },
-                {
-                    "__type__": "Fraction",
-                    "numerator": 5,
-                    "denominator": 1
-                },
-                {
-                    "__type__": "Fraction",
-                    "numerator": 6,
-                    "denominator": 1
-                }
-            ],
-            [
-                {
-                    "__type__": "Fraction",
-                    "numerator": 7,
-                    "denominator": 1
-                },
-                {
-                    "__type__": "Fraction",
-                    "numerator": 8,
-                    "denominator": 1
-                },
-                {
-                    "__type__": "Fraction",
-                    "numerator": 9,
-                    "denominator": 1
-                }
-            ]
-        ]
-    },
-    "D": {
-        "aumentada": false,
-        "filas": 2,
-        "columnas": 3,
-        "valores": [
-            [
-                {
-                    "__type__": "Fraction",
-                    "numerator": 5,
-                    "denominator": 13
-                },
-                {
-                    "__type__": "Fraction",
-                    "numerator": 5,
-                    "denominator": 11
-                },
-                {
-                    "__type__": "Fraction",
-                    "numerator": 4,
-                    "denominator": 1
+                    "numerator": 19,
+                    "denominator": 7
                 }
             ],
             [
                 {
                     "__type__": "Fraction",
                     "numerator": 20,
-                    "denominator": 19
+                    "denominator": 9
                 },
                 {
                     "__type__": "Fraction",
                     "numerator": 1,
-                    "denominator": 19
-                },
-                {
-                    "__type__": "Fraction",
-                    "numerator": 1,
-                    "denominator": 10
-                }
-            ]
-        ]
-    },
-    "B": {
-        "aumentada": false,
-        "filas": 2,
-        "columnas": 2,
-        "valores": [
-            [
-                {
-                    "__type__": "Fraction",
-                    "numerator": 5,
-                    "denominator": 8
-                },
-                {
-                    "__type__": "Fraction",
-                    "numerator": 1,
-                    "denominator": 1
-                }
-            ],
-            [
-                {
-                    "__type__": "Fraction",
-                    "numerator": 1,
-                    "denominator": 16
-                },
-                {
-                    "__type__": "Fraction",
-                    "numerator": 10,
-                    "denominator": 7
-                }
-            ]
-        ]
-    },
-    "A_t": {
-        "aumentada": false,
-        "filas": 2,
-        "columnas": 2,
-        "valores": [
-            [
-                {
-                    "__type__": "Fraction",
-                    "numerator": 1,
-                    "denominator": 1
-                },
-                {
-                    "__type__": "Fraction",
-                    "numerator": 3,
-                    "denominator": 1
-                }
-            ],
-            [
-                {
-                    "__type__": "Fraction",
-                    "numerator": 2,
-                    "denominator": 1
-                },
-                {
-                    "__type__": "Fraction",
-                    "numerator": 4,
-                    "denominator": 1
-                }
-            ]
-        ]
-    },
-    "H": {
-        "aumentada": false,
-        "filas": 2,
-        "columnas": 2,
-        "valores": [
-            [
-                {
-                    "__type__": "Fraction",
-                    "numerator": 5,
-                    "denominator": 2
-                },
-                {
-                    "__type__": "Fraction",
-                    "numerator": 5,
-                    "denominator": 2
-                }
-            ],
-            [
-                {
-                    "__type__": "Fraction",
-                    "numerator": 18,
-                    "denominator": 5
-                },
-                {
-                    "__type__": "Fraction",
-                    "numerator": 3,
-                    "denominator": 2
-                }
-            ]
-        ]
-    },
-    "R": {
-        "aumentada": false,
-        "filas": 2,
-        "columnas": 2,
-        "valores": [
-            [
-                {
-                    "__type__": "Fraction",
-                    "numerator": 5,
-                    "denominator": 4
-                },
-                {
-                    "__type__": "Fraction",
-                    "numerator": 5,
                     "denominator": 3
+                },
+                {
+                    "__type__": "Fraction",
+                    "numerator": 17,
+                    "denominator": 2
+                },
+                {
+                    "__type__": "Fraction",
+                    "numerator": 11,
+                    "denominator": 8
+                }
+            ]
+        ]
+    },
+    "B_r": {
+        "aumentada": true,
+        "filas": 3,
+        "columnas": 4,
+        "valores": [
+            [
+                {
+                    "__type__": "Fraction",
+                    "numerator": 1,
+                    "denominator": 1
+                },
+                {
+                    "__type__": "Fraction",
+                    "numerator": 0,
+                    "denominator": 1
+                },
+                {
+                    "__type__": "Fraction",
+                    "numerator": 0,
+                    "denominator": 1
+                },
+                {
+                    "__type__": "Fraction",
+                    "numerator": 866007,
+                    "denominator": 226268
                 }
             ],
             [
                 {
                     "__type__": "Fraction",
-                    "numerator": 2,
+                    "numerator": 0,
                     "denominator": 1
                 },
                 {
                     "__type__": "Fraction",
-                    "numerator": 14,
-                    "denominator": 5
+                    "numerator": 1,
+                    "denominator": 1
+                },
+                {
+                    "__type__": "Fraction",
+                    "numerator": 0,
+                    "denominator": 1
+                },
+                {
+                    "__type__": "Fraction",
+                    "numerator": -49443,
+                    "denominator": 113134
+                }
+            ],
+            [
+                {
+                    "__type__": "Fraction",
+                    "numerator": 0,
+                    "denominator": 1
+                },
+                {
+                    "__type__": "Fraction",
+                    "numerator": 0,
+                    "denominator": 1
+                },
+                {
+                    "__type__": "Fraction",
+                    "numerator": 1,
+                    "denominator": 1
+                },
+                {
+                    "__type__": "Fraction",
+                    "numerator": -26561,
+                    "denominator": 32324
                 }
             ]
         ]

@@ -47,7 +47,7 @@ class SistemaEcuaciones:
 
         det, _, _ = mat_variables.calcular_det()
         if det == 0:
-            raise ValueError("El determinante de la matriz de variables es 0; no se puede resolver el sistema mediante la Regla de Cramer!")
+            raise ArithmeticError("El determinante de la matriz de variables es 0; no se puede resolver el sistema mediante la Regla de Cramer!")
 
         for i in range(self.matriz.columnas - 1):
             submat = []
@@ -56,19 +56,24 @@ class SistemaEcuaciones:
             det_submat, _, _ = Matriz(False, self.matriz.filas, self.matriz.columnas - 1, submat).calcular_det()
             sub_dets.append(det_submat)
             soluciones.append(det_submat / det)
+        
+        if all(sol == 0 for sol in soluciones):
+            tipo_sol = "trivial"
+        else:
+            tipo_sol = "no trivial"
 
-        self.solucion += "\n---------------------------------------------"
-        self.solucion += f"Variables de matriz {nombre}:"
-        self.solucion += str(mat_variables)
-        self.solucion += f"Vector b = {col_aumentada}"
-        self.solucion += "---------------------------------------------"
-        self.solucion += f"\nDeterminante de la matriz de variables = {det}"
+        self.procedimiento += "\n---------------------------------------------"
+        self.procedimiento += f"Variables de matriz {nombre}:"
+        self.procedimiento += str(mat_variables)
+        self.procedimiento += f"Vector b = {col_aumentada}"
+        self.procedimiento += "---------------------------------------------"
+        self.procedimiento += f"\nDeterminante de la matriz de variables = {det}"
         for i, subdet in enumerate(sub_dets):
-            self.solucion += f"Determinante de {nombre}{i+1}(b) = {subdet}"
-        self.solucion += "\n---------------------------------------------\n"
-        self.solucion += "Soluciones:"
+            self.procedimiento += f"Determinante de {nombre}{i+1}(b) = {subdet}"
+        self.procedimiento += "\n---------------------------------------------\n"
+        self.solucion += f"Solución {tipo_sol} encontrada:"
         for i, sol in enumerate(soluciones):
-            self.solucion += f"X{i + 1} = {sol}"
+            self.solucion += f"\nX{i + 1} = {sol}"
 
     def gauss_jordan(self) -> None:
         """
@@ -362,9 +367,9 @@ class SistemaEcuaciones:
         solucion, fila_inconsistente = validacion
 
         if not solucion and fila_inconsistente != -1:  # señalar fila inconsistente
-            self.solucion += f"\n| En F{fila_inconsistente+1}: 0 != "
+            self.solucion += f"\n En F{fila_inconsistente+1}: 0 != "
             self.solucion += f"{str(self.matriz[fila_inconsistente, -1])}\n"
-            self.solucion += "| Sistema es inconsistente!\n"
+            self.solucion += " Sistema es inconsistente!\n"
             return
 
         if unica:
@@ -373,16 +378,16 @@ class SistemaEcuaciones:
             )
 
             tipo_solucion = "trivial" if solucion_trivial else "no trivial"
-            self.solucion += f"\n| Solución {tipo_solucion} encontrada:\n"
+            self.solucion += f"\n Solución {tipo_solucion} encontrada:\n"
             for i in range(self.matriz.filas):
                 if all(x == 0 for x in self.matriz[i]):
                     continue
-                self.solucion += (f"| X{i+1} = {str(self.matriz[i, -1])}\n")
+                self.solucion += (f" X{i+1} = {str(self.matriz[i, -1])}\n")
             return
 
         ecuaciones = self._despejar_variables(libres)
-        self.solucion += "\n| Sistema no tiene solución única!\n"
-        self.solucion += "| Solución general encontrada:\n"
+        self.solucion += "\n Sistema no tiene solución única!\n"
+        self.solucion += " Solución general encontrada:\n"
         for linea in ecuaciones:
             self.solucion += linea
         return

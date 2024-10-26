@@ -55,6 +55,7 @@ class MatricesFrame(ctkFrame):
         self.nombres_vectores = list(self.app.vecs_manager.vecs_ingresados.keys())
         for tab in self.instances:
             tab.update()
+        self.app.ecuaciones.update_frame()
 
 
 class MostrarTab(ctkScrollFrame):

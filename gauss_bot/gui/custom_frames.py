@@ -46,7 +46,7 @@ class SuccessFrame(ctkFrame):
 class ResultadoFrame(ctkFrame):
     def __init__(self, parent, header, resultado, solo_header=False):
         super().__init__(parent, corner_radius=8, border_width=2, border_color="#18c026")
-        pady_tuple = (10, 3) if not solo_header else (10, 10)
+        pady_tuple = (10, 10) if solo_header else (10, 3)
         self.header = ctkLabel(self, text=header)
         self.header.grid(row=0, column=0, padx=20, pady=pady_tuple, sticky="n")
         if not solo_header:
