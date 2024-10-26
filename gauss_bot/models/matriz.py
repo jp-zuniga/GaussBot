@@ -2,9 +2,6 @@ from copy import deepcopy
 from fractions import Fraction
 from typing import Union, Optional, overload
 
-from gauss_bot.clases.vector import Vector
-from gauss_bot.utils import limpiar_pantalla
-
 Validacion = tuple[bool, int]
 
 
@@ -205,53 +202,6 @@ class Matriz:
         )
         
         return self.es_cuadrada() and diagonales_son_1 and resto_son_cero
-
-    def resolver_cramer(self, nombre: str) -> None:
-        """
-        Resuelve un sistema de ecuaciones ocupando la Regla de Cramer.
-        """
-
-        if not self.aumentada:
-            raise TypeError("La matriz no es aumentada; no representa un sistema de ecuaciones!")
-        if not self.filas == self.columnas - 1:
-            raise ArithmeticError("La matriz de variables no es cuadrada; su determinante es indefinido!")
-
-        mat_variables = Matriz(
-            False,
-            self.filas,
-            self.columnas - 1,
-            [self.valores[i][:-1] for i in range(self.filas)],
-        )
-
-        col_aumentada = Vector([self.valores[i][-1] for i in range(self.filas)])
-        sub_dets = []
-        soluciones = []
-
-        det, _, _ = mat_variables.calcular_det()
-        if det == 0:
-            raise ValueError("El determinante de la matriz de variables es 0; no se puede resolver el sistema mediante la Regla de Cramer!")
-
-        for i in range(self.columnas - 1):
-            submat = []
-            for j in range(self.filas):
-                submat.append([self.valores[j][k] if k != i else col_aumentada[j] for k in range(self.columnas - 1)])
-            det_submat, _, _ = Matriz(False, self.filas, self.columnas - 1, submat).calcular_det()
-            sub_dets.append(det_submat)
-            soluciones.append(det_submat / det)
-
-        limpiar_pantalla()
-        print("\n---------------------------------------------")
-        print(f"Variables de matriz {nombre}:")
-        print(mat_variables)
-        print(f"Vector b = {col_aumentada}")
-        print("---------------------------------------------")
-        print(f"\nDeterminante de la matriz de variables = {det}")
-        for i, subdet in enumerate(sub_dets):
-            print(f"Determinante de {nombre}{i+1}(b) = {subdet}")
-        print("\n---------------------------------------------\n")
-        print("Soluciones:")
-        for i, sol in enumerate(soluciones):
-            print(f"X{i + 1} = {sol}")
 
     def hacer_triangular_superior(self) -> tuple["Matriz", bool]:
         """
