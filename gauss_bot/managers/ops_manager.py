@@ -8,8 +8,8 @@ from json import (
 
 from os import path
 
-from gauss_bot.models.matriz import Matriz
-from gauss_bot.models.vector import Vector
+from gauss_bot.models.Matriz import Matriz
+from gauss_bot.models.Vector import Vector
 from gauss_bot.managers.mats_manager import MatricesManager
 from gauss_bot.managers.vecs_manager import VectoresManager
 

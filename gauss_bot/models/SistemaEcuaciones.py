@@ -1,7 +1,7 @@
 from fractions import Fraction
 
-from gauss_bot.models.matriz import Matriz, Validacion
-from gauss_bot.models.vector import Vector
+from gauss_bot.models.Matriz import Matriz, Validacion
+from gauss_bot.models.Vector import Vector
 
 
 class SistemaEcuaciones:

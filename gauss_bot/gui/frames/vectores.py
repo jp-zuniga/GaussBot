@@ -11,7 +11,7 @@ from customtkinter import (
     CTkOptionMenu as ctkOptionMenu,
 )
 
-from gauss_bot.models.vector import Vector
+from gauss_bot.models.Vector import Vector
 from gauss_bot.managers.vecs_manager import VectoresManager
 
 from gauss_bot.gui.custom_frames import ErrorFrame, SuccessFrame, ResultadoFrame

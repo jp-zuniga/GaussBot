@@ -1,6 +1,6 @@
 from fractions import Fraction
 
-from gauss_bot.models.vector import Vector
+from gauss_bot.models.Vector import Vector
 
 
 class VectoresManager:
@@ -48,7 +48,7 @@ class VectoresManager:
         vec2 = self.vecs_ingresados[nombre_vec2]
 
         vec_resta = vec1 - vec2
-        nombre_vec_resta = f"{nombre_vec1} - {nombre_vec2}"
+        nombre_vec_resta = f"{nombre_vec1} − {nombre_vec2}"
         return (nombre_vec_resta, vec_resta)
 
     def escalar_por_vector(self, escalar: Fraction, nombre_vec: str) -> tuple[str, Vector]:

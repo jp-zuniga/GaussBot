@@ -14,7 +14,7 @@ from customtkinter import (
     CTkOptionMenu as ctkOptionMenu,
 )
 
-from gauss_bot.models.matriz import Matriz
+from gauss_bot.models.Matriz import Matriz
 from gauss_bot.managers.mats_manager import MatricesManager
 
 from gauss_bot.gui.custom_frames import ErrorFrame, SuccessFrame, ResultadoFrame
