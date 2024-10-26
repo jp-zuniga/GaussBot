@@ -98,3 +98,4 @@ class OpsManager:
         print(f"\n{nombre_mat}{nombre_vec}:")
         print(mat_resultante)
         return
+

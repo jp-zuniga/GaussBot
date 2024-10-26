@@ -1,21 +1,21 @@
 from fractions import Fraction
 
-from gauss_bot.clases.matriz import Matriz, Validacion
+from gauss_bot.models.Matriz import Matriz, Validacion
+from gauss_bot.models.Vector import Vector
 
 
 class SistemaEcuaciones:
     """
     Representa un sistema de ecuaciones lineales con una instancia de Matriz() aumentada.
 
-    - resolver_sistema() es el método principal que se encarga de llamar a
-      los otros métodos para encontrar las soluciones del sistema
+    - cramer() y gauss_jordan() son los métodos principales para resolver un sistema.
     - La solución se almacena en el atributo .solucion,
       y el procedimiento realizado en .procedimiento (ambos como strings)
     """
 
     def __init__(self, matriz: Matriz) -> None:
         """
-        * TypeError: ocurre cuando la matriz dada no es aumentada
+        * TypeError: cuando la matriz dada no es aumentada
         """
 
         if not matriz.aumentada:
@@ -23,8 +23,59 @@ class SistemaEcuaciones:
         self.matriz = matriz
         self.solucion = ""
         self.procedimiento = ""
+    
+    def cramer(self, nombre: str) -> None:
+        """
+        Resuelve un sistema de ecuaciones ocupando la Regla de Cramer.
+        """
 
-    def resolver_sistema(self) -> None:
+        if not self.matriz.aumentada:
+            raise TypeError("La matriz no es aumentada; no representa un sistema de ecuaciones!")
+        if not self.matriz.filas == self.matriz.columnas - 1:
+            raise ArithmeticError("La matriz de variables no es cuadrada; su determinante es indefinido!")
+
+        mat_variables = Matriz(
+            False,
+            self.matriz.filas,
+            self.matriz.columnas - 1,
+            [self.matriz.valores[i][:-1] for i in range(self.matriz.filas)],
+        )
+
+        col_aumentada = Vector([self.matriz.valores[i][-1] for i in range(self.matriz.filas)])
+        sub_dets = []
+        soluciones = []
+
+        det, _, _ = mat_variables.calcular_det()
+        if det == 0:
+            raise ArithmeticError("El determinante de la matriz de variables es 0; no se puede resolver el sistema mediante la Regla de Cramer!")
+
+        for i in range(self.matriz.columnas - 1):
+            submat = []
+            for j in range(self.matriz.filas):
+                submat.append([self.matriz.valores[j][k] if k != i else col_aumentada[j] for k in range(self.matriz.columnas - 1)])
+            det_submat, _, _ = Matriz(False, self.matriz.filas, self.matriz.columnas - 1, submat).calcular_det()
+            sub_dets.append(det_submat)
+            soluciones.append(det_submat / det)
+        
+        if all(sol == 0 for sol in soluciones):
+            tipo_sol = "trivial"
+        else:
+            tipo_sol = "no trivial"
+
+        self.procedimiento += "\n---------------------------------------------"
+        self.procedimiento += f"Variables de matriz {nombre}:"
+        self.procedimiento += str(mat_variables)
+        self.procedimiento += f"Vector b = {col_aumentada}"
+        self.procedimiento += "---------------------------------------------"
+        self.procedimiento += f"\nDeterminante de la matriz de variables = {det}"
+        for i, subdet in enumerate(sub_dets):
+            self.procedimiento += f"Determinante de {nombre}{i+1}(b) = {subdet}"
+        self.procedimiento += "\n---------------------------------------------\n"
+        self.solucion += f"Solución {tipo_sol} encontrada:"
+        for i, sol in enumerate(soluciones):
+            self.solucion += f"\nX{i + 1} = {sol}"
+
+    def gauss_jordan(self) -> None:
         """
         * Valida si la matriz es cero o inconsistente de antemano
         * Valida si la matriz ya esta en su forma escalonada reducida para no hacer operaciones innecesarias
@@ -49,7 +100,7 @@ class SistemaEcuaciones:
             self.procedimiento += str(self.matriz)
             self.reducir_matriz()
         else:
-            self.reducir_matriz()
+            self._reducir_matriz()
 
         test_final = self._validar_consistencia()
         if not test_final[0]:
@@ -65,7 +116,7 @@ class SistemaEcuaciones:
         # solucion general:
         self._obtener_soluciones(unica=False, libres=libres, validacion=(True, -1))
 
-    def reducir_matriz(self) -> None:
+    def _reducir_matriz(self) -> None:
         """
         * Reduce la matriz a su forma escalonada usando el método de reducción por filas
         * Actualiza .procedimiento con cada operación realizada
@@ -76,6 +127,7 @@ class SistemaEcuaciones:
         self.procedimiento += "\nReduciendo la matriz a su forma escalonada:\n"
 
         fila_actual: int = 0
+
         # encontrar entradas pivotes maximas, normalizar fila pivote, eliminar elementos debajo del pivote
         for j in range(self.matriz.columnas - 1):
             fila_pivote = None
@@ -316,9 +368,9 @@ class SistemaEcuaciones:
         solucion, fila_inconsistente = validacion
 
         if not solucion and fila_inconsistente != -1:  # señalar fila inconsistente
-            self.solucion += f"\n| En F{fila_inconsistente+1}: 0 != "
+            self.solucion += f"\n En F{fila_inconsistente+1}: 0 != "
             self.solucion += f"{str(self.matriz[fila_inconsistente, -1])}\n"
-            self.solucion += "| Sistema es inconsistente!\n"
+            self.solucion += " Sistema es inconsistente!\n"
             return
 
         if unica:
@@ -327,16 +379,16 @@ class SistemaEcuaciones:
             )
 
             tipo_solucion = "trivial" if solucion_trivial else "no trivial"
-            self.solucion += f"\n| Solución {tipo_solucion} encontrada:\n"
+            self.solucion += f"\n Solución {tipo_solucion} encontrada:\n"
             for i in range(self.matriz.filas):
                 if all(x == 0 for x in self.matriz[i]):
                     continue
-                self.solucion += (f"| X{i+1} = {str(self.matriz[i, -1])}\n")
+                self.solucion += (f" X{i+1} = {str(self.matriz[i, -1])}\n")
             return
 
         ecuaciones = self._despejar_variables(libres)
-        self.solucion += "\n| Sistema no tiene solución única!\n"
-        self.solucion += "| Solución general encontrada:\n"
+        self.solucion += "\n Sistema no tiene solución única!\n"
+        self.solucion += " Solución general encontrada:\n"
         for linea in ecuaciones:
             self.solucion += linea
         return
