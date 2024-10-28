@@ -6,8 +6,8 @@ la Regla de Cramer y el método de Gauss-Jordan.
 
 from fractions import Fraction
 
-from gauss_bot.models.Matriz import Matriz
-from gauss_bot.models.Vector import Vector
+from gauss_bot.models.matriz import Matriz
+from gauss_bot.models.vector import Vector
 
 Validacion = tuple[bool, int]
 

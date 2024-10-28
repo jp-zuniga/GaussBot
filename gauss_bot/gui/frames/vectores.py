@@ -16,7 +16,7 @@ from customtkinter import (
     CTkTabview as ctkTabview,
 )
 
-from gauss_bot.models.Vector import Vector
+from gauss_bot.models.vector import Vector
 from gauss_bot.managers.vecs_manager import VectoresManager
 
 from gauss_bot.gui.custom_frames import (
