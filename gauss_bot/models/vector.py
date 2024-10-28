@@ -37,7 +37,7 @@ class Vector:
         return len(self.componentes)
 
     def __str__(self) -> str:
-        return f"[{', '.join(str(c) for c in self.componentes)}]"
+        return f"[ {', '.join(str(c) for c in self.componentes)} ]"
 
     def __add__(self, vec2: "Vector") -> "Vector":
         """
