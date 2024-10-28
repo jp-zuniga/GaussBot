@@ -1,21 +1,33 @@
+"""
+Implementación de matrices matemáticas de cualquier dimensión.
+Se pueden realizar operaciones básicas como suma, resta y multiplicación
+usando sobrecarga de operadores, y operaciónes más complejas con
+métodos para transponer, calcular determinante, encontrar inversa, etc.
+"""
+
 from copy import deepcopy
 from fractions import Fraction
 from typing import Union, Optional, overload
-
-Validacion = tuple[bool, int]
 
 
 class Matriz:
     """
     Representa una matriz matemática de cualquier dimensión.
     Los valores se almacenan una lista bidimensional de objetos Fraction().
-    Si la matriz representa un sistema de ecuaciones lineales, se puede indicar que incluye una columna aumentada.
+    Si la matriz representa un sistema de ecuaciones lineales,
+    se puede indicar que incluye una columna aumentada.
     """
 
-    def __init__(self, aumentada: bool, filas: int, columnas: int, valores: Optional[list[list[Fraction]]] = None) -> None:
+    def __init__(self, aumentada: bool, filas: int, columnas: int,
+                 valores: Optional[list[list[Fraction]]] = None) -> None:
+
+        if filas < 1 or columnas < 1:
+            raise ValueError("Las dimensiones de la matriz deben ser positivas!")
+
         self._aumentada = aumentada
         self._filas = filas
         self._columnas = columnas
+
         if valores is None:
             self._valores = [[Fraction(0) for _ in range(columnas)] for _ in range(filas)]
         else:
@@ -41,29 +53,70 @@ class Matriz:
     def __getitem__(self, indice: int) -> list[Fraction]: ...
 
     @overload
+    def __getitem__(self, indices: slice) -> list[list[Fraction]]: ...
+
+    @overload
+    def __getitem__(self, indices: tuple[slice, int]) -> list[Fraction]: ...
+
+    @overload
+    def __getitem__(self, indices: tuple[int, slice]) -> list[Fraction]: ...
+
+    @overload
     def __getitem__(self, indices: tuple[int, int]) -> Fraction: ...
 
-    def __getitem__(self, indice: Union[int, tuple[int, int]]) -> Union[list[Fraction], Fraction]:
+    @overload
+    def __getitem__(self, indices: tuple[slice, slice]) -> list[list[Fraction]]: ...
+
+    def __getitem__(
+        self,
+        indice: Union[
+            int,
+            slice,
+            tuple[slice, int],
+            tuple[int, slice],
+            tuple[int, int],
+            tuple[slice, slice]
+        ]
+    ) -> Union[ Fraction, list[Fraction],list[list[Fraction]]]:
+
         """
-        Overloads para acceder a una fila de la matriz, o a un valor específico.
+        Overloads para acceder a los elementos de la matriz
+        sin tener que acceder al atributo 'valores' directamente.
         """
 
-        if isinstance(indice, int):
-            if indice < 0 or indice >= self.filas:
-                raise IndexError("Índice inválido!")
+        if isinstance(indice, int) and -self.filas <= indice < self.filas:
             return self.valores[indice]
+
+        if isinstance(indice, slice):
+            _, _, step = indice.indices(self.filas)
+            if step != 0:
+                return self.valores[indice]
+
         if isinstance(indice, tuple) and len(indice) == 2:
             fila, columna = indice
-            if fila >= self.filas or columna >= self.columnas:
-                raise IndexError("Índice inválido!")
-            return self.valores[fila][columna]
-        raise TypeError("Índice inválido!")
+            if (isinstance(fila, int)
+                and isinstance(columna, int)
+                and -self.filas <= fila < self.filas
+                and -self.columnas <= columna < self.columnas):
+                return self.valores[fila][columna]
 
-    def __setitem__(self, indices: tuple[int, int], valor: Fraction) -> None:
-        fila, columna = indices
-        if fila < 0 or columna < 0 or fila >= self.filas or columna >= self.columnas:
-            raise IndexError("Índice inválido!")
-        self.valores[fila][columna] = valor
+            if isinstance(fila, slice) and isinstance(columna, int):
+                _, _, step = fila.indices(self.filas)
+                if step != 0:
+                    return [fila[columna] for fila in self.valores[fila]]
+
+            if isinstance(fila, int) and isinstance(columna, slice):
+                _, _, step = columna.indices(self.columnas)
+                if step != 0:
+                    return self.valores[fila][columna]
+
+            if isinstance(fila, slice) and isinstance(columna, slice):
+                _, _, step_fila = fila.indices(self.filas)
+                _, _, step_columna = columna.indices(self.columnas)
+                if step_fila != 0 and step_columna != 0:
+                    return [fila[columna] for fila in self.valores[fila]]
+
+        raise IndexError("Índice inválido!")
 
     def __eq__(self, mat2: object) -> bool:
         if not isinstance(mat2, Matriz):
@@ -77,10 +130,6 @@ class Matriz:
         )
 
     def __str__(self) -> str:
-        """
-        Para poder imprimir matrices con sus elementos centrados y alineados.
-        """
-
         max_len = max(
             len(str(self.valores[i][j]))
             for i in range(self.filas)
@@ -152,7 +201,8 @@ class Matriz:
         if isinstance(multiplicador, Matriz):
             if self.columnas != multiplicador.filas:
                 raise ArithmeticError(
-                    "El número de columnas de la primera matriz debe ser igual al número de filas de la segunda matriz!"
+                    "El número de columnas de la primera matriz debe " +
+                    "ser igual al número de filas de la segunda matriz!"
                 )
 
             mat_multiplicada = [
@@ -200,7 +250,7 @@ class Matriz:
             for j in range(self.columnas)
             if i != j
         )
-        
+
         return self.es_cuadrada() and diagonales_son_1 and resto_son_cero
 
     def hacer_triangular_superior(self) -> tuple["Matriz", bool]:
@@ -212,12 +262,15 @@ class Matriz:
         """
 
         intercambio = False
-        mat_triangular = deepcopy(self.valores)
+        mat_triangular: list[list[Fraction]] = deepcopy(self.valores)
 
         for i in range(self.filas):
-            max_f = max(range(i, self.filas), key=lambda j, i=i: abs(mat_triangular[j][i]))  # type: ignore
-            if mat_triangular[max_f][i] == 0:
-                continue
+            max_f = i
+            max_valor = abs(mat_triangular[i][i])
+            for j in range(i + 1, self.filas):
+                if abs(mat_triangular[j][i]) > max_valor:
+                    max_valor = abs(mat_triangular[j][i])
+                    max_f = j
 
             if max_f != i:
                 mat_triangular[i], mat_triangular[max_f] = mat_triangular[max_f], mat_triangular[i]
@@ -232,11 +285,15 @@ class Matriz:
 
     def transponer(self) -> "Matriz":
         """
-        Crea una nueva lista bidimensional con los valores de la instancia transpuestos,
-        y la retorna como un nuevo objeto Matriz()
+        Crea una nueva lista bidimensional con los valores de la
+        instancia transpuestos, y los retorna como un nuevo objeto Matriz().
         """
 
-        mat_transpuesta = [[self.valores[j][i] for j in range(self.filas)] for i in range(self.columnas)]
+        mat_transpuesta = [
+            [self.valores[j][i] for j in range(self.filas)]
+            for i in range(self.columnas)
+        ]
+
         return Matriz(self.aumentada, self.columnas, self.filas, mat_transpuesta)
 
     def calcular_det(self) -> tuple[Fraction, "Matriz", bool]:
@@ -275,19 +332,22 @@ class Matriz:
                     for m in range(self.filas) if m != i
                 ]
 
-                det_submatriz, _, _ = Matriz(False, self.filas - 1, self.columnas - 1, minor).calcular_det()
-                cofactor = (-1) ** (i + j) * det_submatriz
+                det_minor, _, _ = Matriz(
+                    False, self.filas - 1, self.columnas - 1, minor
+                ).calcular_det()
+
+                cofactor = ((-1) ** (i + j)) * det_minor
                 fila.append(cofactor)
             mat_cofactores.append(fila)
 
         adjunta = Matriz(self.aumentada, self.filas, self.columnas, mat_cofactores).transponer()
         return adjunta
 
-    def invertir(self) -> tuple["Matriz", "Matriz", Fraction]:
+    def encontrar_inversa(self) -> tuple["Matriz", "Matriz", Fraction]:
         """
         Encuentra la inversa de la instancia.
         * ArithmeticError: si la matriz no es cuadrada
-        * ArithmeticError: si el determinante de la matriz es 0
+        * ZeroDivisionError: si el determinante de la matriz es 0
         """
 
         if not self.es_cuadrada():
@@ -295,7 +355,7 @@ class Matriz:
 
         det, _, _ = self.calcular_det()
         if det == 0:
-            raise ArithmeticError("El determinante de la matriz es 0; no es invertible!")
+            raise ZeroDivisionError("El determinante de la matriz es 0; no es invertible!")
 
         adjunta = self.encontrar_adjunta()
         inversa = adjunta * (1 / det)

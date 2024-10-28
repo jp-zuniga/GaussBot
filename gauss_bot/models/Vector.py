@@ -1,3 +1,9 @@
+"""
+Implementación de vectores matemáticos de cualquier dimensión.
+Se pueden realizar operaciones básicas como suma, resta, y multiplicación
+usando sobrecarga de operadores.
+"""
+
 from fractions import Fraction
 from typing import Union, overload
 
