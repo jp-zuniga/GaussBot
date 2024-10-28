@@ -127,12 +127,23 @@ class AgregarTab(ctkScrollFrame):
         generar_button.grid(row=1, column=0, padx=5, pady=5, sticky="e")
         aleatorio_button.grid(row=1, column=1, padx=5, pady=5, sticky="w")
         self.vector_frame.grid(row=2, column=0, columnspan=2, padx=5, pady=5, sticky="ns")
+    
+    def limpiar_casillas(self) -> None:
+        """
+        Borra todos los valores ingresados en las casillas del vector.
+        """
+
+        for entry in self.input_entries:
+            entry.delete(0, "end")
+        self.nombre_entry.delete(0, "end")
+        self.input_entries.clear()
 
     def generar_casillas(self) -> None:
         """
         Genera las casillas para ingresar los valores del vector.
         """
 
+        self.limpiar_casillas()
         for widget in self.vector_frame.winfo_children():
             widget.destroy()  # type: ignore
 
@@ -156,7 +167,7 @@ class AgregarTab(ctkScrollFrame):
 
         nombre_label = ctkLabel(self, text="Nombre del vector:")
         agregar_button = ctkButton(self, text="Agregar", command=self.agregar_vector)
-        limpiar_button = ctkButton(self, text="Limpiar casillas", command=self.generar_casillas)
+        limpiar_button = ctkButton(self, text="Limpiar casillas", command=self.limpiar_casillas)
 
         nombre_label.grid(row=4, column=0, padx=5, pady=5, sticky="e")
         self.nombre_entry.grid(row=4, column=1, padx=5, pady=5, sticky="w")
@@ -168,6 +179,7 @@ class AgregarTab(ctkScrollFrame):
         Genera casillas con valores aleatorios para el vector.
         """
 
+        self.limpiar_casillas()
         for widget in self.vector_frame.winfo_children():
             widget.destroy()  # type: ignore
 
@@ -196,7 +208,7 @@ class AgregarTab(ctkScrollFrame):
         nombre_label = ctkLabel(self, text="Nombre del vector:")
         self.nombre_entry = ctkEntry(self, width=60, placeholder_text="u")
         agregar_button = ctkButton(self, text="Agregar", command=self.agregar_vector)
-        limpiar_button = ctkButton(self, text="Limpiar casillas", command=self.generar_casillas)
+        limpiar_button = ctkButton(self, text="Limpiar casillas", command=self.limpiar_casillas)
 
         nombre_label.grid(row=4, column=0, padx=5, pady=5, sticky="e")
         self.nombre_entry.grid(row=4, column=1, padx=5, pady=5, sticky="w")
@@ -207,6 +219,22 @@ class AgregarTab(ctkScrollFrame):
         """
         Crea un vector con los datos ingresados, y lo agrega al diccionario.
         """
+
+        try:
+            dimension = int(self.dimension_entry.get())
+        except ValueError:
+            self.mensaje_frame = ErrorFrame(
+                self, "Debe ingresar un número entero positivo como dimensión!"
+            )
+            self.mensaje_frame.grid(row=6, column=0, columnspan=2, sticky="n", padx=5, pady=5)
+            return
+
+        if dimension != len(self.input_entries):
+            self.mensaje_frame = ErrorFrame(
+                self, "Las dimensiones del vector ingresado no coinciden con las dimensions indicadas!"
+            )
+            self.mensaje_frame.grid(row=6, column=0, columnspan=2, sticky="n", padx=5, pady=5)
+            return
 
         componentes = []
         for entry in self.input_entries:

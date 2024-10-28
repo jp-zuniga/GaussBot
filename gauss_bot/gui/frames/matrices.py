@@ -168,6 +168,7 @@ class AgregarTab(ctkScrollFrame):
         Genera casillas para ingresar una matriz de las dimensiones indicadas.
         """
 
+        self.limpiar_casillas()
         for widget in self.matriz_frame.winfo_children():
             widget.destroy()  # type: ignore
 
@@ -211,6 +212,7 @@ class AgregarTab(ctkScrollFrame):
         con valores racionales aleatorios.
         """
 
+        self.limpiar_casillas()
         for widget in self.matriz_frame.winfo_children():
             widget.destroy()  # type: ignore
 
@@ -257,8 +259,25 @@ class AgregarTab(ctkScrollFrame):
         Agrega la matriz ingresada a la lista de matrices ingresadas.
         """
 
-        filas = len(self.input_entries)
-        columnas = len(self.input_entries[0])
+        input_f = len(self.input_entries)
+        input_c = len(self.input_entries[0])
+
+        try:
+            filas = int(self.entry_filas.get())
+            columnas = int(self.entry_columnas.get())
+        except ValueError:
+            self.mensaje_frame = ErrorFrame(
+                self, "Debe ingresar números enteros positivos como filas y columnas!"
+            )
+            self.mensaje_frame.grid(row=7, column=0, columnspan=2, sticky="n", padx=5, pady=5)
+            return
+
+        if filas != input_f or columnas != input_c:
+            self.mensaje_frame = ErrorFrame(
+                self, "Las dimensiones de la matriz ingresada no coinciden con las dimensions indicadas!"
+            )
+            self.mensaje_frame.grid(row=7, column=0, columnspan=2, sticky="n", padx=5, pady=5)
+            return
 
         valores = []
         for fila_entries in self.input_entries:
@@ -270,13 +289,13 @@ class AgregarTab(ctkScrollFrame):
                     self.mensaje_frame = ErrorFrame(
                         self, "Todos los valores deben ser números racionales!"
                     )
-                    self.mensaje_frame.grid(row=13, column=0, columnspan=2, sticky="n", padx=5, pady=5)
+                    self.mensaje_frame.grid(row=7, column=0, columnspan=2, sticky="n", padx=5, pady=5)
                     return
                 except ZeroDivisionError:
                     self.mensaje_frame = ErrorFrame(
                         self, "El denominador no puede ser 0!"
                     )
-                    self.mensaje_frame.grid(row=13, column=0, columnspan=2, sticky="n", padx=5, pady=5)
+                    self.mensaje_frame.grid(row=7, column=0, columnspan=2, sticky="n", padx=5, pady=5)
                     return
                 fila_valores.append(valor)
             valores.append(fila_valores)
@@ -294,7 +313,7 @@ class AgregarTab(ctkScrollFrame):
         nombre_valido = (
             nombre_nueva_matriz.isalpha()
             and nombre_nueva_matriz.isupper()
-            and len(nombre_nueva_matriz) != 1
+            and len(nombre_nueva_matriz) == 1
         )
 
         if not nombre_valido:
@@ -468,6 +487,10 @@ class SumaRestaTab(ctkFrame):
         self.mensaje_frame.grid(row=0, column=0, padx=5, pady=5)
 
     def update(self) -> None:
+        for widget_s, widget_r in zip(self.tab_sumar.winfo_children(), self.tab_restar.winfo_children()):
+            widget_s.destroy()  # type: ignore
+            widget_r.destroy()  # type: ignore
+
         self.setup_tab(self.tab_sumar, "Sumar")
         self.setup_tab(self.tab_restar, "Restar")
         self.tabview.configure(fg_color="transparent")
