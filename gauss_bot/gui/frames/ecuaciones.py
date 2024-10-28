@@ -3,6 +3,8 @@ Implementación de EcuacionesFrame,
 el frame que resuelve sistemas de ecuaciones lineales.
 """
 
+from typing import Optional
+
 from customtkinter import (
     CTkButton as ctkButton,
     CTkCheckBox as ctkCheckBox,
@@ -34,7 +36,7 @@ class EcuacionesFrame(ctkFrame):
         self.columnconfigure(0, weight=1)
         self.columnconfigure(1, weight=1)
 
-        self.mensaje_frame = None
+        self.mensaje_frame: Optional[ctkFrame] = None
 
         self.nombres_matrices = []
         for nombre, mat in self.mats_manager.mats_ingresadas.items():
@@ -84,12 +86,14 @@ class EcuacionesFrame(ctkFrame):
         if all([self.gauss_jordan, self.cramer]):
             self.mensaje_frame = ErrorFrame(
                 self, "Solamente debe seleccionar un método para resolver el sistema!"
-            ).grid(row=5, column=0, columnspan=2, sticky="n", padx=5, pady=5)
+            )
+            self.mensaje_frame.grid(row=5, column=0, columnspan=2, sticky="n", padx=5, pady=5)
             return
         if not any([self.gauss_jordan, self.cramer]):
             self.mensaje_frame = ErrorFrame(
                 self, "Debe seleccionar un método para resolver el sistema!"
-            ).grid(row=5, column=0, columnspan=2, sticky="n", padx=5, pady=5)
+            )
+            self.mensaje_frame.grid(row=5, column=0, columnspan=2, sticky="n", padx=5, pady=5)
             return
 
         nombre_sistema = ""
@@ -97,18 +101,15 @@ class EcuacionesFrame(ctkFrame):
             nombre_sistema, sistema = (
                 self.mats_manager.resolver_sistema(nombre_mat=self.sis_mat, metodo="gj")
             )
-
         elif self.cramer:
             try:
                 nombre_sistema, sistema = (
                     self.mats_manager.resolver_sistema(nombre_mat=self.sis_mat, metodo="c")
                 )
-
             except (TypeError, ArithmeticError, ZeroDivisionError) as e:
                 self.mensaje_frame = ErrorFrame(self, str(e)).grid(
                     row=5, column=0, columnspan=2, sticky="n", padx=5, pady=5
                 )
-
                 return
 
         if self.mensaje_frame is not None:
@@ -121,7 +122,8 @@ class EcuacionesFrame(ctkFrame):
 
         self.mensaje_frame = ResultadoFrame(
             self, header=sistema.solucion, resultado="", solo_header=True
-        ).grid(row=5, column=0, columnspan=2, sticky="n", padx=5, pady=5)
+        )
+        self.mensaje_frame.grid(row=5, column=0, columnspan=2, sticky="n", padx=5, pady=5)
 
     def toggle_gj(self) -> None:
         self.gauss_jordan = not self.gauss_jordan

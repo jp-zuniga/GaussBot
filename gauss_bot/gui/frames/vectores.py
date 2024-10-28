@@ -4,7 +4,7 @@ Implementación de todos los frames relacionados con vectores.
 
 from fractions import Fraction
 from random import randint
-from typing import Optional
+from typing import Optional, Union
 
 from customtkinter import (
     CTkButton as ctkButton,
@@ -49,7 +49,7 @@ class VectoresFrame(ctkFrame):
         self.tabview = ctkTabview(self)
         self.tabview.pack(expand=True, fill="both")
 
-        self.instances = []
+        self.instances: list[Union[ctkFrame, ctkScrollFrame]] = []
         self.tabs = [
             ("Mostrar vectores", MostrarTab),
             ("Agregar vector", AgregarTab),
@@ -61,7 +61,7 @@ class VectoresFrame(ctkFrame):
             tab = self.tabview.add(nombre)
             tab_instance = cls(self, tab, self.app, self.vecs_manager)
             tab_instance.pack(expand=True, fill="both")
-            self.instances.append(tab_instance)
+            self.instances.append(tab_instance)  # type: ignore
 
     def update_all(self) -> None:
         """
@@ -72,6 +72,9 @@ class VectoresFrame(ctkFrame):
         self.nombres_matrices = list(self.app.mats_manager.mats_ingresadas.keys())
         for tab in self.instances:
             tab.update()
+            for widget in tab.winfo_children():
+                widget.configure(bg_color="transparent")  # type: ignore
+        self.update_idletasks()
 
 
 class MostrarTab(ctkScrollFrame):
@@ -84,9 +87,8 @@ class MostrarTab(ctkScrollFrame):
         self.master_frame = master_frame
         self.app = app
         self.vecs_manager = vecs_manager
-        self.vecs = ctkLabel(self, text=vecs_manager.get_vectores()).pack(
-            padx=5, pady=5, expand=True, fill="both"
-        )
+        self.vecs = ctkLabel(self, text=vecs_manager.get_vectores())
+        self.vecs.pack(padx=5, pady=5, expand=True, fill="both")
 
     def update(self) -> None:
         self.vecs.configure(text=self.vecs_manager.get_vectores())
@@ -108,7 +110,7 @@ class AgregarTab(ctkScrollFrame):
         self.columnconfigure(0, weight=1)
         self.columnconfigure(1, weight=1)
 
-        self.mensaje_frame = None
+        self.mensaje_frame: Optional[ctkFrame] = None
         self.input_entries: list[ctkEntry] = []
         self.nombre_entry = ctkEntry(self, width=60, placeholder_text="u")
 
@@ -118,7 +120,6 @@ class AgregarTab(ctkScrollFrame):
         aleatorio_button = ctkButton(
             self, text="Generar vector aleatorio", command=self.generar_aleatorio
         )
-
         self.vector_frame = ctkFrame(self)
 
         dimension_label.grid(row=0, column=0, padx=5, pady=5, sticky="e")
@@ -140,7 +141,8 @@ class AgregarTab(ctkScrollFrame):
         except ValueError:
             self.mensaje_frame = ErrorFrame(
                 self, "Debe ingresar un número entero positivo como dimensión!"
-            ).grid(row=3, column=0, columnspan=2, sticky="n", padx=5, pady=5)
+            )
+            self.mensaje_frame.grid(row=3, column=0, columnspan=2, sticky="n", padx=5, pady=5)
             return
 
         if self.mensaje_frame is not None:
@@ -174,7 +176,8 @@ class AgregarTab(ctkScrollFrame):
         except ValueError:
             self.mensaje_frame = ErrorFrame(
                 self, "Debe ingresar un número entero positivo como dimensión!"
-            ).grid(row=3, column=0, columnspan=2, sticky="n", padx=5, pady=5)
+            )
+            self.mensaje_frame.grid(row=3, column=0, columnspan=2, sticky="n", padx=5, pady=5)
             return
 
         if self.mensaje_frame is not None:
@@ -212,12 +215,12 @@ class AgregarTab(ctkScrollFrame):
             except ValueError:
                 self.mensaje_frame = ErrorFrame(
                     self, "Todos los valores deben ser números racionales!"
-                ).grid(row=6, column=0, columnspan=2, sticky="n", padx=5, pady=5)
+                )
+                self.mensaje_frame.grid(row=6, column=0, columnspan=2, sticky="n", padx=5, pady=5)
                 return
             except ZeroDivisionError:
-                self.mensaje_frame = ErrorFrame(
-                    self, "El denominador no puede ser 0!"
-                ).grid(row=6, column=0, columnspan=2, sticky="n", padx=5, pady=5)
+                self.mensaje_frame = ErrorFrame(self, "El denominador no puede ser 0!")
+                self.mensaje_frame.grid(row=6, column=0, columnspan=2, sticky="n", padx=5, pady=5)
                 return
             componentes.append(valor)
 
@@ -237,19 +240,20 @@ class AgregarTab(ctkScrollFrame):
         if not nombre_valido:
             self.mensaje_frame = ErrorFrame(
                 self, "El nombre del vector debe ser una letra minúscula!"
-            ).grid(row=6, column=0, columnspan=2, sticky="n", padx=5, pady=5)
+            )
+            self.mensaje_frame.grid(row=6, column=0, columnspan=2, sticky="n", padx=5, pady=5)
             return
         if nombre_nuevo_vector in self.vecs_manager.vecs_ingresados:
             self.mensaje_frame = ErrorFrame(
                 self, f"Ya existe un vector llamado '{nombre_nuevo_vector}'!"
-            ).grid(row=6, column=0, columnspan=2, sticky="n", padx=5, pady=5)
+            )
+            self.mensaje_frame.grid(row=6, column=0, columnspan=2, sticky="n", padx=5, pady=5)
             return
 
         self.vecs_manager.vecs_ingresados[nombre_nuevo_vector] = nuevo_vector
         self.master_frame.update_all()
-        self.mensaje_frame = SuccessFrame(
-            self, "El vector se ha agregado exitosamente!"
-        ).grid(row=6, column=0, columnspan=2, sticky="n", padx=5, pady=5)
+        self.mensaje_frame = SuccessFrame(self, "El vector se ha agregado exitosamente!")
+        self.mensaje_frame.grid(row=6, column=0, columnspan=2, sticky="n", padx=5, pady=5)
 
     def update(self) -> None:
         self.update_idletasks()
@@ -361,7 +365,8 @@ class SumaRestaTab(ctkFrame):
 
         self.mensaje_frame = ResultadoFrame(
             self.resultado_suma, header=f"{header}:", resultado=str(resultado)
-        ).grid(row=0, column=0, padx=5, pady=5)
+        )
+        self.mensaje_frame.grid(row=0, column=0, padx=5, pady=5)
 
     def ejecutar_resta(self, nombre_vec1: str, nombre_vec2: str) -> None:
         """
@@ -385,11 +390,13 @@ class SumaRestaTab(ctkFrame):
 
         self.mensaje_frame = ResultadoFrame(
             self.resultado_resta, header=f"{header}:", resultado=str(resultado)
-        ).grid(row=0, column=0, padx=5, pady=5)
+        )
+        self.mensaje_frame.grid(row=0, column=0, padx=5, pady=5)
 
     def update(self) -> None:
         self.setup_tab(self.tab_sumar, "Sumar")
         self.setup_tab(self.tab_restar, "Restar")
+        self.tabview.configure(fg_color="transparent")
         self.update_idletasks()
 
     def update_select1(self, valor: str) -> None:
@@ -413,11 +420,11 @@ class MultiplicacionTab(ctkFrame):
         self.columnconfigure(0, weight=1)
 
         self.mensaje_frame: Optional[ctkFrame] = None
-        tabview = ctkTabview(self)
+        self.tabview = ctkTabview(self)
 
-        self.tab_escalar = tabview.add("Escalar por Vector")
-        self.tab_vector = tabview.add("Producto Punto")
-        self.tab_matriz_vector = tabview.add("Producto Matriz-Vector")
+        self.tab_escalar = self.tabview.add("Escalar por Vector")
+        self.tab_vector = self.tabview.add("Producto Punto")
+        self.tab_matriz_vector = self.tabview.add("Producto Matriz-Vector")
         self.setup_tabs()
 
         self.select_escalar_vec = ctkOptionMenu(self.tab_escalar, width=60)
@@ -441,7 +448,7 @@ class MultiplicacionTab(ctkFrame):
         self.resultado_vectores.columnconfigure(0, weight=1)
         self.resultado_mat_vec.columnconfigure(0, weight=1)
 
-        tabview.grid(row=0, column=0, sticky="n")
+        self.tabview.grid(row=0, column=0, sticky="n")
         self.resultado_escalar.grid(row=4, column=0, padx=5, sticky="n")
         self.resultado_vectores.grid(row=4, column=0, padx=5, sticky="n")
         self.resultado_mat_vec.grid(row=4, column=0, padx=5, sticky="n")
@@ -462,6 +469,7 @@ class MultiplicacionTab(ctkFrame):
 
         tab.columnconfigure(0, weight=1)
         instruct_e = ctkLabel(tab, text="Seleccione el vector e ingrese el escalar:")
+
         self.select_escalar_vec = ctkOptionMenu(
             tab,
             width=60,
@@ -490,6 +498,7 @@ class MultiplicacionTab(ctkFrame):
 
         tab.columnconfigure(0, weight=1)
         instruct_v = ctkLabel(tab, text="Seleccione los vectores para multiplicar:")
+
         self.select_vec1 = ctkOptionMenu(
             tab,
             width=60,
@@ -525,6 +534,7 @@ class MultiplicacionTab(ctkFrame):
 
         tab.columnconfigure(0, weight=1)
         instruct_mv = ctkLabel(tab, text="Seleccione la matriz y el vector para multiplicar:")
+
         self.select_vmat = ctkOptionMenu(
             tab,
             width=60,
@@ -569,12 +579,14 @@ class MultiplicacionTab(ctkFrame):
         except ValueError:
             self.mensaje_frame = ErrorFrame(
                 self.resultado_escalar, "El escalar debe ser un número racional!"
-            ).grid(row=0, column=0, padx=5, pady=5)
+            )
+            self.mensaje_frame.grid(row=0, column=0, padx=5, pady=5)
             return
         except ZeroDivisionError:
             self.mensaje_frame = ErrorFrame(
                 self.resultado_escalar, "El denominador no puede ser 0!"
-            ).grid(row=0, column=0, padx=5, pady=5)
+            )
+            self.mensaje_frame.grid(row=0, column=0, padx=5, pady=5)
             return
 
         if self.mensaje_frame is not None:
@@ -583,7 +595,8 @@ class MultiplicacionTab(ctkFrame):
 
         self.mensaje_frame = ResultadoFrame(
             self.resultado_escalar, header=f"{header}:", resultado=str(resultado)
-        ).grid(row=0, column=0, padx=5, pady=5)
+        )
+        self.mensaje_frame.grid(row=0, column=0, padx=5, pady=5)
 
     def mult_vectores(self, nombre_vec1: str, nombre_vec2: str) -> None:
         """
@@ -607,7 +620,8 @@ class MultiplicacionTab(ctkFrame):
 
         self.mensaje_frame = ResultadoFrame(
             self.resultado_vectores, header=f"{header}:", resultado=str(resultado)
-        ).grid(row=0, column=0, padx=5, pady=5)
+        )
+        self.mensaje_frame.grid(row=0, column=0, padx=5, pady=5)
 
     def matriz_vector(self, nombre_mat: str, nombre_vec: str) -> None:
         """
@@ -619,7 +633,9 @@ class MultiplicacionTab(ctkFrame):
             self.mensaje_frame = None
 
         try:
-            header, resultado = self.app.ops_manager.producto_matriz_vector(nombre_mat, nombre_vec)
+            header, resultado = self.app.ops_manager.matriz_por_vector(
+                nombre_mat, nombre_vec
+            )
         except ArithmeticError as e:
             self.mensaje_frame = ErrorFrame(self.resultado_mat_vec, str(e))
             self.mensaje_frame.grid(row=0, column=0, padx=5, pady=5)
@@ -631,10 +647,12 @@ class MultiplicacionTab(ctkFrame):
 
         self.mensaje_frame = ResultadoFrame(
             self.resultado_mat_vec, header=f"{header}:", resultado=str(resultado)
-        ).grid(row=0, column=0, padx=5, pady=5)
+        )
+        self.mensaje_frame.grid(row=0, column=0, padx=5, pady=5)
 
     def update(self) -> None:
         self.setup_tabs()
+        self.tabview.configure(fg_color="transparent")
         self.update_idletasks()
 
     def update_escalar_vec(self, valor: str) -> None:

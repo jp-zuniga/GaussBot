@@ -82,13 +82,13 @@ class OpsManager:
             } for nombre, mat in self.mats_manager.mats_ingresadas.items()
         }
 
+        if not path.exists(MATRICES_PATH):
+            makedirs(path.dirname(MATRICES_PATH), exist_ok=True)
+
         if matrices_dict == {}:
             with open(MATRICES_PATH, "w", encoding="utf-8") as _:
                 pass
             return
-
-        if not path.exists(MATRICES_PATH):
-            makedirs(path.dirname(MATRICES_PATH), exist_ok=True)
 
         with open(MATRICES_PATH, mode="w", encoding="utf-8") as matrices_file:
             dump(matrices_dict, matrices_file, indent=4, sort_keys=True, cls=FractionEncoder)
@@ -104,13 +104,13 @@ class OpsManager:
             for nombre, vec in self.vecs_manager.vecs_ingresados.items()
         }
 
+        if not path.exists(VECTORES_PATH):
+            makedirs(path.dirname(VECTORES_PATH), exist_ok=True)
+
         if vectores_dict == {}:
             with open(VECTORES_PATH, "w", encoding="utf-8") as _:
                 pass
             return
-
-        if not path.exists(VECTORES_PATH):
-            makedirs(path.dirname(VECTORES_PATH), exist_ok=True)
 
         with open(VECTORES_PATH, "w", encoding="utf-8") as vectores_file:
             dump(vectores_dict, vectores_file, indent=4, sort_keys=True, cls=FractionEncoder)
@@ -126,6 +126,9 @@ class OpsManager:
             return {}
 
         with open(MATRICES_PATH, "r", encoding="utf-8") as matrices_file:
+            if matrices_file.read() == "":
+                return {}
+
             matrices_dict = load(matrices_file, cls=FractionDecoder)
             return {
                 nombre: Matriz(
@@ -147,6 +150,9 @@ class OpsManager:
             return {}
 
         with open(VECTORES_PATH, mode="r", encoding="utf-8") as vectores_file:
+            if vectores_file.read() == "":
+                return {}
+
             vectores_dict = load(vectores_file, cls=FractionDecoder)
             return {
                 nombre: Vector(componentes)

@@ -1,6 +1,6 @@
 """
 Implementación de la clase NavFrame,
-la barras de navegación de la aplicación.
+la barra de navegación de la aplicación.
 """
 
 from os import path
@@ -29,6 +29,7 @@ class NavFrame(ctkFrame):
 
         self.grid(row=0, column=0, sticky="nsew")
         self.grid_rowconfigure(4, weight=1)
+        self.configure(fg_color=self.app.theme_config["CTk"]["fg_color"])
 
         self.logo = ctkImage(
             dark_image=Image.open(path.join(ASSET_PATH, "light_logo.png")),
@@ -106,12 +107,12 @@ class NavFrame(ctkFrame):
             command=self.quit_event,
         )
 
-        self.ecuaciones_button.grid(row=1, column=0, sticky="ew")
         self.nav_frame_label.grid(row=0, column=0, padx=20, pady=20)
-        self.matrices_button.grid(row=2, column=0, sticky="ew")
-        self.vectores_button.grid(row=3, column=0, sticky="ew")
-        self.config_button.grid(row=5, column=0, sticky="ew")
-        self.quit_button.grid(row=6, column=0, sticky="ew")
+        self.ecuaciones_button.grid(row=1, column=0, padx=10, pady=3, sticky="ew")
+        self.matrices_button.grid(row=2, column=0, padx=10, pady=3, sticky="ew")
+        self.vectores_button.grid(row=3, column=0, padx=10, pady=3, sticky="ew")
+        self.config_button.grid(row=5, column=0, padx=10, pady=3, sticky="ew")
+        self.quit_button.grid(row=6, column=0, padx=10, pady=3, sticky="ew")
 
         self.frames = {
             "ecuaciones": self.app.ecuaciones,

@@ -66,18 +66,28 @@ class GaussUI(ctk):
                 self.config_options = load(config_file)
         else:
             self.config_options = {
-                "modo": "dark",
+                "modo": "light",
                 "escala": 1.0,
-                "tema": "metal.json"
+                "tema": "marsh.json"
             }
 
         self.modo_actual = self.config_options["modo"]
         self.escala_actual = self.config_options["escala"]
         self.tema_actual = self.config_options["tema"]
+        self.theme_config = self._load_theme_config()
+        self.configure(fg_color=self.theme_config["CTkFrame"]["fg_color"])
 
         set_appearance_mode(self.modo_actual)
         set_widget_scaling(self.escala_actual)
         set_default_color_theme(path.join(THEMES_PATH, self.tema_actual))
+    
+    def _load_theme_config(self) -> dict:
+        """
+        Carga el archivo de configuración del tema actual.
+        """
+
+        with open(path.join(THEMES_PATH, self.tema_actual), mode="r", encoding="utf-8") as theme_file:
+            return load(theme_file)
 
     def save_config(self) -> None:
         """

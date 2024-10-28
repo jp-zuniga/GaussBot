@@ -66,9 +66,9 @@ class ConfigFrame(ctkFrame):
         self.escalas = list(self.escalas_dict.keys())
         self.temas = list(self.temas_dict.keys())
 
-        self.modo_actual_key = self.get_dict_key(self.modos_dict, self.app.modo_actual)
-        self.escala_actual_key = self.get_dict_key(self.escalas_dict, self.app.escala_actual)
-        self.tema_actual_key = self.get_dict_key(self.temas_dict, self.app.tema_actual)
+        self.modo_actual_key = self._get_dict_key(self.modos_dict, self.app.modo_actual)
+        self.escala_actual_key = self._get_dict_key(self.escalas_dict, self.app.escala_actual)
+        self.tema_actual_key = self._get_dict_key(self.temas_dict, self.app.tema_actual)
 
         try:
             self.first_tema = StringVar(value=self.tema_actual_key)
@@ -113,6 +113,8 @@ class ConfigFrame(ctkFrame):
         self.app.modo_actual = self.modos_dict[modo_seleccionado]
         set_appearance_mode(self.app.modo_actual)
         self.app.set_icon(self.app.modo_actual)
+        self.app.matrices.update_all()
+        self.app.vectores.update_all()
 
     def cambiar_escala(self, escala_seleccionada: str) -> None:
         """
@@ -131,7 +133,7 @@ class ConfigFrame(ctkFrame):
         set_default_color_theme(self.app.tema_actual)
 
 
-    def get_dict_key(self, dict_lookup: dict, buscando: str) -> Union[str, None]:
+    def _get_dict_key(self, dict_lookup: dict, buscando: str) -> Union[str, None]:
         """
         Busca un valor en un diccionario y retorna su llave.
         """
