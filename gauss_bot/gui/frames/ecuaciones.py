@@ -38,7 +38,7 @@ class EcuacionesFrame(ctkFrame):
 
         self.nombres_matrices: list[str] = []
         self.mensaje_frame: Optional[ctkFrame] = None
-        
+
         self.select_sis_mat: Optional[ctkOptionMenu] = None
         self.gauss_jordan_checkbox: Optional[ctkCheckBox] = None
         self.cramer_checkbox: Optional[ctkCheckBox] = None
@@ -49,7 +49,10 @@ class EcuacionesFrame(ctkFrame):
         self.setup_frame()
 
     def setup_frame(self) -> None:
+        self.rowconfigure(0, weight=0)
+
         if len(self.mats_manager.mats_ingresadas) == 0:
+            self.rowconfigure(0, weight=1)
             self.mensaje_frame = ErrorFrame(self, "No hay matrices ingresadas!")
             self.mensaje_frame.grid(row=0, column=0, columnspan=2, padx=5, pady=5)
             return
@@ -59,10 +62,11 @@ class EcuacionesFrame(ctkFrame):
                 self.nombres_matrices.append(nombre)
 
         if len(self.nombres_matrices) == 0:
+            self.rowconfigure(0, weight=1)
             self.mensaje_frame = ErrorFrame(self, "No hay sistemas de ecuaciones ingresados!")
             self.mensaje_frame.grid(row=0, column=0, columnspan=2, padx=5, pady=5)
             return
-        
+
         if self.mensaje_frame is not None:
             self.mensaje_frame.destroy()
             self.mensaje_frame = None

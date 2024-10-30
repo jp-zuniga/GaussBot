@@ -55,11 +55,11 @@ class MatricesFrame(ctkFrame):
         self.tabs = [
             ("Mostrar matrices", MostrarTab),
             ("Agregar matriz", AgregarTab),
-            ("Suma y resta", SumaRestaTab),
+            ("Suma y Resta", SumaRestaTab),
             ("Multiplicación", MultiplicacionTab),
             ("Transposición", TransposicionTab),
-            ("Calcular determinante", DeterminanteTab),
-            ("Encontrar inversa", InversaTab),
+            ("Calcular Determinante", DeterminanteTab),
+            ("Encontrar Inversa", InversaTab),
         ]
 
         for nombre, cls in self.tabs:
@@ -303,9 +303,7 @@ class AgregarTab(ctkScrollFrame):
         for i in range(filas):
             fila_entries = []
             for j in range(columnas):
-                numerador = randint(1, 20)
-                denominador = randint(1, 10)
-                valor_random = Fraction(numerador, denominador)
+                valor_random = Fraction(randint(1, 20))
                 input_entry = ctkEntry(self.matriz_frame, width=60)
                 input_entry.insert(0, str(valor_random))
                 input_entry.grid(row=i, column=j, padx=5, pady=5)
@@ -334,9 +332,6 @@ class AgregarTab(ctkScrollFrame):
         Agrega la matriz ingresada a la lista de matrices ingresadas.
         """
 
-        input_f = len(self.input_entries)
-        input_c = len(self.input_entries[0])
-
         try:
             filas = int(self.entry_filas.get())
             columnas = int(self.entry_columnas.get())
@@ -349,14 +344,15 @@ class AgregarTab(ctkScrollFrame):
             self.mensaje_frame.grid(row=7, column=0, columnspan=2, sticky="n", padx=5, pady=5)
             return
 
+        input_f = len(self.input_entries)
+        input_c = len(self.input_entries[0])
         dimensiones_validas = (
-            filas == input_f or columnas == input_c
+            filas == input_f and columnas == input_c
             if not self.aumentada
-            else
-            filas == input_f or columnas - 1 == input_c
+            else filas == input_f and columnas - 1 == input_c
         )
 
-        if not dimensiones_validas:
+        if not dimensiones_validas: 
             self.mensaje_frame = ErrorFrame(
                 self, "Las dimensiones de la matriz ingresada no coinciden con las dimensions indicadas!"
             )
@@ -417,11 +413,12 @@ class AgregarTab(ctkScrollFrame):
             return
 
         self.mats_manager.mats_ingresadas[nombre_nueva_matriz] = nueva_matriz
-        self.master_frame.update_all()
         self.mensaje_frame = SuccessFrame(
             self, "La matriz se ha agregado exitosamente!"
         )
         self.mensaje_frame.grid(row=7, column=0, columnspan=2, sticky="n", padx=5, pady=5)
+        self.master_frame.update_all()
+        self.app.vectores.update_all()
 
     def toggle_aumentada(self) -> None:
         self.aumentada = not self.aumentada
@@ -804,7 +801,7 @@ class MultiplicacionTab(ctkFrame):
             self.mensaje_frame = None
 
         placeholder1 = Variable(tab, value=self.master_frame.nombres_matrices[0])
-        placeholder2 = Variable(tab, value=self.master_frame.nombres_matrices[1])
+        placeholder2 = Variable(tab, value=self.master_frame.nombres_vectores[0])
 
         instruct_mv = ctkLabel(tab, text="Seleccione la matriz y el vector para multiplicar:")
         self.select_vmat = ctkOptionMenu(
@@ -925,9 +922,9 @@ class MultiplicacionTab(ctkFrame):
     def update(self) -> None:
         for widget_e in self.tab_escalar.winfo_children():
             widget_e.destroy()  # type: ignore
-        for widget_m in self.tab_matriz_vector.winfo_children():
+        for widget_m in self.tab_matriz.winfo_children():
             widget_m.destroy()  # type: ignore
-        for widget_v in self.tab_matriz.winfo_children():
+        for widget_v in self.tab_matriz_vector.winfo_children():
             widget_v.destroy()  # type: ignore
 
         self.setup_tabs()

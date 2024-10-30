@@ -36,10 +36,10 @@ class VectoresManager:
         """
 
         if not self._validar_vecs_ingresados():
-            return "\nNo hay vectores ingresados!"
+            return "No hay vectores ingresados!"
 
         vectores = ""
-        vectores += "\nVectores ingresados:\n"
+        vectores += "Vectores ingresados:\n"
         vectores += "---------------------------------------------\n"
         for nombre, vec in self.vecs_ingresados.items():
             vectores += f"{nombre}: {vec}\n"
