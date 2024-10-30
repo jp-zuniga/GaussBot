@@ -5,7 +5,12 @@ los datos de MatricesManager y VectoresManager.
 """
 
 from fractions import Fraction
-from json import dump, load
+from json import (
+    dump,
+    load,
+    JSONDecodeError
+)
+
 from os import path, makedirs
 
 from gauss_bot import MATRICES_PATH, VECTORES_PATH
@@ -86,11 +91,11 @@ class OpsManager:
             makedirs(path.dirname(MATRICES_PATH), exist_ok=True)
 
         if matrices_dict == {}:
-            with open(MATRICES_PATH, "w", encoding="utf-8") as _:
+            with open(MATRICES_PATH, "w") as _:
                 pass
             return
 
-        with open(MATRICES_PATH, mode="w", encoding="utf-8") as matrices_file:
+        with open(MATRICES_PATH, mode="w") as matrices_file:
             dump(matrices_dict, matrices_file, indent=4, sort_keys=True, cls=FractionEncoder)
 
     def save_vectores(self) -> None:
@@ -125,8 +130,10 @@ class OpsManager:
         if not path.exists(MATRICES_PATH):
             return {}
 
-        with open(MATRICES_PATH, "r", encoding="utf-8") as matrices_file:
-            if matrices_file.read() == "":
+        with open(MATRICES_PATH, mode="r") as matrices_file:
+            try:
+                matrices_dict = load(matrices_file, cls=FractionDecoder)
+            except JSONDecodeError:
                 return {}
 
             matrices_dict = load(matrices_file, cls=FractionDecoder)
@@ -149,8 +156,10 @@ class OpsManager:
         if not path.exists(VECTORES_PATH):
             return {}
 
-        with open(VECTORES_PATH, mode="r", encoding="utf-8") as vectores_file:
-            if vectores_file.read() == "":
+        with open(VECTORES_PATH, mode="r") as vectores_file:
+            try:
+                vectores_dict = load(vectores_file, cls=FractionDecoder)
+            except JSONDecodeError:
                 return {}
 
             vectores_dict = load(vectores_file, cls=FractionDecoder)
