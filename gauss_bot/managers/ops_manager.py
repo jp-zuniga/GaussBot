@@ -136,6 +136,7 @@ class OpsManager:
             except JSONDecodeError:
                 return {}
 
+            matrices_file.seek(0)
             matrices_dict = load(matrices_file, cls=FractionDecoder)
             return {
                 nombre: Matriz(
@@ -162,6 +163,7 @@ class OpsManager:
             except JSONDecodeError:
                 return {}
 
+            vectores_file.seek(0)
             vectores_dict = load(vectores_file, cls=FractionDecoder)
             return {
                 nombre: Vector(componentes)
