@@ -349,7 +349,7 @@ class AgregarTab(ctkScrollFrame):
         dimensiones_validas = (
             filas == input_f and columnas == input_c
             if not self.aumentada
-            else filas == input_f and columnas - 1 == input_c
+            else filas == input_f and input_c - 1 == columnas
         )
 
         if not dimensiones_validas: 
