@@ -61,11 +61,12 @@ class ResultadoFrame(ctkFrame):
     Frame personalizado para mostrar resultados de operaciones.
     """
 
-    def __init__(self, parent: Union[ctkFrame, ctkScrollFrame], header: str, resultado: str, solo_header=False) -> None:
+    def __init__(self, parent: Union[ctkFrame, ctkScrollFrame],
+                 header: str, resultado: str, solo_header=False) -> None:
+
         super().__init__(parent, corner_radius=8, border_width=2, border_color="#18c026")
 
         pady_tuple = (10, 10) if solo_header else (10, 3)
-
         self.header = ctkLabel(self, text=header)
         self.header.grid(row=0, column=0, padx=20, pady=pady_tuple, sticky="n")
 

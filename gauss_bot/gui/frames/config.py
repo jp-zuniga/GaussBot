@@ -98,12 +98,12 @@ class ConfigFrame(ctkFrame):
             values=self.escalas, command=self.cambiar_escala,
         )
 
-        self.temas_label.grid(row=0, column=0, padx=10, pady=10)
-        self.modos_label.grid(row=1, column=0, padx=10, pady=10)
-        self.desplegar_temas.grid(row=0, column=1, padx=10, pady=10)
-        self.desplegar_modos.grid(row=1, column=1, padx=10, pady=10)
-        self.escala_label.grid(row=2, column=0, padx=10, pady=10)
-        self.desplegar_escalas.grid(row=2, column=1, padx=10, pady=10)
+        self.temas_label.grid(row=0, column=0, padx=(20, 10), pady=10)
+        self.desplegar_temas.grid(row=0, column=1, padx=(20, 10), pady=10)
+        self.modos_label.grid(row=1, column=0, padx=(20, 10), pady=10)
+        self.desplegar_modos.grid(row=1, column=1, padx=(20, 10), pady=10)
+        self.escala_label.grid(row=2, column=0, padx=(20, 10), pady=10)
+        self.desplegar_escalas.grid(row=2, column=1, padx=(20, 10), pady=10)
 
     def cambiar_modo(self, modo_seleccionado: str) -> None:
         """
@@ -123,6 +123,8 @@ class ConfigFrame(ctkFrame):
 
         self.app.escala_actual = self.escalas_dict[escala_seleccionada]
         set_widget_scaling(self.app.escala_actual)
+        self.app.matrices.update_all()
+        self.app.vectores.update_all()
 
     def cambiar_tema(self, tema_seleccionado: str) -> None:
         """
@@ -131,6 +133,8 @@ class ConfigFrame(ctkFrame):
 
         self.app.tema_actual = path.join(THEMES_PATH, (self.temas_dict[tema_seleccionado]))
         set_default_color_theme(self.app.tema_actual)
+        self.app.matrices.update_all()
+        self.app.vectores.update_all()
 
 
     def _get_dict_key(self, dict_lookup: dict, buscando: str) -> Union[str, None]:

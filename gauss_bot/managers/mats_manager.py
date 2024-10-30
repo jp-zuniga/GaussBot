@@ -41,14 +41,14 @@ class MatricesManager:
         """
 
         if not self._validar_mats_ingresadas():
-            return "\nNo hay matrices ingresadas!"
+            return "No hay matrices ingresadas!"
 
-        matrices = "\nMatrices guardadas:\n"
+        matrices = "Matrices guardadas:\n"
         matrices += "---------------------------------------------"
         for nombre, mat in self.mats_ingresadas.items():
             matrices += f"\n{nombre}:\n"
             matrices += str(mat)
-        matrices += "---------------------------------------------\n"
+        matrices += "---------------------------------------------"
         return matrices
 
     def resolver_sistema(self, nombre_mat: str, metodo: str) -> tuple[str, SistemaEcuaciones]:

@@ -108,11 +108,11 @@ class NavFrame(ctkFrame):
         )
 
         self.nav_frame_label.grid(row=0, column=0, padx=20, pady=20)
-        self.ecuaciones_button.grid(row=1, column=0, padx=10, pady=3, sticky="ew")
-        self.matrices_button.grid(row=2, column=0, padx=10, pady=3, sticky="ew")
-        self.vectores_button.grid(row=3, column=0, padx=10, pady=3, sticky="ew")
-        self.config_button.grid(row=5, column=0, padx=10, pady=3, sticky="ew")
-        self.quit_button.grid(row=6, column=0, padx=10, pady=(3, 6), sticky="ew")
+        self.ecuaciones_button.grid(row=1, column=0, padx=10, sticky="ew")
+        self.matrices_button.grid(row=2, column=0, padx=10, sticky="ew")
+        self.vectores_button.grid(row=3, column=0, padx=10, sticky="ew")
+        self.config_button.grid(row=5, column=0, padx=10, sticky="ew")
+        self.quit_button.grid(row=6, column=0, padx=10, pady=(0, 10), sticky="ew")
 
         self.frames = {
             "ecuaciones": self.app.ecuaciones,

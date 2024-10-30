@@ -36,18 +36,36 @@ class EcuacionesFrame(ctkFrame):
         self.columnconfigure(0, weight=1)
         self.columnconfigure(1, weight=1)
 
+        self.nombres_matrices: list[str] = []
         self.mensaje_frame: Optional[ctkFrame] = None
+        
+        self.select_sis_mat: Optional[ctkOptionMenu] = None
+        self.gauss_jordan_checkbox: Optional[ctkCheckBox] = None
+        self.cramer_checkbox: Optional[ctkCheckBox] = None
+        self.sis_mat: str = ""
+        self.gauss_jordan = False
+        self.cramer = False
 
-        self.nombres_matrices = []
+        self.setup_frame()
+
+    def setup_frame(self) -> None:
+        if len(self.mats_manager.mats_ingresadas) == 0:
+            self.mensaje_frame = ErrorFrame(self, "No hay matrices ingresadas!")
+            self.mensaje_frame.grid(row=0, column=0, columnspan=2, padx=5, pady=5)
+            return
+
         for nombre, mat in self.mats_manager.mats_ingresadas.items():
             if mat.aumentada:
                 self.nombres_matrices.append(nombre)
 
-        if not self.nombres_matrices:
-            self.rowconfigure(0, weight=1)
+        if len(self.nombres_matrices) == 0:
             self.mensaje_frame = ErrorFrame(self, "No hay sistemas de ecuaciones ingresados!")
             self.mensaje_frame.grid(row=0, column=0, columnspan=2, padx=5, pady=5)
             return
+        
+        if self.mensaje_frame is not None:
+            self.mensaje_frame.destroy()
+            self.mensaje_frame = None
 
         instruct_se = ctkLabel(self, text="Seleccione el sistema de ecuaciones a resolver:")
         self.select_sis_mat = ctkOptionMenu(
@@ -59,7 +77,7 @@ class EcuacionesFrame(ctkFrame):
 
         self.cramer_checkbox = ctkCheckBox(self, text="", command=self.toggle_cramer)
         cramer_label = ctkLabel(self, text="Regla de Cramer")
-        button = ctkButton(self, text="Resolver", command=self.resolver_sistema)
+        button = ctkButton(self, text="Resolver", command=self.resolver)
 
         self.sis_mat = self.select_sis_mat.get()
         self.gauss_jordan = False
@@ -73,7 +91,7 @@ class EcuacionesFrame(ctkFrame):
         cramer_label.grid(row=3, column=0, pady=5, padx=5, sticky="e")
         button.grid(row=4, column=0, columnspan=2, pady=5, padx=5)
 
-    def resolver_sistema(self) -> None:
+    def resolver(self) -> None:
         """
         Resuelve el sistema de ecuaciones seleccionado
         por el usuario, utilizando el método indicado.
@@ -107,7 +125,8 @@ class EcuacionesFrame(ctkFrame):
                     self.mats_manager.resolver_sistema(nombre_mat=self.sis_mat, metodo="c")
                 )
             except (TypeError, ArithmeticError, ZeroDivisionError) as e:
-                self.mensaje_frame = ErrorFrame(self, str(e)).grid(
+                self.mensaje_frame = ErrorFrame(self, str(e))
+                self.mensaje_frame.grid(
                     row=5, column=0, columnspan=2, sticky="n", padx=5, pady=5
                 )
                 return
@@ -132,7 +151,7 @@ class EcuacionesFrame(ctkFrame):
         self.cramer = not self.cramer
 
     def update_frame(self) -> None:
-        self.__init__(self.master, self.app, self.mats_manager)
+        self.setup_frame()
 
     def update_sis_mat(self, valor: str) -> None:
         self.sis_mat = valor
