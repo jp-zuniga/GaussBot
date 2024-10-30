@@ -365,7 +365,7 @@ class AgregarTab(ctkScrollFrame):
         self.mensaje_frame.grid(row=6, column=0, columnspan=2, sticky="n", padx=5, pady=5)
         self.master_frame.update_all()
         self.app.matrices.update_all()
-        self.app.config_frame.update_all()
+        self.app.config_frame.udpate_frame()
 
     def update(self) -> None:
         self.update_idletasks()
