@@ -23,6 +23,8 @@ class ErrorFrame(ctkFrame):
 
     def __init__(self, parent: Union[ctkFrame, ctkScrollFrame], message: str) -> None:
         super().__init__(parent, corner_radius=8, border_width=2, border_color="#ff3131")
+        self.rowconfigure(0, weight=1)
+        self.columnconfigure(0, weight=1)
 
         self.error_icon = ctkImage(Image.open(path.join(ASSET_PATH, "error_icon.png")))
         self.error_icon_label = ctkLabel(self, text="", image=self.error_icon)
@@ -43,6 +45,8 @@ class SuccessFrame(ctkFrame):
 
     def __init__(self, parent: Union[ctkFrame, ctkScrollFrame], message: str) -> None:
         super().__init__(parent, corner_radius=8, border_width=2, border_color="#18c026")
+        self.rowconfigure(0, weight=1)
+        self.columnconfigure(0, weight=1)
 
         self.check_icon = ctkImage(Image.open(path.join(ASSET_PATH, "check_icon.png")))
         self.check_icon_label = ctkLabel(self, text="", image=self.check_icon)

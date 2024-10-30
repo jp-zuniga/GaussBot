@@ -419,6 +419,7 @@ class AgregarTab(ctkScrollFrame):
         self.mensaje_frame.grid(row=7, column=0, columnspan=2, sticky="n", padx=5, pady=5)
         self.master_frame.update_all()
         self.app.vectores.update_all()
+        self.app.config_frame.update_frame()
 
     def toggle_aumentada(self) -> None:
         self.aumentada = not self.aumentada
