@@ -39,10 +39,10 @@ class EcuacionesFrame(ctkFrame):
         self.nombres_sistemas: list[str] = []
         self.mensaje_frame: Optional[ctkFrame] = None
 
-        self.select_sis_mat: Optional[ctkOptionMenu] = None
-        self.gauss_jordan_checkbox: Optional[ctkCheckBox] = None
-        self.cramer_checkbox: Optional[ctkCheckBox] = None
-        self.sis_mat: str = ""
+        self.select_sis_mat: ctkOptionMenu
+        self.gauss_jordan_checkbox: ctkCheckBox
+        self.cramer_checkbox: ctkCheckBox
+        self.sis_mat = ""
         self.gauss_jordan = False
         self.cramer = False
 
@@ -108,6 +108,8 @@ class EcuacionesFrame(ctkFrame):
         if self.mensaje_frame is not None:
             self.mensaje_frame.destroy()
             self.mensaje_frame = None
+        
+        print(self.gauss_jordan, self.cramer)
 
         if all([self.gauss_jordan, self.cramer]):
             self.mensaje_frame = ErrorFrame(
@@ -120,6 +122,7 @@ class EcuacionesFrame(ctkFrame):
                 self, "Debe seleccionar un método para resolver el sistema!"
             )
             self.mensaje_frame.grid(row=5, column=0, columnspan=2, sticky="n", padx=5, pady=5)
+            return
 
         if self.mats_manager.mats_ingresadas[self.sis_mat].es_matriz_cero():
             self.gauss_jordan = True
