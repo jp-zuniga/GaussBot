@@ -3,12 +3,12 @@ Implementación de todos los frames relacionados a matrices.
 """
 
 from fractions import Fraction
-from PIL import Image
 from os import path
 from random import randint
 from typing import Optional, Union
-
 from tkinter import Variable, TclError
+
+from PIL import Image
 from customtkinter import (
     CTkBaseClass as ctkBase,
     CTkButton as ctkButton,
@@ -45,8 +45,18 @@ class MatricesFrame(ctkFrame):
         self.app = app
         self.mats_manager = mats_manager
         self.nombres_vectores = list(self.app.vecs_manager.vecs_ingresados.keys())
-        self.nombres_matrices = [nombre for nombre, mat in self.mats_manager.mats_ingresadas.items() if not mat.aumentada]
-        self.nombres_sistemas = [nombre for nombre, mat in self.mats_manager.mats_ingresadas.items() if mat.aumentada]
+        self.nombres_matrices = [
+            nombre
+            for nombre, mat in self.mats_manager.mats_ingresadas.items()
+            if not mat.aumentada
+        ]
+
+        self.nombres_sistemas = [
+            nombre
+            for nombre, mat in self.mats_manager.mats_ingresadas.items()
+            if mat.aumentada
+        ]
+
         self.crear_tabview()
 
     def crear_tabview(self) -> None:
@@ -89,8 +99,17 @@ class MatricesFrame(ctkFrame):
         }
 
         self.nombres_vectores = list(self.app.vecs_manager.vecs_ingresados.keys())
-        self.nombres_matrices = [nombre for nombre, mat in self.mats_manager.mats_ingresadas.items() if not mat.aumentada]
-        self.nombres_sistemas = [nombre for nombre, mat in self.mats_manager.mats_ingresadas.items() if mat.aumentada]
+        self.nombres_matrices = [
+            nombre
+            for nombre, mat in self.mats_manager.mats_ingresadas.items()
+            if not mat.aumentada
+        ]
+
+        self.nombres_sistemas = [
+            nombre
+            for nombre, mat in self.mats_manager.mats_ingresadas.items()
+            if mat.aumentada
+        ]
 
         for tab in self.instances:
             tab.update()
@@ -344,7 +363,8 @@ class AgregarTab(ctkScrollFrame):
 
         if not dimensiones_validas:
             self.mensaje_frame = ErrorFrame(
-                self, "Las dimensiones de la matriz ingresada no coinciden con las dimensions indicadas!"
+                self,
+                "Las dimensiones de la matriz ingresada no coinciden con las dimensions indicadas!"
             )
             self.mensaje_frame.grid(row=7, column=0, columnspan=2, sticky="n", padx=5, pady=5)
             return
@@ -362,13 +382,17 @@ class AgregarTab(ctkScrollFrame):
                     self.mensaje_frame = ErrorFrame(
                         self, "Todos los valores deben ser números racionales!"
                     )
-                    self.mensaje_frame.grid(row=7, column=0, columnspan=2, sticky="n", padx=5, pady=5)
+                    self.mensaje_frame.grid(
+                        row=7, column=0, columnspan=2, sticky="n", padx=5, pady=5
+                    )
                     return
                 except ZeroDivisionError:
                     self.mensaje_frame = ErrorFrame(
                         self, "El denominador no puede ser 0!"
                     )
-                    self.mensaje_frame.grid(row=7, column=0, columnspan=2, sticky="n", padx=5, pady=5)
+                    self.mensaje_frame.grid(
+                        row=7, column=0, columnspan=2, sticky="n", padx=5, pady=5
+                    )
                     return
                 fila_valores.append(valor)
             valores.append(fila_valores)
@@ -414,44 +438,44 @@ class AgregarTab(ctkScrollFrame):
     def toggle_aumentada(self) -> None:
         self.aumentada = not self.aumentada
 
-    def focus_set_columnas(self, event=None) -> None:
+    def focus_set_columnas(self) -> None:
         self.columnas_entry.focus_set()
 
-    def focus_set_filas(self, event=None) -> None:
+    def focus_set_filas(self) -> None:
         self.filas_entry.focus_set()
 
-    def columnas_move_down(self, event=None) -> None:
+    def columnas_move_down(self) -> None:
         if len(self.matriz_frame.winfo_children()) == 0:
             self.focus_set_filas()
         else:
             self.input_entries[0][0].focus_set()
 
     def bind_entry_keys(self, entry: ctkEntry, i: int, j: int) -> None:
-        entry.bind("<Up>", lambda event: self.entry_move_up(i, j, event=event))
-        entry.bind("<Down>", lambda event: self.entry_move_down(i, j, event=event))
-        entry.bind("<Left>", lambda event: self.entry_move_left(i, j, event=event))
-        entry.bind("<Right>", lambda event: self.entry_move_right(i, j, event=event))
+        entry.bind("<Up>", lambda x: self.entry_move_up(i, j))
+        entry.bind("<Down>", lambda x: self.entry_move_down(i, j))
+        entry.bind("<Left>", lambda x: self.entry_move_left(i, j))
+        entry.bind("<Right>", lambda x: self.entry_move_right(i, j))
 
-    def entry_move_up(self, i: int, j: int, event=None) -> None:
+    def entry_move_up(self, i: int, j: int) -> None:
         if i > 0:
             self.input_entries[i - 1][j].focus_set()
         elif i == 0:
             self.focus_set_columnas()
 
-    def entry_move_down(self, i: int, j: int, event=None) -> None:
+    def entry_move_down(self, i: int, j: int) -> None:
         if i < len(self.input_entries) - 1:
             self.input_entries[i + 1][j].focus_set()
         elif i == len(self.input_entries) - 1:
             self.nombre_entry.focus_set()
 
-    def entry_move_left(self, i: int, j: int, event=None) -> None:
+    def entry_move_left(self, i: int, j: int) -> None:
         if j > 0:
             self.input_entries[i][j - 1].focus_set()
         elif j == 0:
             if i > 0:
                 self.input_entries[i - 1][-1].focus_set()
 
-    def entry_move_right(self, i: int, j: int, event=None) -> None:
+    def entry_move_right(self, i: int, j: int) -> None:
         if j < len(self.input_entries[i]) - 1:
             self.input_entries[i][j + 1].focus_set()
         elif j == len(self.input_entries[i]) - 1:
@@ -484,6 +508,11 @@ class SumaRestaTab(ctkFrame):
         self.input_guardians: list[ctkFrame] = []
         self.mensaje_frame: Optional[ctkFrame] = None
         self.tabview = ctkTabview(self)
+
+        self.select_1: ctkOptionMenu
+        self.select_2: ctkOptionMenu
+        self.resultado_suma: ctkFrame
+        self.resultado_resta: ctkFrame
 
         self.tab_sumar = self.tabview.add("Sumar")
         self.tab_restar = self.tabview.add("Restar")
@@ -792,6 +821,7 @@ class MultiplicacionTab(ctkFrame):
             self.mensaje_frame.destroy()
             self.mensaje_frame = None
 
+        placeholder1 = placeholder2 = None
         if num_matrices > 1:
             placeholder1 = Variable(tab, value=self.master_frame.nombres_matrices[0])
             placeholder2 = Variable(tab, value=self.master_frame.nombres_matrices[1])
@@ -1074,7 +1104,10 @@ class TransposicionTab(ctkFrame):
                 self.rowconfigure(6, weight=0)
 
             placeholder = Variable(self, value=self.master_frame.nombres_matrices[0])
-            self.select_tmat.configure(values=self.master_frame.nombres_matrices, variable=placeholder)
+            self.select_tmat.configure(
+                values=self.master_frame.nombres_matrices, variable=placeholder
+            )
+
             self.update_tmat(self.select_tmat.get())
             self.instruct_t.grid(row=0, column=0, padx=5, pady=5, sticky="n")
             self.select_tmat.grid(row=1, column=0, padx=5, pady=5, sticky="n")
@@ -1174,7 +1207,10 @@ class DeterminanteTab(ctkFrame):
                 self.rowconfigure(6, weight=0)
 
             placeholder = Variable(self, value=self.master_frame.nombres_matrices[0])
-            self.select_dmat.configure(values=self.master_frame.nombres_matrices, variable=placeholder)
+            self.select_dmat.configure(
+                values=self.master_frame.nombres_matrices, variable=placeholder
+            )
+
             self.update_dmat(self.select_dmat.get())
             self.instruct_d.grid(row=0, column=0, padx=5, pady=5, sticky="n")
             self.select_dmat.grid(row=1, column=0, padx=5, pady=5, sticky="n")
@@ -1267,7 +1303,10 @@ class InversaTab(ctkFrame):
                 self.rowconfigure(6, weight=0)
 
             placeholder = Variable(self, value=self.master_frame.nombres_matrices[0])
-            self.select_imat.configure(values=self.master_frame.nombres_matrices, variable=placeholder)
+            self.select_imat.configure(
+                values=self.master_frame.nombres_matrices, variable=placeholder
+            )
+
             self.update_imat(self.select_imat.get())
             self.instruct_i.grid(row=0, column=0, padx=5, pady=5, sticky="n")
             self.select_imat.grid(row=1, column=0, padx=5, pady=5, sticky="n")

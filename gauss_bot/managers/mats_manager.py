@@ -141,7 +141,10 @@ class MatricesManager:
         mat_transpuesta = mat.transponer()
         return (nombre_mat_transpuesta, mat_transpuesta)
 
-    # def calcular_determinante(self, nombre_mat: str) -> Union[Fraction, tuple[Fraction, "Matriz", bool]]:
+    # def calcular_determinante(
+    #     self, nombre_mat: str
+    # ) -> Union[Fraction, tuple[Fraction, "Matriz", bool]]:
+
     #     """
     #     Calcula el determinante de la matriz indicada.
     #     * ArithmeticError: si la matriz no es cuadrada

@@ -40,7 +40,12 @@ class VectoresFrame(ctkFrame):
         self.app = app
         self.vecs_manager = vecs_manager
         self.nombres_vectores = list(self.vecs_manager.vecs_ingresados.keys())
-        self.nombres_matrices = [nombre for nombre, mat in self.app.mats_manager.mats_ingresadas.items() if not mat.aumentada]
+        self.nombres_matrices = [
+            nombre
+            for nombre, mat in self.app.mats_manager.mats_ingresadas.items()
+            if not mat.aumentada
+        ]
+
         self.crear_tabview()
 
     def crear_tabview(self) -> None:
@@ -80,7 +85,11 @@ class VectoresFrame(ctkFrame):
         }
 
         self.nombres_vectores = list(self.vecs_manager.vecs_ingresados.keys())
-        self.nombres_matrices = [nombre for nombre, mat in self.app.mats_manager.mats_ingresadas.items() if not mat.aumentada]
+        self.nombres_matrices = [
+            nombre
+            for nombre, mat in self.app.mats_manager.mats_ingresadas.items()
+            if not mat.aumentada
+        ]
 
         for tab in self.instances:
             tab.update()
@@ -280,7 +289,8 @@ class AgregarTab(ctkScrollFrame):
         input_d = len(self.input_entries)
         if dimension != input_d:
             self.mensaje_frame = ErrorFrame(
-                self, "Las dimensiones del vector ingresado no coinciden con las dimensions indicadas!"
+                self,
+                "Las dimensiones del vector ingresado no coinciden con las dimensions indicadas!",
             )
             self.mensaje_frame.grid(row=2, column=0, columnspan=2, sticky="n", padx=5, pady=5)
             return
@@ -338,27 +348,27 @@ class AgregarTab(ctkScrollFrame):
         self.app.matrices.update_all()
         self.app.config_frame.update_frame()
 
-    def dimensiones_move_down(self, event=None) -> None:
+    def dimensiones_move_down(self) -> None:
         if len(self.vector_frame.winfo_children()) != 0:
             self.input_entries[0].focus_set()
 
     def bind_entry_keys(self, entry: ctkEntry, i: int) -> None:
-        entry.bind("<Up>", lambda event: self.entry_move_up(i, event=event))
-        entry.bind("<Down>", lambda event: self.entry_move_down(i, event=event))
+        entry.bind("<Up>", lambda event: self.entry_move_up(i))
+        entry.bind("<Down>", lambda event: self.entry_move_down(i))
 
-    def entry_move_up(self, i: int, event=None) -> None:
+    def entry_move_up(self, i: int) -> None:
         if i > 0:
             self.input_entries[i - 1].focus_set()
         elif i == 0:
             self.dimension_entry.focus_set()
 
-    def entry_move_down(self, i: int, event=None) -> None:
+    def entry_move_down(self, i: int) -> None:
         if i < len(self.input_entries) - 1:
             self.input_entries[i + 1].focus_set()
         elif i == len(self.input_entries) - 1:
             self.nombre_entry.focus_set()
 
-    def nombre_entry_up(self, event=None) -> None:
+    def nombre_entry_up(self) -> None:
         self.input_entries[-1].focus_set()
 
     def update(self) -> None:
@@ -382,6 +392,11 @@ class SumaRestaTab(ctkFrame):
         self.input_guardians: list[ctkFrame] = []
         self.mensaje_frame: Optional[ctkFrame] = None
         self.tabview = ctkTabview(self)
+
+        self.select_1: ctkOptionMenu
+        self.select_2: ctkOptionMenu
+        self.resultado_suma: ctkFrame
+        self.resultado_resta: ctkFrame
 
         self.tab_sumar = self.tabview.add("Sumar")
         self.tab_restar = self.tabview.add("Restar")
@@ -690,6 +705,7 @@ class MultiplicacionTab(ctkFrame):
             self.mensaje_frame.destroy()
             self.mensaje_frame = None
 
+        placeholder1 = placeholder2 = None
         if num_vectores > 1:
             placeholder1 = Variable(tab, value=self.master_frame.nombres_vectores[0])
             placeholder2 = Variable(tab, value=self.master_frame.nombres_vectores[1])
