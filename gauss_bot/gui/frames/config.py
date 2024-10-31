@@ -1,51 +1,36 @@
+"""
+Implementación de ConfigFrame, encargado de mostrar
+y editar las configuraciones de la aplicación.
+"""
+
 from os import path
+from typing import Optional, Union
 
 from tkinter import StringVar
 from customtkinter import (
     CTkFrame as ctkFrame,
     CTkLabel as ctkLabel,
     CTkOptionMenu as ctkOptionMenu,
+    set_appearance_mode,
     set_widget_scaling,
     set_default_color_theme,
-    set_appearance_mode,
 )
 
-THEMES_PATH = path.join(path.dirname(path.dirname(path.dirname(path.realpath(__file__)))), "themes")
-CONFIG_PATH = path.join(path.dirname(path.dirname(path.dirname(path.realpath(__file__)))), "data", "config.json")
+from gauss_bot import THEMES_PATH
+from gauss_bot.gui.custom_frames import SuccessFrame
 
 
 class ConfigFrame(ctkFrame):
-    def __init__(self, master, app):
+    """
+    Frame personalizado para mostrar y editar la configuración.
+    """
+
+    def __init__(self, master, app) -> None:
         super().__init__(master, corner_radius=0, fg_color="transparent")
         self.app = app
+        self.mensaje_frame: Optional[SuccessFrame] = None
 
-        self.temas_json = {
-            "Autumn": path.join(THEMES_PATH, "autumn.json"),
-            "Breeze": path.join(THEMES_PATH, "breeze.json"),
-            "Cherry": path.join(THEMES_PATH, "cherry.json"),
-            "Carrot": path.join(THEMES_PATH, "carrot.json"),
-            "Coffee": path.join(THEMES_PATH, "coffee.json"),
-            "Lavender": path.join(THEMES_PATH, "lavender.json"),
-            "Marsh": path.join(THEMES_PATH, "marsh.json"),
-            "Metal": path.join(THEMES_PATH, "metal.json"),
-            "Midnight": path.join(THEMES_PATH, "midnight.json"),
-            "Orange": path.join(THEMES_PATH, "orange.json"),
-            "Patina": path.join(THEMES_PATH, "patina.json"),
-            "Pink": path.join(THEMES_PATH, "pink.json"),
-            "Red": path.join(THEMES_PATH, "red.json"),
-            "Rime": path.join(THEMES_PATH, "rime.json"),
-            "Rose": path.join(THEMES_PATH, "rose.json"),
-            "Sky": path.join(THEMES_PATH, "sky.json"),
-            "Violet": path.join(THEMES_PATH, "violet.json"),
-            "Yellow": path.join(THEMES_PATH, "yellow.json"),
-        }
-
-        self.modos_dict = {
-            "Claro": "light",
-            "Oscuro": "dark",
-        }
-
-        self.escalas_float = {
+        self.escalas_dict = {
             "80%": 0.8,
             "90%": 0.9,
             "100%": 1.0,
@@ -53,53 +38,136 @@ class ConfigFrame(ctkFrame):
             "120%": 1.2,
         }
 
-        self.get_tema = self.get_dict_key(self.temas_json, self.app.tema_actual)
-        self.get_modo = self.get_dict_key(self.modos_dict, self.app.modo_actual)
-        self.get_escala = self.get_dict_key(self.escalas_float, self.app.escala_actual)
-        
-        try:
-            self.first_tema = StringVar(value=self.get_tema.split("\\")[-1])
-            self.first_modo = StringVar(value=self.get_modo)
-            self.first_escala = StringVar(value=self.get_escala)
-        except AttributeError:
-            self.first_tema = StringVar(value="Metal")
-            self.first_modo = StringVar(value="Oscuro")
-            self.first_escala = StringVar(value="100%")
+        self.modos_dict = {
+            "Claro": "light",
+            "Oscuro": "dark",
+        }
 
-        self.temas = list(self.temas_json.keys())
-        self.escalas = list(self.escalas_float.keys())
+        self.temas_dict = {
+            "Autumn": "autumn.json",
+            "Breeze": "breeze.json",
+            "Cherry": "cherry.json",
+            "Carrot": "carrot.json",
+            "Coffee": "coffee.json",
+            "Lavender": "lavender.json",
+            "Marsh": "marsh.json",
+            "Metal": "metal.json",
+            "Midnight": "midnight.json",
+            "Orange": "orange.json",
+            "Patina": "patina.json",
+            "Pink": "pink.json",
+            "Red": "red.json",
+            "Rime": "rime.json",
+            "Rose": "rose.json",
+            "Sky": "sky.json",
+            "Violet": "violet.json",
+            "Yellow": "yellow.json",
+        }
+
+        self.escalas = list(self.escalas_dict.keys())
         self.modos = list(self.modos_dict.keys())
+        self.temas = list(self.temas_dict.keys())
 
-        self.temas_label = ctkLabel(self, text="Tema:")
-        self.temas_label.grid(row=0, column=0, padx=20, pady=10)
-        self.desplegar_temas = ctkOptionMenu(self, variable=self.first_tema, values=self.temas, command=self.cambiar_tema)
-        self.desplegar_temas.grid(row=0, column=1, padx=20, pady=10)
+        self.escala_actual_key = self._get_dict_key(self.escalas_dict, self.app.escala_actual)
+        self.modo_actual_key = self._get_dict_key(self.modos_dict, self.app.modo_actual)
+        self.tema_actual_key = self._get_dict_key(self.temas_dict, self.app.tema_actual)
 
-        self.modos_label = ctkLabel(self, text="Modo:")
-        self.modos_label.grid(row=1, column=0, padx=20, pady=10)
-        self.desplegar_modos = ctkOptionMenu(self, variable=self.first_modo, values=self.modos, command=self.light_dark)
-        self.desplegar_modos.grid(row=1, column=1, padx=20, pady=10)
+        try:
+            self.first_escala = StringVar(value=self.escala_actual_key)
+            self.first_modo = StringVar(value=self.modo_actual_key)
+            self.first_tema = StringVar(value=self.tema_actual_key)
+        except AttributeError:
+            self.first_escala = StringVar(value="100%")
+            self.first_modo = StringVar(value="Oscuro")
+            self.first_tema = StringVar(value="Metal")
 
         self.escala_label = ctkLabel(self, text="Escala:")
-        self.escala_label.grid(row=2, column=0, padx=20, pady=10)
-        self.desplegar_escalas = ctkOptionMenu(self, variable=self.first_escala, values=self.escalas, command=self.cambiar_escala)
-        self.desplegar_escalas.grid(row=2, column=1, padx=20, pady=10)
+        self.modos_label = ctkLabel(self, text="Modo:")
+        self.temas_label = ctkLabel(self, text="Tema:")
 
-    def cambiar_escala(self, escala_seleccionada):
-        self.app.escala_actual = self.escalas_float[escala_seleccionada]
+        self.desplegar_escalas = ctkOptionMenu(
+            self, width=105, variable=self.first_escala,
+            values=self.escalas, command=self.cambiar_escala,
+        )
+
+        self.desplegar_modos = ctkOptionMenu(
+            self, width=105, variable=self.first_modo,
+            values=self.modos, command=self.cambiar_modo
+        )
+
+        self.desplegar_temas = ctkOptionMenu(
+            self, width=105, variable=self.first_tema,
+            values=self.temas, command=self.cambiar_tema
+        )
+
+        self.escala_label.grid(row=0, column=0, padx=(30, 10), pady=(20, 10), sticky="nw")
+        self.desplegar_escalas.grid(row=0, column=1, padx=10, pady=(20, 10), sticky="nw")
+        self.modos_label.grid(row=1, column=0, padx=(30, 10), pady=10, sticky="nw")
+        self.desplegar_modos.grid(row=1, column=1, padx=10, pady=10, sticky="nw")
+        self.temas_label.grid(row=2, column=0, padx=(30, 10), pady=10, sticky="nw")
+        self.desplegar_temas.grid(row=2, column=1, padx=10, pady=10, sticky="nw")
+
+    def cambiar_escala(self, escala_seleccionada: str) -> None:
+        """
+        Cambia la escala actual de la aplicación a la indicado.
+        """
+
+        if self.escalas_dict[escala_seleccionada] == self.app.escala_actual:
+            return
+
+        self.app.escala_actual = self.escalas_dict[escala_seleccionada]
         set_widget_scaling(self.app.escala_actual)
+        self.app.matrices.update_all()
+        self.app.vectores.update_all()
 
-    def cambiar_tema(self, tema_seleccionado):
-        self.app.tema_actual = self.temas_json[tema_seleccionado]
-        set_default_color_theme(self.app.tema_actual)
+    def cambiar_modo(self, modo_seleccionado: str) -> None:
+        """
+        Cambia el modo actual de apariencia de la aplicación al indicado.
+        """
 
-    def light_dark(self, modo_seleccionado):
+        if self.modos_dict[modo_seleccionado] == self.app.modo_actual:
+            return
+
         self.app.modo_actual = self.modos_dict[modo_seleccionado]
         set_appearance_mode(self.app.modo_actual)
         self.app.set_icon(self.app.modo_actual)
+        self.app.matrices.update_all()
+        self.app.vectores.update_all()
 
-    def get_dict_key(self, dict, tema):
-        for key, value in dict.items():
-            if value == tema:
+    def cambiar_tema(self, tema_seleccionado: str) -> None:
+        """
+        Cambia el tema actual de la aplicación al indicado.
+        """
+
+        if self.temas_dict[tema_seleccionado] == self.app.tema_actual:
+            return
+
+        self.app.tema_actual = self.temas_dict[tema_seleccionado]
+        set_default_color_theme(path.join(THEMES_PATH, self.app.tema_actual))
+
+        self.mensaje_frame = SuccessFrame(
+            self,
+            message="Tema cambiado exitosamente! Cambios tomarán efecto al reiniciar la aplicación."
+        )
+        self.mensaje_frame.grid(row=3, column=1, pady=30)
+
+    def _get_dict_key(self, dict_lookup: dict, buscando: str) -> Union[str, None]:
+        """
+        Busca un valor en un diccionario y retorna su llave.
+        """
+
+        for key, value in dict_lookup.items():
+            if value == buscando:
                 return key
         return None
+
+    def update_frame(self) -> None:
+        if self.mensaje_frame is not None:
+            self.mensaje_frame.destroy()
+            self.mensaje_frame = None
+        self.modo_actual_key = self._get_dict_key(self.modos_dict, self.app.modo_actual)
+        self.escala_actual_key = self._get_dict_key(self.escalas_dict, self.app.escala_actual)
+        self.tema_actual_key = self._get_dict_key(self.temas_dict, self.app.tema_actual)
+        self.first_modo.set(self.modo_actual_key)  # type: ignore
+        self.first_escala.set(self.escala_actual_key)  # type: ignore
+        self.first_tema.set(self.tema_actual_key)  # type: ignore

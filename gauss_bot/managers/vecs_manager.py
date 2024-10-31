@@ -1,6 +1,17 @@
+"""
+Implementación de VectoresManager.
+Almacena vectores, realiza operaciones y retorna resultados.
+
+Operaciones implementadas:
+* suma
+* resta
+* producto escalar
+* producto punto
+"""
+
 from fractions import Fraction
 
-from gauss_bot.models.Vector import Vector
+from gauss_bot.models.vector import Vector
 
 
 class VectoresManager:
@@ -24,11 +35,11 @@ class VectoresManager:
         Obtiene los vectores guardados en self.vecs_ingresados y los retorna como un string.
         """
 
-        if not self.validar_vecs_ingresados():
-            return "\nNo hay vectores ingresados!"
+        if not self._validar_vecs_ingresados():
+            return "No hay vectores ingresados!"
 
         vectores = ""
-        vectores += "\nVectores ingresados:\n"
+        vectores += "Vectores ingresados:\n"
         vectores += "---------------------------------------------\n"
         for nombre, vec in self.vecs_ingresados.items():
             vectores += f"{nombre}: {vec}\n"
@@ -36,6 +47,11 @@ class VectoresManager:
         return vectores
 
     def sumar_vecs(self, nombre_vec1: str, nombre_vec2: str) -> tuple[str, Vector]:
+        """
+        Suma los dos vectors indicados.
+        * ArithmeticError: si los vectores no tienen la misma dimensión.
+        """
+
         vec1 = self.vecs_ingresados[nombre_vec1]
         vec2 = self.vecs_ingresados[nombre_vec2]
 
@@ -44,6 +60,11 @@ class VectoresManager:
         return (nombre_vec_suma, vec_suma)
 
     def restar_vecs(self, nombre_vec1: str, nombre_vec2: str) -> tuple[str, Vector]:
+        """
+        Resta los dos vectores indicados.
+        * ArithmeticError: si los vectores no tienen la misma dimensión.
+        """
+
         vec1 = self.vecs_ingresados[nombre_vec1]
         vec2 = self.vecs_ingresados[nombre_vec2]
 
@@ -52,6 +73,10 @@ class VectoresManager:
         return (nombre_vec_resta, vec_resta)
 
     def escalar_por_vector(self, escalar: Fraction, nombre_vec: str) -> tuple[str, Vector]:
+        """
+        Multiplica un vector por un escalar.
+        """
+
         vec = self.vecs_ingresados[nombre_vec]
         vec_multiplicado = vec * escalar
 
@@ -68,6 +93,11 @@ class VectoresManager:
         return (nombre_vec_multiplicado, vec_multiplicado)
 
     def producto_punto(self, nombre_vec1: str, nombre_vec2: str) -> tuple[str, Fraction]:
+        """
+        Calcula el producto punto de los dos vectores indicados.
+        * ArithmeticError: si los vectores no tienen la misma dimensión.
+        """
+
         vec1 = self.vecs_ingresados[nombre_vec1]
         vec2 = self.vecs_ingresados[nombre_vec2]
 
@@ -75,30 +105,7 @@ class VectoresManager:
         nombre_prod_punto = f"{nombre_vec1}.{nombre_vec2}"
         return (nombre_prod_punto, prod_punto)
 
-    def validar_input_vec(self, input_vec: str) -> None:
-        """
-        Valida el vector seleccionado por el usuario.
-        * KeyError: si el vector no existe en vecs_ingresados
-        """
-
-        if input_vec not in self.vecs_ingresados:
-            raise KeyError(f"El vector '{input_vec}' no existe!")
-
-    def validar_input_vecs(self, input_vecs: list[str]) -> None:
-        """
-        Valida los vectores seleccionados por el usuario.
-        * KeyError: si uno de los vectores seleccionados no existe
-        * ArithmeticError: si los vectores no tienen las mismas dimensiones
-        """
-
-        vec = next((vec for vec in input_vecs if vec not in self.vecs_ingresados), None)
-        if vec is not None:
-            raise KeyError(f"El vector '{vec}' no existe!")
-        vec1, vec2 = input_vecs
-        if len(vec1) != len(vec2):
-            raise ArithmeticError("Los vectores no tienen las mismas dimensiones!")
-
-    def validar_vecs_ingresados(self) -> bool:
+    def _validar_vecs_ingresados(self) -> bool:
         """
         Valida si el diccionario de vectores ingresados esta vacío o no.
         """

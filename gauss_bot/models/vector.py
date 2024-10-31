@@ -1,3 +1,9 @@
+"""
+Implementación de vectores matemáticos de cualquier dimensión.
+Se pueden realizar operaciones básicas como suma, resta, y multiplicación
+usando sobrecarga de operadores.
+"""
+
 from fractions import Fraction
 from typing import Union, overload
 
@@ -31,7 +37,7 @@ class Vector:
         return len(self.componentes)
 
     def __str__(self) -> str:
-        return f"[{', '.join(str(c) for c in self.componentes)}]"
+        return f"[ {', '.join(str(c) for c in self.componentes)} ]"
 
     def __add__(self, vec2: "Vector") -> "Vector":
         """
