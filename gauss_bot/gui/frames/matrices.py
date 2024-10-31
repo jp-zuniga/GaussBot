@@ -44,6 +44,7 @@ class MatricesFrame(ctkFrame):
         super().__init__(master, corner_radius=0, fg_color="transparent")
         self.app = app
         self.mats_manager = mats_manager
+
         self.nombres_vectores = list(self.app.vecs_manager.vecs_ingresados.keys())
         self.nombres_matrices = [
             nombre
@@ -57,9 +58,9 @@ class MatricesFrame(ctkFrame):
             if mat.aumentada
         ]
 
-        self.crear_tabview()
+        self.setup_tabview()
 
-    def crear_tabview(self) -> None:
+    def setup_tabview(self) -> None:
         """
         Crea un tabview con pestañas para cada operación con matrices.
         """
@@ -69,18 +70,20 @@ class MatricesFrame(ctkFrame):
 
         self.instances: list[Union[ctkFrame, ctkScrollFrame]] = []
         self.tabs = [
-            ("Mostrar matrices", MostrarTab),
-            ("Agregar matriz", AgregarTab),
+            ("Manejar Matrices", ManejarFrame),
             ("Suma y Resta", SumaRestaTab),
             ("Multiplicación", MultiplicacionTab),
             ("Transposición", TransposicionTab),
             ("Calcular Determinante", DeterminanteTab),
-            ("Encontrar Inversa", InversaTab),
+            ("Encontrar Inversa", InversaTab)
         ]
 
         for nombre, cls in self.tabs:
             tab = self.tabview.add(nombre)
-            tab_instance = cls(self, tab, self.app, self.mats_manager)
+            tab_instance: Union[ctkFrame, ctkScrollFrame] = (
+                cls(self, tab, self.app, self.mats_manager)
+            )
+
             tab_instance.pack(expand=True, fill="both")
             self.instances.append(tab_instance)  # type: ignore
 
@@ -93,6 +96,7 @@ class MatricesFrame(ctkFrame):
             nombre: mat
             for nombre, mat in sorted(self.mats_manager.mats_ingresadas.items())
         }
+
         self.app.vecs_manager.vecs_ingresados = {
             nombre: vec
             for nombre, vec in sorted(self.app.vecs_manager.vecs_ingresados.items())
@@ -119,29 +123,97 @@ class MatricesFrame(ctkFrame):
         self.update_idletasks()
 
 
-class MostrarTab(ctkScrollFrame):
+class ManejarFrame(ctkFrame):
+    def __init__(self, master_frame: MatricesFrame, master_tab,
+                 app, mats_manager: MatricesManager) -> None:
+
+        super().__init__(master_tab, corner_radius=0, fg_color="transparent")
+        self.app = app
+        self.master_frame = master_frame
+        self.mats_manager = mats_manager
+        self.columnconfigure(0, weight=1)
+        self.setup_tabview()
+
+    def setup_tabview(self) -> None:
+        self.tabview = ctkTabview(self)
+        self.tabview.pack(expand=True, fill="both")
+
+        self.instances: list[Union[ctkFrame, ctkScrollFrame]] = []
+        self.tabs = [
+            ("Agregar", AgregarTab),
+            ("Mostrar", MostrarTab),
+            # ("Editar", EditarTab),
+            # ("Eliminar", EliminarTab)
+        ]
+
+        for nombre, cls in self.tabs:
+            tab = self.tabview.add(nombre)
+            tab_instance: Union[ctkFrame, ctkScrollFrame] = (
+                cls(self, tab, self.app, self.mats_manager)
+            )
+
+            tab_instance.pack(expand=True, fill="both")
+            self.instances.append(tab_instance)   # type: ignore
+
+    def update(self):
+        for tab in self.instances:
+            tab.update()
+            for widget in tab.winfo_children():
+                widget.configure(bg_color="transparent")  # type: ignore
+        self.tabview.configure(fg_color="transparent")
+        self.update_idletasks()
+
+
+class MostrarTab(ctkFrame):
     """
     Frame para mostrar todas las matrices ingresadas.
     """
 
-    def __init__(self, master_frame: MatricesFrame,
-                 master_tab, app, mats_manager: MatricesManager) -> None:
+    def __init__(self, master_frame: ManejarFrame, master_tab,
+                 app, mats_manager: MatricesManager) -> None:
 
         super().__init__(master_tab, corner_radius=0, fg_color="transparent")
-        self.master_frame = master_frame
         self.app = app
+        self.master_frame = master_frame
         self.mats_manager = mats_manager
         self.columnconfigure(0, weight=1)
 
-        mats_text = self.mats_manager.get_matrices()
-        self.print_frame: Union[ErrorFrame, ResultadoFrame]
+        self.options: dict[str, tuple[int, bool]] = {
+            "Sistemas ingresados": (1, False),
+            "Matrices ingresadas": (0, False),
+            "Matrices calculadas": (-1, True),
+        }
+
+        self.select_label = ctkLabel(self, text="Seleccione un filtro:")
+        self.select_option = ctkOptionMenu(
+            self, width=140, values=list(self.options.keys()), command=self.update_option
+        )
+
+        self.option_seleccionada = self.options[self.select_option.get()]
+        self.mostrar_button = ctkButton(self, width=80, text="Mostrar", command=self.setup_mostrar)
+        self.mostrar_frame = ctkFrame(self)
+        self.print_frame: Optional[Union[ErrorFrame, ResultadoFrame]] = None
+
+        self.select_label.grid(row=0, column=0, padx=5, pady=5, sticky="n")
+        self.select_option.grid(row=1, column=0, padx=5, pady=5, sticky="n")
+        self.mostrar_button.grid(row=2, column=0, padx=5, pady=5, sticky="n")
+        self.mostrar_frame.grid(row=3, column=0, padx=5, pady=10, sticky="n")
+
+    def setup_mostrar(self) -> None:
+        self.update_option(self.select_option.get())
+        aumentada, calculada = self.option_seleccionada
+        mats_text: str = self.mats_manager.get_matrices(aumentada, calculada)
+
+        if self.print_frame is not None:
+            self.print_frame.destroy()
+            self.print_frame = None
 
         if mats_text.startswith("No"):
-            self.print_frame = ErrorFrame(self, mats_text)
-            self.print_frame.grid(row=0, column=0, padx=5, pady=5, sticky="n")
+            self.print_frame = ErrorFrame(self.mostrar_frame, mats_text)
+            self.print_frame.grid(row=0, column=0, padx=10, pady=10, sticky="n")
         else:
             self.print_frame = ResultadoFrame(
-                self, header=mats_text, resultado="", solo_header=True
+                self.mostrar_frame, header=mats_text, resultado="", solo_header=True
             )
             self.print_frame.grid(
                 row=0, column=0,
@@ -151,36 +223,25 @@ class MostrarTab(ctkScrollFrame):
         self.print_frame.columnconfigure(0, weight=1)
 
     def update(self) -> None:
-        mats_text = self.mats_manager.get_matrices()
-        self.print_frame.destroy()
-
-        if mats_text.startswith("No"):
-            self.print_frame = ErrorFrame(self, mats_text)
-            self.print_frame.grid(row=0, column=0, sticky="n")
-        else:
-            self.print_frame = ResultadoFrame(
-                self, header=mats_text, resultado="", solo_header=True
-            )
-            self.print_frame.grid(
-                row=0, column=0,
-                padx=10, pady=10, sticky="n",
-            )
-            self.print_frame.header.grid(ipadx=10, ipady=10)
-        self.print_frame.columnconfigure(0, weight=1)
+        for widget in self.mostrar_frame.winfo_children():
+            widget.destroy()  # type: ignore
         self.update_idletasks()
 
+    def update_option(self, valor: str) -> None:
+        self.option_seleccionada = self.options[valor]
 
-class AgregarTab(ctkScrollFrame):
+
+class AgregarTab(ctkFrame):
     """
     Frame para agregar una nueva matriz.
     """
 
-    def __init__(self, master_frame: MatricesFrame,
-                 master_tab, app, mats_manager: MatricesManager) -> None:
+    def __init__(self, master_frame: ManejarFrame, master_tab,
+                 app, mats_manager: MatricesManager) -> None:
 
         super().__init__(master_tab, corner_radius=0, fg_color="transparent")
-        self.master_frame = master_frame
         self.app = app
+        self.master_frame = master_frame
         self.mats_manager = mats_manager
 
         self.columnconfigure(0, weight=1)
@@ -199,12 +260,11 @@ class AgregarTab(ctkScrollFrame):
         self.columnas_entry = ctkEntry(self, width=60, placeholder_text="3")
 
         ingresar_button = ctkButton(
-            self, height=30, text="Ingresar datos", command=self.generar_casillas
+            self, text="Ingresar datos", command=self.generar_casillas
         )
 
         aleatoria_button = ctkButton(
             self,
-            height=30,
             text="Generar matriz aleatoria",
             command=self.generar_aleatoria,
         )
@@ -212,10 +272,10 @@ class AgregarTab(ctkScrollFrame):
         self.matriz_frame = ctkFrame(self)
 
         self.filas_entry.bind("<Return>", lambda x: self.generar_casillas())
-        self.filas_entry.bind("<Up>", command=self.focus_set_columnas)
-        self.filas_entry.bind("<Down>", command=self.focus_set_columnas)
+        self.filas_entry.bind("<Up>", lambda x: self.focus_set_columnas())
+        self.filas_entry.bind("<Down>", lambda x: self.focus_set_columnas())
         self.columnas_entry.bind("<Return>", lambda x: self.generar_casillas())
-        self.columnas_entry.bind("<Up>", command=self.focus_set_filas)
+        self.columnas_entry.bind("<Up>", lambda x: self.focus_set_filas())
         self.columnas_entry.bind("<Down>", lambda x: self.columnas_move_down())
 
         checkbox_label.grid(row=0, column=0, padx=5, pady=5, sticky="e")
@@ -431,7 +491,7 @@ class AgregarTab(ctkScrollFrame):
             self, "La matriz se ha agregado exitosamente!"
         )
         self.mensaje_frame.grid(row=7, column=0, columnspan=2, sticky="n", padx=5, pady=5)
-        self.master_frame.update_all()
+        self.app.matrices.update_all()
         self.app.vectores.update_all()
         self.app.config_frame.update_frame()
 
@@ -491,37 +551,44 @@ class AgregarTab(ctkScrollFrame):
         self.update_idletasks()
 
 
+class EditarTab(ctkFrame):
+    pass
+
+
+class EliminarTab(ctkFrame):
+    pass
+
+
 class SumaRestaTab(ctkFrame):
     """
     Frame para sumar y restar matrices.
     """
 
-    def __init__(self, master_frame: MatricesFrame,
-                 master_tab, app, mats_manager: MatricesManager) -> None:
+    def __init__(self, master_frame: MatricesFrame, master_tab,
+                 app, mats_manager: MatricesManager) -> None:
 
         super().__init__(master_tab, corner_radius=0, fg_color="transparent")
-        self.master_frame = master_frame
         self.app = app
+        self.master_frame = master_frame
         self.mats_manager = mats_manager
         self.columnconfigure(0, weight=1)
 
         self.input_guardians: list[ctkFrame] = []
         self.mensaje_frame: Optional[ctkFrame] = None
-        self.tabview = ctkTabview(self)
 
         self.select_1: ctkOptionMenu
         self.select_2: ctkOptionMenu
         self.resultado_suma: ctkFrame
         self.resultado_resta: ctkFrame
 
-        self.tab_sumar = self.tabview.add("Sumar")
-        self.tab_restar = self.tabview.add("Restar")
-        self.setup_tabs()
-
         self.mat1 = ""
         self.mat2 = ""
 
+        self.tabview = ctkTabview(self)
         self.tabview.grid(row=0, column=0, sticky="n")
+        self.tab_sumar = self.tabview.add("Sumar")
+        self.tab_restar = self.tabview.add("Restar")
+        self.setup_tabs()
 
     def setup_tabs(self) -> None:
         for tab in self.tabview.winfo_children():
@@ -683,23 +750,17 @@ class MultiplicacionTab(ctkFrame):
     multiplicación matricial y producto matriz-vector.
     """
 
-    def __init__(self, master_frame: MatricesFrame,
-                 master_tab, app, mats_manager: MatricesManager) -> None:
+    def __init__(self, master_frame: MatricesFrame, master_tab,
+                 app, mats_manager: MatricesManager) -> None:
 
         super().__init__(master_tab, corner_radius=0, fg_color="transparent")
-        self.master_frame = master_frame
         self.app = app
+        self.master_frame = master_frame
         self.mats_manager = mats_manager
         self.columnconfigure(0, weight=1)
 
         self.mensaje_frame: Optional[ctkFrame] = None
         self.input_guardians: list[ctkFrame] = []
-
-        self.tabview = ctkTabview(self)
-        self.tab_escalar = self.tabview.add("Escalar por Matriz")
-        self.tab_matriz = self.tabview.add("Multiplicación Matricial")
-        self.tab_matriz_vector = self.tabview.add("Producto Matriz-Vector")
-        self.setup_tabs()
 
         self.select_escalar_mat: ctkOptionMenu
         self.escalar_entry: ctkEntry
@@ -714,7 +775,12 @@ class MultiplicacionTab(ctkFrame):
         self.vmat = ""
         self.mvec = ""
 
+        self.tabview = ctkTabview(self)
         self.tabview.grid(row=0, column=0, sticky="n")
+        self.tab_escalar = self.tabview.add("Escalar por Matriz")
+        self.tab_matriz = self.tabview.add("Multiplicación Matricial")
+        self.tab_matriz_vector = self.tabview.add("Producto Matriz-Vector")
+        self.setup_tabs()
 
     def setup_tabs(self) -> None:
         """
@@ -1030,22 +1096,23 @@ class TransposicionTab(ctkFrame):
     Frame para transponer una matriz.
     """
 
-    def __init__(self, master_frame: MatricesFrame,
-                 master_tab, app, mats_manager: MatricesManager) -> None:
+    def __init__(self, master_frame: MatricesFrame, master_tab,
+                 app, mats_manager: MatricesManager) -> None:
 
         super().__init__(master_tab, corner_radius=0, fg_color="transparent")
-        self.master_frame = master_frame
         self.app = app
+        self.master_frame = master_frame
         self.mats_manager = mats_manager
         self.columnconfigure(0, weight=1)
 
-        self.mensaje_frame: Optional[ctkFrame] = None
         if len(self.master_frame.nombres_matrices) > 0:
             placeholder = Variable(self, value=self.master_frame.nombres_matrices[0])
         else:
             placeholder = None
 
+        self.mensaje_frame: Optional[ctkFrame] = None
         self.instruct_t = ctkLabel(self, text="Seleccione la matriz para transponer:")
+
         self.select_tmat = ctkOptionMenu(
             self,
             width=60,
@@ -1124,22 +1191,23 @@ class DeterminanteTab(ctkFrame):
     Frame para calcular el determinante de una matriz.
     """
 
-    def __init__(self, master_frame: MatricesFrame,
-                 master_tab, app, mats_manager: MatricesManager) -> None:
+    def __init__(self, master_frame: MatricesFrame, master_tab,
+                 app, mats_manager: MatricesManager) -> None:
 
         super().__init__(master_tab, corner_radius=0, fg_color="transparent")
-        self.master_frame = master_frame
         self.app = app
+        self.master_frame = master_frame
         self.mats_manager = mats_manager
         self.columnconfigure(0, weight=1)
 
-        self.mensaje_frame: Optional[ctkFrame] = None
         if len(self.master_frame.nombres_matrices) > 0:
             placeholder = Variable(self, value=self.master_frame.nombres_matrices[0])
         else:
             placeholder = None
 
+        self.mensaje_frame: Optional[ctkFrame] = None
         self.instruct_d = ctkLabel(self, text="Seleccione la matriz para calcular el determinante:")
+
         self.select_dmat = ctkOptionMenu(
             self,
             width=60,
@@ -1227,12 +1295,12 @@ class InversaTab(ctkFrame):
     Frame para encontrar la inversa de una matriz.
     """
 
-    def __init__(self, master_frame: MatricesFrame,
-                 master_tab, app, mats_manager: MatricesManager) -> None:
+    def __init__(self, master_frame: MatricesFrame, master_tab,
+                 app, mats_manager: MatricesManager) -> None:
 
         super().__init__(master_tab, corner_radius=0, fg_color="transparent")
-        self.master_frame = master_frame
         self.app = app
+        self.master_frame = master_frame
         self.mats_manager = mats_manager
         self.columnconfigure(0, weight=1)
 
