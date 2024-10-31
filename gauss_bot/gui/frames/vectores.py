@@ -40,7 +40,7 @@ class VectoresFrame(ctkFrame):
         self.app = app
         self.vecs_manager = vecs_manager
         self.nombres_vectores = list(self.vecs_manager.vecs_ingresados.keys())
-        self.nombres_matrices = list(self.app.mats_manager.mats_ingresadas.keys())
+        self.nombres_matrices = [nombre for nombre, mat in self.app.mats_manager.mats_ingresadas.items() if not mat.aumentada]
         self.crear_tabview()
 
     def crear_tabview(self) -> None:
@@ -70,8 +70,18 @@ class VectoresFrame(ctkFrame):
         Actualiza los datos de todos los frames del tabview.
         """
 
+        self.app.mats_manager.mats_ingresadas = {
+            nombre: mat
+            for nombre, mat in sorted(self.app.mats_manager.mats_ingresadas.items())
+        }
+        self.app.vecs_manager.vecs_ingresados = {
+            nombre: vec
+            for nombre, vec in sorted(self.app.vecs_manager.vecs_ingresados.items())
+        }
+
         self.nombres_vectores = list(self.vecs_manager.vecs_ingresados.keys())
-        self.nombres_matrices = list(self.app.mats_manager.mats_ingresadas.keys())
+        self.nombres_matrices = [nombre for nombre, mat in self.app.mats_manager.mats_ingresadas.items() if not mat.aumentada]
+
         for tab in self.instances:
             tab.update()
             for widget in tab.winfo_children():
@@ -365,7 +375,7 @@ class AgregarTab(ctkScrollFrame):
         self.mensaje_frame.grid(row=6, column=0, columnspan=2, sticky="n", padx=5, pady=5)
         self.master_frame.update_all()
         self.app.matrices.update_all()
-        self.app.config_frame.udpate_frame()
+        self.app.config_frame.update_frame()
 
     def update(self) -> None:
         self.update_idletasks()
@@ -475,8 +485,8 @@ class SumaRestaTab(ctkFrame):
         Ejecuta la suma o resta de vectores, dependiendo en la elección del usuario.
         """
 
-        self.update_select1(self.select_1.get())
-        self.update_select2(self.select_2.get())
+        nombre_vec1 = self.select_1.get()
+        nombre_vec2 = self.select_2.get()
 
         if operacion == "Sumar":
             self.ejecutar_suma(nombre_vec1, nombre_vec2)
@@ -576,12 +586,12 @@ class MultiplicacionTab(ctkFrame):
         self.tab_matriz_vector = self.tabview.add("Producto Matriz-Vector")
         self.setup_tabs()
 
-        self.select_escalar_vec: Optional[ctkOptionMenu] = None
-        self.escalar_entry: Optional[ctkEntry] = None
-        self.select_vec1: Optional[ctkOptionMenu] = None
-        self.select_vec2: Optional[ctkOptionMenu] = None
-        self.select_vmat: Optional[ctkOptionMenu] = None
-        self.select_mvec: Optional[ctkOptionMenu] = None
+        self.select_escalar_vec: ctkOptionMenu
+        self.escalar_entry: ctkEntry
+        self.select_vec1: ctkOptionMenu
+        self.select_vec2: ctkOptionMenu
+        self.select_vmat: ctkOptionMenu
+        self.select_mvec: ctkOptionMenu
 
         self.escalar_vec = ""
         self.vec1 = ""
@@ -784,6 +794,8 @@ class MultiplicacionTab(ctkFrame):
         Realiza la multiplicación de un vector por un escalar.
         """
 
+        vec = self.select_escalar_vec.get()  # type: ignore
+
         if self.mensaje_frame is not None:
             self.mensaje_frame.destroy()
             self.mensaje_frame = None
@@ -818,6 +830,9 @@ class MultiplicacionTab(ctkFrame):
         Realiza el producto punto de dos vectores.
         """
 
+        nombre_vec1 = self.select_vec1.get()  # type: ignore
+        nombre_vec2 = self.select_vec2.get()  # type: ignore
+
         if self.mensaje_frame is not None:
             self.mensaje_frame.destroy()
             self.mensaje_frame = None
@@ -842,6 +857,9 @@ class MultiplicacionTab(ctkFrame):
         """
         Realiza el producto de una matriz por un vector.
         """
+
+        nombre_mat = self.select_vmat.get()  # type: ignore
+        nombre_vec = self.select_mvec.get()  # type: ignore
 
         if self.mensaje_frame is not None:
             self.mensaje_frame.destroy()

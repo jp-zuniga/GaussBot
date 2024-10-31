@@ -28,7 +28,9 @@ class NavFrame(ctkFrame):
         self.app = app
 
         self.grid(row=0, column=0, sticky="nsew")
-        self.grid_rowconfigure(4, weight=1)
+        self.rowconfigure(4, weight=1)
+        self.columnconfigure(0, weight=1)
+        self.columnconfigure(1, weight=1)
         self.configure(fg_color=self.app.theme_config["CTk"]["fg_color"])
 
         self.logo = ctkImage(
@@ -61,10 +63,11 @@ class NavFrame(ctkFrame):
             light_image=Image.open(path.join(ASSET_PATH, "dark_quit_icon.png"))
         )
 
-        self.nav_frame_label = ctkLabel(
-            self, text="  GaussBot",
-            image=self.logo, compound="left",
-            font=ctkFont(size=16, weight="bold"),
+
+        self.logo_label = ctkLabel(self, image=self.logo, text="")
+        self.logo_text = ctkLabel(
+            self, text="GaussBot",
+            font=ctkFont(size=18, weight="bold"),
         )
 
         self.ecuaciones_button = ctkButton(
@@ -107,12 +110,13 @@ class NavFrame(ctkFrame):
             command=self.quit_event,
         )
 
-        self.nav_frame_label.grid(row=0, column=0, padx=20, pady=20)
-        self.ecuaciones_button.grid(row=1, column=0, padx=10, sticky="ew")
-        self.matrices_button.grid(row=2, column=0, padx=10, sticky="ew")
-        self.vectores_button.grid(row=3, column=0, padx=10, sticky="ew")
-        self.config_button.grid(row=5, column=0, padx=10, sticky="ew")
-        self.quit_button.grid(row=6, column=0, padx=10, pady=(0, 10), sticky="ew")
+        self.logo_label.grid(row=0, column=0, padx=5, pady=20, sticky="e")
+        self.logo_text.grid(row=0, column=1, padx=5, pady=20, sticky="w")
+        self.ecuaciones_button.grid(row=1, column=0, columnspan=2, padx=10, sticky="ew")
+        self.matrices_button.grid(row=2, column=0, columnspan=2, padx=10, sticky="ew")
+        self.vectores_button.grid(row=3, column=0, columnspan=2, padx=10, sticky="ew")
+        self.config_button.grid(row=5, column=0, columnspan=2, padx=10, sticky="ew")
+        self.quit_button.grid(row=6, column=0, columnspan=2, padx=10, pady=(0, 10), sticky="ew")
 
         self.frames = {
             "ecuaciones": self.app.ecuaciones,

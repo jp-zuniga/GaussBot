@@ -36,7 +36,7 @@ class EcuacionesFrame(ctkFrame):
         self.columnconfigure(0, weight=1)
         self.columnconfigure(1, weight=1)
 
-        self.nombres_matrices: list[str] = []
+        self.nombres_sistemas: list[str] = []
         self.mensaje_frame: Optional[ctkFrame] = None
 
         self.select_sis_mat: Optional[ctkOptionMenu] = None
@@ -57,11 +57,13 @@ class EcuacionesFrame(ctkFrame):
             self.mensaje_frame.grid(row=0, column=0, columnspan=2, padx=5, pady=5)
             return
 
-        for nombre, mat in self.mats_manager.mats_ingresadas.items():
-            if mat.aumentada:
-                self.nombres_matrices.append(nombre)
+        self.nombres_sistemas = [
+            nombre
+            for nombre, mat in self.mats_manager.mats_ingresadas.items()
+            if mat.aumentada
+        ]
 
-        if len(self.nombres_matrices) == 0:
+        if len(self.nombres_sistemas) == 0:
             self.rowconfigure(0, weight=1)
             self.mensaje_frame = ErrorFrame(self, "No hay sistemas de ecuaciones ingresados!")
             self.mensaje_frame.grid(row=0, column=0, columnspan=2, padx=5, pady=5)
@@ -73,7 +75,7 @@ class EcuacionesFrame(ctkFrame):
 
         instruct_se = ctkLabel(self, text="Seleccione el sistema de ecuaciones a resolver:")
         self.select_sis_mat = ctkOptionMenu(
-            self, width=60, values=self.nombres_matrices, command=self.update_sis_mat
+            self, width=60, values=self.nombres_sistemas, command=self.update_sis_mat
         )
 
         self.gauss_jordan_checkbox = ctkCheckBox(self, text="", command=self.toggle_gj)
@@ -101,6 +103,8 @@ class EcuacionesFrame(ctkFrame):
         por el usuario, utilizando el método indicado.
         """
 
+        self.update_sis_mat(self.select_sis_mat.get())  # type: ignore
+
         if self.mensaje_frame is not None:
             self.mensaje_frame.destroy()
             self.mensaje_frame = None
@@ -116,16 +120,18 @@ class EcuacionesFrame(ctkFrame):
                 self, "Debe seleccionar un método para resolver el sistema!"
             )
             self.mensaje_frame.grid(row=5, column=0, columnspan=2, sticky="n", padx=5, pady=5)
-            return
 
-        nombre_sistema = ""
+        if self.mats_manager.mats_ingresadas[self.sis_mat].es_matriz_cero():
+            self.gauss_jordan = True
+            self.cramer = False
+
         if self.gauss_jordan:
-            nombre_sistema, sistema = (
+            sistema = (
                 self.mats_manager.resolver_sistema(nombre_mat=self.sis_mat, metodo="gj")
             )
         elif self.cramer:
             try:
-                nombre_sistema, sistema = (
+                sistema = (
                     self.mats_manager.resolver_sistema(nombre_mat=self.sis_mat, metodo="c")
                 )
             except (TypeError, ArithmeticError, ZeroDivisionError) as e:
@@ -139,13 +145,14 @@ class EcuacionesFrame(ctkFrame):
             self.mensaje_frame.destroy()
             self.mensaje_frame = None
 
-        if not any(sistema.matriz == mat for mat in self.mats_manager.mats_ingresadas.values()):
-            self.mats_manager.mats_ingresadas[nombre_sistema] = sistema.matriz
-            self.app.matrices.update_all()
-
-        self.mensaje_frame = ResultadoFrame(
-            self, header=sistema.solucion, resultado="", solo_header=True
-        )
+        if sistema.solucion.count("!=") > 0:
+            self.mensaje_frame = ResultadoFrame(
+                self, header=sistema.solucion, resultado="", solo_header=True, border_color="#ff3131"
+            )
+        else:
+            self.mensaje_frame = ResultadoFrame(
+                self, header=sistema.solucion, resultado="", solo_header=True
+            )
         self.mensaje_frame.grid(row=5, column=0, columnspan=2, sticky="n", padx=5, pady=5)
 
     def toggle_gj(self) -> None:
@@ -155,6 +162,8 @@ class EcuacionesFrame(ctkFrame):
         self.cramer = not self.cramer
 
     def update_frame(self) -> None:
+        for widget in self.winfo_children():
+            widget.destroy()  # type: ignore
         self.setup_frame()
 
     def update_sis_mat(self, valor: str) -> None:

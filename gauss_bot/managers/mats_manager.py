@@ -14,6 +14,7 @@ Operaciones implementadas:
 
 from copy import deepcopy
 from fractions import Fraction
+# from typing import Union
 
 from gauss_bot.models.matriz import Matriz
 from gauss_bot.models.sistema_ecuaciones import SistemaEcuaciones
@@ -51,7 +52,7 @@ class MatricesManager:
         matrices += "---------------------------------------------"
         return matrices
 
-    def resolver_sistema(self, nombre_mat: str, metodo: str) -> tuple[str, SistemaEcuaciones]:
+    def resolver_sistema(self, nombre_mat: str, metodo: str) -> SistemaEcuaciones:
         """
         Resuelve un sistema de ecuaciones representado por la matriz ingresada.
         * nombre_mat: nombre de la matriz que representa el sistema de ecuaciones
@@ -68,8 +69,7 @@ class MatricesManager:
         else:
             raise ValueError("Argumento inválido para 'metodo'!")
 
-        nombre_sistema = f"{nombre_mat}_r"
-        return (nombre_sistema, sistema)
+        return sistema
 
     def sumar_matrices(self, nombre_mat1: str, nombre_mat2: str) -> tuple[str, Matriz]:
         """
@@ -141,16 +141,16 @@ class MatricesManager:
         mat_transpuesta = mat.transponer()
         return (nombre_mat_transpuesta, mat_transpuesta)
 
-    def calcular_determinante(self, nombre_mat: str) -> tuple[Fraction, "Matriz", bool]:
-        """
-        Calcula el determinante de la matriz indicada.
-        * ArithmeticError: si la matriz no es cuadrada
-        """
+    # def calcular_determinante(self, nombre_mat: str) -> Union[Fraction, tuple[Fraction, "Matriz", bool]]:
+    #     """
+    #     Calcula el determinante de la matriz indicada.
+    #     * ArithmeticError: si la matriz no es cuadrada
+    #     """
 
-        mat = self.mats_ingresadas[nombre_mat]
-        return mat.calcular_det()
+    #     mat = self.mats_ingresadas[nombre_mat]
+    #     return mat.calcular_det()
 
-    def encontrar_inversa(self, nombre_mat: str) -> tuple[str, "Matriz", "Matriz", Fraction]:
+    def invertir_matriz(self, nombre_mat: str) -> tuple[str, "Matriz", "Matriz", Fraction]:
         """
         Encuentra la inversa de la matriz indicada.
         * ArithmeticError: si la matriz no es cuadrada
@@ -159,7 +159,7 @@ class MatricesManager:
 
         mat = self.mats_ingresadas[nombre_mat]
         nombre_mat_invertida = f"{nombre_mat}_i"
-        inversa, adjunta, det = mat.encontrar_inversa()
+        inversa, adjunta, det = mat.invertir()
         return (nombre_mat_invertida, inversa, adjunta, det)
 
     def _validar_mats_ingresadas(self) -> bool:

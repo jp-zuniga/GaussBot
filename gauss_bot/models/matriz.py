@@ -296,7 +296,7 @@ class Matriz:
 
         return Matriz(self.aumentada, self.columnas, self.filas, mat_transpuesta)
 
-    def calcular_det(self) -> tuple[Fraction, "Matriz", bool]:
+    def calcular_det(self) -> Union[Fraction, tuple[Fraction, "Matriz", bool]]:
         """
         Calcula el determinante de la instancia.
         * ArithmeticError: si la matriz no es cuadrada
@@ -304,6 +304,9 @@ class Matriz:
 
         if not self.es_cuadrada():
             raise ArithmeticError("El determinante solo esta definido para matrices cuadradas!")
+
+        if self.filas == 2 and self.columnas == 2:
+            return (self[0, 0] * self[1, 1]) - (self[0, 1] * self[1, 0])
 
         mat_triangular, intercambio = self.hacer_triangular_superior()
         det = Fraction(1)
@@ -332,9 +335,17 @@ class Matriz:
                     for m in range(self.filas) if m != i
                 ]
 
-                det_minor, _, _ = Matriz(
-                    False, self.filas - 1, self.columnas - 1, minor
-                ).calcular_det()
+                if len(minor) == 1 and len(minor[0]) == 1:
+                    det_minor = minor[0][0]
+                elif len(minor) == 2 and len(minor[0]) == 2:
+                    det_minor = Matriz(
+                        False, self.filas - 1, self.columnas - 1, minor
+                    ).calcular_det()  # type: ignore
+                else:
+                    det_minor, _, _ = Matriz(
+                        False, self.filas - 1, self.columnas - 1, minor
+                    ).calcular_det()  # type: ignore
+
 
                 cofactor = ((-1) ** (i + j)) * det_minor
                 fila.append(cofactor)
@@ -343,7 +354,7 @@ class Matriz:
         adjunta = Matriz(self.aumentada, self.filas, self.columnas, mat_cofactores).transponer()
         return adjunta
 
-    def encontrar_inversa(self) -> tuple["Matriz", "Matriz", Fraction]:
+    def invertir(self) -> tuple["Matriz", "Matriz", Fraction]:
         """
         Encuentra la inversa de la instancia.
         * ArithmeticError: si la matriz no es cuadrada
@@ -353,7 +364,13 @@ class Matriz:
         if not self.es_cuadrada():
             raise ArithmeticError("La matriz no es cuadrada; su determinante es indefinido!")
 
-        det, _, _ = self.calcular_det()
+        if self.filas == 1 and self.columnas == 1:
+            det = self[0, 0]
+        elif self.filas == 2 and self.columnas == 2:
+            det = self.calcular_det()  # type: ignore
+        else:
+            det, _, _ = self.calcular_det()  # type: ignore
+
         if det == 0:
             raise ZeroDivisionError("El determinante de la matriz es 0; no es invertible!")
 

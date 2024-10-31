@@ -59,7 +59,7 @@ class OpsManager:
         vec = self.vecs_manager.vecs_ingresados[nombre_vec]
         if mat.columnas != len(vec):
             raise ArithmeticError(
-                "El número de columnas de la matriz debe ser" +
+                "El número de columnas de la matriz debe ser " +
                 "igual al número de componentes del vector!"
             )
 

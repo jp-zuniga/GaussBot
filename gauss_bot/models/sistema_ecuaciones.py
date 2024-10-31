@@ -55,7 +55,13 @@ class SistemaEcuaciones:
         sub_dets = []
         soluciones = []
 
-        det, _, _ = mat_variables.calcular_det()
+        if mat_variables.filas == 1 and mat_variables.columnas == 1:
+            det = mat_variables[0, 0]
+        elif mat_variables.filas == 2 and mat_variables.columnas == 2:
+            det = mat_variables.calcular_det()  # type: ignore
+        else:
+            det, _, _ = mat_variables.calcular_det()  # type: ignore
+
         if det == 0:
             raise ZeroDivisionError(
                 "El determinante de la matriz de variables es 0; " +
@@ -63,18 +69,25 @@ class SistemaEcuaciones:
             )
 
         for i in range(self.matriz.columnas - 1):
-            submat = []
+            submat_valores = []
             for j in range(self.matriz.filas):
-                submat.append(
+                submat_valores.append(
                     [
                         self.matriz.valores[j][k] if k != i else col_aumentada[j]
                         for k in range(self.matriz.columnas - 1)
                     ]
                 )
 
-            det_submat, _, _ = Matriz(
-                False, self.matriz.filas, self.matriz.columnas - 1, submat
-            ).calcular_det()
+            submat = Matriz(
+                False, self.matriz.filas, self.matriz.columnas - 1, submat_valores
+            )
+
+            if submat.filas == 1 and submat.columnas == 1:
+                det_submat = submat[0, 0]
+            elif submat.filas == 2 and submat.columnas == 2:
+                det_submat = submat.calcular_det()  # type: ignore
+            else:
+                det_submat, _, _ = submat.calcular_det()  # type: ignore
 
             sub_dets.append(det_submat)
             soluciones.append(det_submat / det)
@@ -93,9 +106,9 @@ class SistemaEcuaciones:
         for i, subdet in enumerate(sub_dets):
             self.procedimiento += f"Determinante de {nombre}{i+1}(b) = {subdet}"
         self.procedimiento += "\n---------------------------------------------\n"
-        self.solucion += f"Solución {tipo_sol} encontrada:"
+        self.solucion += f"\nSolución {tipo_sol} encontrada:\n"
         for i, sol in enumerate(soluciones):
-            self.solucion += f"\nX{i + 1} = {sol}"
+            self.solucion += f"X{i + 1} = {sol}\n"
 
     def gauss_jordan(self) -> None:
         """
@@ -108,6 +121,10 @@ class SistemaEcuaciones:
         """
 
         if self.matriz.es_matriz_cero():
+            self.solucion += "Sistema tiene soluciones infinitas!"
+            self.procedimiento += str(self.matriz)
+            self.procedimiento += "\nTodas las ecuaciones tienen la forma 0 = 0, lo cual siempre es verdadero.\n"
+            self.procedimiento += "Por lo tanto, el sistema tiene soluciones infinitas."
             return
 
         test_inicial = self._validar_consistencia()
@@ -423,9 +440,9 @@ class SistemaEcuaciones:
         solucion, fila_inconsistente = validacion
 
         if not solucion and fila_inconsistente != -1:
-            self.solucion += f"\n En F{fila_inconsistente+1}: 0 != "
+            self.solucion += f"\nEn F{fila_inconsistente+1}: 0 != "
             self.solucion += f"{str(self.matriz[fila_inconsistente, -1])}\n"
-            self.solucion += " Sistema es inconsistente!\n"
+            self.solucion += "Sistema es inconsistente!\n"
             return
 
         if unica:
@@ -434,15 +451,15 @@ class SistemaEcuaciones:
             )
 
             tipo_solucion = "trivial" if solucion_trivial else "no trivial"
-            self.solucion += f"\n Solución {tipo_solucion} encontrada:\n"
+            self.solucion += f"\nSolución {tipo_solucion} encontrada:\n"
             for i in range(self.matriz.filas):
                 if all(x == 0 for x in self.matriz[i]):
                     continue
-                self.solucion += (f" X{i+1} = {str(self.matriz[i, -1])}\n")
+                self.solucion += (f"X{i+1} = {str(self.matriz[i, -1])}\n")
             return
 
         ecuaciones = self._despejar_variables(libres)
-        self.solucion += "\n Sistema no tiene solución única!\n"
+        self.solucion += "\nSistema no tiene solución única!\n"
         self.solucion += " Solución general encontrada:\n"
         for linea in ecuaciones:
             self.solucion += linea

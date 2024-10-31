@@ -3,6 +3,8 @@ Implementación de todos los frames relacionados a matrices.
 """
 
 from fractions import Fraction
+from PIL import Image
+from os import path
 from random import randint
 from typing import Optional, Union
 
@@ -13,11 +15,14 @@ from customtkinter import (
     CTkCheckBox as ctkCheckBox,
     CTkEntry as ctkEntry,
     CTkFrame as ctkFrame,
+    CTkImage as ctkImage,
     CTkLabel as ctkLabel,
     CTkOptionMenu as ctkOptionMenu,
     CTkScrollableFrame as ctkScrollFrame,
     CTkTabview as ctkTabview,
 )
+
+from gauss_bot import ASSET_PATH
 
 from gauss_bot.models.matriz import Matriz
 from gauss_bot.managers.mats_manager import MatricesManager
@@ -39,8 +44,9 @@ class MatricesFrame(ctkFrame):
         super().__init__(master, corner_radius=0, fg_color="transparent")
         self.app = app
         self.mats_manager = mats_manager
-        self.nombres_matrices = list(self.mats_manager.mats_ingresadas.keys())
         self.nombres_vectores = list(self.app.vecs_manager.vecs_ingresados.keys())
+        self.nombres_matrices = [nombre for nombre, mat in self.mats_manager.mats_ingresadas.items() if not mat.aumentada]
+        self.nombres_sistemas = [nombre for nombre, mat in self.mats_manager.mats_ingresadas.items() if mat.aumentada]
         self.crear_tabview()
 
     def crear_tabview(self) -> None:
@@ -73,8 +79,18 @@ class MatricesFrame(ctkFrame):
         Actualiza todos los frames del tabview.
         """
 
-        self.nombres_matrices = list(self.mats_manager.mats_ingresadas.keys())
+        self.mats_manager.mats_ingresadas = {
+            nombre: mat
+            for nombre, mat in sorted(self.mats_manager.mats_ingresadas.items())
+        }
+        self.app.vecs_manager.vecs_ingresados = {
+            nombre: vec
+            for nombre, vec in sorted(self.app.vecs_manager.vecs_ingresados.items())
+        }
+
         self.nombres_vectores = list(self.app.vecs_manager.vecs_ingresados.keys())
+        self.nombres_matrices = [nombre for nombre, mat in self.mats_manager.mats_ingresadas.items() if not mat.aumentada]
+        self.nombres_sistemas = [nombre for nombre, mat in self.mats_manager.mats_ingresadas.items() if mat.aumentada]
 
         for tab in self.instances:
             tab.update()
@@ -156,7 +172,7 @@ class AgregarTab(ctkScrollFrame):
         self.input_entries: list[list[ctkEntry]] = []
         self.post_matriz_widgets: list[ctkBase] = []
 
-        checkbox_label = ctkLabel(self, text="¿Es aumentada?")
+        checkbox_label = ctkLabel(self, text="¿Es un sistema de ecuaciones?")
         self.check_aumentada = ctkCheckBox(self, text="", command=self.toggle_aumentada)
         label_filas = ctkLabel(self, text="Número de filas:")
         self.entry_filas = ctkEntry(self, width=60, placeholder_text="3")
@@ -236,12 +252,28 @@ class AgregarTab(ctkScrollFrame):
 
         if self.aumentada:
             columnas += 1
+        
+        size = 40 * filas + 8
+        sep_icon = ctkImage(
+            dark_image=Image.open(
+                path.join(ASSET_PATH, "light_separator.png")
+            ),
+            light_image=Image.open(
+                path.join(ASSET_PATH, "dark_separator.png")
+            ),
+            size=(30, size),
+        )
 
         for i in range(filas):
             fila_entries = []
             for j in range(columnas):
                 input_entry = ctkEntry(self.matriz_frame, width=60)
-                input_entry.grid(row=i, column=j, padx=5, pady=5)
+                if not self.aumentada or j != columnas - 1:
+                    input_entry.grid(row=i, column=j, padx=5, pady=5)
+                elif self.aumentada and j == columnas - 1:
+                    sep_placed = ctkLabel(self.matriz_frame, image=sep_icon, text="")
+                    sep_placed.grid(row=0, rowspan=filas, column=j)
+                    input_entry.grid(row=i, column=j+1, padx=5, pady=5)
                 fila_entries.append(input_entry)
             self.input_entries.append(fila_entries)
 
@@ -352,13 +384,13 @@ class AgregarTab(ctkScrollFrame):
             else filas == input_f and input_c - 1 == columnas
         )
 
-        if not dimensiones_validas: 
+        if not dimensiones_validas:
             self.mensaje_frame = ErrorFrame(
                 self, "Las dimensiones de la matriz ingresada no coinciden con las dimensions indicadas!"
             )
             self.mensaje_frame.grid(row=7, column=0, columnspan=2, sticky="n", padx=5, pady=5)
             return
-        
+
         if self.aumentada:
             columnas += 1
 
@@ -532,8 +564,8 @@ class SumaRestaTab(ctkFrame):
         Suma o resta las matrices seleccionadas.
         """
 
-        self.update_select1(self.select_1.get())
-        self.update_select2(self.select_2.get())
+        nombre_mat1 = self.select_1.get()
+        nombre_mat2 = self.select_2.get()
 
         if operacion == "Sumar":
             self.ejecutar_suma(nombre_mat1, nombre_mat2)
@@ -633,12 +665,12 @@ class MultiplicacionTab(ctkFrame):
         self.tab_matriz_vector = self.tabview.add("Producto Matriz-Vector")
         self.setup_tabs()
 
-        self.select_escalar_mat: Optional[ctkOptionMenu] = None
-        self.escalar_entry: Optional[ctkEntry] = None
-        self.select_mat1: Optional[ctkOptionMenu] = None
-        self.select_mat2: Optional[ctkOptionMenu] = None
-        self.select_mvec: Optional[ctkOptionMenu] = None
-        self.select_vmat: Optional[ctkOptionMenu] = None
+        self.select_escalar_mat: ctkOptionMenu
+        self.escalar_entry: ctkEntry
+        self.select_mat1: ctkOptionMenu
+        self.select_mat2: ctkOptionMenu
+        self.select_mvec: ctkOptionMenu
+        self.select_vmat: ctkOptionMenu
 
         self.escalar_mat = ""
         self.mat1 = ""
@@ -841,6 +873,8 @@ class MultiplicacionTab(ctkFrame):
         Realiza la multiplicación escalar de la matriz seleccionada por el escalar indicado.
         """
 
+        mat = self.select_escalar_mat.get()  # type: ignore
+
         if self.mensaje_frame is not None:
             self.mensaje_frame.destroy()
             self.mensaje_frame = None
@@ -875,6 +909,9 @@ class MultiplicacionTab(ctkFrame):
         Realiza la multiplicación matricial de las matrices seleccionadas.
         """
 
+        nombre_mat1 = self.select_mat1.get()  # type: ignore
+        nombre_mat2 = self.select_mat2.get()  # type: ignore
+
         if self.mensaje_frame is not None:
             self.mensaje_frame.destroy()
             self.mensaje_frame = None
@@ -899,6 +936,9 @@ class MultiplicacionTab(ctkFrame):
         """
         Realiza el producto matriz-vector de la matriz y el vector seleccionados.
         """
+
+        nombre_mat = self.select_vmat.get()  # type: ignore
+        nombre_vec = self.select_mvec.get()  # type: ignore
 
         if self.mensaje_frame is not None:
             self.mensaje_frame.destroy()
@@ -1098,8 +1138,14 @@ class DeterminanteTab(ctkFrame):
             self.mensaje_frame.destroy()
             self.mensaje_frame = None
 
+        dmat = self.mats_manager.mats_ingresadas[nombre_dmat]
         try:
-            det, _, _ = self.mats_manager.calcular_determinante(nombre_dmat)
+            if dmat.filas == 1 and dmat.columnas == 1:
+                det = dmat[0, 0]
+            elif dmat.filas == 2 and dmat.columnas == 2:
+                det = dmat.calcular_det()  # type: ignore
+            else:
+                det, _, _ = dmat.calcular_det()  # type: ignore
         except ArithmeticError as e:
             self.mensaje_frame = ErrorFrame(self.resultado, str(e))
             self.mensaje_frame.grid(row=0, column=0, padx=5, pady=5)
@@ -1189,7 +1235,7 @@ class InversaTab(ctkFrame):
             self.mensaje_frame = None
 
         try:
-            nombre_inversa, inversa, _, _ = self.mats_manager.encontrar_inversa(nombre_imat)
+            nombre_inversa, inversa, _, _ = self.mats_manager.invertir_matriz(nombre_imat)
         except (ArithmeticError, ZeroDivisionError) as e:
             self.mensaje_frame = ErrorFrame(self.resultado, str(e))
             self.mensaje_frame.grid(row=0, column=0, padx=5, pady=5)
