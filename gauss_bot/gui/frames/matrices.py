@@ -174,10 +174,10 @@ class AgregarTab(ctkScrollFrame):
 
         checkbox_label = ctkLabel(self, text="¿Es un sistema de ecuaciones?")
         self.check_aumentada = ctkCheckBox(self, text="", command=self.toggle_aumentada)
-        label_filas = ctkLabel(self, text="Número de filas:")
-        self.entry_filas = ctkEntry(self, width=60, placeholder_text="3")
-        label_columnas = ctkLabel(self, text="Número de columnas:")
-        self.entry_columnas = ctkEntry(self, width=60, placeholder_text="3")
+        filas_label = ctkLabel(self, text="Número de filas:")
+        self.filas_entry = ctkEntry(self, width=60, placeholder_text="3")
+        columnas_label = ctkLabel(self, text="Número de columnas:")
+        self.columnas_entry = ctkEntry(self, width=60, placeholder_text="3")
 
         ingresar_button = ctkButton(
             self, height=30, text="Ingresar datos", command=self.generar_casillas
@@ -192,12 +192,19 @@ class AgregarTab(ctkScrollFrame):
 
         self.matriz_frame = ctkFrame(self)
 
+        self.filas_entry.bind("<Return>", lambda x: self.generar_casillas())
+        self.filas_entry.bind("<Up>", command=self.focus_set_columnas)
+        self.filas_entry.bind("<Down>", command=self.focus_set_columnas)
+        self.columnas_entry.bind("<Return>", lambda x: self.generar_casillas())
+        self.columnas_entry.bind("<Up>", command=self.focus_set_filas)
+        self.columnas_entry.bind("<Down>", lambda x: self.columnas_move_down())
+
         checkbox_label.grid(row=0, column=0, padx=5, pady=5, sticky="e")
         self.check_aumentada.grid(row=0, column=1, padx=5, pady=5, sticky="w")
-        label_filas.grid(row=1, column=0, padx=5, pady=5, sticky="e")
-        self.entry_filas.grid(row=1, column=1, padx=5, pady=5, sticky="w")
-        label_columnas.grid(row=2, column=0, padx=5, pady=5, sticky="e")
-        self.entry_columnas.grid(row=2, column=1, padx=5, pady=5, sticky="w")
+        filas_label.grid(row=1, column=0, padx=5, pady=5, sticky="e")
+        self.filas_entry.grid(row=1, column=1, padx=5, pady=5, sticky="w")
+        columnas_label.grid(row=2, column=0, padx=5, pady=5, sticky="e")
+        self.columnas_entry.grid(row=2, column=1, padx=5, pady=5, sticky="w")
         ingresar_button.grid(row=3, column=0, padx=5, pady=5, sticky="e")
         aleatoria_button.grid(row=3, column=1, padx=5, pady=5, sticky="w")
         self.matriz_frame.grid(row=4, column=0, columnspan=2, padx=5, pady=5, sticky="ns")
@@ -235,8 +242,8 @@ class AgregarTab(ctkScrollFrame):
             self.mensaje_frame = None
 
         try:
-            filas = int(self.entry_filas.get())
-            columnas = int(self.entry_columnas.get())
+            filas = int(self.filas_entry.get())
+            columnas = int(self.columnas_entry.get())
             if filas <= 0 or columnas <= 0:
                 raise ValueError
         except ValueError:
@@ -252,8 +259,8 @@ class AgregarTab(ctkScrollFrame):
 
         if self.aumentada:
             columnas += 1
-        
-        size = 40 * filas + 8
+
+        height = 35 * filas
         sep_icon = ctkImage(
             dark_image=Image.open(
                 path.join(ASSET_PATH, "light_separator.png")
@@ -261,7 +268,7 @@ class AgregarTab(ctkScrollFrame):
             light_image=Image.open(
                 path.join(ASSET_PATH, "dark_separator.png")
             ),
-            size=(30, size),
+            size=(35, height),
         )
 
         for i in range(filas):
@@ -274,6 +281,7 @@ class AgregarTab(ctkScrollFrame):
                     sep_placed = ctkLabel(self.matriz_frame, image=sep_icon, text="")
                     sep_placed.grid(row=0, rowspan=filas, column=j)
                     input_entry.grid(row=i, column=j+1, padx=5, pady=5)
+                self.bind_entry_keys(input_entry, i, j)
                 fila_entries.append(input_entry)
             self.input_entries.append(fila_entries)
 
@@ -286,6 +294,9 @@ class AgregarTab(ctkScrollFrame):
         self.nombre_entry.grid(row=5, column=1, padx=5, pady=5, sticky="w")
         agregar_button.grid(row=6, column=0, padx=5, pady=5, sticky="e")
         limpiar_button.grid(row=6, column=1, padx=5, pady=5, sticky="w")
+
+        self.nombre_entry.bind("<Up>", lambda x: self.nombre_entry_up())
+        self.nombre_entry.bind("<Return>", lambda x: self.agregar_matriz())
 
         self.post_matriz_widgets = [
             nombre_label,
@@ -300,64 +311,11 @@ class AgregarTab(ctkScrollFrame):
         con valores racionales aleatorios.
         """
 
-        try:
-            self.limpiar_casillas()
-            for widget in self.matriz_frame.winfo_children():
-                widget.destroy()  # type: ignore
-            for widget in self.post_matriz_widgets:
-                widget.destroy()
-        except TclError:
-            pass
-
-        if self.mensaje_frame is not None:
-            self.mensaje_frame.destroy()
-            self.mensaje_frame = None
-
-        try:
-            filas = int(self.entry_filas.get())
-            columnas = int(self.entry_columnas.get())
-            if filas <= 0 or columnas <= 0:
-                raise ValueError
-        except ValueError:
-            self.mensaje_frame = ErrorFrame(
-                self, "Debe ingresar números enteros positivos como filas y columnas!"
-            )
-            self.mensaje_frame.grid(row=4, column=0, columnspan=2, sticky="n", padx=5, pady=5)
-            return
-
-        if self.mensaje_frame is not None:
-            self.mensaje_frame.destroy()
-            self.mensaje_frame = None
-
-        if self.aumentada:
-            columnas += 1
-
-        for i in range(filas):
-            fila_entries = []
-            for j in range(columnas):
-                valor_random = Fraction(randint(1, 20))
-                input_entry = ctkEntry(self.matriz_frame, width=60)
-                input_entry.insert(0, str(valor_random))
-                input_entry.grid(row=i, column=j, padx=5, pady=5)
-                fila_entries.append(input_entry)
-            self.input_entries.append(fila_entries)
-
-        nombre_label = ctkLabel(self, text="Nombre de la matriz:")
-        self.nombre_entry = ctkEntry(self, width=60, placeholder_text="A")
-        agregar_button = ctkButton(self, text="Agregar", command=self.agregar_matriz)
-        limpiar_button = ctkButton(self, text="Limpiar casillas", command=self.limpiar_casillas)
-
-        nombre_label.grid(row=5, column=0, padx=5, pady=5, sticky="e")
-        self.nombre_entry.grid(row=5, column=1, padx=5, pady=5, sticky="w")
-        agregar_button.grid(row=6, column=0, padx=5, pady=5, sticky="e")
-        limpiar_button.grid(row=6, column=1, padx=5, pady=5, sticky="w")
-
-        self.post_matriz_widgets = [
-            nombre_label,
-            self.nombre_entry,
-            agregar_button,
-            limpiar_button,
-        ]
+        self.generar_casillas()
+        for fila_entries in self.input_entries:
+            for entry in fila_entries:
+                entry.delete(0, "end")
+                entry.insert(0, str(randint(-15, 15)))
 
     def agregar_matriz(self) -> None:
         """
@@ -365,8 +323,8 @@ class AgregarTab(ctkScrollFrame):
         """
 
         try:
-            filas = int(self.entry_filas.get())
-            columnas = int(self.entry_columnas.get())
+            filas = int(self.filas_entry.get())
+            columnas = int(self.columnas_entry.get())
             if filas <= 0 or columnas <= 0:
                 raise ValueError
         except ValueError:
@@ -455,6 +413,55 @@ class AgregarTab(ctkScrollFrame):
 
     def toggle_aumentada(self) -> None:
         self.aumentada = not self.aumentada
+
+    def focus_set_columnas(self, event=None) -> None:
+        self.columnas_entry.focus_set()
+
+    def focus_set_filas(self, event=None) -> None:
+        self.filas_entry.focus_set()
+
+    def columnas_move_down(self, event=None) -> None:
+        if len(self.matriz_frame.winfo_children()) == 0:
+            self.focus_set_filas()
+        else:
+            self.input_entries[0][0].focus_set()
+
+    def bind_entry_keys(self, entry: ctkEntry, i: int, j: int) -> None:
+        entry.bind("<Up>", lambda event: self.entry_move_up(i, j, event=event))
+        entry.bind("<Down>", lambda event: self.entry_move_down(i, j, event=event))
+        entry.bind("<Left>", lambda event: self.entry_move_left(i, j, event=event))
+        entry.bind("<Right>", lambda event: self.entry_move_right(i, j, event=event))
+
+    def entry_move_up(self, i: int, j: int, event=None) -> None:
+        if i > 0:
+            self.input_entries[i - 1][j].focus_set()
+        elif i == 0:
+            self.focus_set_columnas()
+
+    def entry_move_down(self, i: int, j: int, event=None) -> None:
+        if i < len(self.input_entries) - 1:
+            self.input_entries[i + 1][j].focus_set()
+        elif i == len(self.input_entries) - 1:
+            self.nombre_entry.focus_set()
+
+    def entry_move_left(self, i: int, j: int, event=None) -> None:
+        if j > 0:
+            self.input_entries[i][j - 1].focus_set()
+        elif j == 0:
+            if i > 0:
+                self.input_entries[i - 1][-1].focus_set()
+
+    def entry_move_right(self, i: int, j: int, event=None) -> None:
+        if j < len(self.input_entries[i]) - 1:
+            self.input_entries[i][j + 1].focus_set()
+        elif j == len(self.input_entries[i]) - 1:
+            if i < len(self.input_entries) - 1:
+                self.input_entries[i + 1][0].focus_set()
+            elif i == len(self.input_entries) - 1:
+                self.nombre_entry.focus_set()
+
+    def nombre_entry_up(self) -> None:
+        self.input_entries[-1][-1].focus_set()
 
     def update(self) -> None:
         self.update_idletasks()

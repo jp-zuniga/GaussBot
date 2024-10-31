@@ -167,7 +167,11 @@ class AgregarTab(ctkScrollFrame):
         aleatorio_button = ctkButton(
             self, text="Generar vector aleatorio", command=self.generar_aleatorio
         )
+
         self.vector_frame = ctkFrame(self)
+
+        self.dimension_entry.bind("<Return>", lambda x: self.generar_casillas())
+        self.dimension_entry.bind("<Down>", lambda x: self.dimensiones_move_down())
 
         dimension_label.grid(row=0, column=0, padx=5, pady=5, sticky="e")
         self.dimension_entry.grid(row=0, column=1, padx=5, pady=5, sticky="w")
@@ -214,7 +218,7 @@ class AgregarTab(ctkScrollFrame):
             self.mensaje_frame = ErrorFrame(
                 self, "Debe ingresar un número entero positivo como dimensión!"
             )
-            self.mensaje_frame.grid(row=3, column=0, columnspan=2, padx=5, pady=5, sticky="n")
+            self.mensaje_frame.grid(row=2, column=0, columnspan=2, padx=5, pady=5, sticky="n")
             return
 
         if self.mensaje_frame is not None:
@@ -224,6 +228,7 @@ class AgregarTab(ctkScrollFrame):
         for i in range(dimension):
             input_entry = ctkEntry(self.vector_frame, width=60)
             input_entry.grid(row=i, column=0, padx=5, pady=5)
+            self.bind_entry_keys(input_entry, i)
             self.input_entries.append(input_entry)
 
         nombre_label = ctkLabel(self, text="Nombre del vector:")
@@ -235,6 +240,9 @@ class AgregarTab(ctkScrollFrame):
         self.nombre_entry.grid(row=4, column=1, padx=5, pady=5, sticky="w")
         agregar_button.grid(row=5, column=0, padx=5, pady=5, sticky="e")
         limpiar_button.grid(row=5, column=1, padx=5, pady=5, sticky="w")
+
+        self.nombre_entry.bind("<Up>", lambda x: self.nombre_entry_up())
+        self.nombre_entry.bind("<Return>", lambda x: self.agregar_vector())
 
         self.post_vector_widgets = [
             nombre_label,
@@ -248,57 +256,10 @@ class AgregarTab(ctkScrollFrame):
         Genera casillas con valores aleatorios para el vector.
         """
 
-        try:
-            self.limpiar_casillas()
-            for widget in self.vector_frame.winfo_children():
-                widget.destroy()  # type: ignore
-            for widget in self.post_vector_widgets:
-                widget.destroy()
-        except TclError:
-            pass
-
-        if self.mensaje_frame is not None:
-            self.mensaje_frame.destroy()
-            self.mensaje_frame = None
-
-        try:
-            dimension = int(self.dimension_entry.get())
-            if dimension <= 0:
-                raise ValueError
-        except ValueError:
-            self.mensaje_frame = ErrorFrame(
-                self, "Debe ingresar un número entero positivo como dimensión!"
-            )
-            self.mensaje_frame.grid(row=3, column=0, columnspan=2, padx=5, pady=5, sticky="n")
-            return
-
-        if self.mensaje_frame is not None:
-            self.mensaje_frame.destroy()
-            self.mensaje_frame = None
-
-        for i in range(dimension):
-            valor_random = Fraction(randint(1, 20))
-            input_entry = ctkEntry(self.vector_frame, width=60)
-            input_entry.insert(0, str(valor_random))
-            input_entry.grid(row=i, column=0, padx=5, pady=5)
-            self.input_entries.append(input_entry)
-
-        nombre_label = ctkLabel(self, text="Nombre del vector:")
-        self.nombre_entry = ctkEntry(self, width=60, placeholder_text="u")
-        agregar_button = ctkButton(self, text="Agregar", command=self.agregar_vector)
-        limpiar_button = ctkButton(self, text="Limpiar casillas", command=self.limpiar_casillas)
-
-        nombre_label.grid(row=4, column=0, padx=5, pady=5, sticky="e")
-        self.nombre_entry.grid(row=4, column=1, padx=5, pady=5, sticky="w")
-        agregar_button.grid(row=5, column=0, padx=5, pady=5, sticky="e")
-        limpiar_button.grid(row=5, column=1, padx=5, pady=5, sticky="w")
-
-        self.post_vector_widgets = [
-            nombre_label,
-            self.nombre_entry,
-            agregar_button,
-            limpiar_button,
-        ]
+        self.generar_casillas()
+        for entry in self.input_entries:
+            entry.delete(0, "end")
+            entry.insert(0, str(randint(-15, 15)))
 
     def agregar_vector(self) -> None:
         """
@@ -313,7 +274,7 @@ class AgregarTab(ctkScrollFrame):
             self.mensaje_frame = ErrorFrame(
                 self, "Debe ingresar un número entero positivo como dimensión!"
             )
-            self.mensaje_frame.grid(row=6, column=0, columnspan=2, sticky="n", padx=5, pady=5)
+            self.mensaje_frame.grid(row=2, column=0, columnspan=2, sticky="n", padx=5, pady=5)
             return
 
         input_d = len(self.input_entries)
@@ -321,7 +282,7 @@ class AgregarTab(ctkScrollFrame):
             self.mensaje_frame = ErrorFrame(
                 self, "Las dimensiones del vector ingresado no coinciden con las dimensions indicadas!"
             )
-            self.mensaje_frame.grid(row=6, column=0, columnspan=2, sticky="n", padx=5, pady=5)
+            self.mensaje_frame.grid(row=2, column=0, columnspan=2, sticky="n", padx=5, pady=5)
             return
 
         if self.mensaje_frame is not None:
@@ -376,6 +337,29 @@ class AgregarTab(ctkScrollFrame):
         self.master_frame.update_all()
         self.app.matrices.update_all()
         self.app.config_frame.update_frame()
+
+    def dimensiones_move_down(self, event=None) -> None:
+        if len(self.vector_frame.winfo_children()) != 0:
+            self.input_entries[0].focus_set()
+
+    def bind_entry_keys(self, entry: ctkEntry, i: int) -> None:
+        entry.bind("<Up>", lambda event: self.entry_move_up(i, event=event))
+        entry.bind("<Down>", lambda event: self.entry_move_down(i, event=event))
+
+    def entry_move_up(self, i: int, event=None) -> None:
+        if i > 0:
+            self.input_entries[i - 1].focus_set()
+        elif i == 0:
+            self.dimension_entry.focus_set()
+
+    def entry_move_down(self, i: int, event=None) -> None:
+        if i < len(self.input_entries) - 1:
+            self.input_entries[i + 1].focus_set()
+        elif i == len(self.input_entries) - 1:
+            self.nombre_entry.focus_set()
+
+    def nombre_entry_up(self, event=None) -> None:
+        self.input_entries[-1].focus_set()
 
     def update(self) -> None:
         self.update_idletasks()

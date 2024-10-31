@@ -147,7 +147,7 @@ class ConfigFrame(ctkFrame):
 
         self.mensaje_frame = SuccessFrame(
             self,
-            message="Tema cambiado exitosamente! Cambios tomáran efecto al reiniciar la aplicación."
+            message="Tema cambiado exitosamente! Cambios tomarán efecto al reiniciar la aplicación."
         )
         self.mensaje_frame.grid(row=3, column=1, pady=30)
 
