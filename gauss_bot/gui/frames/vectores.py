@@ -172,9 +172,13 @@ class AgregarTab(ctkScrollFrame):
 
         dimension_label = ctkLabel(self, text="Dimensiones del vector:")
         self.dimension_entry = ctkEntry(self, width=60)
-        generar_button = ctkButton(self, text="Ingresar datos", command=self.generar_casillas)
+
+        generar_button = ctkButton(
+            self, height=30, text="Ingresar datos", command=self.generar_casillas
+        )
+
         aleatorio_button = ctkButton(
-            self, text="Generar vector aleatorio", command=self.generar_aleatorio
+            self, height=30, text="Generar vector aleatorio", command=self.generar_aleatorio
         )
 
         self.vector_frame = ctkFrame(self)
@@ -242,8 +246,10 @@ class AgregarTab(ctkScrollFrame):
 
         nombre_label = ctkLabel(self, text="Nombre del vector:")
         self.nombre_entry = ctkEntry(self, width=60, placeholder_text="u")
-        agregar_button = ctkButton(self, text="Agregar", command=self.agregar_vector)
-        limpiar_button = ctkButton(self, text="Limpiar casillas", command=self.limpiar_casillas)
+        agregar_button = ctkButton(self, height=30, text="Agregar", command=self.agregar_vector)
+        limpiar_button = ctkButton(
+            self, height=30, text="Limpiar casillas", command=self.limpiar_casillas
+        )
 
         nombre_label.grid(row=4, column=0, padx=5, pady=5, sticky="e")
         self.nombre_entry.grid(row=4, column=1, padx=5, pady=5, sticky="w")
@@ -462,6 +468,7 @@ class SumaRestaTab(ctkFrame):
 
         ejecutar_button = ctkButton(
             tab,
+            height=30,
             text=operacion,
             command=lambda: self.ejecutar_operacion(operacion, self.vec1, self.vec2),
         )
@@ -684,6 +691,7 @@ class MultiplicacionTab(ctkFrame):
 
         multiplicar_button = ctkButton(
             tab,
+            height=30,
             text="Multiplicar",
             command=lambda: self.mult_por_escalar(self.escalar_vec),
         )
@@ -735,6 +743,7 @@ class MultiplicacionTab(ctkFrame):
 
         multiplicar_button = ctkButton(
             tab,
+            height=30,
             text="Multiplicar",
             command=lambda: self.mult_vectores(self.vec1, self.vec2),
         )
@@ -779,6 +788,7 @@ class MultiplicacionTab(ctkFrame):
 
         multiplicar_button = ctkButton(
             tab,
+            height=30,
             text="Multiplicar",
             command=lambda: self.matriz_vector(self.vmat, self.mvec),
         )

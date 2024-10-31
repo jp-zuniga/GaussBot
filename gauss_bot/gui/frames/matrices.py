@@ -186,11 +186,16 @@ class MostrarTab(ctkFrame):
 
         self.select_label = ctkLabel(self, text="Seleccione un filtro:")
         self.select_option = ctkOptionMenu(
-            self, width=140, values=list(self.options.keys()), command=self.update_option
+            self,
+            values=list(self.options.keys()),
+            command=self.update_option,
         )
 
         self.option_seleccionada = self.options[self.select_option.get()]
-        self.mostrar_button = ctkButton(self, width=80, text="Mostrar", command=self.setup_mostrar)
+        self.mostrar_button = ctkButton(
+            self, width=80, height=30, text="Mostrar", command=self.setup_mostrar
+        )
+
         self.mostrar_frame = ctkFrame(self)
         self.print_frame: Optional[Union[ErrorFrame, ResultadoFrame]] = None
 
@@ -260,11 +265,12 @@ class AgregarTab(ctkFrame):
         self.columnas_entry = ctkEntry(self, width=60, placeholder_text="3")
 
         ingresar_button = ctkButton(
-            self, text="Ingresar datos", command=self.generar_casillas
+            self, height=30, text="Ingresar datos", command=self.generar_casillas
         )
 
         aleatoria_button = ctkButton(
             self,
+            height=30,
             text="Generar matriz aleatoria",
             command=self.generar_aleatoria,
         )
@@ -366,8 +372,10 @@ class AgregarTab(ctkFrame):
 
         nombre_label = ctkLabel(self, text="Nombre de la matriz:")
         self.nombre_entry = ctkEntry(self, width=60, placeholder_text="A")
-        agregar_button = ctkButton(self, text="Agregar", command=self.agregar_matriz)
-        limpiar_button = ctkButton(self, text="Limpiar casillas", command=self.limpiar_casillas)
+        agregar_button = ctkButton(self, height=30, text="Agregar", command=self.agregar_matriz)
+        limpiar_button = ctkButton(
+            self, height=30, text="Limpiar casillas", command=self.limpiar_casillas
+        )
 
         nombre_label.grid(row=5, column=0, padx=5, pady=5, sticky="e")
         self.nombre_entry.grid(row=5, column=1, padx=5, pady=5, sticky="w")
@@ -645,6 +653,7 @@ class SumaRestaTab(ctkFrame):
 
         ejecutar_button = ctkButton(
             tab,
+            height=30,
             text=operacion,
             command=lambda: self.ejecutar_operacion(operacion, self.mat1, self.mat2),
         )
@@ -917,6 +926,7 @@ class MultiplicacionTab(ctkFrame):
 
         button_multiplicar = ctkButton(
             tab,
+            height=30,
             text="Multiplicar",
             command=lambda: self.mult_matrices(self.mat1, self.mat2),
         )
@@ -961,6 +971,7 @@ class MultiplicacionTab(ctkFrame):
 
         button_multiplicar = ctkButton(
             tab,
+            height=30,
             text="Multiplicar",
             command=lambda: self.matriz_vector(self.vmat, self.mvec),
         )
@@ -1123,6 +1134,7 @@ class TransposicionTab(ctkFrame):
 
         self.button = ctkButton(
             self,
+            height=30,
             text="Transponer",
             command=lambda: self.encontrar_transpuesta(self.tmat),
         )
@@ -1217,7 +1229,10 @@ class DeterminanteTab(ctkFrame):
         )
 
         self.button = ctkButton(
-            self, text="Calcular", command=lambda: self.calcular_determinante(self.dmat)
+            self,
+            height=30,
+            text="Calcular",
+            command=lambda: self.calcular_determinante(self.dmat),
         )
 
         self.resultado = ctkFrame(self)
@@ -1315,7 +1330,10 @@ class InversaTab(ctkFrame):
         )
 
         self.button = ctkButton(
-            self, text="Encontrar", command=lambda: self.encontrar_inversa(self.imat)
+            self,
+            height=30,
+            text="Encontrar",
+            command=lambda: self.encontrar_inversa(self.imat),
         )
 
         self.resultado = ctkFrame(self)

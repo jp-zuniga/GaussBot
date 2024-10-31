@@ -83,7 +83,7 @@ class EcuacionesFrame(ctkFrame):
 
         self.cramer_checkbox = ctkCheckBox(self, text="", command=self.toggle_cramer)
         cramer_label = ctkLabel(self, text="Regla de Cramer")
-        button = ctkButton(self, text="Resolver", command=self.resolver)
+        button = ctkButton(self, height=30, text="Resolver", command=self.resolver)
 
         self.sis_mat = self.select_sis_mat.get()
         self.gauss_jordan = False
