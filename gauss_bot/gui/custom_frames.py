@@ -16,12 +16,58 @@ from customtkinter import (
 
 from gauss_bot import ASSET_PATH
 
+
+class CustomScrollFrame(ctkScrollFrame):
+    def __init__(self, app, master, **kwargs) -> None:
+        super().__init__(master, **kwargs)
+        self.app = app
+        self.bind("<Configure>", self._on_frame_configure)
+    
+    def _on_frame_configure(self, event) -> None:
+        self.update_idletasks()
+        self._fit_frame_dimensions_to_canvas(event)
+        self._parent_canvas.configure(scrollregion=self._parent_canvas.bbox("all"))
+        self.update_scrollbar_visibility()
+
+    def update_scrollbar_visibility(self) -> None:
+        self.update_idletasks()
+        content_height, frame_height = self._calculate_heights()
+        if content_height > frame_height:
+            self._scrollbar.grid()
+        else:
+            self._scrollbar.grid_remove()
+
+    def _calculate_heights(self) -> tuple[int, int]:
+        total_padding = 0
+        for widget in self.winfo_children():
+            if not isinstance(widget, ctkFrame):
+                total_padding += 5
+            else:
+                for subwidget in widget.winfo_children():
+                    if subwidget.grid_info()["column"] == 0:
+                        total_padding += 5
+
+        frame_height = self.app._current_height + total_padding
+        content_height = 0
+
+        for widget in self.winfo_children():
+            content_height += widget.winfo_reqheight()
+            if isinstance(widget, ctkFrame):
+                content_height += sum(
+                    subwidget.winfo_reqheight()
+                    for subwidget in widget.winfo_children()
+                    if subwidget.grid_info()["column"] == 0
+                )
+        content_height -= total_padding
+        return (content_height, frame_height)
+
+
 class ErrorFrame(ctkFrame):
     """
     Frame personalizado para mostrar mensajes de error.
     """
 
-    def __init__(self, parent: Union[ctkFrame, ctkScrollFrame], message: str) -> None:
+    def __init__(self, parent: Union[ctkFrame, CustomScrollFrame], message: str) -> None:
         super().__init__(parent, corner_radius=8, border_width=2, border_color="#ff3131")
         self.rowconfigure(0, weight=1)
         self.columnconfigure(0, weight=1)
@@ -43,7 +89,7 @@ class SuccessFrame(ctkFrame):
     Frame personalizado para mostrar mensajes de éxito.
     """
 
-    def __init__(self, parent: Union[ctkFrame, ctkScrollFrame], message: str) -> None:
+    def __init__(self, parent: Union[ctkFrame, CustomScrollFrame], message: str) -> None:
         super().__init__(parent, corner_radius=8, border_width=2, border_color="#18c026")
         self.rowconfigure(0, weight=1)
         self.columnconfigure(0, weight=1)
@@ -65,7 +111,7 @@ class ResultadoFrame(ctkFrame):
     Frame personalizado para mostrar resultados de operaciones.
     """
 
-    def __init__(self, parent: Union[ctkFrame, ctkScrollFrame],
+    def __init__(self, parent: Union[ctkFrame, CustomScrollFrame],
                  header: str, resultado: str, solo_header=False,
                  border_color="#18c026") -> None:
 
