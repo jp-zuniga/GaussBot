@@ -190,25 +190,26 @@ class MostrarTab(ctkScrollFrame):
             "Matrices calculadas": (-1, 1)
         }
 
-        self.select_label = ctkLabel(self, text="Seleccione un filtro:")
+        select_label = ctkLabel(self, text="Seleccione un filtro:")
         self.select_option = ctkOptionMenu(
             self,
+            height=30,
             values=list(self.options.keys()),
             command=self.update_option,
         )
 
         self.option_seleccionada = self.options[self.select_option.get()]
-        self.mostrar_button = ctkButton(
+        mostrar_button = ctkButton(
             self, height=30, text="Mostrar", command=self.setup_mostrar
         )
 
         self.mostrar_frame = ctkFrame(self)
         self.print_frame: Optional[Union[ErrorFrame, ResultadoFrame]] = None
 
-        self.select_label.grid(row=0, column=0, padx=5, pady=(5, 2), sticky="n")
-        self.select_option.grid(row=1, column=0, padx=5, pady=(2, 5), sticky="n")
-        self.mostrar_button.grid(row=2, column=0, padx=5, pady=5, sticky="n")
-        self.mostrar_frame.grid(row=3, column=0, padx=5, pady=10, sticky="n")
+        select_label.grid(row=0, column=0, padx=5, pady=5, sticky="n")
+        self.select_option.grid(row=1, column=0, ipadx=10, padx=5, pady=5, sticky="n")
+        mostrar_button.grid(row=2, column=0, padx=5, pady=5, sticky="n")
+        self.mostrar_frame.grid(row=3, column=0, padx=5, pady=5, sticky="n")
 
     def setup_mostrar(self) -> None:
         self.update_option(self.select_option.get())

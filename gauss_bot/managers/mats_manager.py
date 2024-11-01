@@ -59,8 +59,10 @@ class MatricesManager:
         if calculada == 1:
             header = "Matrices calculadas:"
         elif aumentada == 1:
-            header = "Sistemas de ecuaciones guardados:"
-        elif calculada in (-1, 0) or aumentada in (-1, 0):
+            header = "Sistemas de ecuaciones ingresadas:"
+        elif calculada == 0 or aumentada == 0:
+            header = "Matrices ingresadas:"
+        elif calculada == -1 or aumentada == -1:
             header = "Matrices guardadas:"
 
         matrices = f"{header}\n"
