@@ -148,7 +148,7 @@ class ManejarFrame(ctkFrame):
             ("Agregar", AgregarTab),
             ("Mostrar", MostrarTab),
             # ("Editar", EditarTab),
-            # ("Eliminar", EliminarTab)
+            ("Eliminar", EliminarTab)
         ]
 
         for nombre, cls in self.tabs:
@@ -508,7 +508,6 @@ class AgregarTab(ctkScrollFrame):
         self.mensaje_frame.grid(row=7, column=0, columnspan=2, sticky="n", padx=5, pady=5)
         self.app.matrices.update_all()
         self.app.vectores.update_all()
-        self.app.config_frame.update_frame()
 
     def toggle_aumentada(self) -> None:
         self.aumentada = not self.aumentada
@@ -1026,7 +1025,95 @@ class EditarTab(ctkScrollFrame):
 
 
 class EliminarTab(ctkFrame):
-    pass
+    def __init__(self, master_frame: MatricesFrame, master_tab,
+                 app, mats_manager: MatricesManager) -> None:
+
+        super().__init__(master_tab, corner_radius=0, fg_color="transparent")
+        self.app = app
+        self.master_frame = master_frame
+        self.mats_manager = mats_manager
+        self.columnconfigure(0, weight=1)
+
+        self.nombres_matrices = list(self.mats_manager.mats_ingresadas.keys())
+
+        if len(self.nombres_matrices) > 0:
+            placeholder = Variable(self, value=self.nombres_matrices[0])
+        else:
+            placeholder = None
+
+        self.mensaje_frame: Optional[ctkFrame] = None
+        self.instruct_eliminar = ctkLabel(self, text="¿Cuál matriz desea eliminar?")
+
+        self.select_mat = ctkOptionMenu(
+            self,
+            width=60,
+            values=self.nombres_matrices,
+            variable=placeholder,
+            command=self.update_mat,
+        )
+
+        self.button = ctkButton(
+            self,
+            height=30,
+            text="Eliminar",
+            command=lambda: self.eliminar_matriz(self.mat_seleccionada),
+        )
+
+        self.mat_seleccionada = self.select_mat.get()
+
+        if len(self.nombres_matrices) == 0:
+            self.mensaje_frame = ErrorFrame(
+                self, "No hay matrices guardadas!"
+            )
+            self.mensaje_frame.grid(row=3, column=0, sticky="n", padx=5, pady=5)
+            return
+
+        self.instruct_eliminar.grid(row=0, column=0, padx=5, pady=5, sticky="n")
+        self.select_mat.grid(row=1, column=0, padx=5, pady=5, sticky="n")
+        self.button.grid(row=2, column=0, padx=5, pady=5, sticky="n")
+
+    def eliminar_matriz(self, nombre_tmat: str) -> None:
+        """
+        Elimina la matriz seleccionada.
+        """
+
+        if self.mensaje_frame is not None:
+            self.mensaje_frame.destroy()
+            self.mensaje_frame = None
+
+        self.update_mat(self.select_mat.get())
+        self.mats_manager.mats_ingresadas.pop(self.mat_seleccionada)
+
+        self.mensaje_frame = SuccessFrame(
+            self, message=f"Matriz '{self.mat_seleccionada}' eliminada!"
+        )
+        self.mensaje_frame.grid(row=3, column=0, padx=5, pady=5)
+
+        self.app.matrices.update_all()
+        self.app.vectores.update_all()
+
+    def update(self) -> None:
+        self.nombres_matrices = list(self.mats_manager.mats_ingresadas.keys())
+        if len(self.nombres_matrices) > 0:
+            if isinstance(self.mensaje_frame, ErrorFrame):
+                self.mensaje_frame.destroy()
+                self.mensaje_frame = None
+            elif isinstance(self.mensaje_frame, SuccessFrame):
+                return
+
+            placeholder = Variable(self, value=self.nombres_matrices[0])
+            self.select_mat.configure(
+                values=self.nombres_matrices, variable=placeholder
+            )
+
+            self.update_mat(self.select_mat.get())
+            self.instruct_eliminar.grid(row=0, column=0, padx=5, pady=5, sticky="n")
+            self.select_mat.grid(row=1, column=0, padx=5, pady=5, sticky="n")
+            self.button.grid(row=2, column=0, padx=5, pady=5, sticky="n")
+        self.update_idletasks()
+
+    def update_mat(self, valor: str) -> None:
+        self.mat_seleccionada = valor
 
 
 class SumaRestaTab(ctkFrame):
@@ -1631,6 +1718,7 @@ class TransposicionTab(ctkFrame):
         if not any(transpuesta == mat for mat in self.mats_manager.mats_ingresadas.values()):
             self.mats_manager.mats_ingresadas[nombre_transpuesta] = transpuesta
             self.master_frame.update_all()
+            self.app.vectores.update_all()
 
         self.mensaje_frame = ResultadoFrame(
             self.resultado, header=f"{nombre_transpuesta}:", resultado=str(transpuesta)
@@ -1835,6 +1923,7 @@ class InversaTab(ctkFrame):
         if not any(inversa == mat for mat in self.mats_manager.mats_ingresadas.values()):
             self.mats_manager.mats_ingresadas[nombre_inversa] = inversa
             self.master_frame.update_all()
+            self.app.vectores.update_all()
 
         self.mensaje_frame = ResultadoFrame(
             self.resultado,

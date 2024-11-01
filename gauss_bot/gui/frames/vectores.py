@@ -352,7 +352,6 @@ class AgregarTab(ctkScrollFrame):
         self.mensaje_frame.grid(row=6, column=0, columnspan=2, sticky="n", padx=5, pady=5)
         self.master_frame.update_all()
         self.app.matrices.update_all()
-        self.app.config_frame.update_frame()
 
     def dimensiones_move_down(self) -> None:
         if len(self.vector_frame.winfo_children()) != 0:
