@@ -36,7 +36,7 @@ class MatricesManager:
         else:
             raise TypeError("Argumento inválido para 'mats_ingresadas'!")
 
-    def get_matrices(self, aumentada: int, calculada: bool) -> str:
+    def get_matrices(self, aumentada: int, calculada: int) -> str:
         """
         Obtiene las matrices guardadas en self.mats_ingresadas y las retorna como string.
         - aumentada: 0 para no mostrar aumentadas,
@@ -45,30 +45,30 @@ class MatricesManager:
         - calculada: True para mostrar solo matrices calculadas,
                      False para mostrar matrices ingresadas
 
-        * ValueError: si aumentada no es -1, 0 o 1
+        * ValueError: si aumentada o calculada no son (-1, 0, 1)
         """
 
         if aumentada not in (-1, 0, 1):
             raise ValueError("Argumento inválido para 'aumentada'!")
+        if calculada not in (-1, 0, 1):
+            raise ValueError("Argumento inválido para 'calculada'!")
 
         if not self._validar_mats_ingresadas():
             return "No hay matrices ingresadas!"
 
-        if calculada:
-            header = "Matrices calculadas guardadas:"
+        if calculada == 1:
+            header = "Matrices calculadas:"
         elif aumentada == 1:
             header = "Sistemas de ecuaciones guardados:"
-        elif not calculada or aumentada in (-1, 0):
+        elif calculada in (-1, 0) or aumentada in (-1, 0):
             header = "Matrices guardadas:"
-        elif calculada and aumentada == 1:
-            header = "Sistemas de ecuaciones guardados:"
 
         matrices = f"{header}\n"
         matrices += "---------------------------------------------"
         for nombre, mat in self.mats_ingresadas.items():
             if (aumentada == 1 and not mat.aumentada) or (aumentada == 0 and mat.aumentada):
                 continue
-            if (not calculada and len(nombre) > 1) or (calculada and len(nombre) == 1):
+            if (calculada == 0 and len(nombre) > 1) or (calculada == 1 and len(nombre) == 1):
                 continue
             matrices += f"\n{nombre}:\n"
             matrices += str(mat)

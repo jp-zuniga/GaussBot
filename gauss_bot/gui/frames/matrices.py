@@ -6,7 +6,12 @@ from fractions import Fraction
 from os import path
 from random import randint
 from typing import Optional, Union
-from tkinter import Variable, TclError
+
+from tkinter import (
+    Variable,
+    BooleanVar as BoolVar,
+    TclError
+)
 
 from PIL import Image
 from customtkinter import (
@@ -164,7 +169,7 @@ class ManejarFrame(ctkFrame):
         self.update_idletasks()
 
 
-class MostrarTab(ctkFrame):
+class MostrarTab(ctkScrollFrame):
     """
     Frame para mostrar todas las matrices ingresadas.
     """
@@ -178,10 +183,11 @@ class MostrarTab(ctkFrame):
         self.mats_manager = mats_manager
         self.columnconfigure(0, weight=1)
 
-        self.options: dict[str, tuple[int, bool]] = {
-            "Sistemas ingresados": (1, False),
-            "Matrices ingresadas": (0, False),
-            "Matrices calculadas": (-1, True),
+        self.options: dict[str, tuple[int, int]] = {
+            "Mostrar todo": (-1, -1),
+            "Sistemas ingresados": (1, 0),
+            "Matrices ingresadas": (0, 0),
+            "Matrices calculadas": (-1, 1)
         }
 
         self.select_label = ctkLabel(self, text="Seleccione un filtro:")
@@ -193,14 +199,14 @@ class MostrarTab(ctkFrame):
 
         self.option_seleccionada = self.options[self.select_option.get()]
         self.mostrar_button = ctkButton(
-            self, width=80, height=30, text="Mostrar", command=self.setup_mostrar
+            self, height=30, text="Mostrar", command=self.setup_mostrar
         )
 
         self.mostrar_frame = ctkFrame(self)
         self.print_frame: Optional[Union[ErrorFrame, ResultadoFrame]] = None
 
-        self.select_label.grid(row=0, column=0, padx=5, pady=5, sticky="n")
-        self.select_option.grid(row=1, column=0, padx=5, pady=5, sticky="n")
+        self.select_label.grid(row=0, column=0, padx=5, pady=(5, 2), sticky="n")
+        self.select_option.grid(row=1, column=0, padx=5, pady=(2, 5), sticky="n")
         self.mostrar_button.grid(row=2, column=0, padx=5, pady=5, sticky="n")
         self.mostrar_frame.grid(row=3, column=0, padx=5, pady=10, sticky="n")
 
@@ -236,7 +242,7 @@ class MostrarTab(ctkFrame):
         self.option_seleccionada = self.options[valor]
 
 
-class AgregarTab(ctkFrame):
+class AgregarTab(ctkScrollFrame):
     """
     Frame para agregar una nueva matriz.
     """
@@ -559,8 +565,463 @@ class AgregarTab(ctkFrame):
         self.update_idletasks()
 
 
-class EditarTab(ctkFrame):
-    pass
+class EditarTab(ctkScrollFrame):
+    def __init__(self, master_frame: ManejarFrame, master_tab,
+                 app, mats_manager: MatricesManager) -> None:
+
+        super().__init__(master_tab, corner_radius=0, fg_color="transparent")
+        self.app = app
+        self.master_frame = master_frame
+        self.mats_manager = mats_manager
+        self.columnconfigure(0, weight=1)
+
+        self.nombres_matrices = list(self.mats_manager.mats_ingresadas.keys())
+        self.mensaje_frame: Optional[ctkFrame] = None
+        self.edit_frame: ctkFrame
+
+        self.input_entries: list[list[ctkEntry]] = []
+        self.post_matriz_widgets: list[ctkBase] = []
+
+        self.check_aumentada: ctkCheckBox
+        self.filas_entry: ctkEntry
+        self.columnas_entry: ctkEntry
+        self.nombre_entry: ctkEntry
+        self.select_mat: ctkOptionMenu
+        self.editar_button: ctkButton
+
+        self.aumentada: bool
+        self.mat_seleccionada = ""
+        self.setup()
+
+    def setup(self) -> None:
+        for widget in self.winfo_children():
+            if widget == self.edit_frame:
+                for subwidget in self.edit_frame.winfo_children():
+                    subwidget.destroy()  # type: ignore
+            widget.destroy()  # type: ignore
+
+        self.nombres_matrices = list(self.mats_manager.mats_ingresadas.keys())
+        num_matrices = len(self.nombres_matrices)
+
+        if num_matrices >= 1:
+            self.setup_main()
+        if num_matrices == 0:
+            self.mensaje_frame = ErrorFrame(self, "No hay matrices guardadas!")
+            self.mensaje_frame.grid(row=0, column=0, padx=5, pady=5, sticky="n")
+
+    def setup_main(self) -> None:
+        matrices_editables = [
+            nombre
+            for nombre, _ in self.mats_manager.mats_ingresadas.items()
+            if len(nombre) == 1 and nombre.isupper()
+        ]
+
+        if self.mensaje_frame is not None:
+            self.mensaje_frame.destroy()
+            self.mensaje_frame = None
+
+        self.edit_frame = ctkFrame(self)
+
+        select_mat_label = ctkLabel(self, text="Seleccione la matriz a editar:")
+        self.select_mat = ctkOptionMenu(
+            self,
+            width=60,
+            values=matrices_editables,
+            command=self.update_mat,
+        )
+
+        self.editar_button = ctkButton(
+            self, height=30, text="Editar", command=self.setup_edit_frame
+        )
+
+        select_mat_label.grid(row=0, column=0, padx=5, pady=(5, 2), sticky="n")
+        self.select_mat.grid(row=1, column=0, padx=5, pady=(2, 5), sticky="n")
+        self.editar_button.grid(row=2, column=0, padx=5, pady=5, sticky="n")
+
+    def setup_edit_frame(self) -> None:
+        for widget in self.edit_frame.winfo_children():
+            if widget == self.matriz_frame:  # type: ignore
+                for subwidget in self.matriz_frame.winfo_children():  # type: ignore
+                    subwidget.destroy()  # type: ignore
+            widget.destroy()  # type: ignore
+
+        self.edit_frame.grid(row=3, column=0, padx=5, pady=5, sticky="n")
+        self.edit_frame.columnconfigure(0, weight=1)
+        self.edit_frame.columnconfigure(1, weight=1)
+
+        self.update_mat(self.select_mat.get())
+        mat_obj = self.mats_manager.mats_ingresadas[self.mat_seleccionada]
+
+        checkbox_label = ctkLabel(self.edit_frame, text="¿Es un sistema de ecuaciones?")
+        self.check_aumentada = ctkCheckBox(
+            self.edit_frame,
+            text="",
+            command=self.toggle_aumentada
+        )
+
+        filas_label = ctkLabel(self.edit_frame, text="Número de filas:")
+        self.filas_entry = ctkEntry(self.edit_frame, width=60, placeholder_text="3")
+        columnas_label = ctkLabel(self.edit_frame, text="Número de columnas:")
+        self.columnas_entry = ctkEntry(self.edit_frame, width=60, placeholder_text="3")
+        self.actualizar_button = ctkButton(
+            self.edit_frame,
+            height=30,
+            text="Actualizar dimensiones",
+            command=self.actualizar_dimensiones,
+        )
+
+        self.matriz_frame = ctkFrame(self.edit_frame)
+        nombre_label = ctkLabel(self.edit_frame, text="Nombre de la matriz:")
+        self.nombre_entry = ctkEntry(self.edit_frame, width=60, placeholder_text="A")
+
+        guardar_button = ctkButton(
+            self.edit_frame,
+            height=30,
+            text="Guardar cambios",
+            command=self.guardar_cambios,
+        )
+
+        limpiar_button = ctkButton(
+            self.edit_frame,
+            height=30,
+            text="Limpiar casillas",
+            command=self.limpiar_casillas
+        )
+
+        self.aumentada = mat_obj.aumentada
+        self.nombre_entry.insert(0, self.mat_seleccionada)
+        self.check_aumentada.configure(variable=BoolVar(value=mat_obj.aumentada))
+        self.filas_entry.insert(0, mat_obj.filas)
+        self.columnas_entry.insert(
+            0, (mat_obj.columnas if not self.aumentada else mat_obj.columnas - 1)
+        )
+
+        height = 35 * mat_obj.filas
+        sep_icon = ctkImage(
+            dark_image=Image.open(
+                path.join(ASSET_PATH, "light_separator.png")
+            ),
+            light_image=Image.open(
+                path.join(ASSET_PATH, "dark_separator.png")
+            ),
+            size=(35, height),
+        )
+
+        for i in range(mat_obj.filas):
+            fila_entries = []
+            for j in range(mat_obj.columnas):
+                input_entry = ctkEntry(self.matriz_frame, width=60)
+                input_entry.insert(0, mat_obj[i, j])
+                if not mat_obj.aumentada or j != mat_obj.columnas - 1:
+                    input_entry.grid(row=i, column=j, padx=5, pady=5)
+                elif mat_obj.aumentada and j == mat_obj.columnas - 1:
+                    sep_placed = ctkLabel(self.matriz_frame, image=sep_icon, text="")
+                    sep_placed.grid(row=0, rowspan=mat_obj.filas, column=j)
+                    input_entry.grid(row=i, column=j+1, padx=5, pady=5)
+                self.bind_entry_keys(input_entry, i, j)
+                fila_entries.append(input_entry)
+            self.input_entries.append(fila_entries)
+
+        self.filas_entry.bind("<Up>", lambda x: self.focus_set_columnas())
+        self.filas_entry.bind("<Down>", lambda x: self.focus_set_columnas())
+        self.columnas_entry.bind("<Up>", lambda x: self.focus_set_filas())
+        self.columnas_entry.bind("<Down>", lambda x: self.columnas_move_down())
+        self.nombre_entry.bind("<Up>", lambda x: self.nombre_entry_up())
+        self.nombre_entry.bind("<Return>", lambda x: self.guardar_cambios())
+
+        checkbox_label.grid(row=0, column=0, padx=5, pady=5, sticky="e")
+        self.check_aumentada.grid(row=0, column=1, padx=5, pady=5, sticky="w")
+        filas_label.grid(row=1, column=0, padx=5, pady=5, sticky="e")
+        self.filas_entry.grid(row=1, column=1, padx=5, pady=5, sticky="w")
+        columnas_label.grid(row=2, column=0, padx=5, pady=5, sticky="e")
+        self.columnas_entry.grid(row=2, column=1, padx=5, pady=5, sticky="w")
+        self.actualizar_button.grid(row=3, column=0, columnspan=2, padx=5, pady=5, sticky="n")
+        self.matriz_frame.grid(row=4, column=0, columnspan=2, padx=5, pady=5, sticky="ns")
+        nombre_label.grid(row=5, column=0, padx=5, pady=5, sticky="e")
+        self.nombre_entry.grid(row=5, column=1, padx=5, pady=5, sticky="w")
+        guardar_button.grid(row=6, column=0, padx=5, pady=5, sticky="e")
+        limpiar_button.grid(row=6, column=1, padx=5, pady=5, sticky="w")
+
+        self.post_matriz_widgets = [
+            nombre_label,
+            self.nombre_entry,
+            guardar_button,
+            limpiar_button,
+        ]
+
+    def guardar_cambios(self) -> None:
+        try:
+            filas = int(self.filas_entry.get())
+            columnas = int(self.columnas_entry.get())
+            if filas <= 0 or columnas <= 0:
+                raise ValueError
+        except ValueError:
+            self.mensaje_frame = ErrorFrame(
+                self.edit_frame, "Debe ingresar números enteros positivos como filas y columnas!"
+            )
+            self.mensaje_frame.grid(row=7, column=0, columnspan=2, sticky="n", padx=5, pady=5)
+            return
+
+        input_f = len(self.input_entries)
+        input_c = len(self.input_entries[0])
+
+        dimensiones_validas = (
+            filas == input_f and columnas == input_c
+            if not self.aumentada
+            else filas == input_f and input_c == columnas
+        )
+
+        if not dimensiones_validas:
+            self.mensaje_frame = ErrorFrame(
+                self,
+                "Las dimensiones de la matriz ingresada no coinciden con las dimensions indicadas!"
+            )
+            self.mensaje_frame.grid(row=7, column=0, columnspan=2, sticky="n", padx=5, pady=5)
+            return
+
+        if self.aumentada:
+            columnas += 1
+
+        valores = []
+        for fila_entries in self.input_entries:
+            fila_valores = []
+            for entry in fila_entries:
+                try:
+                    valor = Fraction(entry.get())
+                except ValueError:
+                    self.mensaje_frame = ErrorFrame(
+                        self.edit_frame, "Todos los valores deben ser números racionales!"
+                    )
+                    self.mensaje_frame.grid(
+                        row=7, column=0, columnspan=2, sticky="n", padx=5, pady=5
+                    )
+                    return
+                except ZeroDivisionError:
+                    self.mensaje_frame = ErrorFrame(
+                        self.edit_frame, "El denominador no puede ser 0!"
+                    )
+                    self.mensaje_frame.grid(
+                        row=7, column=0, columnspan=2, sticky="n", padx=5, pady=5
+                    )
+                    return
+                fila_valores.append(valor)
+            valores.append(fila_valores)
+
+        if self.mensaje_frame is not None:
+            self.mensaje_frame.destroy()
+            self.mensaje_frame = None
+
+        nombre_editado = self.nombre_entry.get()
+        matriz_editada = Matriz(
+            aumentada=self.aumentada, filas=filas,
+            columnas=columnas, valores=valores
+        )
+
+        nombre_valido = (
+            nombre_editado.isalpha()
+            and nombre_editado.isupper()
+            and len(nombre_editado) == 1
+        )
+
+        if (nombre_editado == self.mat_seleccionada and
+            matriz_editada == self.mats_manager.mats_ingresadas[self.mat_seleccionada]):
+            pass
+        else:
+            self.mats_manager.mats_ingresadas.pop(self.mat_seleccionada)
+            if not nombre_valido:
+                self.mensaje_frame = ErrorFrame(
+                    self, "El nombre de la matriz debe ser una letra mayúscula!"
+                )
+                self.mensaje_frame.grid(row=7, column=0, columnspan=2, sticky="n", padx=5, pady=5)
+                return
+            if nombre_editado in self.mats_manager.mats_ingresadas:
+                self.mensaje_frame = ErrorFrame(
+                    self, f"Ya existe una matriz llamada '{nombre_editado}'!"
+                )
+                self.mensaje_frame.grid(row=7, column=0, columnspan=2, sticky="n", padx=5, pady=5)
+                return
+            self.mats_manager.mats_ingresadas[nombre_editado] = matriz_editada
+
+        self.mensaje_frame = SuccessFrame(
+            self.edit_frame, "La matriz se ha editado exitosamente!"
+        )
+        self.mensaje_frame.grid(row=7, column=0, columnspan=2, sticky="n", padx=5, pady=5)
+        self.app.matrices.update_all()
+        self.app.vectores.update_all()
+        self.app.config_frame.update_frame()
+
+    def actualizar_dimensiones(self) -> None:
+        try:
+            filas = int(self.filas_entry.get())
+            columnas = int(self.columnas_entry.get())
+            if filas <= 0 or columnas <= 0:
+                raise ValueError
+        except ValueError:
+            self.mensaje_frame = ErrorFrame(
+                self.edit_frame, "Debe ingresar números enteros positivos como filas y columnas!"
+            )
+            self.mensaje_frame.grid(row=7, column=0, columnspan=2, sticky="n", padx=5, pady=5)
+            return
+
+        input_f = len(self.input_entries) - 1
+        input_c = len(self.input_entries[0]) - 1
+
+        if self.aumentada and columnas != input_c - 1:
+            columnas += 1
+        elif not self.aumentada and columnas == input_c - 1:
+            columnas -= 1
+
+        if filas == input_f and columnas == input_c:
+            return
+
+        if not self.aumentada:
+            for widget in self.matriz_frame.winfo_children():
+                if isinstance(widget, ctkLabel):
+                    widget.destroy()
+
+        if filas < input_f or columnas < input_c:
+            self.eliminar_fc(filas, columnas)
+        elif filas > input_f or columnas > input_c:
+            self.agregar_fc(filas, columnas)
+
+    def agregar_fc(self, filas: int, columnas: int) -> None:
+        num_filas_actual = len(self.input_entries)
+        num_columnas_actual = len(self.input_entries[0])
+
+        height = 35 * filas
+        sep_icon = ctkImage(
+            dark_image=Image.open(
+                path.join(ASSET_PATH, "light_separator.png")
+            ),
+            light_image=Image.open(
+                path.join(ASSET_PATH, "dark_separator.png")
+            ),
+            size=(35, height),
+        )
+
+
+        if self.aumentada:
+            for widget in self.matriz_frame.winfo_children():
+                if isinstance(widget, ctkLabel):
+                    widget.destroy()
+
+        for i, fila_entries in enumerate(self.input_entries):
+            if i >= num_filas_actual:
+                for j in range(columnas):
+                    input_entry = ctkEntry(self.matriz_frame, width=60)
+                    if not self.aumentada or j != columnas - 1:
+                        input_entry.grid(row=i, column=j, padx=5, pady=5)
+                    elif self.aumentada and j == columnas - 1:
+                        sep_placed = ctkLabel(self.matriz_frame, image=sep_icon, text="")
+                        sep_placed.grid(row=0, rowspan=filas, column=j)
+                        input_entry.grid(row=i, column=j+1, padx=5, pady=5)
+                    self.bind_entry_keys(input_entry, i, j)
+                    fila_entries.append(input_entry)
+                self.input_entries.append(fila_entries)
+            else:
+                for j in range(columnas):
+                    if j >= num_columnas_actual:
+                        input_entry = ctkEntry(self.matriz_frame, width=60)
+                        if not self.aumentada or j != columnas - 1:
+                            input_entry.grid(row=i, column=j, padx=5, pady=5)
+                        elif self.aumentada and j == columnas - 1:
+                            sep_placed = ctkLabel(self.matriz_frame, image=sep_icon, text="")
+                            sep_placed.grid(row=0, rowspan=filas, column=j)
+                            input_entry.grid(row=i, column=j+1, padx=5, pady=5)
+                        self.bind_entry_keys(input_entry, i, j)
+                        fila_entries.append(input_entry)
+
+    def eliminar_fc(self, filas: int, columnas: int) -> None:
+        for i in range(len(self.input_entries) - 1, filas - 1, -1):
+            for entry in self.input_entries[i]:
+                entry.destroy()
+            del self.input_entries[i]
+
+        for fila_entries in self.input_entries:
+            for j in range(len(fila_entries) - 1, columnas - 1, -1):
+                fila_entries[j].destroy()
+                del fila_entries[j]
+
+
+    def limpiar_casillas(self) -> None:
+        """
+        Borra todos los valores ingresados en las casillas de la matriz.
+        """
+
+        for fila_entries in self.input_entries:
+            for entry in fila_entries:
+                entry.delete(0, "end")
+        self.input_entries.clear()
+        try:
+            self.nombre_entry.delete(0, "end")
+        except AttributeError:
+            pass
+
+    def toggle_aumentada(self) -> None:
+        self.aumentada = not self.aumentada
+
+    def focus_set_columnas(self) -> None:
+        self.columnas_entry.focus_set()
+
+    def focus_set_filas(self) -> None:
+        self.filas_entry.focus_set()
+
+    def columnas_move_down(self) -> None:
+        if len(self.matriz_frame.winfo_children()) == 0:
+            self.focus_set_filas()
+        else:
+            self.input_entries[0][0].focus_set()
+
+    def bind_entry_keys(self, entry: ctkEntry, i: int, j: int) -> None:
+        entry.bind("<Up>", lambda x: self.entry_move_up(i, j))
+        entry.bind("<Down>", lambda x: self.entry_move_down(i, j))
+        entry.bind("<Left>", lambda x: self.entry_move_left(i, j))
+        entry.bind("<Right>", lambda x: self.entry_move_right(i, j))
+
+    def entry_move_up(self, i: int, j: int) -> None:
+        if i > 0:
+            self.input_entries[i - 1][j].focus_set()
+        elif i == 0:
+            self.focus_set_columnas()
+
+    def entry_move_down(self, i: int, j: int) -> None:
+        if i < len(self.input_entries) - 1:
+            self.input_entries[i + 1][j].focus_set()
+        elif i == len(self.input_entries) - 1:
+            self.nombre_entry.focus_set()
+
+    def entry_move_left(self, i: int, j: int) -> None:
+        if j > 0:
+            self.input_entries[i][j - 1].focus_set()
+        elif j == 0:
+            if i > 0:
+                self.input_entries[i - 1][-1].focus_set()
+
+    def entry_move_right(self, i: int, j: int) -> None:
+        if j < len(self.input_entries[i]) - 1:
+            self.input_entries[i][j + 1].focus_set()
+        elif j == len(self.input_entries[i]) - 1:
+            if i < len(self.input_entries) - 1:
+                self.input_entries[i + 1][0].focus_set()
+            elif i == len(self.input_entries) - 1:
+                self.nombre_entry.focus_set()
+
+    def nombre_entry_up(self) -> None:
+        self.input_entries[-1][-1].focus_set()
+
+    def update(self) -> None:
+        for widget in self.winfo_children():
+            if widget == self.mensaje_frame and isinstance(self.mensaje_frame, SuccessFrame):
+                continue
+            if widget == self.edit_frame:
+                for subwidget in self.edit_frame.winfo_children():
+                    subwidget.destroy()  # type: ignore
+            widget.destroy()  # type: ignore
+        self.setup()
+        self.update_idletasks()
+
+    def update_mat(self, valor: str) -> None:
+        self.mat_seleccionada = valor
 
 
 class EliminarTab(ctkFrame):
