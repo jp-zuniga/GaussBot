@@ -113,13 +113,13 @@ class EcuacionesFrame(ctkFrame):
             self.mensaje_frame = ErrorFrame(
                 self, "Solamente debe seleccionar un método para resolver el sistema!"
             )
-            self.mensaje_frame.grid(row=5, column=0, columnspan=2, sticky="n", padx=5, pady=5)
+            self.mensaje_frame.grid(row=5, column=0, columnspan=2, padx=5, pady=5, sticky="n")
             return
         if not any([self.gauss_jordan, self.cramer]):
             self.mensaje_frame = ErrorFrame(
                 self, "Debe seleccionar un método para resolver el sistema!"
             )
-            self.mensaje_frame.grid(row=5, column=0, columnspan=2, sticky="n", padx=5, pady=5)
+            self.mensaje_frame.grid(row=5, column=0, columnspan=2, padx=5, pady=5, sticky="n")
             return
 
         sistema: Optional[SistemaEcuaciones] = None
@@ -139,7 +139,7 @@ class EcuacionesFrame(ctkFrame):
             except (TypeError, ArithmeticError, ZeroDivisionError) as e:
                 self.mensaje_frame = ErrorFrame(self, str(e))
                 self.mensaje_frame.grid(
-                    row=5, column=0, columnspan=2, sticky="n", padx=5, pady=5
+                    row=5, column=0, columnspan=2, padx=5, pady=5, sticky="n"
                 )
                 return
 
@@ -158,7 +158,7 @@ class EcuacionesFrame(ctkFrame):
                 self, header=sistema.solucion,  # type: ignore
                 resultado="", solo_header=True
             )
-        self.mensaje_frame.grid(row=5, column=0, columnspan=2, sticky="n", padx=5, pady=5)
+        self.mensaje_frame.grid(row=5, column=0, columnspan=2, padx=5, pady=5, sticky="n")
 
     def toggle_gj(self) -> None:
         self.gauss_jordan = not self.gauss_jordan

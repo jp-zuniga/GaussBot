@@ -41,11 +41,11 @@ class MatricesManager:
         Obtiene las matrices guardadas en self.mats_ingresadas y las retorna como string.
         - aumentada: 0 para no mostrar aumentadas,
                      1 para mostrar solo aumentadas,
-                     -1 para mostrar todas
+                    -1 para mostrar todas
         - calculada: True para mostrar solo matrices calculadas,
                      False para mostrar matrices ingresadas
 
-        * ValueError: si aumentada o calculada no son (-1, 0, 1)
+        * ValueError: si aumentada o calculada no estan en (-1, 0, 1)
         """
 
         if aumentada not in (-1, 0, 1):

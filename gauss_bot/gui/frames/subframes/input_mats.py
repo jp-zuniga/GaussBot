@@ -1,5 +1,5 @@
 """
-Implementación de ManejarFrame y sus subframes,
+Implementación de ManejarMats y sus subframes,
 que se encargan de manejar los inputs de matrices:
 agregar, mostrar, editar y eliminar.
 """
@@ -48,7 +48,7 @@ if TYPE_CHECKING:
     from gauss_bot.gui.frames.matrices import MatricesFrame
 
 
-class ManejarFrame(ctkFrame):
+class ManejarMats(ctkFrame):
     def __init__(self, master_frame: "MatricesFrame", master_tab,
                  app, mats_manager: MatricesManager) -> None:
 
@@ -94,7 +94,7 @@ class MostrarTab(CustomScrollFrame):
     Frame para mostrar todas las matrices ingresadas.
     """
 
-    def __init__(self, master_frame: ManejarFrame, master_tab,
+    def __init__(self, master_frame: ManejarMats, master_tab,
                  app, mats_manager: MatricesManager) -> None:
 
         super().__init__(app, master_tab, corner_radius=0, fg_color="transparent")
@@ -171,7 +171,7 @@ class AgregarTab(CustomScrollFrame):
     Frame para agregar una nueva matriz.
     """
 
-    def __init__(self, master_frame: ManejarFrame, master_tab,
+    def __init__(self, master_frame: ManejarMats, master_tab,
                  app, mats_manager: MatricesManager) -> None:
 
         super().__init__(app, master_tab, corner_radius=0, fg_color="transparent")
@@ -437,7 +437,7 @@ class AgregarTab(CustomScrollFrame):
         self.mensaje_frame = SuccessFrame(
             self, "La matriz se ha agregado exitosamente!"
         )
-        self.mensaje_frame.grid(row=7, column=0, columnspan=2, sticky="n", padx=5, pady=5)
+        self.mensaje_frame.grid(row=7, column=0, columnspan=2, padx=5, pady=5, sticky="n")
         self.update_scrollbar_visibility()
         self.app.matrices.update_all()
         self.app.vectores.update_all()
@@ -500,7 +500,7 @@ class AgregarTab(CustomScrollFrame):
 
 
 class EliminarTab(CustomScrollFrame):
-    def __init__(self, master_frame: ManejarFrame, master_tab,
+    def __init__(self, master_frame: ManejarMats, master_tab,
                  app, mats_manager: MatricesManager) -> None:
 
         super().__init__(app, master_tab, corner_radius=0, fg_color="transparent")
@@ -540,7 +540,7 @@ class EliminarTab(CustomScrollFrame):
             self.mensaje_frame = ErrorFrame(
                 self, "No hay matrices guardadas!"
             )
-            self.mensaje_frame.grid(row=3, column=0, sticky="n", padx=5, pady=5)
+            self.mensaje_frame.grid(row=3, column=0, padx=5, pady=5, sticky="n")
             self.update_scrollbar_visibility()
             return
 
@@ -571,7 +571,16 @@ class EliminarTab(CustomScrollFrame):
 
     def update(self) -> None:
         self.nombres_matrices = list(self.mats_manager.mats_ingresadas.keys())
-        if len(self.nombres_matrices) > 0:
+
+        if len(self.nombres_matrices) == 0:
+            if isinstance(self.mensaje_frame, ErrorFrame):
+                return
+            for widget in self.winfo_children():
+                widget.destroy()
+            self.mensaje_frame = ErrorFrame(self, "No hay matrices guardadas!")
+            self.mensaje_frame.grid(row=0, column=0, padx=5, pady=5, sticky="n")
+
+        elif len(self.nombres_matrices) > 0:
             placeholder = Variable(self, value=self.nombres_matrices[0])
             self.select_mat.configure(
                 values=self.nombres_matrices, variable=placeholder

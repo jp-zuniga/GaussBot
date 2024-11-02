@@ -6,7 +6,7 @@ de operaciones con matrices.
 from fractions import Fraction
 from typing import (
     TYPE_CHECKING,
-    Optional
+    Optional,
 )
 
 from tkinter import Variable
@@ -58,6 +58,7 @@ class SumaRestaTab(CustomScrollFrame):
 
         self.tabview = ctkTabview(self)
         self.tabview.grid(row=0, column=0, sticky="n")
+
         self.tab_sumar = self.tabview.add("Sumar")
         self.tab_restar = self.tabview.add("Restar")
         self.setup_tabs()
@@ -252,6 +253,7 @@ class MultiplicacionTab(CustomScrollFrame):
 
         self.tabview = ctkTabview(self)
         self.tabview.grid(row=0, column=0, sticky="n")
+
         self.tab_escalar = self.tabview.add("Escalar por Matriz")
         self.tab_matriz = self.tabview.add("Multiplicación Matricial")
         self.tab_matriz_vector = self.tabview.add("Producto Matriz-Vector")
@@ -625,7 +627,7 @@ class TransposicionTab(CustomScrollFrame):
                 self, "No hay matrices guardadas!"
             )
             self.rowconfigure(6, weight=1)
-            self.mensaje_frame.grid(row=6, column=0, columnspan=2, sticky="n", padx=5, pady=5)
+            self.mensaje_frame.grid(row=6, column=0, columnspan=2, padx=5, pady=5, sticky="n")
             self.update_scrollbar_visibility()
             return
 
@@ -727,7 +729,7 @@ class DeterminanteTab(CustomScrollFrame):
                 self, "No hay matrices guardadas!"
             )
             self.rowconfigure(6, weight=1)
-            self.mensaje_frame.grid(row=6, column=0, columnspan=2, sticky="n", padx=5, pady=5)
+            self.mensaje_frame.grid(row=6, column=0, columnspan=2, padx=5, pady=5, sticky="n")
             self.update_scrollbar_visibility()
             return
 
@@ -834,7 +836,7 @@ class InversaTab(CustomScrollFrame):
                 self, "No hay matrices guardadas!"
             )
             self.rowconfigure(6, weight=1)
-            self.mensaje_frame.grid(row=6, column=0, columnspan=2, sticky="n", padx=5, pady=5)
+            self.mensaje_frame.grid(row=6, column=0, columnspan=2, padx=5, pady=5, sticky="n")
             self.update_scrollbar_visibility()
             return
 
