@@ -131,6 +131,7 @@ class ConfigFrame(ctkFrame):
         self.app.modo_actual = self.modos_dict[modo_seleccionado]
         set_appearance_mode(self.app.modo_actual)
         self.app.set_icon(self.app.modo_actual)
+        self.app.inputs_frame.update_all()
         self.app.matrices.update_all()
         self.app.vectores.update_all()
 

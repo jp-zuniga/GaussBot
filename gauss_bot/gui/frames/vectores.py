@@ -12,7 +12,6 @@ from customtkinter import (
 
 from gauss_bot.managers.vecs_manager import VectoresManager
 
-from gauss_bot.gui.frames.subframes.input_vecs import ManejarVecs
 from gauss_bot.gui.frames.subframes.operaciones_vecs import (
     SumaRestaTab,
     MultiplicacionTab,
@@ -49,7 +48,6 @@ class VectoresFrame(ctkFrame):
 
         self.instances: list[Union[ctkFrame, ctkScrollFrame]] = []
         self.tabs = [
-            ("Manejar Vectores", ManejarVecs),
             ("Suma y Resta", SumaRestaTab),
             ("Multiplicación", MultiplicacionTab),
         ]

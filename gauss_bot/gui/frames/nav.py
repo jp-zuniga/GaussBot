@@ -28,7 +28,7 @@ class NavFrame(ctkFrame):
         self.app = app
 
         self.grid(row=0, column=0, sticky="nsew")
-        self.rowconfigure(4, weight=1)
+        self.rowconfigure(5, weight=1)
         self.columnconfigure(0, weight=1)
         self.columnconfigure(1, weight=1)
         self.configure(fg_color=self.app.theme_config["CTk"]["fg_color"])
@@ -38,9 +38,9 @@ class NavFrame(ctkFrame):
             light_image=Image.open(path.join(ASSET_PATH, "dark_logo.png"))
         )
 
-        self.ecuaciones_icon = ctkImage(
-            dark_image=Image.open(path.join(ASSET_PATH, "light_ecuaciones_icon.png")),
-            light_image=Image.open(path.join(ASSET_PATH, "dark_ecuaciones_icon.png"))
+        self.inputs_icon = ctkImage(
+            dark_image=Image.open(path.join(ASSET_PATH, "light_input_icon.png")),
+            light_image=Image.open(path.join(ASSET_PATH, "dark_input_icon.png"))
         )
 
         self.matriz_icon = ctkImage(
@@ -51,6 +51,11 @@ class NavFrame(ctkFrame):
         self.vector_icon = ctkImage(
             dark_image=Image.open(path.join(ASSET_PATH, "light_vector_icon.png")),
             light_image=Image.open(path.join(ASSET_PATH, "dark_vector_icon.png"))
+        )
+
+        self.ecuaciones_icon = ctkImage(
+            dark_image=Image.open(path.join(ASSET_PATH, "light_ecuaciones_icon.png")),
+            light_image=Image.open(path.join(ASSET_PATH, "dark_ecuaciones_icon.png"))
         )
 
         self.config_icon = ctkImage(
@@ -70,12 +75,12 @@ class NavFrame(ctkFrame):
             font=ctkFont(size=18, weight="bold"),
         )
 
-        self.ecuaciones_button = ctkButton(
+        self.inputs_button = ctkButton(
             self, corner_radius=0, height=40, border_spacing=10,
-            text="Menú de Ecuaciones", fg_color="transparent",
+            text="Menú de Datos", fg_color="transparent",
             text_color=("gray10", "gray90"), hover_color=("gray70", "gray30"),
-            image=self.ecuaciones_icon, anchor="w",
-            command=self.ecuaciones_button_event,
+            image=self.inputs_icon, anchor="w",
+            command=self.input_button_event,
         )
 
         self.matrices_button = ctkButton(
@@ -92,6 +97,14 @@ class NavFrame(ctkFrame):
             text_color=("gray10", "gray90"), hover_color=("gray70", "gray30"),
             image=self.vector_icon, anchor="w",
             command=self.vectores_button_event,
+        )
+
+        self.ecuaciones_button = ctkButton(
+            self, corner_radius=0, height=40, border_spacing=10,
+            text="Menú de Ecuaciones", fg_color="transparent",
+            text_color=("gray10", "gray90"), hover_color=("gray70", "gray30"),
+            image=self.ecuaciones_icon, anchor="w",
+            command=self.ecuaciones_button_event,
         )
 
         self.config_button = ctkButton(
@@ -112,23 +125,26 @@ class NavFrame(ctkFrame):
 
         self.logo_label.grid(row=0, column=0, padx=5, pady=20, sticky="e")
         self.logo_text.grid(row=0, column=1, padx=5, pady=20, sticky="w")
-        self.ecuaciones_button.grid(row=1, column=0, columnspan=2, padx=10, sticky="ew")
+        self.inputs_button.grid(row=1, column=0, columnspan=2, padx=10, sticky="ew")
         self.matrices_button.grid(row=2, column=0, columnspan=2, padx=10, sticky="ew")
         self.vectores_button.grid(row=3, column=0, columnspan=2, padx=10, sticky="ew")
-        self.config_button.grid(row=5, column=0, columnspan=2, padx=10, sticky="ew")
-        self.quit_button.grid(row=6, column=0, columnspan=2, padx=10, pady=(0, 10), sticky="ew")
+        self.ecuaciones_button.grid(row=4, column=0, columnspan=2, padx=10, sticky="ew")
+        self.config_button.grid(row=6, column=0, columnspan=2, padx=10, sticky="ew")
+        self.quit_button.grid(row=7, column=0, columnspan=2, padx=10, pady=(0, 10), sticky="ew")
 
         self.frames = {
-            "ecuaciones": self.app.ecuaciones,
+            "input": self.app.inputs_frame,
             "matrices": self.app.matrices,
             "vectores": self.app.vectores,
+            "ecuaciones": self.app.ecuaciones,
             "config": self.app.config_frame
         }
 
         self.buttons = {
-            "ecuaciones": self.ecuaciones_button,
+            "input": self.inputs_button,
             "matrices": self.matrices_button,
             "vectores": self.vectores_button,
+            "ecuaciones": self.ecuaciones_button,
             "config": self.config_button
         }
 
@@ -150,6 +166,9 @@ class NavFrame(ctkFrame):
                 frame.grid(row=0, column=1, sticky="nsew")
             else:
                 frame.grid_forget()
+
+    def input_button_event(self) -> None:
+        self.seleccionar_frame("input")
 
     def matrices_button_event(self) -> None:
         self.seleccionar_frame("matrices")

@@ -15,7 +15,6 @@ from typing import (
 
 from tkinter import (
     Variable,
-    # BooleanVar as BoolVar,
     TclError
 )
 
@@ -28,7 +27,6 @@ from customtkinter import (
     CTkFrame as ctkFrame,
     CTkImage as ctkImage,
     CTkLabel as ctkLabel,
-    CTkTabview as ctkTabview,
     CTkOptionMenu as ctkOptionMenu,
 )
 
@@ -45,56 +43,15 @@ from gauss_bot.gui.custom_frames import (
 )
 
 if TYPE_CHECKING:
-    from gauss_bot.gui.frames.matrices import MatricesFrame
+    from gauss_bot.gui.frames.inputs import ManejarMats
 
 
-class ManejarMats(ctkFrame):
-    def __init__(self, master_frame: "MatricesFrame", master_tab,
-                 app, mats_manager: MatricesManager) -> None:
-
-        super().__init__(master_tab, corner_radius=0, fg_color="transparent")
-        self.app = app
-        self.master_frame = master_frame
-        self.mats_manager = mats_manager
-        self.columnconfigure(0, weight=1)
-        self.setup_tabview()
-
-    def setup_tabview(self) -> None:
-        self.tabview = ctkTabview(self)
-        self.tabview.pack(expand=True, fill="both")
-
-        self.instances: list[Union[ctkFrame, CustomScrollFrame]] = []
-        self.tabs = [
-            ("Agregar", AgregarTab),
-            ("Mostrar", MostrarTab),
-            # ("Editar", EditarTab),
-            ("Eliminar", EliminarTab)
-        ]
-
-        for nombre, cls in self.tabs:
-            tab = self.tabview.add(nombre)
-            tab_instance: Union[ctkFrame, CustomScrollFrame] = (
-                cls(self, tab, self.app, self.mats_manager)
-            )
-
-            tab_instance.pack(expand=True, fill="both")
-            self.instances.append(tab_instance)   # type: ignore
-
-    def update_frame(self):
-        for tab in self.instances:
-            tab.update_frame()
-            for widget in tab.winfo_children():
-                widget.configure(bg_color="transparent")  # type: ignore
-        self.tabview.configure(fg_color="transparent")
-        self.update_idletasks()
-
-
-class MostrarTab(CustomScrollFrame):
+class MostrarMats(CustomScrollFrame):
     """
     Frame para mostrar todas las matrices ingresadas.
     """
 
-    def __init__(self, master_frame: ManejarMats, master_tab,
+    def __init__(self, master_frame: "ManejarMats", master_tab,
                  app, mats_manager: MatricesManager) -> None:
 
         super().__init__(app, master_tab, corner_radius=0, fg_color="transparent")
@@ -166,12 +123,12 @@ class MostrarTab(CustomScrollFrame):
         self.option_seleccionada = self.options[valor]
 
 
-class AgregarTab(CustomScrollFrame):
+class AgregarMats(CustomScrollFrame):
     """
     Frame para agregar una nueva matriz.
     """
 
-    def __init__(self, master_frame: ManejarMats, master_tab,
+    def __init__(self, master_frame: "ManejarMats", master_tab,
                  app, mats_manager: MatricesManager) -> None:
 
         super().__init__(app, master_tab, corner_radius=0, fg_color="transparent")
@@ -499,8 +456,8 @@ class AgregarTab(CustomScrollFrame):
         self.update_scrollbar_visibility()
 
 
-class EliminarTab(CustomScrollFrame):
-    def __init__(self, master_frame: ManejarMats, master_tab,
+class EliminarMats(CustomScrollFrame):
+    def __init__(self, master_frame: "ManejarMats", master_tab,
                  app, mats_manager: MatricesManager) -> None:
 
         super().__init__(app, master_tab, corner_radius=0, fg_color="transparent")

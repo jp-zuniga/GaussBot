@@ -14,7 +14,6 @@ from gauss_bot.managers.mats_manager import MatricesManager
 
 from gauss_bot.gui.custom_frames import CustomScrollFrame
 
-from gauss_bot.gui.frames.subframes.input_mats import ManejarMats
 from gauss_bot.gui.frames.subframes.operaciones_mats import (
     SumaRestaTab,
     MultiplicacionTab,
@@ -60,7 +59,6 @@ class MatricesFrame(ctkFrame):
 
         self.instances: list[Union[ctkFrame, CustomScrollFrame]] = []
         self.tabs = [
-            ("Manejar Matrices", ManejarMats),
             ("Suma y Resta", SumaRestaTab),
             ("Multiplicación", MultiplicacionTab),
             ("Transposición", TransposicionTab),
