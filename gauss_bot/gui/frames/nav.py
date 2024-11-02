@@ -187,7 +187,7 @@ class NavFrame(ctkFrame):
         self.seleccionar_frame("home")
 
     def inputs_button_event(self) -> None:
-        self.seleccionar_frame("input")
+        self.seleccionar_frame("inputs")
 
     def matrices_button_event(self) -> None:
         self.seleccionar_frame("matrices")
