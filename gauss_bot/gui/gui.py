@@ -114,5 +114,7 @@ class GaussUI(ctk):
         Carga el archivo de configuración del tema actual.
         """
 
-        with open(path.join(THEMES_PATH, self.tema_actual), mode="r", encoding="utf-8") as theme_file:
+        with open(
+            path.join(THEMES_PATH, self.tema_actual), mode="r", encoding="utf-8"
+        ) as theme_file:
             return load(theme_file)

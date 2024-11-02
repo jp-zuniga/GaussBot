@@ -36,20 +36,55 @@ class MatricesManager:
         else:
             raise TypeError("Argumento inválido para 'mats_ingresadas'!")
 
-    def get_matrices(self) -> str:
+    def get_matrices(self, aumentada: int, calculada: int) -> str:
         """
         Obtiene las matrices guardadas en self.mats_ingresadas y las retorna como string.
+        - aumentada: 0 para no mostrar aumentadas,
+                     1 para mostrar solo aumentadas,
+                    -1 para mostrar todas
+        - calculada: True para mostrar solo matrices calculadas,
+                     False para mostrar matrices ingresadas
+
+        * ValueError: si aumentada o calculada no estan en (-1, 0, 1)
         """
+
+        if aumentada not in (-1, 0, 1):
+            raise ValueError("Argumento inválido para 'aumentada'!")
+        if calculada not in (-1, 0, 1):
+            raise ValueError("Argumento inválido para 'calculada'!")
 
         if not self._validar_mats_ingresadas():
             return "No hay matrices ingresadas!"
 
-        matrices = "Matrices guardadas:\n"
+        if calculada == 1:
+            header = "Matrices calculadas:"
+        elif aumentada == 1:
+            header = "Sistemas de ecuaciones ingresadas:"
+        elif calculada == 0 or aumentada == 0:
+            header = "Matrices ingresadas:"
+        elif calculada == -1 or aumentada == -1:
+            header = "Matrices guardadas:"
+
+        matrices = f"{header}\n"
         matrices += "---------------------------------------------"
         for nombre, mat in self.mats_ingresadas.items():
+            if (aumentada == 1 and not mat.aumentada) or (aumentada == 0 and mat.aumentada):
+                continue
+            if (calculada == 0 and len(nombre) > 1) or (calculada == 1 and len(nombre) == 1):
+                continue
             matrices += f"\n{nombre}:\n"
             matrices += str(mat)
         matrices += "---------------------------------------------"
+
+        if matrices.count("(") == 0:
+            if calculada:
+                return "No hay matrices calculadas guardadas!"
+            elif aumentada == 1:
+                return "No hay sistemas de ecuaciones guardados!"
+            elif not calculada or aumentada in (-1, 0):
+                return "No hay matrices guardadas!"
+            elif calculada and aumentada == 1:
+                return "No hay sistemas de ecuaciones guardados!"
         return matrices
 
     def resolver_sistema(self, nombre_mat: str, metodo: str) -> SistemaEcuaciones:
@@ -141,7 +176,10 @@ class MatricesManager:
         mat_transpuesta = mat.transponer()
         return (nombre_mat_transpuesta, mat_transpuesta)
 
-    # def calcular_determinante(self, nombre_mat: str) -> Union[Fraction, tuple[Fraction, "Matriz", bool]]:
+    # def calcular_determinante(
+    #     self, nombre_mat: str
+    # ) -> Union[Fraction, tuple[Fraction, "Matriz", bool]]:
+
     #     """
     #     Calcula el determinante de la matriz indicada.
     #     * ArithmeticError: si la matriz no es cuadrada

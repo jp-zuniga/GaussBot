@@ -91,11 +91,11 @@ class OpsManager:
             makedirs(path.dirname(MATRICES_PATH), exist_ok=True)
 
         if matrices_dict == {}:
-            with open(MATRICES_PATH, "w") as _:
+            with open(MATRICES_PATH, "w", encoding="utf-8") as _:
                 pass
             return
 
-        with open(MATRICES_PATH, mode="w") as matrices_file:
+        with open(MATRICES_PATH, mode="w", encoding="utf-8") as matrices_file:
             dump(matrices_dict, matrices_file, indent=4, sort_keys=True, cls=FractionEncoder)
 
     def save_vectores(self) -> None:
@@ -130,7 +130,7 @@ class OpsManager:
         if not path.exists(MATRICES_PATH):
             return {}
 
-        with open(MATRICES_PATH, mode="r") as matrices_file:
+        with open(MATRICES_PATH, mode="r", encoding="utf-8") as matrices_file:
             try:
                 matrices_dict = load(matrices_file, cls=FractionDecoder)
             except JSONDecodeError:
@@ -157,7 +157,7 @@ class OpsManager:
         if not path.exists(VECTORES_PATH):
             return {}
 
-        with open(VECTORES_PATH, mode="r") as vectores_file:
+        with open(VECTORES_PATH, mode="r", encoding="utf-8") as vectores_file:
             try:
                 vectores_dict = load(vectores_file, cls=FractionDecoder)
             except JSONDecodeError:

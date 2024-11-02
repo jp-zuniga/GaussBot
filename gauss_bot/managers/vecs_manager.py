@@ -30,20 +30,45 @@ class VectoresManager:
         else:
             raise TypeError("Argumento inválido para 'vecs_ingresados'!")
 
-    def get_vectores(self) -> str:
+    def get_vectores(self, calculado: int) -> str:
         """
-        Obtiene los vectores guardados en self.vecs_ingresados y los retorna como un string.
+        Obtiene los vectores guardados en self.vecs_ingresados y los retorna como string.
+        - calculado: 0 para no mostrar calculados,
+                     1 para mostrar solo calculados,
+                    -1 para mostrar todos
+
+        * ValueError: si calculado no estan en (-1, 0, 1)
         """
+
+        if calculado not in (-1, 0, 1):
+            raise ValueError("Argumento inválido para 'calculado'!")
 
         if not self._validar_vecs_ingresados():
             return "No hay vectores ingresados!"
 
-        vectores = ""
-        vectores += "Vectores ingresados:\n"
-        vectores += "---------------------------------------------\n"
-        for nombre, vec in self.vecs_ingresados.items():
-            vectores += f"{nombre}: {vec}\n"
+        if calculado == 1:
+            header = "Vectores calculados:"
+        elif calculado == 0:
+            header = "Vectores ingresados:"
+        elif calculado == -1:
+            header = "Vectores guardados:"
+
+        vectores = f"{header}\n"
         vectores += "---------------------------------------------"
+        for nombre, vec in self.vecs_ingresados.items():
+            if (calculado == 0 and len(nombre) > 1) or (calculado == 1 and len(nombre) == 1):
+                continue
+            vectores += f"\n{nombre}:\n"
+            vectores += str(vec) + "\n"
+        vectores += "---------------------------------------------"
+
+        if vectores.count("[") == 0:
+            if calculado == 1:
+                return "No hay vectores calculados!"
+            elif calculado == 0:
+                return "No hay vectores ingresados!"
+            elif calculado == -1:
+                return "No hay vectores guardados!"
         return vectores
 
     def sumar_vecs(self, nombre_vec1: str, nombre_vec2: str) -> tuple[str, Vector]:

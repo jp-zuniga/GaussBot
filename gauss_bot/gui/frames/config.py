@@ -143,13 +143,12 @@ class ConfigFrame(ctkFrame):
             return
 
         self.app.tema_actual = self.temas_dict[tema_seleccionado]
-        set_default_color_theme(path.join(THEMES_PATH, self.app.tema_actual))
-
         self.mensaje_frame = SuccessFrame(
             self,
             message="Tema cambiado exitosamente! Cambios tomarán efecto al reiniciar la aplicación."
         )
         self.mensaje_frame.grid(row=3, column=1, pady=30)
+        set_default_color_theme(path.join(THEMES_PATH, self.app.tema_actual))
 
     def _get_dict_key(self, dict_lookup: dict, buscando: str) -> Union[str, None]:
         """

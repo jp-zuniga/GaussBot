@@ -123,7 +123,8 @@ class SistemaEcuaciones:
         if self.matriz.es_matriz_cero():
             self.solucion += "Sistema tiene soluciones infinitas!"
             self.procedimiento += str(self.matriz)
-            self.procedimiento += "\nTodas las ecuaciones tienen la forma 0 = 0, lo cual siempre es verdadero.\n"
+            self.procedimiento += "\nTodas las ecuaciones tienen la forma 0 = 0,"
+            self.procedimiento += " lo cual siempre es verdadero.\n"
             self.procedimiento += "Por lo tanto, el sistema tiene soluciones infinitas."
             return
 
