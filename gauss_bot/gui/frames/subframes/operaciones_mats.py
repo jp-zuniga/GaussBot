@@ -92,7 +92,13 @@ class SumaRestaTab(CustomScrollFrame):
             self.mensaje_frame = None
 
         tab.columnconfigure(0, weight=1)
+        tab.columnconfigure(2, weight=1)
         num_matrices = len(self.master_frame.nombres_matrices)
+
+        if operacion == "Sumar":
+            operador = "+"
+        elif operacion == "Restar":
+            operador = "−"
 
         placeholder1 = Variable(tab, value=self.master_frame.nombres_matrices[0])
         if num_matrices == 1:
@@ -100,7 +106,9 @@ class SumaRestaTab(CustomScrollFrame):
         else:
             placeholder2 = Variable(tab, value=self.master_frame.nombres_matrices[1])
 
-        instruct_sr = ctkLabel(tab, text=f"Seleccione las matrices para {operacion.lower()}:")
+        instruct_sr = ctkLabel(tab, text=f"Seleccione las matrices a {operacion.lower()}:")
+        operador_label = ctkLabel(tab, text=operador)
+
         self.select_1 = ctkOptionMenu(
             tab,
             width=60,
@@ -127,15 +135,16 @@ class SumaRestaTab(CustomScrollFrame):
         self.mat1 = self.select_1.get()
         self.mat2 = self.select_2.get()
 
-        instruct_sr.grid(row=0, column=0, padx=5, pady=5, sticky="n")
-        self.select_1.grid(row=1, column=0, padx=5, pady=5, sticky="n")
-        self.select_2.grid(row=2, column=0, padx=5, pady=5, sticky="n")
-        ejecutar_button.grid(row=3, column=0, padx=5, pady=5, sticky="n")
+        instruct_sr.grid(row=0, column=0, columnspan=3, padx=5, pady=5, sticky="n")
+        self.select_1.grid(row=1, column=0, ipadx=5, padx=5, pady=5, sticky="e")
+        operador_label.grid(row=1, column=1, padx=5, pady=5, sticky="ew")
+        self.select_2.grid(row=1, column=2, ipadx=5, padx=5, pady=5, sticky="w")
+        ejecutar_button.grid(row=2, column=0, columnspan=3, padx=5, pady=10, sticky="n")
 
         if operacion == "Sumar":
-            self.resultado_suma.grid(row=4, column=0, padx=5, pady=5, sticky="n")
+            self.resultado_suma.grid(row=3, column=0, columnspan=3, padx=5, pady=5, sticky="n")
         elif operacion == "Restar":
-            self.resultado_resta.grid(row=4, column=0, padx=5, pady=5, sticky="n")
+            self.resultado_resta.grid(row=3, column=0, columnspan=3, padx=5, pady=5, sticky="n")
 
     def ejecutar_operacion(self, operacion, nombre_mat1, nombre_mat2) -> None:
         """
@@ -164,7 +173,7 @@ class SumaRestaTab(CustomScrollFrame):
             header, resultado = self.mats_manager.sumar_matrices(nombre_mat1, nombre_mat2)
         except ArithmeticError as e:
             self.mensaje_frame = ErrorFrame(self.resultado_suma, str(e))
-            self.mensaje_frame.grid(row=0, column=0, padx=5, pady=5)
+            self.mensaje_frame.grid(row=0, column=0, columnspan=3, padx=5, pady=5)
             self.update_scrollbar_visibility()
             return
 
@@ -175,7 +184,7 @@ class SumaRestaTab(CustomScrollFrame):
         self.mensaje_frame = ResultadoFrame(
             self.resultado_suma, header=f"{header}:", resultado=str(resultado)
         )
-        self.mensaje_frame.grid(row=0, column=0, padx=5, pady=5)
+        self.mensaje_frame.grid(row=0, column=0, columnspan=3, padx=5, pady=5)
 
     def ejecutar_resta(self, nombre_mat1, nombre_mat2) -> None:
         """
@@ -190,7 +199,7 @@ class SumaRestaTab(CustomScrollFrame):
             header, resultado = self.mats_manager.restar_matrices(nombre_mat1, nombre_mat2)
         except ArithmeticError as e:
             self.mensaje_frame = ErrorFrame(self.resultado_resta, str(e))
-            self.mensaje_frame.grid(row=0, column=0, padx=5, pady=5)
+            self.mensaje_frame.grid(row=0, column=0, columnspan=3, padx=5, pady=5)
             self.update_scrollbar_visibility()
             return
 
@@ -201,9 +210,9 @@ class SumaRestaTab(CustomScrollFrame):
         self.mensaje_frame = ResultadoFrame(
             self.resultado_resta, header=f"{header}:", resultado=str(resultado)
         )
-        self.mensaje_frame.grid(row=0, column=0, padx=5, pady=5)
+        self.mensaje_frame.grid(row=0, column=0, columnspan=3, padx=5, pady=5)
 
-    def update(self) -> None:
+    def update_frame(self) -> None:
         for widget_s in self.tab_sumar.winfo_children():
             widget_s.destroy()  # type: ignore
         for widget_r in self.tab_restar.winfo_children():
@@ -266,6 +275,7 @@ class MultiplicacionTab(CustomScrollFrame):
 
         for tab in self.tabview.winfo_children():
             tab.columnconfigure(0, weight=1)  # type: ignore
+            tab.columnconfigure(2, weight=1)  # type: ignore
 
         num_matrices = len(self.master_frame.nombres_matrices)
         num_vectores = len(self.master_frame.nombres_vectores)
@@ -303,7 +313,7 @@ class MultiplicacionTab(CustomScrollFrame):
             ]
 
             for frame in self.input_guardians:
-                frame.grid(row=0, column=0, columnspan=2, padx=5, pady=5, sticky="n")
+                frame.grid(row=0, column=0, columnspan=3, padx=5, pady=5, sticky="n")
             self.update_scrollbar_visibility()
             return
         if num_matrices == 0:
@@ -314,11 +324,11 @@ class MultiplicacionTab(CustomScrollFrame):
             ]
 
             for frame in self.input_guardians:
-                frame.grid(row=0, column=0, columnspan=2, padx=5, pady=5, sticky="n")
+                frame.grid(row=0, column=0, columnspan=3, padx=5, pady=5, sticky="n")
             self.update_scrollbar_visibility()
             return
         if num_vectores == 0:
-            no_vectores.grid(row=0, column=0, columnspan=2, padx=5, pady=5, sticky="n")
+            no_vectores.grid(row=0, column=0, columnspan=3, padx=5, pady=5, sticky="n")
             self.input_guardians = [no_vectores]
         self.update_scrollbar_visibility()
 
@@ -333,6 +343,8 @@ class MultiplicacionTab(CustomScrollFrame):
             self.mensaje_frame = None
 
         instruct_e = ctkLabel(tab, text="Seleccione la matriz e ingrese el escalar:")
+        operador_label = ctkLabel(tab, text="*")
+
         self.select_escalar_mat = ctkOptionMenu(
             tab,
             width=60,
@@ -341,20 +353,26 @@ class MultiplicacionTab(CustomScrollFrame):
             command=self.update_escalar_mat,
         )
 
-        self.escalar_entry = ctkEntry(tab, width=60, )
+        self.escalar_entry = ctkEntry(tab, width=60)
         self.escalar_mat = self.select_escalar_mat.get()
 
-        button_multiplicar = ctkButton(
+        multiplicar_button = ctkButton(
             tab,
+            height=30,
             text="Multiplicar",
             command=lambda: self.mult_por_escalar(self.escalar_mat),
         )
 
-        instruct_e.grid(row=0, column=0, padx=5, pady=5, sticky="n")
-        self.select_escalar_mat.grid(row=1, column=0, padx=5, pady=5, sticky="n")
-        self.escalar_entry.grid(row=2, column=0, padx=5, pady=5, sticky="n")
-        button_multiplicar.grid(row=3, column=0, padx=5, pady=5, sticky="n")
-        self.resultado_escalar.grid(row=4, column=0, padx=5, pady=5, sticky="n")
+        instruct_e.grid(row=0, column=0, columnspan=3, padx=5, pady=5, sticky="n")
+
+        self.escalar_entry.grid(row=1, column=0, padx=5, pady=5, sticky="e")
+        operador_label.grid(row=1, column=1, pady=5, sticky="ew")
+        self.select_escalar_mat.grid(
+            row=1, column=2, ipadx=5, padx=5, pady=5, sticky="w"
+        )
+
+        multiplicar_button.grid(row=2, column=0, columnspan=3, padx=5, pady=10, sticky="n")
+        self.resultado_escalar.grid(row=3, column=0, columnspan=3, padx=5, pady=5, sticky="n")
 
     def setup_mult_matrices_tab(self, tab: ctkFrame) -> None:
         """
@@ -376,6 +394,8 @@ class MultiplicacionTab(CustomScrollFrame):
             placeholder2 = placeholder1
 
         instruct_ms = ctkLabel(tab, text="Seleccione las matrices para multiplicar:")
+        operador_label = ctkLabel(tab, text="*")
+
         self.select_mat1 = ctkOptionMenu(
             tab,
             width=60,
@@ -395,18 +415,23 @@ class MultiplicacionTab(CustomScrollFrame):
         self.mat1 = self.select_mat1.get()
         self.mat2 = self.select_mat2.get()
 
-        button_multiplicar = ctkButton(
+        multiplicar_button = ctkButton(
             tab,
             height=30,
             text="Multiplicar",
             command=lambda: self.mult_matrices(self.mat1, self.mat2),
         )
 
-        instruct_ms.grid(row=0, column=0, padx=5, pady=5, sticky="n")
-        self.select_mat1.grid(row=1, column=0, padx=5, pady=5, sticky="n")
-        self.select_mat2.grid(row=2, column=0, padx=5, pady=5, sticky="n")
-        button_multiplicar.grid(row=3, column=0, padx=5, pady=5, sticky="n")
-        self.resultado_mats.grid(row=4, column=0, padx=5, pady=5, sticky="n")
+        instruct_ms.grid(row=0, column=0, columnspan=3, padx=5, pady=5, sticky="n")
+
+        self.select_mat1.grid(row=1, column=0, ipadx=5, padx=5, pady=5, sticky="e")
+        operador_label.grid(row=1, column=1, pady=5, sticky="ew")
+        self.select_mat2.grid(
+            row=1, column=2, ipadx=5, padx=5, pady=5, sticky="w"
+        )
+
+        multiplicar_button.grid(row=2, column=0, columnspan=3, padx=5, pady=10, sticky="n")
+        self.resultado_mats.grid(row=3, column=0, columnspan=3, padx=5, pady=5, sticky="n")
 
     def setup_matriz_vector_tab(self, tab: ctkFrame) -> None:
         """
@@ -421,6 +446,8 @@ class MultiplicacionTab(CustomScrollFrame):
         placeholder2 = Variable(tab, value=self.master_frame.nombres_vectores[0])
 
         instruct_mv = ctkLabel(tab, text="Seleccione la matriz y el vector para multiplicar:")
+        operador_label = ctkLabel(tab, text="*")
+
         self.select_vmat = ctkOptionMenu(
             tab,
             width=60,
@@ -440,18 +467,23 @@ class MultiplicacionTab(CustomScrollFrame):
         self.vmat = self.select_vmat.get()
         self.mvec = self.select_mvec.get()
 
-        button_multiplicar = ctkButton(
+        multiplicar_button = ctkButton(
             tab,
             height=30,
             text="Multiplicar",
             command=lambda: self.matriz_vector(self.vmat, self.mvec),
         )
 
-        instruct_mv.grid(row=0, column=0, padx=5, pady=5, sticky="n")
-        self.select_vmat.grid(row=1, column=0, padx=5, pady=5, sticky="n")
-        self.select_mvec.grid(row=2, column=0, padx=5, pady=5, sticky="n")
-        button_multiplicar.grid(row=3, column=0, padx=5, pady=5, sticky="n")
-        self.resultado_mat_vec.grid(row=4, column=0, padx=5, pady=5, sticky="n")
+        instruct_mv.grid(row=0, column=0, columnspan=3, padx=5, pady=5, sticky="n")
+
+        self.select_vmat.grid(row=1, column=0, ipadx=5, padx=5, pady=5, sticky="e")
+        operador_label.grid(row=1, column=1, pady=5, sticky="ew")
+        self.select_mvec.grid(
+            row=1, column=2, ipadx=5, padx=5, pady=5, sticky="w"
+        )
+
+        multiplicar_button.grid(row=2, column=0, columnspan=3, padx=5, pady=10, sticky="n")
+        self.resultado_mat_vec.grid(row=3, column=0, columnspan=3, padx=5, pady=5, sticky="n")
 
     def mult_por_escalar(self, mat: str) -> None:
         """
@@ -552,7 +584,7 @@ class MultiplicacionTab(CustomScrollFrame):
         self.mensaje_frame.grid(row=0, column=0, padx=5, pady=5)
         self.update_scrollbar_visibility()
 
-    def update(self) -> None:
+    def update_frame(self) -> None:
         for widget_e in self.tab_escalar.winfo_children():
             widget_e.destroy()  # type: ignore
         for widget_m in self.tab_matriz.winfo_children():
@@ -632,7 +664,7 @@ class TransposicionTab(CustomScrollFrame):
             return
 
         self.instruct_t.grid(row=0, column=0, padx=5, pady=5, sticky="n")
-        self.select_tmat.grid(row=1, column=0, padx=5, pady=5, sticky="n")
+        self.select_tmat.grid(row=1, column=0, ipadx=5, padx=5, pady=5, sticky="n")
         self.button.grid(row=2, column=0, padx=5, pady=5, sticky="n")
         self.resultado.grid(row=3, column=0, padx=5, pady=5, sticky="n")
         self.update_scrollbar_visibility()
@@ -658,7 +690,7 @@ class TransposicionTab(CustomScrollFrame):
         self.mensaje_frame.grid(row=0, column=0, padx=5, pady=5)
         self.update_scrollbar_visibility()
 
-    def update(self) -> None:
+    def update_frame(self) -> None:
         if len(self.master_frame.nombres_matrices) > 0:
             if self.mensaje_frame is not None:
                 self.mensaje_frame.destroy()
@@ -734,7 +766,7 @@ class DeterminanteTab(CustomScrollFrame):
             return
 
         self.instruct_d.grid(row=0, column=0, padx=5, pady=5, sticky="n")
-        self.select_dmat.grid(row=1, column=0, padx=5, pady=5, sticky="n")
+        self.select_dmat.grid(row=1, column=0, ipadx=5, padx=5, pady=5, sticky="n")
         self.button.grid(row=2, column=0, padx=5, pady=5, sticky="n")
         self.resultado.grid(row=3, column=0, padx=5, pady=5, sticky="n")
         self.update_scrollbar_visibility()
@@ -771,7 +803,7 @@ class DeterminanteTab(CustomScrollFrame):
         self.mensaje_frame.grid(row=0, column=0, padx=5, pady=5)
         self.update_scrollbar_visibility()
 
-    def update(self) -> None:
+    def update_frame(self) -> None:
         if len(self.master_frame.nombres_matrices) > 0:
             if self.mensaje_frame is not None:
                 self.mensaje_frame.destroy()
@@ -841,7 +873,7 @@ class InversaTab(CustomScrollFrame):
             return
 
         self.instruct_i.grid(row=0, column=0, padx=5, pady=5, sticky="n")
-        self.select_imat.grid(row=1, column=0, padx=5, pady=5, sticky="n")
+        self.select_imat.grid(row=1, column=0, ipadx=5, padx=5, pady=5, sticky="n")
         self.button.grid(row=2, column=0, padx=5, pady=5, sticky="n")
         self.resultado.grid(row=3, column=0, padx=5, pady=5, sticky="n")
         self.update_scrollbar_visibility()
@@ -877,7 +909,7 @@ class InversaTab(CustomScrollFrame):
         self.mensaje_frame.grid(row=0, column=0, padx=5, pady=5)
         self.update_scrollbar_visibility()
 
-    def update(self) -> None:
+    def update_frame(self) -> None:
         if len(self.master_frame.nombres_matrices) > 0:
             if self.mensaje_frame is not None:
                 self.mensaje_frame.destroy()

@@ -82,7 +82,7 @@ class VectoresFrame(ctkFrame):
         ]
 
         for tab in self.instances:
-            tab.update()
+            tab.update_frame()  # type: ignore
             for widget in tab.winfo_children():
                 widget.configure(bg_color="transparent")  # type: ignore
         self.update_idletasks()

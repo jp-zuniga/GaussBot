@@ -69,9 +69,9 @@ class ManejarVecs(ctkFrame):
             tab_instance.pack(expand=True, fill="both")
             self.instances.append(tab_instance)   # type: ignore
 
-    def update(self):
+    def update_frame(self):
         for tab in self.instances:
-            tab.update()
+            tab.update_frame()
             for widget in tab.winfo_children():
                 widget.configure(bg_color="transparent")  # type: ignore
         self.tabview.configure(fg_color="transparent")
@@ -144,7 +144,7 @@ class MostrarTab(CustomScrollFrame):
         self.print_frame.columnconfigure(0, weight=1)
         self.update_scrollbar_visibility()
 
-    def update(self) -> None:
+    def update_frame(self) -> None:
         for widget in self.mostrar_frame.winfo_children():
             widget.destroy()  # type: ignore
         self.update_idletasks()
@@ -391,7 +391,7 @@ class AgregarTab(CustomScrollFrame):
     def nombre_entry_up(self) -> None:
         self.input_entries[-1].focus_set()
 
-    def update(self) -> None:
+    def update_frame(self) -> None:
         self.update_idletasks()
 
 
@@ -465,7 +465,7 @@ class EliminarTab(CustomScrollFrame):
         self.app.matrices.update_all()
         self.app.vectores.update_all()
 
-    def update(self) -> None:
+    def update_frame(self) -> None:
         self.nombres_vectores = list(self.vecs_manager.vecs_ingresados.keys())
 
         if len(self.nombres_vectores) == 0:

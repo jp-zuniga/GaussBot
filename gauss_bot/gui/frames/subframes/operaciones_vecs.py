@@ -63,7 +63,6 @@ class SumaRestaTab(CustomScrollFrame):
         self.tab_restar = self.tabview.add("Restar")
         self.setup_tabs()
 
-
     def setup_tabs(self) -> None:
         for tab in self.tabview.winfo_children():
             for widget in tab.winfo_children():  # type: ignore
@@ -79,8 +78,8 @@ class SumaRestaTab(CustomScrollFrame):
         if num_vectores == 0:
             for tab in self.tabview.winfo_children():
                 tab.columnconfigure(0, weight=1)  # type: ignore
-                no_matrices = ErrorFrame(tab, "No hay vectores guardados!")
-                no_matrices.grid(row=0, column=0, padx=5, pady=5, sticky="n")
+                no_vectores = ErrorFrame(tab, "No hay vectores guardados!")
+                no_vectores.grid(row=0, column=0, padx=5, pady=5, sticky="n")
         self.update_scrollbar_visibility()
 
     def setup_suma_resta(self, tab: ctkFrame, operacion: str) -> None:
@@ -93,7 +92,13 @@ class SumaRestaTab(CustomScrollFrame):
             self.mensaje_frame = None
 
         tab.columnconfigure(0, weight=1)
+        tab.columnconfigure(2, weight=1)
         num_vectores = len(self.master_frame.nombres_vectores)
+
+        if operacion == "Sumar":
+            operador = "+"
+        elif operacion == "Restar":
+            operador = "−"
 
         placeholder1 = Variable(tab, value=self.master_frame.nombres_vectores[0])
         if num_vectores == 1:
@@ -101,7 +106,9 @@ class SumaRestaTab(CustomScrollFrame):
         else:
             placeholder2 = Variable(tab, value=self.master_frame.nombres_vectores[1])
 
-        instruct_sr = ctkLabel(tab, text=f"Seleccione los vectores para {operacion.lower()}:")
+        instruct_sr = ctkLabel(tab, text=f"Seleccione los vectores a {operacion.lower()}:")
+        operador_label = ctkLabel(tab, text=operador)
+
         self.select_1 = ctkOptionMenu(
             tab,
             width=60,
@@ -128,19 +135,20 @@ class SumaRestaTab(CustomScrollFrame):
         self.vec1 = self.select_1.get()
         self.vec2 = self.select_2.get()
 
-        instruct_sr.grid(row=0, column=0, padx=5, pady=5, sticky="n")
-        self.select_1.grid(row=1, column=0, padx=5, pady=5, sticky="n")
-        self.select_2.grid(row=2, column=0, padx=5, pady=5, sticky="n")
-        ejecutar_button.grid(row=3, column=0, padx=5, pady=5, sticky="n")
+        instruct_sr.grid(row=0, column=0, columnspan=3, padx=5, pady=5, sticky="n")
+        self.select_1.grid(row=1, column=0, ipadx=5, padx=5, pady=5, sticky="e")
+        operador_label.grid(row=1, column=1, padx=5, pady=5, sticky="ew")
+        self.select_2.grid(row=1, column=2, ipadx=5, padx=5, pady=5, sticky="w")
+        ejecutar_button.grid(row=2, column=0, columnspan=3, padx=5, pady=10, sticky="n")
 
         if operacion == "Sumar":
-            self.resultado_suma.grid(row=4, column=0, padx=5, pady=5, sticky="n")
+            self.resultado_suma.grid(row=3, column=0, columnspan=3, padx=5, pady=5, sticky="n")
         elif operacion == "Restar":
-            self.resultado_resta.grid(row=4, column=0, padx=5, pady=5, sticky="n")
+            self.resultado_resta.grid(row=3, column=0, columnspan=3, padx=5, pady=5, sticky="n")
 
-    def ejecutar_operacion(self, operacion: str, nombre_vec1: str, nombre_vec2: str) -> None:
+    def ejecutar_operacion(self, operacion, nombre_vec1, nombre_vec2) -> None:
         """
-        Ejecuta la suma o resta de vectores, dependiendo en la elección del usuario.
+        Suma o resta los vectores seleccionados.
         """
 
         nombre_vec1 = self.select_1.get()
@@ -152,9 +160,9 @@ class SumaRestaTab(CustomScrollFrame):
             self.ejecutar_resta(nombre_vec1, nombre_vec2)
         self.update_scrollbar_visibility()
 
-    def ejecutar_suma(self, nombre_vec1: str, nombre_vec2: str) -> None:
+    def ejecutar_suma(self, nombre_vec1, nombre_vec2) -> None:
         """
-        Ejecuta la suma de dos vectores.
+        Suma los vectores seleccionados.
         """
 
         if self.mensaje_frame is not None:
@@ -165,7 +173,7 @@ class SumaRestaTab(CustomScrollFrame):
             header, resultado = self.vecs_manager.sumar_vecs(nombre_vec1, nombre_vec2)
         except ArithmeticError as e:
             self.mensaje_frame = ErrorFrame(self.resultado_suma, str(e))
-            self.mensaje_frame.grid(row=0, column=0, padx=5, pady=5)
+            self.mensaje_frame.grid(row=0, column=0, columnspan=3, padx=5, pady=5)
             self.update_scrollbar_visibility()
             return
 
@@ -176,11 +184,11 @@ class SumaRestaTab(CustomScrollFrame):
         self.mensaje_frame = ResultadoFrame(
             self.resultado_suma, header=f"{header}:", resultado=str(resultado)
         )
-        self.mensaje_frame.grid(row=0, column=0, padx=5, pady=5)
+        self.mensaje_frame.grid(row=0, column=0, columnspan=3, padx=5, pady=5)
 
-    def ejecutar_resta(self, nombre_vec1: str, nombre_vec2: str) -> None:
+    def ejecutar_resta(self, nombre_vec1, nombre_vec2) -> None:
         """
-        Ejecuta la resta de dos vectores.
+        Resta los vectores seleccionados.
         """
 
         if self.mensaje_frame is not None:
@@ -191,7 +199,7 @@ class SumaRestaTab(CustomScrollFrame):
             header, resultado = self.vecs_manager.restar_vecs(nombre_vec1, nombre_vec2)
         except ArithmeticError as e:
             self.mensaje_frame = ErrorFrame(self.resultado_resta, str(e))
-            self.mensaje_frame.grid(row=0, column=0, padx=5, pady=5)
+            self.mensaje_frame.grid(row=0, column=0, columnspan=3, padx=5, pady=5)
             self.update_scrollbar_visibility()
             return
 
@@ -202,9 +210,9 @@ class SumaRestaTab(CustomScrollFrame):
         self.mensaje_frame = ResultadoFrame(
             self.resultado_resta, header=f"{header}:", resultado=str(resultado)
         )
-        self.mensaje_frame.grid(row=0, column=0, padx=5, pady=5)
+        self.mensaje_frame.grid(row=0, column=0, columnspan=3, padx=5, pady=5)
 
-    def update(self) -> None:
+    def update_frame(self) -> None:
         for widget_s in self.tab_sumar.winfo_children():
             widget_s.destroy()  # type: ignore
         for widget_r in self.tab_restar.winfo_children():
@@ -267,6 +275,7 @@ class MultiplicacionTab(CustomScrollFrame):
 
         for tab in self.tabview.winfo_children():
             tab.columnconfigure(0, weight=1)  # type: ignore
+            tab.columnconfigure(2, weight=1)  # type: ignore
 
         num_matrices = len(self.master_frame.nombres_matrices)
         num_vectores = len(self.master_frame.nombres_vectores)
@@ -304,7 +313,7 @@ class MultiplicacionTab(CustomScrollFrame):
             ]
 
             for frame in self.input_guardians:
-                frame.grid(row=0, column=0, columnspan=2, padx=5, pady=5, sticky="n")
+                frame.grid(row=0, column=0, columnspan=3, padx=5, pady=5, sticky="n")
             self.update_scrollbar_visibility()
             return
         if num_vectores == 0:
@@ -315,11 +324,11 @@ class MultiplicacionTab(CustomScrollFrame):
             ]
 
             for frame in self.input_guardians:
-                frame.grid(row=0, column=0, columnspan=2, padx=5, pady=5, sticky="n")
+                frame.grid(row=0, column=0, columnspan=3, padx=5, pady=5, sticky="n")
             self.update_scrollbar_visibility()
             return
         if num_matrices == 0:
-            no_matrices.grid(row=0, column=0, columnspan=2, padx=5, pady=5, sticky="n")
+            no_matrices.grid(row=0, column=0, columnspan=3, padx=5, pady=5, sticky="n")
             self.input_guardians = [no_matrices]
         self.update_scrollbar_visibility()
 
@@ -334,6 +343,8 @@ class MultiplicacionTab(CustomScrollFrame):
             self.mensaje_frame = None
 
         instruct_e = ctkLabel(tab, text="Seleccione el vector e ingrese el escalar:")
+        operador_label = ctkLabel(tab, text="*")
+
         self.select_escalar_vec = ctkOptionMenu(
             tab,
             width=60,
@@ -352,11 +363,16 @@ class MultiplicacionTab(CustomScrollFrame):
             command=lambda: self.mult_por_escalar(self.escalar_vec),
         )
 
-        instruct_e.grid(row=0, column=0, padx=5, pady=5, sticky="n")
-        self.select_escalar_vec.grid(row=1, column=0, padx=5, pady=5, sticky="n")
-        self.escalar_entry.grid(row=2, column=0, padx=5, pady=5, sticky="n")
-        multiplicar_button.grid(row=3, column=0, padx=5, pady=5, sticky="n")
-        self.resultado_escalar.grid(row=4, column=0, padx=5, pady=5, sticky="n")
+        instruct_e.grid(row=0, column=0, columnspan=3, padx=5, pady=5, sticky="n")
+
+        self.escalar_entry.grid(row=1, column=0, padx=5, pady=5, sticky="e")
+        operador_label.grid(row=1, column=1, pady=5, sticky="ew")
+        self.select_escalar_vec.grid(
+            row=1, column=2, ipadx=5, padx=5, pady=5, sticky="w"
+        )
+
+        multiplicar_button.grid(row=2, column=0, columnspan=3, padx=5, pady=10, sticky="n")
+        self.resultado_escalar.grid(row=3, column=0, columnspan=3, padx=5, pady=5, sticky="n")
 
     def setup_vector_tab(self, tab: ctkFrame) -> None:
         """
@@ -378,6 +394,8 @@ class MultiplicacionTab(CustomScrollFrame):
             placeholder2 = placeholder1
 
         instruct_v = ctkLabel(tab, text="Seleccione los vectores para multiplicar:")
+        operador_label = ctkLabel(tab, text="*")
+
         self.select_vec1 = ctkOptionMenu(
             tab,
             width=60,
@@ -404,11 +422,16 @@ class MultiplicacionTab(CustomScrollFrame):
             command=lambda: self.mult_vectores(self.vec1, self.vec2),
         )
 
-        instruct_v.grid(row=0, column=0, padx=5, pady=5, sticky="n")
-        self.select_vec1.grid(row=1, column=0, padx=5, pady=5, sticky="n")
-        self.select_vec2.grid(row=2, column=0, padx=5, pady=5, sticky="n")
-        multiplicar_button.grid(row=3, column=0, padx=5, pady=5, sticky="n")
-        self.resultado_vectores.grid(row=4, column=0, padx=5, pady=5, sticky="n")
+        instruct_v.grid(row=0, column=0, columnspan=3, padx=5, pady=5, sticky="n")
+
+        self.select_vec1.grid(row=1, column=0, padx=5, pady=5, sticky="e")
+        operador_label.grid(row=1, column=1, pady=5, sticky="ew")
+        self.select_vec2.grid(
+            row=1, column=2, ipadx=5, padx=5, pady=5, sticky="w"
+        )
+
+        multiplicar_button.grid(row=2, column=0, columnspan=3, padx=5, pady=10, sticky="n")
+        self.resultado_vectores.grid(row=3, column=0, columnspan=3, padx=5, pady=5, sticky="n")
 
     def setup_matriz_vector_tab(self, tab: ctkFrame) -> None:
         """
@@ -423,6 +446,8 @@ class MultiplicacionTab(CustomScrollFrame):
         placeholder2 = Variable(tab, value=self.master_frame.nombres_vectores[0])
 
         instruct_mv = ctkLabel(tab, text="Seleccione la matriz y el vector para multiplicar:")
+        operador_label = ctkLabel(tab, text="*")
+
         self.select_vmat = ctkOptionMenu(
             tab,
             width=60,
@@ -449,11 +474,16 @@ class MultiplicacionTab(CustomScrollFrame):
             command=lambda: self.matriz_vector(self.vmat, self.mvec),
         )
 
-        instruct_mv.grid(row=0, column=0, padx=5, pady=5, sticky="n")
-        self.select_vmat.grid(row=1, column=0, padx=5, pady=5, sticky="n")
-        self.select_mvec.grid(row=2, column=0, padx=5, pady=5, sticky="n")
-        multiplicar_button.grid(row=3, column=0, padx=5, pady=5, sticky="n")
-        self.resultado_mat_vec.grid(row=4, column=0, padx=5, pady=5, sticky="n")
+        instruct_mv.grid(row=0, column=0, columnspan=3, padx=5, pady=5, sticky="n")
+
+        self.select_vmat.grid(row=1, column=0, padx=5, pady=5, sticky="e")
+        operador_label.grid(row=1, column=1, pady=5, sticky="ew")
+        self.select_mvec.grid(
+            row=1, column=2, ipadx=5, padx=5, pady=5, sticky="w"
+        )
+
+        multiplicar_button.grid(row=2, column=0, columnspan=3, padx=5, pady=10, sticky="n")
+        self.resultado_mat_vec.grid(row=3, column=0, columnspan=3, padx=5, pady=5, sticky="n")
 
     def mult_por_escalar(self, vec: str) -> None:
         """
@@ -556,7 +586,7 @@ class MultiplicacionTab(CustomScrollFrame):
         self.mensaje_frame.grid(row=0, column=0, padx=5, pady=5)
         self.update_scrollbar_visibility()
 
-    def update(self) -> None:
+    def update_frame(self) -> None:
         for widget_e in self.tab_escalar.winfo_children():
             widget_e.destroy()  # type: ignore
         for widget_v in self.tab_vector.winfo_children():

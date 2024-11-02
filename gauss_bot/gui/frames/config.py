@@ -145,7 +145,8 @@ class ConfigFrame(ctkFrame):
         self.app.tema_actual = self.temas_dict[tema_seleccionado]
         self.mensaje_frame = SuccessFrame(
             self,
-            message="Tema cambiado exitosamente! Cambios tomarán efecto al reiniciar la aplicación."
+            message="Tema cambiado exitosamente! " +
+                    "Cambios tomarán efecto al reiniciar la aplicación."
         )
         self.mensaje_frame.grid(row=3, column=1, pady=30)
         set_default_color_theme(path.join(THEMES_PATH, self.app.tema_actual))
