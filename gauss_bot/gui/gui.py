@@ -21,6 +21,7 @@ from gauss_bot import (
 
 from gauss_bot.managers.ops_manager import OpsManager
 
+from gauss_bot.gui.frames.home import HomeFrame
 from gauss_bot.gui.frames.inputs import InputsFrame
 from gauss_bot.gui.frames.matrices import MatricesFrame
 from gauss_bot.gui.frames.vectores import VectoresFrame
@@ -56,11 +57,13 @@ class GaussUI(ctk):
             vecs_manager=self.vecs_manager,
         )
 
+        self.home_frame = HomeFrame(master=self, app=self)
         self.matrices = MatricesFrame(master=self, app=self, mats_manager=self.mats_manager)
         self.vectores = VectoresFrame(master=self, app=self, vecs_manager=self.vecs_manager)
         self.ecuaciones = EcuacionesFrame(master=self, app=self, mats_manager=self.mats_manager)
         self.config_frame = ConfigFrame(master=self, app=self)
         self.nav_frame = NavFrame(master=self, app=self)
+        self.nav_frame.seleccionar_frame("home")
 
     def load_config(self) -> None:
         """
