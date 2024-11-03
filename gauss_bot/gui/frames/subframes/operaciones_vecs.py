@@ -15,13 +15,13 @@ from customtkinter import (
     CTkEntry as ctkEntry,
     CTkFrame as ctkFrame,
     CTkLabel as ctkLabel,
-    CTkOptionMenu as ctkOptionMenu,
     CTkTabview as ctkTabview,
 )
 
 from gauss_bot.managers.vecs_manager import VectoresManager
 
 from gauss_bot.gui.custom_frames import (
+    CustomDropdown,
     CustomScrollFrame,
     ErrorFrame,
     ResultadoFrame
@@ -48,8 +48,8 @@ class SumaRestaTab(CustomScrollFrame):
         self.input_guardians: list[ctkFrame] = []
         self.mensaje_frame: Optional[ctkFrame] = None
 
-        self.select_1: ctkOptionMenu
-        self.select_2: ctkOptionMenu
+        self.select_1: CustomDropdown
+        self.select_2: CustomDropdown
         self.resultado_suma: ctkFrame
         self.resultado_resta: ctkFrame
 
@@ -109,7 +109,7 @@ class SumaRestaTab(CustomScrollFrame):
         instruct_sr = ctkLabel(tab, text=f"Seleccione los vectores a {operacion.lower()}:")
         operador_label = ctkLabel(tab, text=operador)
 
-        self.select_1 = ctkOptionMenu(
+        self.select_1 = CustomDropdown(
             tab,
             width=60,
             values=self.master_frame.nombres_vectores,
@@ -117,7 +117,7 @@ class SumaRestaTab(CustomScrollFrame):
             command=self.update_select1,
         )
 
-        self.select_2 = ctkOptionMenu(
+        self.select_2 = CustomDropdown(
             tab,
             width=60,
             values=self.master_frame.nombres_vectores,
@@ -247,12 +247,12 @@ class MultiplicacionTab(CustomScrollFrame):
         self.mensaje_frame: Optional[ctkFrame] = None
         self.input_guardians: list[ctkFrame] = []
 
-        self.select_escalar_vec: ctkOptionMenu
+        self.select_escalar_vec: CustomDropdown
         self.escalar_entry: ctkEntry
-        self.select_vec1: ctkOptionMenu
-        self.select_vec2: ctkOptionMenu
-        self.select_vmat: ctkOptionMenu
-        self.select_mvec: ctkOptionMenu
+        self.select_vec1: CustomDropdown
+        self.select_vec2: CustomDropdown
+        self.select_vmat: CustomDropdown
+        self.select_mvec: CustomDropdown
 
         self.escalar_vec = ""
         self.vec1 = ""
@@ -345,7 +345,7 @@ class MultiplicacionTab(CustomScrollFrame):
         instruct_e = ctkLabel(tab, text="Seleccione el vector e ingrese el escalar:")
         operador_label = ctkLabel(tab, text="*")
 
-        self.select_escalar_vec = ctkOptionMenu(
+        self.select_escalar_vec = CustomDropdown(
             tab,
             width=60,
             values=self.master_frame.nombres_vectores,
@@ -366,7 +366,7 @@ class MultiplicacionTab(CustomScrollFrame):
         instruct_e.grid(row=0, column=0, columnspan=3, padx=5, pady=5, sticky="n")
 
         self.escalar_entry.grid(row=1, column=0, padx=5, pady=5, sticky="e")
-        operador_label.grid(row=1, column=1, pady=5, sticky="ew")
+        operador_label.grid(row=1, column=1, padx=5, pady=5, sticky="ew")
         self.select_escalar_vec.grid(
             row=1, column=2, ipadx=5, padx=5, pady=5, sticky="w"
         )
@@ -396,7 +396,7 @@ class MultiplicacionTab(CustomScrollFrame):
         instruct_v = ctkLabel(tab, text="Seleccione los vectores para multiplicar:")
         operador_label = ctkLabel(tab, text="*")
 
-        self.select_vec1 = ctkOptionMenu(
+        self.select_vec1 = CustomDropdown(
             tab,
             width=60,
             values=self.master_frame.nombres_vectores,
@@ -404,7 +404,7 @@ class MultiplicacionTab(CustomScrollFrame):
             command=self.update_vec1,
         )
 
-        self.select_vec2 = ctkOptionMenu(
+        self.select_vec2 = CustomDropdown(
             tab,
             width=60,
             values=self.master_frame.nombres_vectores,
@@ -425,7 +425,7 @@ class MultiplicacionTab(CustomScrollFrame):
         instruct_v.grid(row=0, column=0, columnspan=3, padx=5, pady=5, sticky="n")
 
         self.select_vec1.grid(row=1, column=0, padx=5, pady=5, sticky="e")
-        operador_label.grid(row=1, column=1, pady=5, sticky="ew")
+        operador_label.grid(row=1, column=1, padx=5, pady=5, sticky="ew")
         self.select_vec2.grid(
             row=1, column=2, ipadx=5, padx=5, pady=5, sticky="w"
         )
@@ -448,7 +448,7 @@ class MultiplicacionTab(CustomScrollFrame):
         instruct_mv = ctkLabel(tab, text="Seleccione la matriz y el vector para multiplicar:")
         operador_label = ctkLabel(tab, text="*")
 
-        self.select_vmat = ctkOptionMenu(
+        self.select_vmat = CustomDropdown(
             tab,
             width=60,
             values=self.master_frame.nombres_matrices,
@@ -456,7 +456,7 @@ class MultiplicacionTab(CustomScrollFrame):
             command=self.update_vmat,
         )
 
-        self.select_mvec = ctkOptionMenu(
+        self.select_mvec = CustomDropdown(
             tab,
             width=60,
             values=self.master_frame.nombres_vectores,
@@ -477,7 +477,7 @@ class MultiplicacionTab(CustomScrollFrame):
         instruct_mv.grid(row=0, column=0, columnspan=3, padx=5, pady=5, sticky="n")
 
         self.select_vmat.grid(row=1, column=0, padx=5, pady=5, sticky="e")
-        operador_label.grid(row=1, column=1, pady=5, sticky="ew")
+        operador_label.grid(row=1, column=1, padx=5, pady=5, sticky="ew")
         self.select_mvec.grid(
             row=1, column=2, ipadx=5, padx=5, pady=5, sticky="w"
         )

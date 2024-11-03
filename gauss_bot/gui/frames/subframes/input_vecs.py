@@ -19,13 +19,13 @@ from customtkinter import (
     CTkEntry as ctkEntry,
     CTkFrame as ctkFrame,
     CTkLabel as ctkLabel,
-    CTkOptionMenu as ctkOptionMenu,
 )
 
 from gauss_bot.models.vector import Vector
 from gauss_bot.managers.vecs_manager import VectoresManager
 
 from gauss_bot.gui.custom_frames import (
+    CustomDropdown,
     CustomScrollFrame,
     ErrorFrame,
     SuccessFrame,
@@ -57,7 +57,7 @@ class MostrarVecs(CustomScrollFrame):
         }
 
         select_label = ctkLabel(self, text="Seleccione un filtro:")
-        self.select_option = ctkOptionMenu(
+        self.select_option = CustomDropdown(
             self,
             height=30,
             values=list(self.options.keys()),
@@ -373,7 +373,7 @@ class EliminarVecs(CustomScrollFrame):
         self.mensaje_frame: Optional[ctkFrame] = None
         self.instruct_eliminar = ctkLabel(self, text="¿Cuál vector desea eliminar?")
 
-        self.select_vec = ctkOptionMenu(
+        self.select_vec = CustomDropdown(
             self,
             width=60,
             values=self.nombres_vectores,

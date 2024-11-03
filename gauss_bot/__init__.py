@@ -1,5 +1,8 @@
 from os import path
 
+from PIL.Image import open as open_img
+from customtkinter import CTkImage as ctkImage
+
 
 ASSET_PATH = path.join(
     path.dirname(path.realpath(__file__)),
@@ -25,4 +28,8 @@ MATRICES_PATH = path.join(
 VECTORES_PATH = path.join(
     path.dirname(path.realpath(__file__)),
     "data", "vectores.json"
+)
+
+dropdown_icon = ctkImage(
+    open_img(path.join(ASSET_PATH, "dropdown_icon.png"))
 )

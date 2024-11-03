@@ -15,13 +15,13 @@ from customtkinter import (
     CTkEntry as ctkEntry,
     CTkFrame as ctkFrame,
     CTkLabel as ctkLabel,
-    CTkOptionMenu as ctkOptionMenu,
     CTkTabview as ctkTabview,
 )
 
 from gauss_bot.managers.mats_manager import MatricesManager
 
 from gauss_bot.gui.custom_frames import (
+    CustomDropdown,
     CustomScrollFrame,
     ErrorFrame,
     ResultadoFrame
@@ -48,8 +48,8 @@ class SumaRestaTab(CustomScrollFrame):
         self.input_guardians: list[ctkFrame] = []
         self.mensaje_frame: Optional[ctkFrame] = None
 
-        self.select_1: ctkOptionMenu
-        self.select_2: ctkOptionMenu
+        self.select_1: CustomDropdown
+        self.select_2: CustomDropdown
         self.resultado_suma: ctkFrame
         self.resultado_resta: ctkFrame
 
@@ -109,7 +109,7 @@ class SumaRestaTab(CustomScrollFrame):
         instruct_sr = ctkLabel(tab, text=f"Seleccione las matrices a {operacion.lower()}:")
         operador_label = ctkLabel(tab, text=operador)
 
-        self.select_1 = ctkOptionMenu(
+        self.select_1 = CustomDropdown(
             tab,
             width=60,
             values=self.master_frame.nombres_matrices,
@@ -117,7 +117,7 @@ class SumaRestaTab(CustomScrollFrame):
             command=self.update_select1,
         )
 
-        self.select_2 = ctkOptionMenu(
+        self.select_2 = CustomDropdown(
             tab,
             width=60,
             values=self.master_frame.nombres_matrices,
@@ -247,12 +247,12 @@ class MultiplicacionTab(CustomScrollFrame):
         self.mensaje_frame: Optional[ctkFrame] = None
         self.input_guardians: list[ctkFrame] = []
 
-        self.select_escalar_mat: ctkOptionMenu
+        self.select_escalar_mat: CustomDropdown
         self.escalar_entry: ctkEntry
-        self.select_mat1: ctkOptionMenu
-        self.select_mat2: ctkOptionMenu
-        self.select_mvec: ctkOptionMenu
-        self.select_vmat: ctkOptionMenu
+        self.select_mat1: CustomDropdown
+        self.select_mat2: CustomDropdown
+        self.select_mvec: CustomDropdown
+        self.select_vmat: CustomDropdown
 
         self.escalar_mat = ""
         self.mat1 = ""
@@ -345,7 +345,7 @@ class MultiplicacionTab(CustomScrollFrame):
         instruct_e = ctkLabel(tab, text="Seleccione la matriz e ingrese el escalar:")
         operador_label = ctkLabel(tab, text="*")
 
-        self.select_escalar_mat = ctkOptionMenu(
+        self.select_escalar_mat = CustomDropdown(
             tab,
             width=60,
             values=self.master_frame.nombres_matrices,
@@ -365,8 +365,8 @@ class MultiplicacionTab(CustomScrollFrame):
 
         instruct_e.grid(row=0, column=0, columnspan=3, padx=5, pady=5, sticky="n")
 
-        self.escalar_entry.grid(row=1, column=0, padx=5, pady=5, sticky="e")
-        operador_label.grid(row=1, column=1, pady=5, sticky="ew")
+        self.escalar_entry.grid(row=1, column=0, ipadx=5, padx=5, pady=5, sticky="e")
+        operador_label.grid(row=1, column=1, padx=5, pady=5, sticky="ew")
         self.select_escalar_mat.grid(
             row=1, column=2, ipadx=5, padx=5, pady=5, sticky="w"
         )
@@ -396,7 +396,7 @@ class MultiplicacionTab(CustomScrollFrame):
         instruct_ms = ctkLabel(tab, text="Seleccione las matrices para multiplicar:")
         operador_label = ctkLabel(tab, text="*")
 
-        self.select_mat1 = ctkOptionMenu(
+        self.select_mat1 = CustomDropdown(
             tab,
             width=60,
             values=self.master_frame.nombres_matrices,
@@ -404,7 +404,7 @@ class MultiplicacionTab(CustomScrollFrame):
             command=self.update_mat1,
         )
 
-        self.select_mat2 = ctkOptionMenu(
+        self.select_mat2 = CustomDropdown(
             tab,
             width=60,
             values=self.master_frame.nombres_matrices,
@@ -425,7 +425,7 @@ class MultiplicacionTab(CustomScrollFrame):
         instruct_ms.grid(row=0, column=0, columnspan=3, padx=5, pady=5, sticky="n")
 
         self.select_mat1.grid(row=1, column=0, ipadx=5, padx=5, pady=5, sticky="e")
-        operador_label.grid(row=1, column=1, pady=5, sticky="ew")
+        operador_label.grid(row=1, column=1, padx=5, pady=5, sticky="ew")
         self.select_mat2.grid(
             row=1, column=2, ipadx=5, padx=5, pady=5, sticky="w"
         )
@@ -448,7 +448,7 @@ class MultiplicacionTab(CustomScrollFrame):
         instruct_mv = ctkLabel(tab, text="Seleccione la matriz y el vector para multiplicar:")
         operador_label = ctkLabel(tab, text="*")
 
-        self.select_vmat = ctkOptionMenu(
+        self.select_vmat = CustomDropdown(
             tab,
             width=60,
             values=self.master_frame.nombres_matrices,
@@ -456,7 +456,7 @@ class MultiplicacionTab(CustomScrollFrame):
             command=self.update_vmat,
         )
 
-        self.select_mvec = ctkOptionMenu(
+        self.select_mvec = CustomDropdown(
             tab,
             width=60,
             values=self.master_frame.nombres_vectores,
@@ -477,7 +477,7 @@ class MultiplicacionTab(CustomScrollFrame):
         instruct_mv.grid(row=0, column=0, columnspan=3, padx=5, pady=5, sticky="n")
 
         self.select_vmat.grid(row=1, column=0, ipadx=5, padx=5, pady=5, sticky="e")
-        operador_label.grid(row=1, column=1, pady=5, sticky="ew")
+        operador_label.grid(row=1, column=1, padx=5, pady=5, sticky="ew")
         self.select_mvec.grid(
             row=1, column=2, ipadx=5, padx=5, pady=5, sticky="w"
         )
@@ -634,7 +634,7 @@ class TransposicionTab(CustomScrollFrame):
         self.mensaje_frame: Optional[ctkFrame] = None
         self.instruct_t = ctkLabel(self, text="Seleccione la matriz para transponer:")
 
-        self.select_tmat = ctkOptionMenu(
+        self.select_tmat = CustomDropdown(
             self,
             width=60,
             values=self.master_frame.nombres_matrices,
@@ -736,7 +736,7 @@ class DeterminanteTab(CustomScrollFrame):
         self.mensaje_frame: Optional[ctkFrame] = None
         self.instruct_d = ctkLabel(self, text="Seleccione la matriz para calcular el determinante:")
 
-        self.select_dmat = ctkOptionMenu(
+        self.select_dmat = CustomDropdown(
             self,
             width=60,
             values=self.master_frame.nombres_matrices,
@@ -844,7 +844,7 @@ class InversaTab(CustomScrollFrame):
         self.mensaje_frame: Optional[ctkFrame] = None
 
         self.instruct_i = ctkLabel(self, text="Seleccione la matriz para encontrar su inversa:")
-        self.select_imat = ctkOptionMenu(
+        self.select_imat = CustomDropdown(
             self,
             width=60,
             values=self.master_frame.nombres_matrices,

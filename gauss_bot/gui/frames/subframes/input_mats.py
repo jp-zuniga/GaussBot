@@ -18,7 +18,7 @@ from tkinter import (
     TclError
 )
 
-from PIL import Image
+from PIL.Image import open as open_img
 from customtkinter import (
     CTkBaseClass as ctkBase,
     CTkButton as ctkButton,
@@ -27,7 +27,6 @@ from customtkinter import (
     CTkFrame as ctkFrame,
     CTkImage as ctkImage,
     CTkLabel as ctkLabel,
-    CTkOptionMenu as ctkOptionMenu,
 )
 
 from gauss_bot import ASSET_PATH
@@ -36,6 +35,7 @@ from gauss_bot.models.matriz import Matriz
 from gauss_bot.managers.mats_manager import MatricesManager
 
 from gauss_bot.gui.custom_frames import (
+    CustomDropdown,
     CustomScrollFrame,
     ErrorFrame,
     SuccessFrame,
@@ -68,7 +68,7 @@ class MostrarMats(CustomScrollFrame):
         }
 
         select_label = ctkLabel(self, text="Seleccione un filtro:")
-        self.select_option = ctkOptionMenu(
+        self.select_option = CustomDropdown(
             self,
             height=30,
             values=list(self.options.keys()),
@@ -236,10 +236,10 @@ class AgregarMats(CustomScrollFrame):
 
         height = 35 * filas
         sep_icon = ctkImage(
-            dark_image=Image.open(
+            dark_image=open_img(
                 path.join(ASSET_PATH, "light_separator.png")
             ),
-            light_image=Image.open(
+            light_image=open_img(
                 path.join(ASSET_PATH, "dark_separator.png")
             ),
             size=(35, height),
@@ -395,9 +395,9 @@ class AgregarMats(CustomScrollFrame):
             self, "La matriz se ha agregado exitosamente!"
         )
         self.mensaje_frame.grid(row=7, column=0, columnspan=2, padx=5, pady=5, sticky="n")
-        self.update_scrollbar_visibility()
         self.app.matrices.update_all()
         self.app.vectores.update_all()
+        self.update_scrollbar_visibility()
 
     def toggle_aumentada(self) -> None:
         self.aumentada = not self.aumentada
@@ -476,7 +476,7 @@ class EliminarMats(CustomScrollFrame):
         self.mensaje_frame: Optional[ctkFrame] = None
         self.instruct_eliminar = ctkLabel(self, text="¿Cuál matriz desea eliminar?")
 
-        self.select_mat = ctkOptionMenu(
+        self.select_mat = CustomDropdown(
             self,
             width=60,
             values=self.nombres_matrices,

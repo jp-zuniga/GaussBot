@@ -56,6 +56,7 @@ class InputsFrame(ctkFrame):
             tab.pack(expand=True, fill="both")
 
     def update_all(self):
+        self.update_idletasks()
         for tab in self.instances:
             tab.update_frame()
             for widget in tab.winfo_children():
@@ -138,6 +139,7 @@ class ManejarVecs(ctkFrame):
             self.instances.append(tab_instance)   # type: ignore
 
     def update_frame(self):
+        self.update_idletasks()
         for tab in self.instances:
             tab.update_frame()
             for widget in tab.winfo_children():

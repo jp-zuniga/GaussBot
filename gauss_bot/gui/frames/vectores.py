@@ -63,6 +63,7 @@ class VectoresFrame(ctkFrame):
         Actualiza los datos de todos los frames del tabview.
         """
 
+        self.update_idletasks()
         self.app.mats_manager.mats_ingresadas = {
             nombre: mat
             for nombre, mat in sorted(self.app.mats_manager.mats_ingresadas.items())

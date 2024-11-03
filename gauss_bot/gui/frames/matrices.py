@@ -80,6 +80,7 @@ class MatricesFrame(ctkFrame):
         Actualiza todos los frames del tabview.
         """
 
+        self.update_idletasks()
         self.mats_manager.mats_ingresadas = {
             nombre: mat
             for nombre, mat in sorted(self.mats_manager.mats_ingresadas.items())

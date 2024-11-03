@@ -10,14 +10,16 @@ from tkinter import StringVar
 from customtkinter import (
     CTkFrame as ctkFrame,
     CTkLabel as ctkLabel,
-    CTkOptionMenu as ctkOptionMenu,
     set_appearance_mode,
     set_widget_scaling,
     set_default_color_theme,
 )
 
 from gauss_bot import THEMES_PATH
-from gauss_bot.gui.custom_frames import SuccessFrame
+from gauss_bot.gui.custom_frames import (
+    CustomDropdown,
+    SuccessFrame,
+)
 
 
 class ConfigFrame(ctkFrame):
@@ -36,6 +38,12 @@ class ConfigFrame(ctkFrame):
             "100%": 1.0,
             "110%": 1.1,
             "120%": 1.2,
+            "130%": 1.3,
+            "140%": 1.4,
+            "150%": 1.5,
+            "160%": 1.6,
+            "170%": 1.7,
+            "180%": 1.8,
         }
 
         self.modos_dict = {
@@ -85,17 +93,17 @@ class ConfigFrame(ctkFrame):
         self.modos_label = ctkLabel(self, text="Modo:")
         self.temas_label = ctkLabel(self, text="Tema:")
 
-        self.desplegar_escalas = ctkOptionMenu(
+        self.desplegar_escalas = CustomDropdown(
             self, width=105, variable=self.first_escala,
             values=self.escalas, command=self.cambiar_escala,
         )
 
-        self.desplegar_modos = ctkOptionMenu(
+        self.desplegar_modos = CustomDropdown(
             self, width=105, variable=self.first_modo,
             values=self.modos, command=self.cambiar_modo
         )
 
-        self.desplegar_temas = ctkOptionMenu(
+        self.desplegar_temas = CustomDropdown(
             self, width=105, variable=self.first_tema,
             values=self.temas, command=self.cambiar_tema
         )
@@ -117,8 +125,9 @@ class ConfigFrame(ctkFrame):
 
         self.app.escala_actual = self.escalas_dict[escala_seleccionada]
         set_widget_scaling(self.app.escala_actual)
-        self.app.matrices.update_all()
-        self.app.vectores.update_all()
+        # self.app.inputs_frame.update_frame()
+        # # self.app.matrices.update_all()
+        # # self.app.vectores.update_all()
 
     def cambiar_modo(self, modo_seleccionado: str) -> None:
         """
@@ -127,13 +136,14 @@ class ConfigFrame(ctkFrame):
 
         if self.modos_dict[modo_seleccionado] == self.app.modo_actual:
             return
-
+            
         self.app.modo_actual = self.modos_dict[modo_seleccionado]
         set_appearance_mode(self.app.modo_actual)
         self.app.set_icon(self.app.modo_actual)
         self.app.inputs_frame.update_all()
         self.app.matrices.update_all()
         self.app.vectores.update_all()
+        self.app.config_frame.update_frame()
 
     def cambiar_tema(self, tema_seleccionado: str) -> None:
         """
@@ -163,6 +173,7 @@ class ConfigFrame(ctkFrame):
         return None
 
     def update_frame(self) -> None:
+        self.update_idletasks()
         if self.mensaje_frame is not None:
             self.mensaje_frame.destroy()
             self.mensaje_frame = None
@@ -172,3 +183,7 @@ class ConfigFrame(ctkFrame):
         self.first_modo.set(self.modo_actual_key)  # type: ignore
         self.first_escala.set(self.escala_actual_key)  # type: ignore
         self.first_tema.set(self.tema_actual_key)  # type: ignore
+        self.desplegar_escalas.configure(variable=self.first_escala)
+        self.desplegar_modos.configure(variable=self.first_modo)
+        self.desplegar_temas.configure(variable=self.first_tema)
+        self.update_idletasks()

@@ -10,13 +10,13 @@ from customtkinter import (
     CTkCheckBox as ctkCheckBox,
     CTkFrame as ctkFrame,
     CTkLabel as ctkLabel,
-    CTkOptionMenu as ctkOptionMenu,
 )
 
 from gauss_bot.models.sistema_ecuaciones import SistemaEcuaciones
 from gauss_bot.managers.mats_manager import MatricesManager
 
 from gauss_bot.gui.custom_frames import (
+    CustomDropdown,
     ErrorFrame,
     ResultadoFrame
 )
@@ -39,7 +39,7 @@ class EcuacionesFrame(ctkFrame):
         self.nombres_sistemas: list[str] = []
         self.mensaje_frame: Optional[ctkFrame] = None
 
-        self.select_sis_mat: ctkOptionMenu
+        self.select_sis_mat: CustomDropdown
         self.gauss_jordan_checkbox: ctkCheckBox
         self.cramer_checkbox: ctkCheckBox
         self.sis_mat = ""
@@ -74,7 +74,7 @@ class EcuacionesFrame(ctkFrame):
             self.mensaje_frame = None
 
         instruct_se = ctkLabel(self, text="Seleccione el sistema de ecuaciones a resolver:")
-        self.select_sis_mat = ctkOptionMenu(
+        self.select_sis_mat = CustomDropdown(
             self, width=60, values=self.nombres_sistemas, command=self.update_sis_mat
         )
 

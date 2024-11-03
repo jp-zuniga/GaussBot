@@ -15,7 +15,6 @@ class HomeFrame(ctkFrame):
         super().__init__(master, corner_radius=0)
         self.app = app
         self.rowconfigure(0, weight=1)
-        # self.rowconfigure(1, weight=1)
         self.rowconfigure(2, weight=1)
         self.columnconfigure(0, weight=1)
         self.columnconfigure(1, weight=1)
