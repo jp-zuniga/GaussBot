@@ -219,12 +219,15 @@ class SumaRestaTab(CustomScrollFrame):
         self.mensaje_frame.grid(row=0, column=0, columnspan=3, padx=5, pady=5)
 
     def update_frame(self) -> None:
+        self.update_idletasks()
         for widget_s in self.tab_sumar.winfo_children():
             widget_s.destroy()  # type: ignore
         for widget_r in self.tab_restar.winfo_children():
             widget_r.destroy()  # type: ignore
 
+        self.update_idletasks()
         self.setup_tabs()
+        self.tabview.configure(bg_color="transparent")
         self.tabview.configure(fg_color="transparent")
         self.update_idletasks()
 
@@ -597,6 +600,7 @@ class MultiplicacionTab(CustomScrollFrame):
         self.update_scrollbar_visibility()
 
     def update_frame(self) -> None:
+        self.update_idletasks()
         if not any(widget.master == self.tab_escalar for widget in self.input_guardians):
             for widget_e in self.tab_escalar.winfo_children():
                 widget_e.destroy()  # type: ignore
@@ -607,7 +611,9 @@ class MultiplicacionTab(CustomScrollFrame):
             for widget_v in self.tab_matriz_vector.winfo_children():
                 widget_v.destroy()  # type: ignore
 
+        self.update_idletasks()
         self.setup_tabs()
+        self.tabview.configure(bg_color="transparent")
         self.tabview.configure(fg_color="transparent")
         self.update_idletasks()
 
@@ -646,13 +652,28 @@ class TransposicionTab(CustomScrollFrame):
         self.mats_manager = mats_manager
         self.columnconfigure(0, weight=1)
 
-        if len(self.master_frame.nombres_matrices) > 0:
-            placeholder = Variable(self, value=self.master_frame.nombres_matrices[0])
-        else:
-            placeholder = None
-
         self.mensaje_frame: Optional[ctkFrame] = None
-        self.instruct_t = ctkLabel(self, text="Seleccione la matriz para transponer:")
+        self.select_tmat: CustomDropdown
+        self.tmat = ""
+        self.resultado: ctkFrame
+
+        self.setup_frame()
+
+    def setup_frame(self) -> None:
+        if self.mensaje_frame is not None:
+            self.mensaje_frame.destroy()
+            self.mensaje_frame = None
+
+        if len(self.master_frame.nombres_matrices) == 0:
+            self.mensaje_frame = ErrorFrame(
+                self, "No hay matrices guardadas!"
+            )
+            self.mensaje_frame.grid(row=0, column=0, padx=5, pady=5, sticky="n")
+            self.update_scrollbar_visibility()
+            return
+
+        placeholder = Variable(self, value=self.master_frame.nombres_matrices[0])
+        instruct_t = ctkLabel(self, text="Seleccione la matriz para transponer:")
 
         self.select_tmat = CustomDropdown(
             self,
@@ -664,7 +685,7 @@ class TransposicionTab(CustomScrollFrame):
 
         self.tmat = self.select_tmat.get()
 
-        self.button = ctkButton(
+        button = ctkButton(
             self,
             height=30,
             text="Transponer",
@@ -674,17 +695,9 @@ class TransposicionTab(CustomScrollFrame):
         self.resultado = ctkFrame(self)
         self.resultado.columnconfigure(0, weight=1)
 
-        if len(self.master_frame.nombres_matrices) == 0:
-            self.mensaje_frame = ErrorFrame(
-                self, "No hay matrices guardadas!"
-            )
-            self.mensaje_frame.grid(row=6, column=0, columnspan=2, padx=5, pady=5, sticky="n")
-            self.update_scrollbar_visibility()
-            return
-
-        self.instruct_t.grid(row=0, column=0, padx=5, pady=5, sticky="n")
+        instruct_t.grid(row=0, column=0, padx=5, pady=5, sticky="n")
         self.select_tmat.grid(row=1, column=0, padx=5, pady=5, sticky="n")
-        self.button.grid(row=2, column=0, padx=5, pady=5, sticky="n")
+        button.grid(row=2, column=0, padx=5, pady=5, sticky="n")
         self.resultado.grid(row=3, column=0, padx=5, pady=5, sticky="n")
         self.update_scrollbar_visibility()
 
@@ -700,7 +713,7 @@ class TransposicionTab(CustomScrollFrame):
         nombre_transpuesta, transpuesta = self.mats_manager.transponer_matriz(nombre_tmat)
         if not any(transpuesta == mat for mat in self.mats_manager.mats_ingresadas.values()):
             self.mats_manager.mats_ingresadas[nombre_transpuesta] = transpuesta
-            self.app.inputs_frame.instances[0].update_frame()  # type: ignore
+            self.app.inputs_frame.instances[0].update_all()  # type: ignore
             self.master_frame.update_all()
             self.app.vectores.update_all()  # type: ignore
 
@@ -711,29 +724,8 @@ class TransposicionTab(CustomScrollFrame):
         self.update_scrollbar_visibility()
 
     def update_frame(self) -> None:
-        if len(self.master_frame.nombres_matrices) == 0:
-            self.mensaje_frame = ErrorFrame(
-                self, "No hay matrices guardadas!"
-            )
-            self.mensaje_frame.grid(row=6, column=0, columnspan=2, padx=5, pady=5, sticky="n")
-            self.update_scrollbar_visibility()
-        elif len(self.master_frame.nombres_matrices) > 0:
-            if self.mensaje_frame is not None:
-                self.mensaje_frame.destroy()
-                self.mensaje_frame = None
-                self.rowconfigure(6, weight=0)
-
-            placeholder = Variable(self, value=self.master_frame.nombres_matrices[0])
-            self.select_tmat.configure(
-                values=self.master_frame.nombres_matrices, variable=placeholder
-            )
-
-            self.update_tmat(self.select_tmat.get())
-            self.instruct_t.grid(row=0, column=0, padx=5, pady=5, sticky="n")
-            self.select_tmat.grid(row=1, column=0, padx=5, pady=5, sticky="n")
-            self.button.grid(row=2, column=0, padx=5, pady=5, sticky="n")
-            self.resultado.grid(row=3, column=0, padx=5, pady=5, sticky="n")
-        self.update_scrollbar_visibility()
+        self.update_idletasks()
+        self.setup_frame()
         self.update_idletasks()
 
     def update_tmat(self, valor: str) -> None:
@@ -759,13 +751,28 @@ class DeterminanteTab(CustomScrollFrame):
         self.mats_manager = mats_manager
         self.columnconfigure(0, weight=1)
 
-        if len(self.master_frame.nombres_matrices) > 0:
-            placeholder = Variable(self, value=self.master_frame.nombres_matrices[0])
-        else:
-            placeholder = None
-
         self.mensaje_frame: Optional[ctkFrame] = None
-        self.instruct_d = ctkLabel(self, text="Seleccione la matriz para calcular el determinante:")
+        self.select_dmat: CustomDropdown
+        self.dmat = ""
+        self.resultado: ctkFrame
+
+        self.setup_frame()
+
+    def setup_frame(self) -> None:
+        if self.mensaje_frame is not None:
+            self.mensaje_frame.destroy()
+            self.mensaje_frame = None
+
+        if len(self.master_frame.nombres_matrices) == 0:
+            self.mensaje_frame = ErrorFrame(
+                self, "No hay matrices guardadas!"
+            )
+            self.mensaje_frame.grid(row=0, column=0, padx=5, pady=5, sticky="n")
+            self.update_scrollbar_visibility()
+            return
+
+        placeholder = Variable(self, value=self.master_frame.nombres_matrices[0])
+        instruct_d = ctkLabel(self, text="Seleccione la matriz para transponer:")
 
         self.select_dmat = CustomDropdown(
             self,
@@ -777,27 +784,19 @@ class DeterminanteTab(CustomScrollFrame):
 
         self.dmat = self.select_dmat.get()
 
-        self.button = ctkButton(
+        button = ctkButton(
             self,
             height=30,
-            text="Calcular",
+            text="Transponer",
             command=lambda: self.calcular_determinante(self.dmat),
         )
 
         self.resultado = ctkFrame(self)
         self.resultado.columnconfigure(0, weight=1)
 
-        if len(self.master_frame.nombres_matrices) == 0:
-            self.mensaje_frame = ErrorFrame(
-                self, "No hay matrices guardadas!"
-            )
-            self.mensaje_frame.grid(row=6, column=0, columnspan=2, padx=5, pady=5, sticky="n")
-            self.update_scrollbar_visibility()
-            return
-
-        self.instruct_d.grid(row=0, column=0, padx=5, pady=5, sticky="n")
+        instruct_d.grid(row=0, column=0, padx=5, pady=5, sticky="n")
         self.select_dmat.grid(row=1, column=0, padx=5, pady=5, sticky="n")
-        self.button.grid(row=2, column=0, padx=5, pady=5, sticky="n")
+        button.grid(row=2, column=0, padx=5, pady=5, sticky="n")
         self.resultado.grid(row=3, column=0, padx=5, pady=5, sticky="n")
         self.update_scrollbar_visibility()
 
@@ -834,28 +833,8 @@ class DeterminanteTab(CustomScrollFrame):
         self.update_scrollbar_visibility()
 
     def update_frame(self) -> None:
-        if len(self.master_frame.nombres_matrices) == 0:
-            self.mensaje_frame = ErrorFrame(
-                self, "No hay matrices guardadas!"
-            )
-            self.mensaje_frame.grid(row=6, column=0, columnspan=2, padx=5, pady=5, sticky="n")
-            self.update_scrollbar_visibility()
-        elif len(self.master_frame.nombres_matrices) > 0:
-            if self.mensaje_frame is not None:
-                self.mensaje_frame.destroy()
-                self.mensaje_frame = None
-
-            placeholder = Variable(self, value=self.master_frame.nombres_matrices[0])
-            self.select_dmat.configure(
-                values=self.master_frame.nombres_matrices, variable=placeholder
-            )
-
-            self.update_dmat(self.select_dmat.get())
-            self.instruct_d.grid(row=0, column=0, padx=5, pady=5, sticky="n")
-            self.select_dmat.grid(row=1, column=0, padx=5, pady=5, sticky="n")
-            self.button.grid(row=2, column=0, padx=5, pady=5, sticky="n")
-            self.resultado.grid(row=3, column=0, padx=5, pady=5, sticky="n")
-        self.update_scrollbar_visibility()
+        self.update_idletasks()
+        self.setup_frame()
         self.update_idletasks()
 
     def update_dmat(self, valor: str) -> None:
@@ -882,38 +861,51 @@ class InversaTab(CustomScrollFrame):
         self.columnconfigure(0, weight=1)
 
         self.mensaje_frame: Optional[ctkFrame] = None
+        self.select_imat: CustomDropdown
+        self.imat = ""
+        self.resultado: ctkFrame
 
-        self.instruct_i = ctkLabel(self, text="Seleccione la matriz para encontrar su inversa:")
+        self.setup_frame()
+
+    def setup_frame(self) -> None:
+        if self.mensaje_frame is not None:
+            self.mensaje_frame.destroy()
+            self.mensaje_frame = None
+
+        if len(self.master_frame.nombres_matrices) == 0:
+            self.mensaje_frame = ErrorFrame(
+                self, "No hay matrices guardadas!"
+            )
+            self.mensaje_frame.grid(row=0, column=0, padx=5, pady=5, sticky="n")
+            self.update_scrollbar_visibility()
+            return
+
+        placeholder = Variable(self, value=self.master_frame.nombres_matrices[0])
+        instruct_i = ctkLabel(self, text="Seleccione la matriz para transponer:")
+
         self.select_imat = CustomDropdown(
             self,
             width=60,
             values=self.master_frame.nombres_matrices,
+            variable=placeholder,
             command=self.update_imat,
         )
 
         self.imat = self.select_imat.get()
 
-        self.button = ctkButton(
+        button = ctkButton(
             self,
             height=30,
-            text="Encontrar",
+            text="Transponer",
             command=lambda: self.encontrar_inversa(self.imat),
         )
 
         self.resultado = ctkFrame(self)
         self.resultado.columnconfigure(0, weight=1)
 
-        if len(self.master_frame.nombres_matrices) == 0:
-            self.mensaje_frame = ErrorFrame(
-                self, "No hay matrices guardadas!"
-            )
-            self.mensaje_frame.grid(row=6, column=0, columnspan=2, padx=5, pady=5, sticky="n")
-            self.update_scrollbar_visibility()
-            return
-
-        self.instruct_i.grid(row=0, column=0, padx=5, pady=5, sticky="n")
+        instruct_i.grid(row=0, column=0, padx=5, pady=5, sticky="n")
         self.select_imat.grid(row=1, column=0, padx=5, pady=5, sticky="n")
-        self.button.grid(row=2, column=0, padx=5, pady=5, sticky="n")
+        button.grid(row=2, column=0, padx=5, pady=5, sticky="n")
         self.resultado.grid(row=3, column=0, padx=5, pady=5, sticky="n")
         self.update_scrollbar_visibility()
 
@@ -950,29 +942,8 @@ class InversaTab(CustomScrollFrame):
         self.update_scrollbar_visibility()
 
     def update_frame(self) -> None:
-        if len(self.master_frame.nombres_matrices) == 0:
-            self.mensaje_frame = ErrorFrame(
-                self, "No hay matrices guardadas!"
-            )
-            self.mensaje_frame.grid(row=6, column=0, columnspan=2, padx=5, pady=5, sticky="n")
-            self.update_scrollbar_visibility()
-        elif len(self.master_frame.nombres_matrices) > 0:
-            if self.mensaje_frame is not None:
-                self.mensaje_frame.destroy()
-                self.mensaje_frame = None
-                self.rowconfigure(6, weight=0)
-
-            placeholder = Variable(self, value=self.master_frame.nombres_matrices[0])
-            self.select_imat.configure(
-                values=self.master_frame.nombres_matrices, variable=placeholder
-            )
-
-            self.update_imat(self.select_imat.get())
-            self.instruct_i.grid(row=0, column=0, padx=5, pady=5, sticky="n")
-            self.select_imat.grid(row=1, column=0, padx=5, pady=5, sticky="n")
-            self.button.grid(row=2, column=0, padx=5, pady=5, sticky="n")
-            self.resultado.grid(row=3, column=0, padx=5, pady=5, sticky="n")
-        self.update_scrollbar_visibility()
+        self.update_idletasks()
+        self.setup_frame()
         self.update_idletasks()
 
     def update_imat(self, valor: str) -> None:

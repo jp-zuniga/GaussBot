@@ -56,10 +56,10 @@ class EcuacionesFrame(ctkFrame):
             tab = self.tabview.add(nombre)
             if nombre.startswith("Sistemas"):
                 tab_instance: SistemasFrame = (
-                    cls(self, tab, self.app, self.mats_manager)
+                    cls(self.app, tab, self, self.mats_manager)
                 )
             else:
-                tab_instance: RaicesFrame = cls(self, tab, self.app)  # type: ignore
+                tab_instance: RaicesFrame = cls(self.app, tab, self)  # type: ignore
 
             tab_instance.pack(expand=True, fill="both")
             self.instances.append(tab_instance)

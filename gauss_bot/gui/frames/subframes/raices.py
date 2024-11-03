@@ -31,7 +31,8 @@ if TYPE_CHECKING:
 
 class RaicesFrame(CustomScrollFrame):
     def __init__(
-        self, app: "GaussUI",
+        self,
+        app: "GaussUI",
         master_tab: ctkFrame,
         master_frame: "EcuacionesFrame"
     ) -> None:

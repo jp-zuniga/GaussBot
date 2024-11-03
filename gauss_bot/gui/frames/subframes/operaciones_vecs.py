@@ -225,6 +225,7 @@ class SumaRestaTab(CustomScrollFrame):
             widget_r.destroy()  # type: ignore
 
         self.setup_tabs()
+        self.tabview.configure(bg_color="transparent")
         self.tabview.configure(fg_color="transparent")
         self.update_idletasks()
 
@@ -610,6 +611,7 @@ class MultiplicacionTab(CustomScrollFrame):
                 widget_m.destroy()  # type: ignore
 
         self.setup_tabs()
+        self.tabview.configure(bg_color="transparent")
         self.tabview.configure(fg_color="transparent")
         self.update_idletasks()
 

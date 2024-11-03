@@ -75,8 +75,8 @@ class AgregarVecs(CustomScrollFrame):
 
         self.vector_frame = ctkFrame(self)
 
-        self.dimension_entry.bind("<Return>", lambda x: self.generar_casillas())
-        self.dimension_entry.bind("<Down>", lambda x: self.dimensiones_move_down())
+        self.dimension_entry.bind("<Return>", lambda _: self.generar_casillas())
+        self.dimension_entry.bind("<Down>", lambda _: self.dimensiones_move_down())
 
         dimension_label.grid(row=0, column=0, padx=5, pady=5, sticky="e")
         self.dimension_entry.grid(row=0, column=1, padx=5, pady=5, sticky="w")
@@ -150,8 +150,8 @@ class AgregarVecs(CustomScrollFrame):
         agregar_button.grid(row=5, column=0, padx=5, pady=5, sticky="e")
         limpiar_button.grid(row=5, column=1, padx=5, pady=5, sticky="w")
 
-        self.nombre_entry.bind("<Up>", lambda x: self.nombre_entry_up())
-        self.nombre_entry.bind("<Return>", lambda x: self.agregar_vector())
+        self.nombre_entry.bind("<Up>", lambda _: self.nombre_entry_up())
+        self.nombre_entry.bind("<Return>", lambda _: self.agregar_vector())
         self.update_scrollbar_visibility()
 
         self.post_vector_widgets = [
@@ -379,48 +379,61 @@ class EliminarVecs(CustomScrollFrame):
         self.vecs_manager = vecs_manager
         self.columnconfigure(0, weight=1)
 
-        self.nombres_vectores = list(self.vecs_manager.vecs_ingresados.keys())
-
-        if len(self.nombres_vectores) > 0:
-            placeholder = Variable(self, value=self.nombres_vectores[0])
-        else:
-            placeholder = None
-
+        self.nombres_matrices = list(self.vecs_manager.vecs_ingresados.keys())
         self.mensaje_frame: Optional[ctkFrame] = None
-        self.instruct_eliminar = ctkLabel(self, text="¿Cuál vector desea eliminar?")
+        self.select_vec: CustomDropdown
+        self.vec_seleccionado = ""
+        self.setup_frame()
+
+    def setup_frame(self) -> None:
+        if self.mensaje_frame is not None:
+            self.mensaje_frame.destroy()
+            self.mensaje_frame = None
+
+        if len(self.nombres_matrices) == 0:
+            if isinstance(self.mensaje_frame, ErrorFrame):
+                return
+            
+            try:
+                for widget in self.winfo_children():
+                    if isinstance(widget, SuccessFrame):
+                        old_mensaje_frame = SuccessFrame(self, widget.mensaje_exito.cget("text"))
+                    widget.destroy()
+                old_mensaje_frame.grid(row=0, column=0, padx=5, pady=5, sticky="n")
+            except UnboundLocalError:
+                pass
+            
+            self.mensaje_frame = ErrorFrame(self, "No hay vectores guardados!")
+            self.after(1000, self.mensaje_frame.grid(row=1, column=0, padx=5, pady=5, sticky="n"))
+            return
+
+        placeholder = Variable(self, value=self.nombres_matrices[0])
+        instruct_eliminar = ctkLabel(self, text="¿Cuál vector desea eliminar?")
 
         self.select_vec = CustomDropdown(
             self,
-            width=60,
             height=30,
-            values=self.nombres_vectores,
+            width=60,
+            values=self.nombres_matrices,
             variable=placeholder,
             command=self.update_vec,
         )
 
-        self.button = ctkButton(
+        button = ctkButton(
             self,
             height=30,
             text="Eliminar",
-            command=lambda: self.eliminar_vector(self.vec_seleccionada),
+            command=lambda: self.eliminar_vector(),
         )
 
-        self.vec_seleccionada = self.select_vec.get()
+        self.vec_seleccionado = self.select_vec.get()
 
-        if len(self.nombres_vectores) == 0:
-            self.mensaje_frame = ErrorFrame(
-                self, "No hay vectores guardados!"
-            )
-            self.mensaje_frame.grid(row=3, column=0, padx=5, pady=5, sticky="n")
-            self.update_scrollbar_visibility()
-            return
-
-        self.instruct_eliminar.grid(row=0, column=0, padx=5, pady=5, sticky="n")
+        instruct_eliminar.grid(row=0, column=0, padx=5, pady=5, sticky="n")
         self.select_vec.grid(row=1, column=0, padx=5, pady=5, sticky="n")
-        self.button.grid(row=2, column=0, padx=5, pady=5, sticky="n")
+        button.grid(row=2, column=0, padx=5, pady=5, sticky="n")
         self.update_scrollbar_visibility()
 
-    def eliminar_vector(self, nombre_vec: str) -> None:
+    def eliminar_vector(self) -> None:
         """
         Elimina el vector seleccionado.
         """
@@ -443,46 +456,8 @@ class EliminarVecs(CustomScrollFrame):
 
     def update_frame(self) -> None:
         self.nombres_vectores = list(self.vecs_manager.vecs_ingresados.keys())
-
-        if len(self.nombres_vectores) == 0:
-            if isinstance(self.mensaje_frame, ErrorFrame):
-                return
-            for widget in self.winfo_children():
-                if isinstance(widget, SuccessFrame):
-                    old_mensaje_frame = SuccessFrame(self, widget.mensaje_exito.cget("text"))
-                widget.destroy()
-            old_mensaje_frame.grid(row=0, column=0, padx=5, pady=5, sticky="n")
-            self.mensaje_frame = ErrorFrame(self, "No hay vectores guardados!")
-            self.after(500, self.mensaje_frame.grid(row=1, column=0, padx=5, pady=5, sticky="n"))
-
-        elif len(self.nombres_vectores) > 0:
-            placeholder = Variable(self, value=self.nombres_vectores[0])
-            self.instruct_eliminar = ctkLabel(self, text="¿Cuál vector desea eliminar?")
-            self.select_vec = CustomDropdown(
-                self,
-                width=60,
-                height=30,
-                values=self.nombres_vectores,
-                variable=placeholder,
-                command=self.update_vec,
-            )
-
-            self.button = ctkButton(
-                self,
-                height=30,
-                text="Eliminar",
-                command=lambda: self.eliminar_vector(self.vec_seleccionada),
-            )
-
-            if isinstance(self.mensaje_frame, ErrorFrame):
-                self.mensaje_frame.destroy()
-                self.mensaje_frame = None
-
-            self.update_vec(self.select_vec.get())
-            self.instruct_eliminar.grid(row=0, column=0, padx=5, pady=5, sticky="n")
-            self.select_vec.grid(row=1, column=0, padx=5, pady=5, sticky="n")
-            self.button.grid(row=2, column=0, padx=5, pady=5, sticky="n")
-        self.update_scrollbar_visibility()
+        self.update_idletasks()
+        self.setup_frame()
         self.update_idletasks()
 
     def update_vec(self, valor: str) -> None:
