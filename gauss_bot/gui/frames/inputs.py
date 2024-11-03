@@ -45,7 +45,7 @@ class InputsFrame(ctkFrame):
         self.tabview = ctkTabview(self)
         self.tabview.pack(expand=True, fill="both")
 
-        self.instances: list[Union[ctkFrame, CustomScrollFrame]] = []
+        self.instances: list[ctkFrame] = []
 
         matrices_tab = self.tabview.add("Matrices")
         self.instances.append(ManejarMats(self, matrices_tab, self.app, self.mats_manager))

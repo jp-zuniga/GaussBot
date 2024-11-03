@@ -75,7 +75,10 @@ class EcuacionesFrame(ctkFrame):
 
         instruct_se = ctkLabel(self, text="Seleccione el sistema de ecuaciones a resolver:")
         self.select_sis_mat = CustomDropdown(
-            self, width=60, values=self.nombres_sistemas, command=self.update_sis_mat
+            self,
+            width=60,
+            values=self.nombres_sistemas,
+            command=self.update_sis_mat,
         )
 
         self.gauss_jordan_checkbox = ctkCheckBox(self, text="", command=self.toggle_gj)

@@ -35,6 +35,7 @@ from gauss_bot.models.matriz import Matriz
 from gauss_bot.managers.mats_manager import MatricesManager
 
 from gauss_bot.gui.custom_frames import (
+    CustomEntry,
     CustomDropdown,
     CustomScrollFrame,
     ErrorFrame,
@@ -141,7 +142,7 @@ class AgregarMats(CustomScrollFrame):
 
         self.aumentada = False
         self.mensaje_frame: Optional[ctkFrame] = None
-        self.input_entries: list[list[ctkEntry]] = []
+        self.input_entries: list[list[CustomEntry]] = []
         self.post_matriz_widgets: list[ctkBase] = []
 
         checkbox_label = ctkLabel(self, text="¿Es un sistema de ecuaciones?")
@@ -248,7 +249,7 @@ class AgregarMats(CustomScrollFrame):
         for i in range(filas):
             fila_entries = []
             for j in range(columnas):
-                input_entry = ctkEntry(self.matriz_frame, width=60)
+                input_entry = CustomEntry(self.matriz_frame, width=60)
                 if not self.aumentada or j != columnas - 1:
                     input_entry.grid(row=i, column=j, padx=5, pady=5)
                 elif self.aumentada and j == columnas - 1:
@@ -260,7 +261,7 @@ class AgregarMats(CustomScrollFrame):
             self.input_entries.append(fila_entries)
 
         nombre_label = ctkLabel(self, text="Nombre de la matriz:")
-        self.nombre_entry = ctkEntry(self, width=60, placeholder_text="A")
+        self.nombre_entry = ctkEntry(self, width=25, placeholder_text="A")
         agregar_button = ctkButton(self, height=30, text="Agregar", command=self.agregar_matriz)
         limpiar_button = ctkButton(
             self, height=30, text="Limpiar casillas", command=self.limpiar_casillas
@@ -395,6 +396,7 @@ class AgregarMats(CustomScrollFrame):
             self, "La matriz se ha agregado exitosamente!"
         )
         self.mensaje_frame.grid(row=7, column=0, columnspan=2, padx=5, pady=5, sticky="n")
+        self.master_frame.update_frame()
         self.app.matrices.update_all()
         self.app.vectores.update_all()
         self.update_scrollbar_visibility()
@@ -414,7 +416,7 @@ class AgregarMats(CustomScrollFrame):
         else:
             self.input_entries[0][0].focus_set()
 
-    def bind_entry_keys(self, entry: ctkEntry, i: int, j: int) -> None:
+    def bind_entry_keys(self, entry: CustomEntry, i: int, j: int) -> None:
         entry.bind("<Up>", lambda x: self.entry_move_up(i, j))
         entry.bind("<Down>", lambda x: self.entry_move_down(i, j))
         entry.bind("<Left>", lambda x: self.entry_move_left(i, j))
@@ -478,6 +480,7 @@ class EliminarMats(CustomScrollFrame):
 
         self.select_mat = CustomDropdown(
             self,
+            height=30,
             width=60,
             values=self.nombres_matrices,
             variable=placeholder,
@@ -523,6 +526,7 @@ class EliminarMats(CustomScrollFrame):
         )
         self.mensaje_frame.grid(row=3, column=0, padx=5, pady=5)
         self.update_scrollbar_visibility()
+        self.master_frame.update_frame()
         self.app.matrices.update_all()
         self.app.vectores.update_all()
 
@@ -533,21 +537,35 @@ class EliminarMats(CustomScrollFrame):
             if isinstance(self.mensaje_frame, ErrorFrame):
                 return
             for widget in self.winfo_children():
+                if isinstance(widget, SuccessFrame):
+                    old_mensaje_frame = SuccessFrame(self, widget.mensaje_exito.cget("text"))
                 widget.destroy()
+            old_mensaje_frame.grid(row=0, column=0, padx=5, pady=5, sticky="n")
             self.mensaje_frame = ErrorFrame(self, "No hay matrices guardadas!")
-            self.mensaje_frame.grid(row=0, column=0, padx=5, pady=5, sticky="n")
+            self.after(500, self.mensaje_frame.grid(row=1, column=0, padx=5, pady=5, sticky="n"))
 
         elif len(self.nombres_matrices) > 0:
             placeholder = Variable(self, value=self.nombres_matrices[0])
-            self.select_mat.configure(
-                values=self.nombres_matrices, variable=placeholder
+            self.instruct_eliminar = ctkLabel(self, text="¿Cuál matriz desea eliminar?")
+            self.select_mat = CustomDropdown(
+                self,
+                height=30,
+                width=60,
+                values=self.nombres_matrices,
+                variable=placeholder,
+                command=self.update_mat,
+            )
+
+            self.button = ctkButton(
+                self,
+                height=30,
+                text="Eliminar",
+                command=lambda: self.eliminar_matriz(self.mat_seleccionada),
             )
 
             if isinstance(self.mensaje_frame, ErrorFrame):
                 self.mensaje_frame.destroy()
                 self.mensaje_frame = None
-            elif isinstance(self.mensaje_frame, SuccessFrame):
-                return
 
             self.update_mat(self.select_mat.get())
             self.instruct_eliminar.grid(row=0, column=0, padx=5, pady=5, sticky="n")

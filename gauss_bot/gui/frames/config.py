@@ -125,9 +125,10 @@ class ConfigFrame(ctkFrame):
 
         self.app.escala_actual = self.escalas_dict[escala_seleccionada]
         set_widget_scaling(self.app.escala_actual)
-        # self.app.inputs_frame.update_frame()
-        # # self.app.matrices.update_all()
-        # # self.app.vectores.update_all()
+        self.app.inputs_frame.update_frame()
+        self.app.matrices.update_all()
+        self.app.vectores.update_all()
+        self.app.update_idletasks()
 
     def cambiar_modo(self, modo_seleccionado: str) -> None:
         """
@@ -144,6 +145,7 @@ class ConfigFrame(ctkFrame):
         self.app.matrices.update_all()
         self.app.vectores.update_all()
         self.app.config_frame.update_frame()
+        self.app.update_idletasks()
 
     def cambiar_tema(self, tema_seleccionado: str) -> None:
         """
@@ -161,6 +163,7 @@ class ConfigFrame(ctkFrame):
         )
         self.mensaje_frame.grid(row=3, column=1, pady=30)
         set_default_color_theme(path.join(THEMES_PATH, self.app.tema_actual))
+        self.app.update_idletasks()
 
     def _get_dict_key(self, dict_lookup: dict, buscando: str) -> Union[str, None]:
         """

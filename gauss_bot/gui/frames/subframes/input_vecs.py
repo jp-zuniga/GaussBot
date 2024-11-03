@@ -25,6 +25,7 @@ from gauss_bot.models.vector import Vector
 from gauss_bot.managers.vecs_manager import VectoresManager
 
 from gauss_bot.gui.custom_frames import (
+    CustomEntry,
     CustomDropdown,
     CustomScrollFrame,
     ErrorFrame,
@@ -130,7 +131,7 @@ class AgregarVecs(CustomScrollFrame):
         self.columnconfigure(1, weight=1)
 
         self.mensaje_frame: Optional[ctkFrame] = None
-        self.input_entries: list[ctkEntry] = []
+        self.input_entries: list[CustomEntry] = []
         self.post_vector_widgets: list[ctkBase] = []
 
         dimension_label = ctkLabel(self, text="Dimensiones del vector:")
@@ -204,13 +205,13 @@ class AgregarVecs(CustomScrollFrame):
             self.mensaje_frame = None
 
         for i in range(dimension):
-            input_entry = ctkEntry(self.vector_frame, width=60)
+            input_entry = CustomEntry(self.vector_frame, width=60)
             input_entry.grid(row=i, column=0, padx=5, pady=5)
             self.bind_entry_keys(input_entry, i)
             self.input_entries.append(input_entry)
 
         nombre_label = ctkLabel(self, text="Nombre del vector:")
-        self.nombre_entry = ctkEntry(self, width=60, placeholder_text="u")
+        self.nombre_entry = ctkEntry(self, width=25, placeholder_text="u")
         agregar_button = ctkButton(self, height=30, text="Agregar", command=self.agregar_vector)
         limpiar_button = ctkButton(
             self, height=30, text="Limpiar casillas", command=self.limpiar_casillas
@@ -323,6 +324,7 @@ class AgregarVecs(CustomScrollFrame):
         self.mensaje_frame = SuccessFrame(self, "El vector se ha agregado exitosamente!")
         self.mensaje_frame.grid(row=6, column=0, columnspan=2, padx=5, pady=5, sticky="n")
         self.update_scrollbar_visibility()
+        self.master_frame.update_frame()
         self.app.vectores.update_all()
         self.app.matrices.update_all()
 
@@ -330,7 +332,7 @@ class AgregarVecs(CustomScrollFrame):
         if len(self.vector_frame.winfo_children()) != 0:
             self.input_entries[0].focus_set()
 
-    def bind_entry_keys(self, entry: ctkEntry, i: int) -> None:
+    def bind_entry_keys(self, entry: CustomEntry, i: int) -> None:
         entry.bind("<Up>", lambda event: self.entry_move_up(i))
         entry.bind("<Down>", lambda event: self.entry_move_down(i))
 
@@ -376,6 +378,7 @@ class EliminarVecs(CustomScrollFrame):
         self.select_vec = CustomDropdown(
             self,
             width=60,
+            height=30,
             values=self.nombres_vectores,
             variable=placeholder,
             command=self.update_vec,
@@ -420,6 +423,7 @@ class EliminarVecs(CustomScrollFrame):
         )
         self.mensaje_frame.grid(row=3, column=0, padx=5, pady=5)
         self.update_scrollbar_visibility()
+        self.master_frame.update_frame()
         self.app.matrices.update_all()
         self.app.vectores.update_all()
 
@@ -430,21 +434,35 @@ class EliminarVecs(CustomScrollFrame):
             if isinstance(self.mensaje_frame, ErrorFrame):
                 return
             for widget in self.winfo_children():
+                if isinstance(widget, SuccessFrame):
+                    old_mensaje_frame = SuccessFrame(self, widget.mensaje_exito.cget("text"))
                 widget.destroy()
+            old_mensaje_frame.grid(row=0, column=0, padx=5, pady=5, sticky="n")
             self.mensaje_frame = ErrorFrame(self, "No hay vectores guardados!")
-            self.mensaje_frame.grid(row=0, column=0, padx=5, pady=5, sticky="n")
+            self.after(500, self.mensaje_frame.grid(row=1, column=0, padx=5, pady=5, sticky="n"))
 
         elif len(self.nombres_vectores) > 0:
             placeholder = Variable(self, value=self.nombres_vectores[0])
-            self.select_vec.configure(
-                values=self.nombres_vectores, variable=placeholder
+            self.instruct_eliminar = ctkLabel(self, text="¿Cuál vector desea eliminar?")
+            self.select_vec = CustomDropdown(
+                self,
+                width=60,
+                height=30,
+                values=self.nombres_vectores,
+                variable=placeholder,
+                command=self.update_vec,
+            )
+
+            self.button = ctkButton(
+                self,
+                height=30,
+                text="Eliminar",
+                command=lambda: self.eliminar_vector(self.vec_seleccionada),
             )
 
             if isinstance(self.mensaje_frame, ErrorFrame):
                 self.mensaje_frame.destroy()
                 self.mensaje_frame = None
-            elif isinstance(self.mensaje_frame, SuccessFrame):
-                return
 
             self.update_vec(self.select_vec.get())
             self.instruct_eliminar.grid(row=0, column=0, padx=5, pady=5, sticky="n")

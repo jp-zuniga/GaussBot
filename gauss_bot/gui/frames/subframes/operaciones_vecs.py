@@ -12,7 +12,6 @@ from typing import (
 from tkinter import Variable
 from customtkinter import (
     CTkButton as ctkButton,
-    CTkEntry as ctkEntry,
     CTkFrame as ctkFrame,
     CTkLabel as ctkLabel,
     CTkTabview as ctkTabview,
@@ -21,6 +20,7 @@ from customtkinter import (
 from gauss_bot.managers.vecs_manager import VectoresManager
 
 from gauss_bot.gui.custom_frames import (
+    CustomEntry,
     CustomDropdown,
     CustomScrollFrame,
     ErrorFrame,
@@ -136,9 +136,9 @@ class SumaRestaTab(CustomScrollFrame):
         self.vec2 = self.select_2.get()
 
         instruct_sr.grid(row=0, column=0, columnspan=3, padx=5, pady=5, sticky="n")
-        self.select_1.grid(row=1, column=0, ipadx=5, padx=5, pady=5, sticky="e")
+        self.select_1.grid(row=1, column=0, padx=5, pady=5, sticky="e")
         operador_label.grid(row=1, column=1, padx=5, pady=5, sticky="ew")
-        self.select_2.grid(row=1, column=2, ipadx=5, padx=5, pady=5, sticky="w")
+        self.select_2.grid(row=1, column=2, padx=5, pady=5, sticky="w")
         ejecutar_button.grid(row=2, column=0, columnspan=3, padx=5, pady=10, sticky="n")
 
         if operacion == "Sumar":
@@ -248,7 +248,7 @@ class MultiplicacionTab(CustomScrollFrame):
         self.input_guardians: list[ctkFrame] = []
 
         self.select_escalar_vec: CustomDropdown
-        self.escalar_entry: ctkEntry
+        self.escalar_entry: CustomEntry
         self.select_vec1: CustomDropdown
         self.select_vec2: CustomDropdown
         self.select_vmat: CustomDropdown
@@ -353,8 +353,9 @@ class MultiplicacionTab(CustomScrollFrame):
             command=self.update_escalar_vec,
         )
 
-        self.escalar_entry = ctkEntry(tab, width=60)
         self.escalar_vec = self.select_escalar_vec.get()
+        self.escalar_entry = CustomEntry(tab, width=60)
+        self.escalar_entry.bind("<Return>", lambda _: self.mult_por_escalar(self.escalar_vec))
 
         multiplicar_button = ctkButton(
             tab,
@@ -365,10 +366,10 @@ class MultiplicacionTab(CustomScrollFrame):
 
         instruct_e.grid(row=0, column=0, columnspan=3, padx=5, pady=5, sticky="n")
 
-        self.escalar_entry.grid(row=1, column=0, padx=5, pady=5, sticky="e")
+        self.escalar_entry.grid(row=1, column=0, ipadx=5, padx=5, pady=5, sticky="e")
         operador_label.grid(row=1, column=1, padx=5, pady=5, sticky="ew")
         self.select_escalar_vec.grid(
-            row=1, column=2, ipadx=5, padx=5, pady=5, sticky="w"
+            row=1, column=2, padx=5, pady=5, sticky="w"
         )
 
         multiplicar_button.grid(row=2, column=0, columnspan=3, padx=5, pady=10, sticky="n")
@@ -427,7 +428,7 @@ class MultiplicacionTab(CustomScrollFrame):
         self.select_vec1.grid(row=1, column=0, padx=5, pady=5, sticky="e")
         operador_label.grid(row=1, column=1, padx=5, pady=5, sticky="ew")
         self.select_vec2.grid(
-            row=1, column=2, ipadx=5, padx=5, pady=5, sticky="w"
+            row=1, column=2, padx=5, pady=5, sticky="w"
         )
 
         multiplicar_button.grid(row=2, column=0, columnspan=3, padx=5, pady=10, sticky="n")
@@ -479,7 +480,7 @@ class MultiplicacionTab(CustomScrollFrame):
         self.select_vmat.grid(row=1, column=0, padx=5, pady=5, sticky="e")
         operador_label.grid(row=1, column=1, padx=5, pady=5, sticky="ew")
         self.select_mvec.grid(
-            row=1, column=2, ipadx=5, padx=5, pady=5, sticky="w"
+            row=1, column=2, padx=5, pady=5, sticky="w"
         )
 
         multiplicar_button.grid(row=2, column=0, columnspan=3, padx=5, pady=10, sticky="n")
@@ -587,12 +588,15 @@ class MultiplicacionTab(CustomScrollFrame):
         self.update_scrollbar_visibility()
 
     def update_frame(self) -> None:
-        for widget_e in self.tab_escalar.winfo_children():
-            widget_e.destroy()  # type: ignore
-        for widget_v in self.tab_vector.winfo_children():
-            widget_v.destroy()  # type: ignore
-        for widget_m in self.tab_matriz_vector.winfo_children():
-            widget_m.destroy()  # type: ignore
+        if not any(widget.master == self.tab_escalar for widget in self.input_guardians):
+            for widget_e in self.tab_escalar.winfo_children():
+                widget_e.destroy()  # type: ignore
+        if not any(widget.master == self.tab_vector for widget in self.input_guardians):
+            for widget_v in self.tab_vector.winfo_children():
+                widget_v.destroy()  # type: ignore
+        if not any(widget.master == self.tab_matriz_vector for widget in self.input_guardians):
+            for widget_m in self.tab_matriz_vector.winfo_children():
+                widget_m.destroy()  # type: ignore
 
         self.setup_tabs()
         self.tabview.configure(fg_color="transparent")

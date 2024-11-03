@@ -42,7 +42,7 @@ class GaussUI(ctk):
         self.set_icon(self.modo_actual)
 
         self.title("GaussBot")
-        self.geometry("1200x600")
+        self.geometry("1280x720")
         self.grid_rowconfigure(0, weight=1)
         self.grid_columnconfigure(1, weight=1)
 
@@ -77,9 +77,9 @@ class GaussUI(ctk):
                 self.config_options = load(config_file)
         else:
             self.config_options = {
-                "escala": 1.0,
+                "escala": 1.2,
                 "modo": "light",
-                "tema": "marsh.json"
+                "tema": "sky.json"
             }
 
         self.escala_actual = self.config_options["escala"]

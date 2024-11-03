@@ -18,6 +18,7 @@ from tkinter import (
 )
 
 from customtkinter import (
+    CTkEntry as ctkEntry,
     CTkFont as ctkFont,
     CTkFrame as ctkFrame,
     CTkImage as ctkImage,
@@ -32,12 +33,42 @@ from gauss_bot import (
 )
 
 
-class CustomDropdown(ctkOptionMenu):
+class CustomEntry(ctkEntry):
     def __init__(
         self,
         master: Any,
         width: int = 140,
         height: int = 28,
+        corner_radius: Optional[Union[int]] = None,
+        bg_color: Union[str, tuple[str, str]] = "transparent",
+        fg_color: Optional[Union[str, tuple[str, str]]] = None,
+        text_color: Optional[Union[str, tuple[str, str]]] = None,
+        font: Optional[Union[tuple, ctkFont]] = None,
+        justify: str = "center", 
+        **kwargs
+    ):
+
+        super().__init__(
+            master,
+            width=width,
+            height=height,
+            corner_radius=corner_radius,
+            bg_color=bg_color,
+            fg_color=fg_color,
+            text_color=text_color,
+            font=font,
+            **kwargs,
+        )
+
+        self.configure(justify=justify)
+
+
+class CustomDropdown(ctkOptionMenu):
+    def __init__(
+        self,
+        master: Any,
+        width: int = 140,
+        height: int = 30,
         corner_radius: Optional[Union[int]] = None,
         bg_color: Union[str, tuple[str, str]] = "transparent",
         fg_color: Optional[Union[str, tuple[str, str]]] = None,
@@ -57,6 +88,7 @@ class CustomDropdown(ctkOptionMenu):
         command: Union[Callable[[str], Any], None] = None,
         dynamic_resizing: bool = True,
         anchor: str = "w",
+        text_anchor = "center",
         **kwargs
     ):
 
@@ -87,14 +119,21 @@ class CustomDropdown(ctkOptionMenu):
         )
 
         self.image_label: ctkLabel
+
+        self.grid_configure(ipadx=5)
+        self._text_label.configure(anchor=text_anchor)
         self.set_dropdown_icon(dropdown_icon)
 
     def set_dropdown_icon(self, image: ctkImage, right_distance: int = 5):
-        self.image_label = ctkLabel(self, text="", image=image)
-        self._canvas.delete("dropdown_arrow")
+        self.image_label = ctkLabel(
+            self,
+            text="",
+            image=image,
+        )
 
+        self._canvas.delete("dropdown_arrow")
         color = self._canvas.itemcget("inner_parts_right", "fill")
-        self.image_label.configure(fg_color=color, bg_color=color)
+        self.image_label.configure(fg_color=color)
 
         grid_info = self._text_label.grid_info()
         grid_info["padx"], grid_info["sticky"] = right_distance, "e"
@@ -106,28 +145,27 @@ class CustomDropdown(ctkOptionMenu):
 
     def _on_enter(self, event):
         super()._on_enter(event)
-        if self.image_label:
-            color = self._apply_appearance_mode(self._button_hover_color)
-            self.image_label.configure(fg_color=color, bg_color=color)
+        color = self._apply_appearance_mode(self._button_hover_color)
+        self.image_label.configure(fg_color=color, bg_color=color)
 
     def _on_leave(self, event):
         super()._on_leave(event)
-        if self.image_label:
+        color = self._apply_appearance_mode(self._button_color)
+        self.image_label.configure(fg_color=color, bg_color=color)
+
+    def configure(self, **kwargs):
+        super().configure(**kwargs)
+        try:
             color = self._apply_appearance_mode(self._button_color)
             self.image_label.configure(fg_color=color, bg_color=color)
-
+        except AttributeError:
+            pass
 
 class CustomScrollFrame(ctkScrollFrame):
     def __init__(self, app, master, **kwargs) -> None:
         super().__init__(master, **kwargs)
         self.app = app
         self.bind("<Configure>", self._on_frame_configure)
-    
-    def _on_frame_configure(self, event) -> None:
-        self.update_idletasks()
-        self._fit_frame_dimensions_to_canvas(event)
-        self._parent_canvas.configure(scrollregion=self._parent_canvas.bbox("all"))
-        self.update_scrollbar_visibility()
 
     def update_scrollbar_visibility(self) -> None:
         self.update_idletasks()
@@ -136,6 +174,12 @@ class CustomScrollFrame(ctkScrollFrame):
             self._scrollbar.grid()
         else:
             self._scrollbar.grid_remove()
+
+    def _on_frame_configure(self, event) -> None:
+        self.update_idletasks()
+        self._fit_frame_dimensions_to_canvas(event)
+        self._parent_canvas.configure(scrollregion=self._parent_canvas.bbox("all"))
+        self.update_scrollbar_visibility()
 
     def _calculate_heights(self) -> tuple[int, int]:
         total_padding = 0
