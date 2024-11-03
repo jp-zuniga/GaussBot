@@ -5,17 +5,20 @@ mostrar diferentes tipos de mensajes al usuario.
 
 from os import path
 from typing import (
+    TYPE_CHECKING,
     Any,
     Callable,
+    Literal,
     Optional,
-    Union
+    Union,
 )
 
-from PIL.Image import open as open_img
 from tkinter import (
     Variable,
     NORMAL
 )
+
+from PIL.Image import open as open_img
 
 from customtkinter import (
     CTkEntry as ctkEntry,
@@ -32,6 +35,9 @@ from gauss_bot import (
     dropdown_icon
 )
 
+if TYPE_CHECKING:
+    from gauss_bot.gui.gui import GaussUI
+
 
 class CustomEntry(ctkEntry):
     def __init__(
@@ -44,7 +50,7 @@ class CustomEntry(ctkEntry):
         fg_color: Optional[Union[str, tuple[str, str]]] = None,
         text_color: Optional[Union[str, tuple[str, str]]] = None,
         font: Optional[Union[tuple, ctkFont]] = None,
-        justify: str = "center", 
+        justify: str = "center",
         **kwargs
     ):
 
@@ -119,9 +125,9 @@ class CustomDropdown(ctkOptionMenu):
         )
 
         self.image_label: ctkLabel
+        self._text_label.configure(anchor=text_anchor)
 
         self.grid_configure(ipadx=5)
-        self._text_label.configure(anchor=text_anchor)
         self.set_dropdown_icon(dropdown_icon)
 
     def set_dropdown_icon(self, image: ctkImage, right_distance: int = 5):
@@ -143,6 +149,14 @@ class CustomDropdown(ctkOptionMenu):
         self.image_label.bind("<Enter>", self._on_enter)
         self.image_label.bind("<Leave>", self._on_leave)
 
+    def configure(self, **kwargs):
+        super().configure(**kwargs)
+        try:
+            color = self._apply_appearance_mode(self._button_color)
+            self.image_label.configure(fg_color=color, bg_color=color)
+        except AttributeError:
+            pass
+
     def _on_enter(self, event):
         super()._on_enter(event)
         color = self._apply_appearance_mode(self._button_hover_color)
@@ -153,17 +167,52 @@ class CustomDropdown(ctkOptionMenu):
         color = self._apply_appearance_mode(self._button_color)
         self.image_label.configure(fg_color=color, bg_color=color)
 
-    def configure(self, **kwargs):
-        super().configure(**kwargs)
-        try:
-            color = self._apply_appearance_mode(self._button_color)
-            self.image_label.configure(fg_color=color, bg_color=color)
-        except AttributeError:
-            pass
 
 class CustomScrollFrame(ctkScrollFrame):
-    def __init__(self, app, master, **kwargs) -> None:
-        super().__init__(master, **kwargs)
+    def __init__(
+        self,
+        app: "GaussUI",
+        master: Any,
+        width: int = 200,
+        height: int = 200,
+        corner_radius: Optional[Union[int, str]] = None,
+        border_width: Optional[Union[int, str]] = None,
+        bg_color: Union[str, tuple[str, str]] = "transparent",
+        fg_color: Optional[Union[str, tuple[str, str]]] = None,
+        border_color: Optional[Union[str, tuple[str, str]]] = None,
+        scrollbar_fg_color: Optional[Union[str, tuple[str, str]]] = None,
+        scrollbar_button_color: Optional[Union[str, tuple[str, str]]] = None,
+        scrollbar_button_hover_color: Optional[Union[str, tuple[str, str]]] = None,
+        label_fg_color: Optional[Union[str, tuple[str, str]]] = None,
+        label_text_color: Optional[Union[str, tuple[str, str]]] = None,
+        label_text: str = "",
+        label_font: Optional[Union[tuple, ctkFont]] = None,
+        label_anchor: str = "center",
+        orientation: Literal["vertical", "horizontal"] = "vertical",
+        **kwargs
+    ):
+
+        super().__init__(
+            master,
+            width,
+            height,
+            corner_radius,
+            border_width,
+            bg_color,
+            fg_color,
+            border_color,
+            scrollbar_fg_color,
+            scrollbar_button_color,
+            scrollbar_button_hover_color,
+            label_fg_color,
+            label_text_color,
+            label_text,
+            label_font,
+            label_anchor,
+            orientation,
+            **kwargs
+        )
+
         self.app = app
         self.bind("<Configure>", self._on_frame_configure)
 
@@ -252,9 +301,14 @@ class ResultadoFrame(ctkFrame):
     Frame personalizado para mostrar resultados de operaciones.
     """
 
-    def __init__(self, parent: Union[ctkFrame, CustomScrollFrame],
-                 header: str, resultado: str, solo_header=False,
-                 border_color="#18c026") -> None:
+    def __init__(
+        self,
+        parent: Union[ctkFrame, CustomScrollFrame],
+        header: str,
+        resultado: str,
+        solo_header: bool =False,
+        border_color: str = "#18c026",
+    ) -> None:
 
         super().__init__(parent, corner_radius=8, border_width=2, border_color=border_color)
 

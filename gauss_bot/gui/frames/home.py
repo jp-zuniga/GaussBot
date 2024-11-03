@@ -2,6 +2,8 @@
 Home frame de la interfaz.
 """
 
+from typing import TYPE_CHECKING
+
 from customtkinter import (
     CTkButton as ctkButton,
     CTkFont as ctkFont,
@@ -9,9 +11,12 @@ from customtkinter import (
     CTkLabel as ctkLabel,
 )
 
+if TYPE_CHECKING:
+    from gauss_bot.gui.gui import GaussUI
+
 
 class HomeFrame(ctkFrame):
-    def __init__(self, master, app) -> None:
+    def __init__(self, app: "GaussUI", master: "GaussUI") -> None:
         super().__init__(master, corner_radius=0)
         self.app = app
         self.rowconfigure(0, weight=1)
@@ -71,13 +76,13 @@ class HomeFrame(ctkFrame):
         mostrar_vectores.grid(row=2, column=1, padx=20, pady=(10, 20), sticky="nw")
     
     def ir_a_matriz(self, mostrar: bool):
-        self.app.nav_frame.seleccionar_frame("inputs")
-        self.app.inputs_frame.tabview.set("Matrices")
+        self.app.nav_frame.seleccionar_frame("inputs")  # type: ignore
+        self.app.inputs_frame.tabview.set("Matrices")  # type: ignore
         if mostrar:
-            self.app.inputs_frame.instances[0].tabview.set("Mostrar")
+            self.app.inputs_frame.instances[0].tabview.set("Mostrar")  # type: ignore
     
     def ir_a_vector(self, mostrar: bool):
-        self.app.nav_frame.seleccionar_frame("inputs")
-        self.app.inputs_frame.tabview.set("Vectores")
+        self.app.nav_frame.seleccionar_frame("inputs")  # type: ignore
+        self.app.inputs_frame.tabview.set("Vectores")  # type: ignore
         if mostrar:
-            self.app.inputs_frame.instances[1].tabview.set("Mostrar")
+            self.app.inputs_frame.instances[1].tabview.set("Mostrar")  # type: ignore

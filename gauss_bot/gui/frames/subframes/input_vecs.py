@@ -1,7 +1,5 @@
 """
-Implementación de ManejarVecs y sus subframes,
-que se encargan de manejar los inputs de vectores:
-agregar, mostrar, editar y eliminar.
+Implementación de los subframes de ManejarVecs.
 """
 
 from fractions import Fraction
@@ -30,87 +28,12 @@ from gauss_bot.gui.custom_frames import (
     CustomScrollFrame,
     ErrorFrame,
     SuccessFrame,
-    ResultadoFrame
+    ResultadoFrame,
 )
 
 if TYPE_CHECKING:
+    from gauss_bot.gui.gui import GaussUI
     from gauss_bot.gui.frames.inputs import ManejarVecs
-
-
-class MostrarVecs(CustomScrollFrame):
-    """
-    Frame para mostrar todos los vectores ingresados por el usuario.
-    """
-
-    def __init__(self, master_frame: "ManejarVecs", master_tab,
-                 app, vecs_manager: VectoresManager) -> None:
-
-        super().__init__(app, master_tab, corner_radius=0, fg_color="transparent")
-        self.app = app
-        self.master_frame = master_frame
-        self.vecs_manager = vecs_manager
-        self.columnconfigure(0, weight=1)
-
-        self.options: dict[str, int] = {
-            "Mostrar todos": -1,
-            "Vectores ingresados": 0,
-            "Vectores calculados": 1
-        }
-
-        select_label = ctkLabel(self, text="Seleccione un filtro:")
-        self.select_option = CustomDropdown(
-            self,
-            height=30,
-            values=list(self.options.keys()),
-            command=self.update_option,
-        )
-
-        self.option_seleccionada = self.options[self.select_option.get()]
-        mostrar_button = ctkButton(
-            self, height=30, text="Mostrar", command=self.setup_mostrar
-        )
-
-        self.mostrar_frame = ctkFrame(self)
-        self.print_frame: Optional[Union[ErrorFrame, ResultadoFrame]] = None
-
-        select_label.grid(row=0, column=0, padx=5, pady=5, sticky="n")
-        self.select_option.grid(row=1, column=0, ipadx=10, padx=5, pady=5, sticky="n")
-        mostrar_button.grid(row=2, column=0, padx=5, pady=5, sticky="n")
-        self.mostrar_frame.grid(row=3, column=0, padx=5, pady=5, sticky="n")
-        self.update_scrollbar_visibility()
-
-    def setup_mostrar(self) -> None:
-        self.update_option(self.select_option.get())
-        calculado = self.option_seleccionada
-        vecs_text: str = self.vecs_manager.get_vectores(calculado)
-
-        if self.print_frame is not None:
-            self.print_frame.destroy()
-            self.print_frame = None
-
-        if vecs_text.startswith("No"):
-            self.print_frame = ErrorFrame(self.mostrar_frame, vecs_text)
-            self.print_frame.grid(row=0, column=0, padx=10, pady=10, sticky="n")
-        else:
-            self.print_frame = ResultadoFrame(
-                self.mostrar_frame, header=vecs_text, resultado="", solo_header=True
-            )
-            self.print_frame.grid(
-                row=0, column=0,
-                padx=10, pady=10, sticky="n",
-            )
-            self.print_frame.header.grid(ipadx=10, ipady=10)
-        self.print_frame.columnconfigure(0, weight=1)
-        self.update_scrollbar_visibility()
-
-    def update_frame(self) -> None:
-        for widget in self.mostrar_frame.winfo_children():
-            widget.destroy()  # type: ignore
-        self.update_idletasks()
-        self.update_scrollbar_visibility()
-
-    def update_option(self, valor: str) -> None:
-        self.option_seleccionada = self.options[valor]
 
 
 class AgregarVecs(CustomScrollFrame):
@@ -119,8 +42,13 @@ class AgregarVecs(CustomScrollFrame):
     ingresando datos manualmente o generándolos aleatoriamente.
     """
 
-    def __init__(self, master_frame: "ManejarVecs", master_tab,
-                 app, vecs_manager: VectoresManager) -> None:
+    def __init__(
+        self,
+        app: "GaussUI",
+        master_tab: ctkFrame,
+        master_frame: "ManejarVecs",
+        vecs_manager: VectoresManager
+    ) -> None:
 
         super().__init__(app, master_tab, corner_radius=0, fg_color="transparent")
         self.master_frame = master_frame
@@ -324,9 +252,9 @@ class AgregarVecs(CustomScrollFrame):
         self.mensaje_frame = SuccessFrame(self, "El vector se ha agregado exitosamente!")
         self.mensaje_frame.grid(row=6, column=0, columnspan=2, padx=5, pady=5, sticky="n")
         self.update_scrollbar_visibility()
-        self.master_frame.update_frame()
-        self.app.vectores.update_all()
-        self.app.matrices.update_all()
+        self.master_frame.update_all()
+        self.app.vectores.update_all()  # type: ignore
+        self.app.matrices.update_all()  # type: ignore
 
     def dimensiones_move_down(self) -> None:
         if len(self.vector_frame.winfo_children()) != 0:
@@ -355,9 +283,95 @@ class AgregarVecs(CustomScrollFrame):
         self.update_idletasks()
 
 
+class MostrarVecs(CustomScrollFrame):
+    """
+    Frame para mostrar todos los vectores ingresados por el usuario.
+    """
+
+    def __init__(
+        self,
+        app: "GaussUI",
+        master_tab: ctkFrame,
+        master_frame: "ManejarVecs",
+        vecs_manager: VectoresManager
+    ) -> None:
+
+        super().__init__(app, master_tab, corner_radius=0, fg_color="transparent")
+        self.app = app
+        self.master_frame = master_frame
+        self.vecs_manager = vecs_manager
+        self.columnconfigure(0, weight=1)
+
+        self.options: dict[str, int] = {
+            "Mostrar todos": -1,
+            "Vectores ingresados": 0,
+            "Vectores calculados": 1
+        }
+
+        select_label = ctkLabel(self, text="Seleccione un filtro:")
+        self.select_option = CustomDropdown(
+            self,
+            height=30,
+            values=list(self.options.keys()),
+            command=self.update_option,
+        )
+
+        self.option_seleccionada = self.options[self.select_option.get()]
+        mostrar_button = ctkButton(
+            self, height=30, text="Mostrar", command=self.setup_mostrar
+        )
+
+        self.mostrar_frame = ctkFrame(self)
+        self.print_frame: Optional[Union[ErrorFrame, ResultadoFrame]] = None
+
+        select_label.grid(row=0, column=0, padx=5, pady=5, sticky="n")
+        self.select_option.grid(row=1, column=0, ipadx=10, padx=5, pady=5, sticky="n")
+        mostrar_button.grid(row=2, column=0, padx=5, pady=5, sticky="n")
+        self.mostrar_frame.grid(row=3, column=0, padx=5, pady=5, sticky="n")
+        self.update_scrollbar_visibility()
+
+    def setup_mostrar(self) -> None:
+        self.update_option(self.select_option.get())
+        calculado = self.option_seleccionada
+        vecs_text: str = self.vecs_manager.get_vectores(calculado)
+
+        if self.print_frame is not None:
+            self.print_frame.destroy()
+            self.print_frame = None
+
+        if vecs_text.startswith("No"):
+            self.print_frame = ErrorFrame(self.mostrar_frame, vecs_text)
+            self.print_frame.grid(row=0, column=0, padx=10, pady=10, sticky="n")
+        else:
+            self.print_frame = ResultadoFrame(
+                self.mostrar_frame, header=vecs_text, resultado="", solo_header=True
+            )
+            self.print_frame.grid(
+                row=0, column=0,
+                padx=10, pady=10, sticky="n",
+            )
+            self.print_frame.header.grid(ipadx=10, ipady=10)
+        self.print_frame.columnconfigure(0, weight=1)
+        self.update_scrollbar_visibility()
+
+    def update_frame(self) -> None:
+        for widget in self.mostrar_frame.winfo_children():
+            widget.destroy()  # type: ignore
+        self.update_idletasks()
+        self.update_scrollbar_visibility()
+
+    def update_option(self, valor: str) -> None:
+        self.option_seleccionada = self.options[valor]
+
+
 class EliminarVecs(CustomScrollFrame):
-    def __init__(self, master_frame: "ManejarVecs", master_tab,
-                 app, vecs_manager: VectoresManager) -> None:
+    def __init__(
+        self,
+        app: "GaussUI",
+        master_tab: ctkFrame,
+        master_frame: "ManejarVecs",
+        vecs_manager: VectoresManager
+    ) -> None:
 
         super().__init__(app, master_tab, corner_radius=0, fg_color="transparent")
         self.app = app
@@ -423,9 +437,9 @@ class EliminarVecs(CustomScrollFrame):
         )
         self.mensaje_frame.grid(row=3, column=0, padx=5, pady=5)
         self.update_scrollbar_visibility()
-        self.master_frame.update_frame()
-        self.app.matrices.update_all()
-        self.app.vectores.update_all()
+        self.master_frame.update_all()
+        self.app.matrices.update_all()  # type: ignore
+        self.app.vectores.update_all()  # type: ignore
 
     def update_frame(self) -> None:
         self.nombres_vectores = list(self.vecs_manager.vecs_ingresados.keys())

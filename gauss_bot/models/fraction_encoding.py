@@ -11,6 +11,7 @@ from json import (
 
 from typing import Any, Union
 
+
 class FractionEncoder(JSONEncoder):
     """
     JSONEncoder subclass para escribir objetos Fraction()

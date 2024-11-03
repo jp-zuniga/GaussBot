@@ -4,8 +4,10 @@ la barra de navegación de la aplicación.
 """
 
 from os import path
+from typing import TYPE_CHECKING
 
 from PIL.Image import open as open_img
+
 from customtkinter import (
     CTkButton as ctkButton,
     CTkFont as ctkFont,
@@ -16,6 +18,9 @@ from customtkinter import (
 
 from gauss_bot import ASSET_PATH
 
+if TYPE_CHECKING:
+    from gauss_bot.gui.gui import GaussUI
+
 
 class NavFrame(ctkFrame):
     """
@@ -23,7 +28,7 @@ class NavFrame(ctkFrame):
     para navegar entre los distintos frames de la aplicación.
     """
 
-    def __init__(self, master, app) -> None:
+    def __init__(self, app: "GaussUI", master: "GaussUI") -> None:
         super().__init__(master, corner_radius=0)
         self.app = app
 
@@ -147,12 +152,12 @@ class NavFrame(ctkFrame):
         self.quit_button.grid(row=8, column=0, columnspan=2, padx=10, pady=(0, 10), sticky="ew")
 
         self.frames = {
-            "home": self.app.home_frame,
-            "inputs": self.app.inputs_frame,
-            "ecuaciones": self.app.ecuaciones,
-            "matrices": self.app.matrices,
-            "vectores": self.app.vectores,
-            "config": self.app.config_frame
+            "home": self.app.home_frame,  # type: ignore
+            "inputs": self.app.inputs_frame,  # type: ignore
+            "ecuaciones": self.app.ecuaciones,  # type: ignore
+            "matrices": self.app.matrices,  # type: ignore
+            "vectores": self.app.vectores,  # type: ignore
+            "config": self.app.config_frame  # type: ignore
         }
 
         self.buttons = {
@@ -202,7 +207,7 @@ class NavFrame(ctkFrame):
         self.seleccionar_frame("config")
 
     def quit_event(self) -> None:
-        self.app.ops_manager.save_matrices()
-        self.app.ops_manager.save_vectores()
+        self.app.ops_manager.save_matrices()  # type: ignore
+        self.app.ops_manager.save_vectores()  # type: ignore
         self.app.save_config()
         self.app.quit()

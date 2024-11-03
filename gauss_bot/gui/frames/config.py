@@ -4,7 +4,11 @@ y editar las configuraciones de la aplicación.
 """
 
 from os import path
-from typing import Optional, Union
+from typing import (
+    TYPE_CHECKING,
+    Optional,
+    Union,
+)
 
 from tkinter import StringVar
 from customtkinter import (
@@ -21,13 +25,16 @@ from gauss_bot.gui.custom_frames import (
     SuccessFrame,
 )
 
+if TYPE_CHECKING:
+    from gauss_bot.gui.gui import GaussUI
+
 
 class ConfigFrame(ctkFrame):
     """
     Frame personalizado para mostrar y editar la configuración.
     """
 
-    def __init__(self, master, app) -> None:
+    def __init__(self, app: "GaussUI", master: "GaussUI") -> None:
         super().__init__(master, corner_radius=0, fg_color="transparent")
         self.app = app
         self.mensaje_frame: Optional[SuccessFrame] = None
@@ -125,9 +132,10 @@ class ConfigFrame(ctkFrame):
 
         self.app.escala_actual = self.escalas_dict[escala_seleccionada]
         set_widget_scaling(self.app.escala_actual)
-        self.app.inputs_frame.update_frame()
-        self.app.matrices.update_all()
-        self.app.vectores.update_all()
+        self.app.inputs_frame.update_all()  # type: ignore
+        self.app.ecuaciones.update_all()  # type: ignore
+        self.app.matrices.update_all()  # type: ignore
+        self.app.vectores.update_all()  # type: ignore
         self.app.update_idletasks()
 
     def cambiar_modo(self, modo_seleccionado: str) -> None:
@@ -141,10 +149,11 @@ class ConfigFrame(ctkFrame):
         self.app.modo_actual = self.modos_dict[modo_seleccionado]
         set_appearance_mode(self.app.modo_actual)
         self.app.set_icon(self.app.modo_actual)
-        self.app.inputs_frame.update_all()
-        self.app.matrices.update_all()
-        self.app.vectores.update_all()
-        self.app.config_frame.update_frame()
+        self.app.inputs_frame.update_all()  # type: ignore
+        self.app.ecuaciones.update_all()  # type: ignore
+        self.app.matrices.update_all()  # type: ignore
+        self.app.vectores.update_all()  # type: ignore
+        self.app.config_frame.update_frame()  # type: ignore
         self.app.update_idletasks()
 
     def cambiar_tema(self, tema_seleccionado: str) -> None:
@@ -158,7 +167,7 @@ class ConfigFrame(ctkFrame):
         self.app.tema_actual = self.temas_dict[tema_seleccionado]
         self.mensaje_frame = SuccessFrame(
             self,
-            message="Tema cambiado exitosamente! " +
+            message="Tema cambiado exitosamente!\n" +
                     "Cambios tomarán efecto al reiniciar la aplicación."
         )
         self.mensaje_frame.grid(row=3, column=1, pady=30)

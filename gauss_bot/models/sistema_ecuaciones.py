@@ -1,7 +1,7 @@
 """
 Implementación de un sistema de ecuaciones lineales con una matriz aumentada.
 Se pueden resolver sistemas de ecuaciones lineales con
-la Regla de Cramer y el método de Gauss-Jordan.
+la Regla de Cramer y el método Gauss-Jordan.
 """
 
 from fractions import Fraction

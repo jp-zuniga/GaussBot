@@ -50,6 +50,7 @@ class GaussUI(ctk):
         self.mats_manager = self.ops_manager.mats_manager
         self.vecs_manager = self.ops_manager.vecs_manager
 
+        self.home_frame = HomeFrame(master=self, app=self)
         self.inputs_frame = InputsFrame(
             master=self,
             app=self,
@@ -57,10 +58,24 @@ class GaussUI(ctk):
             vecs_manager=self.vecs_manager,
         )
 
-        self.home_frame = HomeFrame(master=self, app=self)
-        self.matrices = MatricesFrame(master=self, app=self, mats_manager=self.mats_manager)
-        self.vectores = VectoresFrame(master=self, app=self, vecs_manager=self.vecs_manager)
-        self.ecuaciones = EcuacionesFrame(master=self, app=self, mats_manager=self.mats_manager)
+
+        self.matrices = MatricesFrame(
+            master=self,
+            app=self,
+            mats_manager=self.mats_manager,
+            vecs_manager=self.vecs_manager,
+        )
+
+        self.vectores = VectoresFrame(
+            master=self,
+            app=self,
+            vecs_manager=self.vecs_manager,
+            mats_manager=self.mats_manager,
+        )
+
+        self.ecuaciones = EcuacionesFrame(
+            master=self, app=self, mats_manager=self.mats_manager
+        )
         self.config_frame = ConfigFrame(master=self, app=self)
         self.nav_frame = NavFrame(master=self, app=self)
         self.nav_frame.seleccionar_frame("home")

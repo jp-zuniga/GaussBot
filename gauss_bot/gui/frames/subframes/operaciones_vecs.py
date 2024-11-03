@@ -24,10 +24,11 @@ from gauss_bot.gui.custom_frames import (
     CustomDropdown,
     CustomScrollFrame,
     ErrorFrame,
-    ResultadoFrame
+    ResultadoFrame,
 )
 
 if TYPE_CHECKING:
+    from gauss_bot.gui.gui import GaussUI
     from gauss_bot.gui.frames.vectores import VectoresFrame
 
 
@@ -36,8 +37,13 @@ class SumaRestaTab(CustomScrollFrame):
     Frame para sumar y restar vectores ingresados por el usuario.
     """
 
-    def __init__(self, master_frame: "VectoresFrame", master_tab,
-                 app, vecs_manager: VectoresManager) -> None:
+    def __init__(
+        self,
+        app: "GaussUI",
+        master_tab: ctkFrame,
+        master_frame: "VectoresFrame",
+        vecs_manager: VectoresManager
+    ) -> None:
 
         super().__init__(app, master_tab, corner_radius=0, fg_color="transparent")
         self.master_frame = master_frame
@@ -57,7 +63,7 @@ class SumaRestaTab(CustomScrollFrame):
         self.vec2 = ""
 
         self.tabview = ctkTabview(self)
-        self.tabview.grid(row=0, column=0, sticky="n")
+        self.tabview.pack(expand=True, fill="both")
 
         self.tab_sumar = self.tabview.add("Sumar")
         self.tab_restar = self.tabview.add("Restar")
@@ -235,8 +241,13 @@ class MultiplicacionTab(CustomScrollFrame):
     producto punto y producto matriz-vector.
     """
 
-    def __init__(self, master_frame: "VectoresFrame", master_tab,
-                 app, vecs_manager: VectoresManager) -> None:
+    def __init__(
+        self,
+        app: "GaussUI",
+        master_tab: ctkFrame,
+        master_frame: "VectoresFrame",
+        vecs_manager: VectoresManager
+    ) -> None:
 
         super().__init__(app, master_tab, corner_radius=0, fg_color="transparent")
         self.master_frame = master_frame
@@ -261,7 +272,7 @@ class MultiplicacionTab(CustomScrollFrame):
         self.mvec = ""
 
         self.tabview = ctkTabview(self)
-        self.tabview.grid(row=0, column=0, sticky="n")
+        self.tabview.pack(expand=True, fill="both")
 
         self.tab_escalar = self.tabview.add("Escalar por Vector")
         self.tab_vector = self.tabview.add("Producto Punto")
@@ -568,7 +579,7 @@ class MultiplicacionTab(CustomScrollFrame):
             self.mensaje_frame = None
 
         try:
-            header, resultado = self.app.ops_manager.matriz_por_vector(
+            header, resultado = self.app.ops_manager.matriz_por_vector(  # type: ignore
                 nombre_mat, nombre_vec
             )
         except ArithmeticError as e:

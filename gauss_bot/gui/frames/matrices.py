@@ -3,7 +3,10 @@ Implementación de MatricesFrame, el parent frame
 de todos los subframes relacionados con matrices.
 """
 
-from typing import Union
+from typing import (
+    TYPE_CHECKING,
+    Union,
+)
 
 from customtkinter import (
     CTkFrame as ctkFrame,
@@ -11,6 +14,7 @@ from customtkinter import (
 )
 
 from gauss_bot.managers.mats_manager import MatricesManager
+from gauss_bot.managers.vecs_manager import VectoresManager
 
 from gauss_bot.gui.custom_frames import CustomScrollFrame
 
@@ -22,6 +26,9 @@ from gauss_bot.gui.frames.subframes.operaciones_mats import (
     InversaTab,
 )
 
+if TYPE_CHECKING:
+    from gauss_bot.gui.gui import GaussUI
+
 
 class MatricesFrame(ctkFrame):
     """
@@ -29,22 +36,24 @@ class MatricesFrame(ctkFrame):
     Contiene un tabview con todas las operaciones disponibles.
     """
 
-    def __init__(self, master, app, mats_manager: MatricesManager) -> None:
+    def __init__(
+        self,
+        app: "GaussUI",
+        master: "GaussUI",
+        mats_manager: MatricesManager,
+        vecs_manager: VectoresManager,
+    ) -> None:
+
         super().__init__(master, corner_radius=0, fg_color="transparent")
         self.app = app
         self.mats_manager = mats_manager
+        self.vecs_manager = vecs_manager
 
-        self.nombres_vectores = list(self.app.vecs_manager.vecs_ingresados.keys())
+        self.nombres_vectores = list(self.vecs_manager.vecs_ingresados.keys())
         self.nombres_matrices = [
             nombre
             for nombre, mat in self.mats_manager.mats_ingresadas.items()
             if not mat.aumentada
-        ]
-
-        self.nombres_sistemas = [
-            nombre
-            for nombre, mat in self.mats_manager.mats_ingresadas.items()
-            if mat.aumentada
         ]
 
         self.setup_tabview()
@@ -69,7 +78,7 @@ class MatricesFrame(ctkFrame):
         for nombre, cls in self.tabs:
             tab = self.tabview.add(nombre)
             tab_instance: Union[ctkFrame, CustomScrollFrame] = (
-                cls(self, tab, self.app, self.mats_manager)  # type: ignore
+                cls(self.app, tab, self, self.mats_manager)
             )
 
             tab_instance.pack(expand=True, fill="both")
@@ -86,27 +95,21 @@ class MatricesFrame(ctkFrame):
             for nombre, mat in sorted(self.mats_manager.mats_ingresadas.items())
         }
 
-        self.app.vecs_manager.vecs_ingresados = {
+        self.vecs_manager.vecs_ingresados = {
             nombre: vec
-            for nombre, vec in sorted(self.app.vecs_manager.vecs_ingresados.items())
+            for nombre, vec in sorted(self.vecs_manager.vecs_ingresados.items())
         }
 
-        self.nombres_vectores = list(self.app.vecs_manager.vecs_ingresados.keys())
+        self.nombres_vectores = list(self.vecs_manager.vecs_ingresados.keys())
         self.nombres_matrices = [
             nombre
             for nombre, mat in self.mats_manager.mats_ingresadas.items()
             if not mat.aumentada
         ]
 
-        self.nombres_sistemas = [
-            nombre
-            for nombre, mat in self.mats_manager.mats_ingresadas.items()
-            if mat.aumentada
-        ]
-
         for tab in self.instances:
             tab.update_frame()  # type: ignore
             for widget in tab.winfo_children():
                 widget.configure(bg_color="transparent")  # type: ignore
-        self.app.ecuaciones.update_frame()
+        self.app.ecuaciones.update_all()  # type: ignore
         self.update_idletasks()

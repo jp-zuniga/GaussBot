@@ -2,7 +2,10 @@
 Implementación de todos los frames relacionados con vectores.
 """
 
-from typing import Union
+from typing import (
+    TYPE_CHECKING,
+    Union,
+)
 
 from customtkinter import (
     CTkFrame as ctkFrame,
@@ -11,11 +14,15 @@ from customtkinter import (
 )
 
 from gauss_bot.managers.vecs_manager import VectoresManager
+from gauss_bot.managers.mats_manager import MatricesManager
 
 from gauss_bot.gui.frames.subframes.operaciones_vecs import (
     SumaRestaTab,
     MultiplicacionTab,
 )
+
+if TYPE_CHECKING:
+    from gauss_bot.gui.gui import GaussUI
 
 
 class VectoresFrame(ctkFrame):
@@ -25,20 +32,29 @@ class VectoresFrame(ctkFrame):
     una tiene su propia tab.
     """
 
-    def __init__(self, master, app, vecs_manager: VectoresManager) -> None:
+    def __init__(
+        self,
+        app: "GaussUI",
+        master: "GaussUI",
+        vecs_manager: VectoresManager,
+        mats_manager: MatricesManager,
+    ) -> None:
+
         super().__init__(master, corner_radius=0, fg_color="transparent")
         self.app = app
         self.vecs_manager = vecs_manager
+        self.mats_manager = mats_manager
+
         self.nombres_vectores = list(self.vecs_manager.vecs_ingresados.keys())
         self.nombres_matrices = [
             nombre
-            for nombre, mat in self.app.mats_manager.mats_ingresadas.items()
+            for nombre, mat in self.mats_manager.mats_ingresadas.items()
             if not mat.aumentada
         ]
 
-        self.crear_tabview()
+        self.setup_tabview()
 
-    def crear_tabview(self) -> None:
+    def setup_tabview(self) -> None:
         """
         Crea un ctkTabview con pestañas para cada funcionalidad.
         """
@@ -54,7 +70,7 @@ class VectoresFrame(ctkFrame):
 
         for nombre, cls in self.tabs:
             tab = self.tabview.add(nombre)
-            tab_instance = cls(self, tab, self.app, self.vecs_manager)
+            tab_instance = cls(self.app, tab, self, self.vecs_manager)
             tab_instance.pack(expand=True, fill="both")
             self.instances.append(tab_instance)  # type: ignore
 
@@ -64,19 +80,20 @@ class VectoresFrame(ctkFrame):
         """
 
         self.update_idletasks()
-        self.app.mats_manager.mats_ingresadas = {
+        self.mats_manager.mats_ingresadas = {
             nombre: mat
-            for nombre, mat in sorted(self.app.mats_manager.mats_ingresadas.items())
+            for nombre, mat in sorted(self.mats_manager.mats_ingresadas.items())
         }
-        self.app.vecs_manager.vecs_ingresados = {
+
+        self.vecs_manager.vecs_ingresados = {
             nombre: vec
-            for nombre, vec in sorted(self.app.vecs_manager.vecs_ingresados.items())
+            for nombre, vec in sorted(self.vecs_manager.vecs_ingresados.items())
         }
 
         self.nombres_vectores = list(self.vecs_manager.vecs_ingresados.keys())
         self.nombres_matrices = [
             nombre
-            for nombre, mat in self.app.mats_manager.mats_ingresadas.items()
+            for nombre, mat in self.mats_manager.mats_ingresadas.items()
             if not mat.aumentada
         ]
 

@@ -24,10 +24,11 @@ from gauss_bot.gui.custom_frames import (
     CustomDropdown,
     CustomScrollFrame,
     ErrorFrame,
-    ResultadoFrame
+    ResultadoFrame,
 )
 
 if TYPE_CHECKING:
+    from gauss_bot.gui.gui import GaussUI
     from gauss_bot.gui.frames.matrices import MatricesFrame
 
 
@@ -36,8 +37,13 @@ class SumaRestaTab(CustomScrollFrame):
     Frame para sumar y restar matrices.
     """
 
-    def __init__(self, master_frame: "MatricesFrame", master_tab,
-                 app, mats_manager: MatricesManager) -> None:
+    def __init__(
+        self,
+        app: "GaussUI",
+        master_tab: ctkFrame,
+        master_frame: "MatricesFrame",
+        mats_manager: MatricesManager
+    ) -> None:
 
         super().__init__(app, master_tab, corner_radius=0, fg_color="transparent")
         self.app = app
@@ -57,7 +63,7 @@ class SumaRestaTab(CustomScrollFrame):
         self.mat2 = ""
 
         self.tabview = ctkTabview(self)
-        self.tabview.grid(row=0, column=0, sticky="n")
+        self.tabview.pack(expand=True, fill="both")
 
         self.tab_sumar = self.tabview.add("Sumar")
         self.tab_restar = self.tabview.add("Restar")
@@ -235,8 +241,13 @@ class MultiplicacionTab(CustomScrollFrame):
     multiplicación matricial y producto matriz-vector.
     """
 
-    def __init__(self, master_frame: "MatricesFrame", master_tab,
-                 app, mats_manager: MatricesManager) -> None:
+    def __init__(
+        self,
+        app: "GaussUI",
+        master_tab: ctkFrame,
+        master_frame: "MatricesFrame",
+        mats_manager: MatricesManager
+    ) -> None:
 
         super().__init__(app, master_tab, corner_radius=0, fg_color="transparent")
         self.app = app
@@ -261,7 +272,7 @@ class MultiplicacionTab(CustomScrollFrame):
         self.mvec = ""
 
         self.tabview = ctkTabview(self)
-        self.tabview.grid(row=0, column=0, sticky="n")
+        self.tabview.pack(expand=True, fill="both")
 
         self.tab_escalar = self.tabview.add("Escalar por Matriz")
         self.tab_matriz = self.tabview.add("Multiplicación Matricial")
@@ -568,7 +579,7 @@ class MultiplicacionTab(CustomScrollFrame):
             self.mensaje_frame = None
 
         try:
-            header, resultado = self.app.ops_manager.matriz_por_vector(nombre_mat, nombre_vec)
+            header, resultado = self.app.ops_manager.matriz_por_vector(nombre_mat, nombre_vec)  # type: ignore
         except ArithmeticError as e:
             self.mensaje_frame = ErrorFrame(self.resultado_mat_vec, str(e))
             self.mensaje_frame.grid(row=0, column=0, padx=5, pady=5)
@@ -621,8 +632,13 @@ class TransposicionTab(CustomScrollFrame):
     Frame para transponer una matriz.
     """
 
-    def __init__(self, master_frame: "MatricesFrame", master_tab,
-                 app, mats_manager: MatricesManager) -> None:
+    def __init__(
+        self,
+        app: "GaussUI",
+        master_tab: ctkFrame,
+        master_frame: "MatricesFrame",
+        mats_manager: MatricesManager
+    ) -> None:
 
         super().__init__(app, master_tab, corner_radius=0, fg_color="transparent")
         self.app = app
@@ -684,9 +700,9 @@ class TransposicionTab(CustomScrollFrame):
         nombre_transpuesta, transpuesta = self.mats_manager.transponer_matriz(nombre_tmat)
         if not any(transpuesta == mat for mat in self.mats_manager.mats_ingresadas.values()):
             self.mats_manager.mats_ingresadas[nombre_transpuesta] = transpuesta
-            self.app.inputs_frame.instances[0].update_frame()
+            self.app.inputs_frame.instances[0].update_frame()  # type: ignore
             self.master_frame.update_all()
-            self.app.vectores.update_all()
+            self.app.vectores.update_all()  # type: ignore
 
         self.mensaje_frame = ResultadoFrame(
             self.resultado, header=f"{nombre_transpuesta}:", resultado=str(transpuesta)
@@ -729,8 +745,13 @@ class DeterminanteTab(CustomScrollFrame):
     Frame para calcular el determinante de una matriz.
     """
 
-    def __init__(self, master_frame: "MatricesFrame", master_tab,
-                 app, mats_manager: MatricesManager) -> None:
+    def __init__(
+        self,
+        app: "GaussUI",
+        master_tab: ctkFrame,
+        master_frame: "MatricesFrame",
+        mats_manager: MatricesManager
+    ) -> None:
 
         super().__init__(app, master_tab, corner_radius=0, fg_color="transparent")
         self.app = app
@@ -846,8 +867,13 @@ class InversaTab(CustomScrollFrame):
     Frame para encontrar la inversa de una matriz.
     """
 
-    def __init__(self, master_frame: "MatricesFrame", master_tab,
-                 app, mats_manager: MatricesManager) -> None:
+    def __init__(
+        self,
+        app: "GaussUI",
+        master_tab: ctkFrame,
+        master_frame: "MatricesFrame",
+        mats_manager: MatricesManager
+    ) -> None:
 
         super().__init__(app, master_tab, corner_radius=0, fg_color="transparent")
         self.app = app
@@ -911,9 +937,9 @@ class InversaTab(CustomScrollFrame):
 
         if not any(inversa == mat for mat in self.mats_manager.mats_ingresadas.values()):
             self.mats_manager.mats_ingresadas[nombre_inversa] = inversa
-            self.app.inputs_frame.instances[0].update_frame()
+            self.app.inputs_frame.instances[0].update_frame()  # type: ignore
             self.master_frame.update_all()
-            self.app.vectores.update_all()
+            self.app.vectores.update_all()  # type: ignore
 
         self.mensaje_frame = ResultadoFrame(
             self.resultado,
