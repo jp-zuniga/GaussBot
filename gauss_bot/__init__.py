@@ -1,4 +1,7 @@
-from os import path
+from os import (
+    path,
+    walk
+)
 
 from PIL.Image import open as open_img
 from customtkinter import CTkImage as ctkImage
@@ -16,8 +19,7 @@ THEMES_PATH = path.join(
 
 CONFIG_PATH = path.join(
     path.dirname(path.realpath(__file__)),
-    "data",
-    "config.json",
+    "data", "config.json",
 )
 
 MATRICES_PATH = path.join(
@@ -30,6 +32,19 @@ VECTORES_PATH = path.join(
     "data", "vectores.json"
 )
 
-dropdown_icon = ctkImage(
+DROPDOWN_ARROW = ctkImage(
     open_img(path.join(ASSET_PATH, "dropdown_icon.png"))
 )
+
+FUNCTIONS: dict[str, ctkImage] = {
+    name.strip(".png"): ctkImage(
+        dark_image=open_img(path.join(ASSET_PATH, f"functions/light_{name}")),
+        light_image=open_img(path.join(ASSET_PATH, f"functions/dark_{name}")),
+        size=open_img(path.join(ASSET_PATH, f"functions/dark_{name}")).size
+    ) for name in set([
+        name.split("_")[1]
+        for _, _, files in walk(path.join(ASSET_PATH, "functions"))
+        for name in files
+        if name.count("f(x)") == 0
+    ])
+}
