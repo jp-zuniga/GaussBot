@@ -31,7 +31,7 @@ from customtkinter import (
 from gauss_bot import (
     ASSET_PATH,
     DROPDOWN_ARROW,
-    FUNCTIONS
+    FUNCTIONS,
 )
 
 if TYPE_CHECKING:
@@ -73,13 +73,15 @@ class CustomImageDropdown(ctkButton):
         self,
         master: Any,
         button_text: str,
+        width=80,
+        height=30,
         **kwargs,
     ) -> None:
 
         super().__init__(
             master,
-            width=100,
-            height=30,
+            width,
+            height,
             text=button_text,
             image=DROPDOWN_ARROW,
             command=self._show_menu,
@@ -93,19 +95,20 @@ class CustomImageDropdown(ctkButton):
         }
 
     def _show_menu(self):
-        self.options_window = ctkTop(self)
+        self.options_window = ctkTop(self, width=self._current_width)
         self.options_window.overrideredirect(True)
         self.options_window.attributes("-topmost", True)
-        for img in self.images.values():
+        for image in self.images.values():
             ctkButton(
                 self.options_window,
-                width=100,
+                width=self._current_width,
                 height=30,
+                corner_radius=0,
+                image=image,
                 text="",
-                image=img,
                 fg_color="transparent",
-                command=lambda: self._on_select(img),
-            ).pack(fill="both", padx=5, pady=5)
+                command=lambda img=image: self._on_select(img),
+            ).pack(fill="both")
         x = self.winfo_rootx()
         y = self.winfo_rooty() + self.winfo_height()
         self.options_window.geometry(f"+{x}+{y}")

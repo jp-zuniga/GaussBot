@@ -14,8 +14,12 @@ from matplotlib.pyplot import (
     text,
 )
 
-from typing import TYPE_CHECKING
+from typing import (
+    TYPE_CHECKING,
+    Optional,
+)
 
+from os import path
 from PIL.Image import (
     LANCZOS,
     open as open_img,
@@ -29,6 +33,7 @@ from customtkinter import (
     CTkLabel as ctkLabel,
 )
 
+from gauss_bot import ASSET_PATH
 from gauss_bot.gui.custom_frames import (
     CustomImageDropdown,
     CustomScrollFrame,
@@ -52,24 +57,33 @@ class RaicesFrame(CustomScrollFrame):
         self.app = app
         self.master_frame = master_frame
         self.columnconfigure(0, weight=1)
-        self.columnconfigure(1, weight=1)
+        self.columnconfigure(2, weight=1)
 
+        check_icon = ctkImage(open_img(path.join(ASSET_PATH, "check_icon.png")))
         terminos_label = ctkLabel(self, text="¿Cuántos términos tendrá la función?")
+
         self.terminos_entry = ctkEntry(self, width=60, placeholder_text="3")
         ingresar_button = ctkButton(
-            self, text="Ingresar términos", command=self.setup_terminos_frame
+            self,
+            width=28,
+            height=28,
+            image=check_icon,
+            fg_color="transparent",
+            bg_color="transparent",
+            text="",
+            command=self.setup_terminos_frame,
         )
 
-        self.terminos_entry.bind("<Return>", lambda _: self.setup_terminos_frame())
         self.option_menus: list[CustomImageDropdown] = []
+        self.mensaje_frame: Optional[ctkFrame] = None
 
         self.terminos_frame = ctkFrame(self)
         self.func_output = ctkFrame(self)
+        self.terminos_entry.bind("<Return>", lambda _: self.setup_terminos_frame())
 
         terminos_label.grid(row=0, column=0, padx=5, pady=5, sticky="e")
-        self.terminos_entry.grid(row=0, column=1, padx=5, pady=5, sticky="w")
-        ingresar_button.grid(row=1, column=0, columnspan=2, padx=5, pady=5, sticky="n")
-        self.terminos_frame.grid(row=2, column=0, columnspan=2, padx=5, pady=5, sticky="n")
+        self.terminos_entry.grid(row=0, column=1, padx=5, pady=5, sticky="n")
+        ingresar_button.grid(row=0, column=2, padx=5, pady=5, sticky="w")
 
     def setup_terminos_frame(self):
         for widget in self.terminos_frame.winfo_children():
@@ -81,9 +95,13 @@ class RaicesFrame(CustomScrollFrame):
             self.mensaje_frame = ErrorFrame(
                 self, "Debe ingresar números enteros positivos para la cantidad de términos!"
             )
-            self.mensaje_frame.grid(row=4, column=0, columnspan=2, padx=5, pady=5, sticky="n")
+            self.mensaje_frame.grid(row=1, column=0, columnspan=3, padx=5, pady=5, sticky="n")
             self.update_scrollbar_visibility()
             return
+
+        if self.mensaje_frame is not None:
+            self.mensaje_frame.destroy()
+            self.mensaje_frame = None
 
         for i in range(num_terminos):
             label = ctkLabel(self.terminos_frame, text=f"Término {i + 1}:")
@@ -96,8 +114,8 @@ class RaicesFrame(CustomScrollFrame):
 
             option_menu.grid(row=i, column=1, padx=10, pady=10, sticky="w")
             self.option_menus.append(option_menu)
-
-        self.func_output.grid(row=3, column=0, columnspan=2, padx=10, pady=10, sticky="n")
+        self.terminos_frame.grid(row=1, column=0, columnspan=3, padx=5, pady=5, sticky="n")
+        self.func_output.grid(row=2, column=0, columnspan=3, padx=10, pady=10, sticky="n")
 
     def latex_to_png(latex_str, output_file):
         rc("text", usetex=True)

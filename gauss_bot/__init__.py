@@ -38,9 +38,9 @@ DROPDOWN_ARROW = ctkImage(
 
 FUNCTIONS: dict[str, ctkImage] = {
     name.strip(".png"): ctkImage(
+        size=open_img(path.join(ASSET_PATH, f"functions/dark_{name}")).size,
         dark_image=open_img(path.join(ASSET_PATH, f"functions/light_{name}")),
         light_image=open_img(path.join(ASSET_PATH, f"functions/dark_{name}")),
-        size=open_img(path.join(ASSET_PATH, f"functions/dark_{name}")).size
     ) for name in set([
         name.split("_")[1]
         for _, _, files in walk(path.join(ASSET_PATH, "functions"))
