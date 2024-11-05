@@ -38,11 +38,14 @@ from gauss_bot import (
     FUNCTIONS,
 )
 
-from gauss_bot.gui.custom_frames import (
+from gauss_bot.gui.custom.custom_widgets import (
     CustomImageDropdown,
+    resize_image,
+)
+
+from gauss_bot.gui.custom.custom_frames import (
     CustomScrollFrame,
     ErrorFrame,
-    resize_image,
 )
 
 if TYPE_CHECKING:

@@ -20,10 +20,8 @@ from customtkinter import (
 )
 
 from gauss_bot import THEMES_PATH
-from gauss_bot.gui.custom_frames import (
-    CustomDropdown,
-    SuccessFrame,
-)
+from gauss_bot.gui.custom.custom_frames import SuccessFrame
+from gauss_bot.gui.custom.custom_widgets import CustomDropdown
 
 if TYPE_CHECKING:
     from gauss_bot.gui.gui import GaussUI

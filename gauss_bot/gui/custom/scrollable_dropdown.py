@@ -198,7 +198,7 @@ class CustomScrollableDropdown(ctkTop):
         self.update_idletasks()
 
     def place_dropdown(self):
-        print("placing dropdown")  # debug
+        # print("placing dropdown")  # debug
         self.x_pos = (
             self.attach.winfo_rootx()
             if self.x is None
@@ -234,31 +234,31 @@ class CustomScrollableDropdown(ctkTop):
         self._withdraw()
 
     def _deiconify(self):
-        print("deiconifying")  # debug
+        # print("deiconifying")  # debug
         if len(self.values) > 0:
             self.deiconify()
 
     def _iconify(self):
-        print(f"Iconify called, hide state: {self.hide}")  # debug
+        # print(f"Iconify called, hide state: {self.hide}")  # debug
         if self.attach.cget("state") == "disabled":
-            print("cant iconify")  # debug
+            # print("cant iconify")  # debug
             return
         if self.hide:
-            print("Showing dropdown")  # debug
+            # print("Showing dropdown")  # debug
             self.event_generate("<<Opened>>")
             self.focus()
             self.hide = False
             self.place_dropdown()
             self._deiconify()
         else:
-            print("Hiding dropdown")  # debug
+            # print("Hiding dropdown")  # debug
             self._withdraw()
 
     def _withdraw(self):
         if not self.winfo_exists() or not self.winfo_viewable():
-            print("cant withdraw")  # debug
+            # print("cant withdraw")  # debug
             return
-        print("withdrawing")  # debug
+        # print("withdrawing")  # debug
         self.withdraw()
         self.event_generate("<<Closed>>")
         self.hide = True

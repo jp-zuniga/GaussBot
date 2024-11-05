@@ -16,7 +16,7 @@ from customtkinter import (
 from gauss_bot.managers.mats_manager import MatricesManager
 from gauss_bot.managers.vecs_manager import VectoresManager
 
-from gauss_bot.gui.custom_frames import CustomScrollFrame
+from gauss_bot.gui.custom.custom_frames import CustomScrollFrame
 
 from gauss_bot.gui.frames.subframes.operaciones_mats import (
     SumaRestaTab,

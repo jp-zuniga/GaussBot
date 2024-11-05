@@ -18,8 +18,8 @@ from customtkinter import (
 from gauss_bot.models.sistema_ecuaciones import SistemaEcuaciones
 from gauss_bot.managers.mats_manager import MatricesManager
 
-from gauss_bot.gui.custom_frames import (
-    CustomDropdown,
+from gauss_bot.gui.custom.custom_widgets import CustomDropdown
+from gauss_bot.gui.custom.custom_frames import (
     CustomScrollFrame,
     ErrorFrame,
     ResultadoFrame,

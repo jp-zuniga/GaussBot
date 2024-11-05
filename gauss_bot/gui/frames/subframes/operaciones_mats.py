@@ -19,9 +19,12 @@ from customtkinter import (
 
 from gauss_bot.managers.mats_manager import MatricesManager
 
-from gauss_bot.gui.custom_frames import (
+from gauss_bot.gui.custom.custom_widgets import (
     CustomEntry,
     CustomDropdown,
+)
+
+from gauss_bot.gui.custom.custom_frames import (
     CustomScrollFrame,
     ErrorFrame,
     ResultadoFrame,
