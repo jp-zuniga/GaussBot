@@ -24,7 +24,6 @@ from customtkinter import (
     CTkImage as ctkImage,
     CTkLabel as ctkLabel,
     CTkScrollableFrame as ctkScrollFrame,
-    CTkToplevel as ctkTop,
     CTkOptionMenu as ctkOptionMenu,
 )
 
@@ -33,6 +32,8 @@ from gauss_bot import (
     DROPDOWN_ARROW,
     FUNCTIONS,
 )
+
+from gauss_bot.gui.scrollable_dropdown import CustomScrollableDropdown
 
 if TYPE_CHECKING:
     from gauss_bot.gui.gui import GaussUI
@@ -66,72 +67,6 @@ class CustomEntry(ctkEntry):
         )
 
         self.configure(justify=justify)
-
-
-class CustomImageDropdown(ctkButton):
-    def __init__(
-        self,
-        master: Any,
-        button_text: str,
-        width=80,
-        height=30,
-        **kwargs,
-    ) -> None:
-
-        super().__init__(
-            master,
-            width,
-            height,
-            text=button_text,
-            image=DROPDOWN_ARROW,
-            command=self._show_menu,
-            **kwargs
-        )
-
-        self.options_window: ctkTop
-        self.images: dict[str, ctkImage] = {
-            name: self._resize_image(img)
-            for name, img in sorted(FUNCTIONS.items())
-        }
-
-    def _show_menu(self):
-        self.options_window = ctkTop(self, width=self._current_width)
-        self.options_window.overrideredirect(True)
-        self.options_window.attributes("-topmost", True)
-        for image in self.images.values():
-            ctkButton(
-                self.options_window,
-                width=self._current_width,
-                height=30,
-                corner_radius=0,
-                image=image,
-                text="",
-                fg_color="transparent",
-                command=lambda img=image: self._on_select(img),
-            ).pack(fill="both")
-        x = self.winfo_rootx()
-        y = self.winfo_rooty() + self.winfo_height()
-        self.options_window.geometry(f"+{x}+{y}")
-
-    def _resize_image(self, img: ctkImage) -> ctkImage:
-        dark = img._dark_image
-        light = img._light_image
-
-        width, height = img._size
-        new_width = width // 4
-        new_height = height // 4
-
-        dark_img = dark.resize((new_width, new_height), LANCZOS)
-        light_img = light.resize((new_width, new_height), LANCZOS)
-        return ctkImage(
-            dark_image=dark_img,
-            light_image=light_img,
-            size=(new_width // 8, new_height // 8),
-        )
-
-    def _on_select(self, img_selected: ctkImage) -> None:
-        self.options_window.destroy()
-        self.configure(image=img_selected)
 
 
 class CustomDropdown(ctkOptionMenu):
@@ -193,6 +128,54 @@ class CustomDropdown(ctkOptionMenu):
         super()._on_leave(event)
         color = self._apply_appearance_mode(self._button_color)
         self.icon_label.configure(fg_color=color, bg_color=color)
+
+
+class CustomImageDropdown(CustomScrollableDropdown):
+    def __init__(
+        self,
+        master: Any,
+        button_text: str,
+        width=80,
+        height=30,
+        **kwargs,
+    ) -> None:
+
+        self.images: dict[str, ctkImage] = {
+            name: resize_image(img)
+            for name, img in sorted(FUNCTIONS.items())
+        }
+
+        self.imgs = [img for name, img in self.images.items() if name != "f(x)"]
+        values = ["" for _ in self.imgs]
+
+        self.options_button = ctkButton(
+            master,
+            width=width,
+            height=height,
+            text=button_text,
+            image=DROPDOWN_ARROW,
+            compound="right",
+            **kwargs
+        )
+
+        super().__init__(
+            attach=self.options_button,
+            width=width * 5,
+            height=height * 60,
+            values=values,
+            image_values=self.imgs,
+            command=self._on_select,
+            **kwargs
+        )
+
+    def _on_select(self, img: ctkImage) -> None:
+        self.options_button.configure(
+            image=img,
+            compound="left",
+            text="",
+        )
+
+        self.update_idletasks()
 
 
 class CustomScrollFrame(ctkScrollFrame):
@@ -318,3 +301,21 @@ class ResultadoFrame(ctkFrame):
     def destroy(self) -> None:
         self.forget()
         super().destroy()
+
+
+def resize_image(img: ctkImage, divisors: tuple[int, int] = (4, 8)) -> ctkImage:
+    div1, div2 = divisors
+    dark = img._dark_image
+    light = img._light_image
+
+    width, height = img._size
+    new_width = width // div1
+    new_height = height // div1
+
+    dark_img = dark.resize((new_width, new_height), LANCZOS)
+    light_img = light.resize((new_width, new_height), LANCZOS)
+    return ctkImage(
+        dark_image=dark_img,
+        light_image=light_img,
+        size=(new_width // div2, new_height // div2),
+    )

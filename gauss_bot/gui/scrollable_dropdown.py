@@ -2,27 +2,22 @@
 Adapted from:
 * https://github.com/Akascape/CTkScrollableDropdown
 * Author: Akash Bora
+
 Modified by: Joaquín Zúñiga, on 11/4/2024
+Heavily simplified for the purpose of this project.
 """
 
-from difflib import SequenceMatcher
-from time import sleep
 from typing import (
+    Any,
     Callable,
     Optional,
 )
 
-from tkinter import StringVar
 from customtkinter import (
-    CTkBaseClass as ctkBase,
     CTkButton as ctkButton,
-    CTkComboBox as ctkCombo,
-    CTkEntry as ctkEntry,
     CTkImage as ctkImage,
-    CTkLabel as ctkLabel,
     CTkScrollableFrame as ctkScrollFrame,
     CTkToplevel as ctkTop,
-    CTkOptionMenu as ctkOptionMenu,
     ThemeManager,
 )
 
@@ -30,7 +25,7 @@ from customtkinter import (
 class CustomScrollableDropdown(ctkTop):
     def __init__(
         self,
-        attach: ctkBase,
+        attach: ctkButton,
         height: int = 200,
         width: int = 200,
         x: Optional[int] = None,
@@ -41,7 +36,7 @@ class CustomScrollableDropdown(ctkTop):
         text_color: Optional[str] = None,
         values: list[str] = [],
         image_values: list[ctkImage] = [],
-        command: Optional[Callable[[Optional[str]], str]] = None,
+        command: Optional[Callable[[Any], Any]] = None,
 
         button_height: int = 20,
         button_color: Optional[str] = None,
@@ -53,9 +48,6 @@ class CustomScrollableDropdown(ctkTop):
         frame_border_color: Optional[str] = None,
 
         resize: bool = True,
-        double_click: bool = False,
-        autocomplete: bool = False,
-        alpha: float = 0.97,
         justify: str = "center",
         **button_kwargs,
     ):
@@ -63,48 +55,65 @@ class CustomScrollableDropdown(ctkTop):
         super().__init__(master=attach.winfo_toplevel(), takefocus=1)
         self.focus()
         self.lift()
-        self.alpha = alpha
         self.attach = attach
         self.corner = frame_corner_radius
-        self.padding = 0
-        self.focus_something = False
-        self.disable = True
-        self.disable = False
 
         self.hide = True  # type: ignore
+        self.withdraw()
         self.update()
 
         self.after(100, lambda: self.overrideredirect(True))
         self.transparent_color = self._apply_appearance_mode(self._fg_color)
         self.attributes("-transparentcolor", self.transparent_color)
-        self.attributes("-alpha", 0)
 
         self.attach.bind(
-            "<Configure>",
-            lambda _: self._withdraw() if not self.disable else None,
-            add="+",
+            "<Button-1>",
+            lambda _: self._iconify(),
+            add="+"
         )
 
-        self.attach.winfo_toplevel().bind(
-            "<Configure>",
-            lambda _: self._withdraw() if not self.disable else None,
-            add="+",
+        self.attach.bind(
+            "<Destroy>",
+            lambda _: self._withdraw(),
+            add="+"
         )
 
-        self.attach.winfo_toplevel().bind(
-            "<ButtonPress>",
-            lambda _: self._withdraw() if not self.disable else None,
-            add="+",
-        )
+        # self.attach.bind(
+        #     "<Configure>",
+        #     lambda _: self._withdraw()
+        #     if not self.disable
+        #     else None,
+        #     add="+",
+        # )
 
-        self.bind(
-            "<Escape>",
-            lambda _: self._withdraw() if not self.disable else None,
-            add="+",
-        )
+        # self.attach.winfo_toplevel().bind(
+        #     "<Configure>",
+        #     lambda _: self._withdraw()
+        #     if not self.disable
+        #     else None,
+        #     add="+",
+        # )
+
+        # self.attach.winfo_toplevel().bind(
+        #     "<ButtonPress>",
+        #     lambda _: self._withdraw()
+        #     if not self.disable
+        #     else None,
+        #     add="+",
+        # )
+
+        # self.bind(
+        #     "<Escape>",
+        #     lambda _: self._withdraw()
+        #     if not self.disable
+        #     else None,
+        #     add="+",
+        # )
 
         self.fg_color = (
-            ThemeManager.theme["CTkFrame"]["fg_color"] if fg_color is None else fg_color
+            ThemeManager.theme["CTkFrame"]["fg_color"]
+            if fg_color is None
+            else fg_color
         )
 
         self.button_color = (
@@ -149,35 +158,22 @@ class CustomScrollableDropdown(ctkTop):
 
         self.frame: ctkScrollFrame = ctkScrollFrame(  # type: ignore
             self,
-            corner_radius=self.corner,
+            width=width,
+            height=height,
+            corner_radius=6,
             fg_color=self.fg_color,
             bg_color=self.transparent_color,
             border_width=frame_border_width,
-            border_color=self.frame_border_color,
-            scrollbar_button_color=self.scroll_button_color,
-            scrollbar_button_hover_color=self.scroll_hover_color,
         )
 
         self.frame._scrollbar.grid_configure(padx=3)
         self.frame.pack(expand=True, fill="both")
-        self.dummy_entry = ctkEntry(
-            self.frame,
-            fg_color="transparent",
-            border_width=0,
-            height=1,
-            width=1
-        )
 
-        self.no_match = ctkLabel(self.frame, text="No Match")
         self.height = height
         self.height_new = height
         self.width = width
         self.command = command  # type: ignore
-        self.fade = False
         self.resize = resize
-        self.autocomplete = autocomplete
-        self.var_update = StringVar()
-        self.appear = False
 
         if justify.lower() == "left":
             self.justify = "w"
@@ -186,64 +182,23 @@ class CustomScrollableDropdown(ctkTop):
         else:
             self.justify = "c"
 
-        self.button_height = button_height
         self.values = values
-        self.button_num = len(self.values)
-        self.image_values = (
-            None if len(image_values) != len(self.values) else image_values
-        )
+        self.image_values = image_values
 
-        self.resizable(width=False, height=False)
+        self.button_height = button_height
+        self.button_num = len(self.values)
+
         self._init_buttons(**button_kwargs)
+        self.resizable(width=False, height=False)
         self.transient(self.master)  # type: ignore
 
-        if (double_click or
-            isinstance(self.attach, ctkEntry) or
-            isinstance(self.attach, ctkCombo)):
-            self.attach.bind("<Double-Button-1>", lambda _: self._iconify(), add="+")
-        else:
-            self.attach.bind("<Button-1>", lambda _: self._iconify(), add="+")
-
-        if isinstance(self.attach, ctkCombo):
-            self.attach._canvas.tag_bind(
-                "right_parts", "<Button-1>", lambda _: self._iconify()
-            )
-
-            self.attach._canvas.tag_bind(
-                "dropdown_arrow", "<Button-1>", lambda _: self._iconify()
-            )
-
-            if self.command is None:
-                self.command = self.attach.set
-
-        if isinstance(self.attach, ctkOptionMenu):
-            self.attach._canvas.bind("<Button-1>", lambda _: self._iconify())
-            self.attach._text_label.bind("<Button-1>", lambda _: self._iconify())
-            if self.command is None:
-                self.command = self.attach.set
-
-        self.attach.bind("<Destroy>", lambda _: self._destroy(), add="+")
-
+        self.x = x
+        self.y = y
+        self.hide = True  # type: ignore
         self.update_idletasks()
-        self.x = x
-        self.y = y
-
-        if self.autocomplete:
-            self.bind_autocomplete()
-
-        self.withdraw()
-        self.attributes("-alpha", self.alpha)
-
-    def hide(self):
-        self._withdraw()
-
-    def popup(self, x=None, y=None):
-        self.x = x
-        self.y = y
-        self.hide = True
-        self._iconify()
 
     def place_dropdown(self):
+        print("placing dropdown")  # debug
         self.x_pos = (
             self.attach.winfo_rootx()
             if self.x is None
@@ -270,175 +225,73 @@ class CustomScrollableDropdown(ctkTop):
             f"{self.width_new}x{self.height_new}+{self.x_pos}+{self.y_pos}"
         )
 
-        self.fade_in()
-        self.attributes("-alpha", self.alpha)
-        self.attach.focus()
-
-    def live_update(self, string=None):
-        if not self.appear:
-            return
-        if self.disable:
-            return
-        if self.fade:
-            return
-        if string:
-            string = string.lower()
-            self._deiconify()
-            i = 1
-            for key in self.widgets.keys():
-                s = self.widgets[key].cget("text").lower()
-                text_similarity = SequenceMatcher(
-                    None, s[0 : len(string)], string
-                ).ratio()
-                similar = s.startswith(string) or text_similarity > 0.75
-                if not similar:
-                    self.widgets[key].pack_forget()
-                else:
-                    self.widgets[key].pack(fill="x", pady=2, padx=(self.padding, 0))
-                    i += 1
-
-            if i == 1:
-                self.no_match.pack(fill="x", pady=2, padx=(self.padding, 0))
-            else:
-                self.no_match.pack_forget()
-            self.button_num = i
-            self.place_dropdown()
-
+        if hasattr(self.attach, "_text_label") and self.attach._text_label is not None:
+            self.attach.focus()
         else:
-            self.no_match.pack_forget()
-            self.button_num = len(self.values)
-            for key in self.widgets.keys():
-                self.widgets[key].destroy()
-            self._init_buttons()
-            self.place_dropdown()
+            self.focus()
 
-        self.frame._parent_canvas.yview_moveto(0.0)
-        self.appear = False
+    def hide(self):
+        self._withdraw()
 
-    def insert(self, value, **kwargs):
-        self.widgets[self.i] = ctkButton(
-            self.frame,
-            text=value,
-            height=self.button_height,
-            fg_color=self.button_color,
-            text_color=self.text_color,
-            hover_color=self.hover_color,
-            anchor=self.justify,
-            command=lambda k=value: self._attach_key_press(k),
-            **kwargs,
-        )
-
-        self.widgets[self.i].pack(fill="x", pady=2, padx=(self.padding, 0))
-        self.i += 1
-        self.values.append(value)
-
-    def bind_autocomplete(self):
-        def appear(x):
-            self.appear = True
-
-        if isinstance(self.attach, ctkCombo):
-            self.attach._entry.configure(textvariable=self.var_update)
-            self.attach._entry.bind("<Key>", appear)
-            self.attach.set(self.values[0])
-            self.var_update.trace_add("write", self._update)
-
-        if isinstance(self.attach, ctkEntry):
-            self.attach.configure(textvariable=self.var_update)
-            self.attach.bind("<Key>", appear)
-            self.var_update.trace_add("write", self._update)
-
-    def fade_out(self):
-        for i in range(100, 0, -10):
-            if not self.winfo_exists():
-                break
-            self.attributes("-alpha", i / 100)
-            self.update()
-            sleep(1 / 100)
-
-    def fade_in(self):
-        for i in range(0, 100, 10):
-            if not self.winfo_exists():
-                break
-            self.attributes("-alpha", i / 100)
-            self.update()
-            sleep(1 / 100)
-
-    def destroy_popup(self):
-        self.destroy()
-        self.disable = True
-
-    def _destroy(self):
-        self.after(500, self.destroy_popup)
-
-    def _update(self, a, b, c):
-        self.live_update(self.attach._entry.get())
-
-    def _withdraw(self):
-        if not self.winfo_exists():
-            return
-        if self.winfo_viewable() and self.hide:
-            self.withdraw()
-
-        self.event_generate("<<Closed>>")
-        self.hide = True
-
-    def _init_buttons(self, **button_kwargs):
-        self.i = 0
-        self.widgets = {}
-        for row in self.values:
-            self.widgets[self.i] = ctkButton(
-                self.frame,
-                text=row,
-                height=self.button_height,
-                fg_color=self.button_color,
-                text_color=self.text_color,
-                image=self.image_values[self.i]
-                if self.image_values is not None
-                else None,
-                anchor=self.justify,
-                hover_color=self.hover_color,
-                command=lambda k=row: self._attach_key_press(k),
-                **button_kwargs,
-            )
-
-            self.widgets[self.i].pack(fill="x", pady=2, padx=(self.padding, 0))
-            self.i += 1
-        self.hide = False
+    def _deiconify(self):
+        print("deiconifying")  # debug
+        if len(self.values) > 0:
+            self.deiconify()
 
     def _iconify(self):
+        print(f"Iconify called, hide state: {self.hide}")  # debug
         if self.attach.cget("state") == "disabled":
+            print("cant iconify")  # debug
             return
-        if self.disable:
-            return
-        if self.winfo_ismapped():
-            self.hide = False
         if self.hide:
+            print("Showing dropdown")  # debug
             self.event_generate("<<Opened>>")
             self.focus()
             self.hide = False
             self.place_dropdown()
             self._deiconify()
-            if self.focus_something:
-                self.dummy_entry.pack()
-                self.dummy_entry.focus_set()
-                self.after(100, self.dummy_entry.pack_forget)
         else:
-            self.withdraw()
-            self.hide = True
+            print("Hiding dropdown")  # debug
+            self._withdraw()
 
-    def _deiconify(self):
-        if len(self.values) > 0:
-            self.deiconify()
+    def _withdraw(self):
+        if not self.winfo_exists() or not self.winfo_viewable():
+            print("cant withdraw")  # debug
+            return
+        print("withdrawing")  # debug
+        self.withdraw()
+        self.event_generate("<<Closed>>")
+        self.hide = True
 
     def _attach_key_press(self, k):
         self.event_generate("<<Selected>>")
-        self.fade = True
         if self.command:
             self.command(k)
-        self.fade = False
-        self.fade_out()
-        self.withdraw()
+        self._withdraw()
         self.hide = True
+
+    def _init_buttons(self, **button_kwargs):
+        self.i = 0
+        self.widgets = {}
+        for _ in self.values:
+            img = self.image_values[self.i]
+            self.widgets[self.i] = ctkButton(
+                self.frame,
+                text="",
+                corner_radius=0,
+                height=self.button_height,
+                fg_color=self.button_color,
+                text_color=self.text_color,
+                image=img,
+                anchor=self.justify,
+                hover_color=self.hover_color,
+                command=lambda k=img: self._attach_key_press(k),
+                **button_kwargs,
+            )
+
+            self.widgets[self.i].pack(fill="x")
+            self.i += 1
+        self.hide = False
 
     def configure(self, **kwargs):
         if "height" in kwargs:

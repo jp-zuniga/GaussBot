@@ -58,7 +58,6 @@ class GaussUI(ctk):
             vecs_manager=self.vecs_manager,
         )
 
-
         self.matrices = MatricesFrame(
             master=self,
             app=self,
@@ -76,9 +75,11 @@ class GaussUI(ctk):
         self.ecuaciones = EcuacionesFrame(
             master=self, app=self, mats_manager=self.mats_manager
         )
+
         self.config_frame = ConfigFrame(master=self, app=self)
         self.nav_frame = NavFrame(master=self, app=self)
         self.nav_frame.seleccionar_frame("home")
+        self.update_idletasks()
 
     def load_config(self) -> None:
         """

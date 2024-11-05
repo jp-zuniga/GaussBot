@@ -63,7 +63,7 @@ class AgregarVecs(CustomScrollFrame):
         self.post_vector_widgets: list[ctkBase] = []
 
         dimension_label = ctkLabel(self, text="Dimensiones del vector:")
-        self.dimension_entry = ctkEntry(self, width=60)
+        self.dimension_entry = ctkEntry(self, width=60, placeholder_text="3")
 
         generar_button = ctkButton(
             self, height=30, text="Ingresar datos", command=self.generar_casillas
