@@ -42,13 +42,13 @@ VECTORES_PATH = path.join(
 )
 
 DROPDOWN_ARROW = ctkImage(
-    open_img(path.join(ASSET_PATH, "dropdown_icon.png"))
+    open_img(path.join(ASSET_PATH, "light_dropdown_icon.png"))
 )
 
 FUNCTIONS: dict[str, ctkImage] = {
     name[:-4]: ctkImage(
         size=open_img(path.join(ASSET_PATH, f"functions/dark_{name}")).size,
-        dark_image=open_img(path.join(ASSET_PATH, f"functions/dark_{name}")),
+        dark_image=open_img(path.join(ASSET_PATH, f"functions/light_{name}")),
         light_image=open_img(path.join(ASSET_PATH, f"functions/light_{name}")),
     ) for name in set([
         name.split("_")[1]

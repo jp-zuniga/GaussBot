@@ -93,7 +93,7 @@ class GaussUI(ctk):
                 self.config_options = load(config_file)
         else:
             self.config_options = {
-                "escala": 1.2,
+                "escala": 1.0,
                 "modo": "light",
                 "tema": "sky.json"
             }

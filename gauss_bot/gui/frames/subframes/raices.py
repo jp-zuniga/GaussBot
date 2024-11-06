@@ -4,14 +4,20 @@ un frame que permite encontrar
 las raíces de funciones matemáticas.
 """
 
-from random import randint
+from fractions import Fraction
+from random import choice
 from os import path
 from typing import (
     TYPE_CHECKING,
     Optional,
 )
 
-from PIL.Image import open as open_img
+from PIL.ImageOps import invert
+from PIL.Image import (
+    Image,
+    merge,
+    open as open_img,
+)
 
 from customtkinter import (
     CTkButton as ctkButton,
@@ -64,6 +70,7 @@ if TYPE_CHECKING:
 
 TRANSFORMS = (standard_transformations + (implicit_multiplication_application,))
 
+MARGEN_ERROR = Fraction(1e-6)
 
 class RaicesFrame(CustomScrollFrame):
     def __init__(
@@ -79,14 +86,29 @@ class RaicesFrame(CustomScrollFrame):
         self.columnconfigure(0, weight=1)
         self.columnconfigure(2, weight=1)
 
+        self.dropup_icon = ctkImage(
+            dark_image=open_img(path.join(ASSET_PATH, "light_dropup_icon.png")),
+            light_image=open_img(path.join(ASSET_PATH, "dark_dropup_icon.png")),
+            size=(18, 18),
+        )
+
+        self.dropdown_icon = ctkImage(
+            dark_image=open_img(path.join(ASSET_PATH, "light_dropdown_icon.png")),
+            light_image=open_img(path.join(ASSET_PATH, "dark_dropdown_icon.png")),
+            size=(18, 18),
+        )
+
+        terminos_label = ctkLabel(self, text="¿Cuántos términos tendrá la función?")
+        self.terminos_entry = ctkEntry(self, width=30, placeholder_text="3")
+        self.terminos_entry.bind("<Return>", lambda _: self.setup_terminos_frame())
+
         enter_icon = ctkImage(
             dark_image=open_img(path.join(ASSET_PATH, "light_enter_icon.png")),
             light_image=open_img(path.join(ASSET_PATH, "dark_enter_icon.png")),
             size=(18, 18),
         )
 
-        terminos_label = ctkLabel(self, text="¿Cuántos términos tendrá la función?")
-        self.terminos_entry = ctkEntry(self, width=60, placeholder_text="3")
+        self.collapse_button: Optional[ctkButton] = None
         ingresar_button = ctkButton(
             self,
             width=20,
@@ -108,18 +130,36 @@ class RaicesFrame(CustomScrollFrame):
 
         self.mensaje_frame: Optional[ctkFrame] = None
 
-        self.func_frame: ResultadoFrame
+        self.collapsed_terminos = True
         self.terminos_frame = ctkFrame(self)
-        self.terminos_frame.columnconfigure(0, weight=1)
-        self.terminos_frame.columnconfigure(1, weight=1)
-
-        self.terminos_entry.bind("<Return>", lambda _: self.setup_terminos_frame())
+        self.calc_frame = ctkFrame(self)
+        self.func_frame = ResultadoFrame(
+            self,
+            header="",
+            resultado="",
+            solo_header=True,
+            border_color="#18c026"
+        )
 
         terminos_label.grid(row=0, column=0, padx=5, pady=5, sticky="ne")
         self.terminos_entry.grid(row=0, column=1, padx=5, pady=5, sticky="new")
         ingresar_button.grid(row=0, column=2, ipady=3, pady=5, sticky="nw")
 
+    def toggle_terminos_frame(self) -> None:
+        if self.collapsed_terminos:
+            self.terminos_frame.grid()
+            if self.collapse_button is not None:
+                self.collapse_button.configure(image=self.dropdown_icon)
+        else:
+            self.terminos_frame.grid_remove()
+            if self.collapse_button is not None:
+                self.collapse_button.configure(image=self.dropup_icon)
+        self.collapsed_terminos = not self.collapsed_terminos
+        self.update_frame()
+
     def setup_terminos_frame(self) -> None:
+        self.terminos_frame.columnconfigure(0, weight=1)
+        self.terminos_frame.columnconfigure(1, weight=1)
         for widget in self.terminos_frame.winfo_children():
             widget.destroy()
 
@@ -140,7 +180,6 @@ class RaicesFrame(CustomScrollFrame):
         fx = resize_image(FUNCTIONS["f(x)"], (3, 7))
         fx_label = ctkLabel(
             self.terminos_frame,
-            width=120,
             corner_radius=10,
             image=fx,
             text="",
@@ -178,23 +217,24 @@ class RaicesFrame(CustomScrollFrame):
 
         leer_func_button.grid(row=num_terminos + 1, column=0, columnspan=3, padx=5, pady=5, sticky="n")
         self.terminos_frame.grid(row=1, column=0, columnspan=3, padx=5, pady=5, sticky="n")
+        self.collapsed_terminos = False
 
     def extract_func(self, dropdown: CustomImageDropdown, img: ctkImage) -> None:
         func_key = get_dict_key(dropdown.images, img)
-        self.crear_arg_entries(dropdown, func_key)  # type: ignore
+        self.crear_arg_entry(dropdown, func_key)  # type: ignore
 
-    def crear_arg_entries(self, dropdown: CustomImageDropdown, func_key: str) -> None:
+    def crear_arg_entry(self, dropdown: CustomImageDropdown, func_key: str) -> None:
         row, column = dropdown.options_button.grid_info()["row"], 2
         arg_entry = ctkEntry(
             self.terminos_frame,
-            width=100,
+            width=80,
             placeholder_text=generate_placeholders(func_key),
         )
 
+        self.arg_entries.append(arg_entry)
+        self.bind_entry_keys(arg_entry, len(self.arg_entries) - 1)
         dropdown.options_button.grid(columnspan=1, sticky="new")
         arg_entry.grid(row=row, column=column, padx=10, pady=10, sticky="nw")
-        self.bind_entry_keys(arg_entry, row - 1)
-        self.arg_entries.append(arg_entry)
 
     def leer_arg_entries(self) -> str:
         func = ""
@@ -221,13 +261,13 @@ class RaicesFrame(CustomScrollFrame):
         return func
 
     def leer_func(self) -> None:
-        input_func = self.leer_arg_entries()
-        if input_func.count("sen") > 0:
-            input_func = input_func.replace("sen", "sin")
-        if input_func.count("^") > 0:
-            input_func = input_func.replace("^", "**")
+        self.func = self.leer_arg_entries()
+        if self.func.count("sen") > 0:
+            self.func = self.func.replace("sen", "sin")
+        if self.func.count("^") > 0:
+            self.func = self.func.replace("^", "**")
 
-        parsed_func = parse_expr(input_func, transformations=TRANSFORMS)
+        parsed_func = parse_expr(self.func, transformations=TRANSFORMS)
         self.mostrar_func(parsed_func)
 
     def mostrar_func(self, parsed_func) -> None:
@@ -235,22 +275,63 @@ class RaicesFrame(CustomScrollFrame):
         latex_func = r"f(x) = " + latex_func
         img = latex_to_png(latex_func, path.join(ASSET_PATH, "func.png"))
 
-        self.func_frame = ResultadoFrame(self, header="", resultado="", solo_header=True)
-        self.func_frame.columnconfigure(0, weight=1)
-
         func_label = ctkLabel(
             self.func_frame,
             image=img,
             text="",
         )
 
+        self.collapse_button = ctkButton(
+            self.func_frame,
+            width=20,
+            height=20,
+            border_width=0,
+            border_spacing=0,
+            image=self.dropup_icon,
+            fg_color="transparent",
+            bg_color="transparent",
+            hover_color=self.app.theme_config["CTkFrame"]["top_fg_color"],
+            text="",
+            command=self.toggle_terminos_frame,
+        )
+
         self.func_frame.grid(row=2, column=0, columnspan=3, padx=5, pady=5, sticky="n")
-        func_label.grid(row=0, column=0, sticky="n")
+        self.collapse_button.grid(row=0, column=0, sticky="ne")
+        func_label.grid(row=0, column=1, sticky="nw")
         self.update_idletasks()
+        self.setup_calc_frame()
+
+    def setup_calc_frame(self) -> None:
+        self.calc_frame.columnconfigure(0, weight=1)
+        self.calc_frame.columnconfigure(3, weight=1)
+
+        encontrar_label = ctkLabel(
+            self.calc_frame, text="Encontrar las raíces de f(x) entre:"
+        )
+
+        a_entry = ctkEntry(self.calc_frame, width=40, placeholder_text="-10")
+        and_label = ctkLabel(self.calc_frame, text="y")
+        b_entry = ctkEntry(self.calc_frame, width=40, placeholder_text="10")
+
+        calc_button = ctkButton(
+            self.calc_frame,
+            text="Calcular por método de bisección",
+            command=lambda: biseccion(
+                self.func, Fraction(a_entry.get()), Fraction(b_entry.get())
+            ),
+        )
+
+        self.calc_frame.grid(row=3, column=0, columnspan=3, padx=5, pady=5, sticky="n")
+        encontrar_label.grid(row=0, column=0, padx=5, pady=5, sticky="ne")
+        a_entry.grid(row=0, column=1, padx=5, pady=5, sticky="ne")
+        and_label.grid(row=0, column=2, padx=5, pady=5, sticky="nw")
+        b_entry.grid(row=0, column=3, padx=5, pady=5, sticky="nw")
+        calc_button.grid(row=1, column=0, columnspan=4, padx=5, pady=5, sticky="n")
 
     def bind_entry_keys(self, entry: ctkEntry, i: int) -> None:
         entry.bind("<Up>", lambda _: self.entry_move_up(i))
         entry.bind("<Down>", lambda _: self.entry_move_down(i))
+        entry.bind("<Return>", lambda _: self.leer_func())
 
     def entry_move_up(self, i: int) -> None:
         if i > 0:
@@ -269,17 +350,33 @@ class RaicesFrame(CustomScrollFrame):
         self.update_idletasks()
 
 
+def biseccion(
+    func_str: str, a: Fraction, b: Fraction, tol: Fraction = MARGEN_ERROR
+) -> tuple[Fraction, int]:
+    return (Fraction(0), 0)
+
+
+def valid_rand(start: int, end: int) -> list[int]:
+    valid = list(range(start + 1, end))
+    try:
+        valid.remove(0)
+        valid.remove(1)
+    except ValueError:
+        pass
+    return valid
+
+
 def generate_placeholders(func_key: str) -> str:
     placeholders: dict[str, str] = {
-        "k": f"{randint(-10, 10)}",
-        "x^n": f"x^{randint(-10, 10)}",
-        "b^x": f"{randint(-10, 10)}^x",
-        "e^x": f"e^{randint(-10, 10)}x",
-        "ln(x)": f"ln({randint(2, 10)}x)",
-        "log-b(x)": f"log_{randint(2, 9)}({randint(2, 9)}x)",
-        "sen(x)": f"sen({randint(-9, 9)}x) - {randint(1, 9)}",
-        "cos(x)": f"cos({randint(-9, 9)}x + {randint(1, 9)})",
-        "tan(x)": f"tan({randint(-9, 9)}x - {randint(1, 9)})",
+        "k": f"{choice(valid_rand(-10, 10))}",
+        "x^n": f"x^{choice(valid_rand(-10, 10))}",
+        "b^x": f"{choice(valid_rand(-10, 10))}^x",
+        "e^x": f"e^{choice(valid_rand(-10, 10))}x",
+        "ln(x)": f"ln({choice(valid_rand(1, 10))}x)",
+        "log-b(x)": f"log_{choice(valid_rand(1, 10))}({choice(valid_rand(1, 10))}x)",
+        "sen(x)": f"sen({choice(valid_rand(-10, 10))}x)-{choice(valid_rand(-10, 10))}",
+        "cos(x)": f"cos({choice(valid_rand(-10, 10))}x+{choice(valid_rand(-10, 10))})",
+        "tan(x)": f"tan({choice(valid_rand(-10, 10))}x-{choice(valid_rand(-10, 10))})",
     }
 
     return placeholders[func_key]
@@ -288,16 +385,16 @@ def generate_placeholders(func_key: str) -> str:
 def latex_to_png(latex_str: str, output_file: str) -> ctkImage:
     rc("text", usetex=True)
     rc("font", family="serif")
-    fig, _ = subplots(figsize=(20, 10))
+    fig, _ = subplots(figsize=(20, 4))
 
     axis("off")
     text(
         0.5,
-        1.0,
+        0.5,
         f"${latex_str}$",
         horizontalalignment="center",
         verticalalignment="center",
-        fontsize=100,
+        fontsize=75,
     )
 
     savefig(
@@ -309,8 +406,17 @@ def latex_to_png(latex_str: str, output_file: str) -> ctkImage:
     )
 
     close(fig)
+
+    img = open_img(output_file)
+    img_inverted = transparent_invert(img)
     return ctkImage(
-        dark_image=open_img(output_file),
-        light_image=open_img(output_file),
-        size=(300, 150),
+        dark_image=img_inverted,
+        light_image=img,
+        size=(400, 80),
     )
+
+
+def transparent_invert(img: Image) -> Image:
+    r, g, b, a = img.split()
+    rgb_inverted = invert(merge("RGB", (r, g, b)))
+    return merge("RGBA", (*rgb_inverted.split(), a))

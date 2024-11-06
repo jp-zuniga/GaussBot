@@ -37,8 +37,6 @@ class ConfigFrame(ctkFrame):
         self.mensaje_frame: Optional[SuccessFrame] = None
 
         self.escalas_dict = {
-            "80%": 0.8,
-            "90%": 0.9,
             "100%": 1.0,
             "110%": 1.1,
             "120%": 1.2,
@@ -56,24 +54,11 @@ class ConfigFrame(ctkFrame):
         }
 
         self.temas_dict = {
-            "Autumn": "autumn.json",
             "Breeze": "breeze.json",
-            "Cherry": "cherry.json",
-            "Carrot": "carrot.json",
-            "Coffee": "coffee.json",
             "Lavender": "lavender.json",
             "Marsh": "marsh.json",
-            "Metal": "metal.json",
             "Midnight": "midnight.json",
-            "Orange": "orange.json",
-            "Patina": "patina.json",
-            "Pink": "pink.json",
-            "Red": "red.json",
-            "Rime": "rime.json",
-            "Rose": "rose.json",
             "Sky": "sky.json",
-            "Violet": "violet.json",
-            "Yellow": "yellow.json",
         }
 
         self.escalas = list(self.escalas_dict.keys())
