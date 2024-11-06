@@ -169,10 +169,10 @@ class AgregarMats(CustomScrollFrame):
         height = 35 * filas
         sep_icon = ctkImage(
             dark_image=open_img(
-                path.join(ASSET_PATH, "light_separator.png")
+                path.join(ASSET_PATH, "light_vseparator.png")
             ),
             light_image=open_img(
-                path.join(ASSET_PATH, "dark_separator.png")
+                path.join(ASSET_PATH, "dark_vseparator.png")
             ),
             size=(35, height),
         )
