@@ -3,6 +3,7 @@ Implementaciones de widgets personalizadas.
 """
 
 from typing import (
+    TYPE_CHECKING,
     Any,
     Optional,
     Union,
@@ -26,6 +27,8 @@ from gauss_bot import (
 
 from gauss_bot.gui.custom.scrollable_dropdown import CustomScrollableDropdown
 
+if TYPE_CHECKING:
+    from gauss_bot.gui.gui import GaussUI
 
 
 def resize_image(img: ctkImage, divisors: tuple[int, int] = (4, 8)) -> ctkImage:
@@ -141,20 +144,36 @@ class CustomImageDropdown(CustomScrollableDropdown):
     def __init__(
         self,
         master: Any,
+        app: "GaussUI",
         button_text: str,
         width=80,
         height=30,
         **kwargs,
     ) -> None:
 
-        self.images: dict[str, ctkImage] = {
+        self.app = app
+        resizes = {
             name: resize_image(img)
             for name, img in sorted(FUNCTIONS.items())
         }
 
-        self.imgs = [img for name, img in self.images.items() if name != "f(x)"]
-        values = ["" for _ in self.imgs]
+        self.images: dict[str, ctkImage] = {
+            "k": resizes["k"],
+            "x^n": resizes["x^n"],
+            "b^x": resizes["b^x"],
+            "e^x": resizes["e^x"],
+            "ln(x)": resizes["ln(x)"],
+            "sen(x)": resizes["sen(x)"],
+            "cos(x)": resizes["cos(x)"],
+            "tan(x)": resizes["tan(x)"],
+        }
 
+        imgs = [
+            img
+            for name, img in self.images.items()
+        ]
+
+        values = ["" for _ in imgs]
         self.options_button = ctkButton(
             master,
             width=width,
@@ -162,23 +181,32 @@ class CustomImageDropdown(CustomScrollableDropdown):
             text=button_text,
             image=DROPDOWN_ARROW,
             compound="right",
-            **kwargs
+            **kwargs,
         )
 
         super().__init__(
             attach=self.options_button,
-            width=width * 5,
+            width=width * 3,
             height=height * 60,
             values=values,
-            image_values=self.imgs,
+            image_values=imgs,
             command=self._on_select,
+            fg_color=self.app.ecuaciones.tabview._segmented_button.cget("unselected_color"),  # type: ignore
+            button_color=self.app.ecuaciones.tabview._segmented_button.cget("unselected_color"),  # type: ignore
             **kwargs
         )
+
+        for button in self.widgets.values():
+            button.bind(
+                "<Button-1>",
+                command=lambda _, drop=self, img=button._image:
+                self.app.ecuaciones.instances[1].extract_func(drop, img),  # type: ignore
+            )
 
     def _on_select(self, img: ctkImage) -> None:
         self.options_button.configure(
             image=img,
-            compound="left",
+            compound="center",
             text="",
         )
 

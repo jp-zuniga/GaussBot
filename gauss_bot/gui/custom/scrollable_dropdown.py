@@ -80,33 +80,25 @@ class CustomScrollableDropdown(ctkTop):
 
         # self.attach.bind(
         #     "<Configure>",
-        #     lambda _: self._withdraw()
-        #     if not self.disable
-        #     else None,
+        #     lambda _: self._withdraw(),
         #     add="+",
         # )
 
-        # self.attach.winfo_toplevel().bind(
-        #     "<Configure>",
-        #     lambda _: self._withdraw()
-        #     if not self.disable
-        #     else None,
-        #     add="+",
-        # )
+        self.attach.winfo_toplevel().bind(
+            "<Configure>",
+            lambda _: self._withdraw(),
+            add="+",
+        )
 
         # self.attach.winfo_toplevel().bind(
         #     "<ButtonPress>",
-        #     lambda _: self._withdraw()
-        #     if not self.disable
-        #     else None,
+        #     lambda _: self._withdraw(),
         #     add="+",
         # )
 
         # self.bind(
         #     "<Escape>",
-        #     lambda _: self._withdraw()
-        #     if not self.disable
-        #     else None,
+        #     lambda _: self._withdraw(),
         #     add="+",
         # )
 
@@ -272,7 +264,7 @@ class CustomScrollableDropdown(ctkTop):
 
     def _init_buttons(self, **button_kwargs):
         self.i = 0
-        self.widgets = {}
+        self.widgets: dict[int, ctkButton] = {}  # type: ignore
         for _ in self.values:
             img = self.image_values[self.i]
             self.widgets[self.i] = ctkButton(

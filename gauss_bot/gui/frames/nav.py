@@ -3,7 +3,7 @@ Implementación de la clase NavFrame,
 la barra de navegación de la aplicación.
 """
 
-from os import path
+from os import path, remove
 from typing import TYPE_CHECKING
 
 from PIL.Image import open as open_img
@@ -211,3 +211,4 @@ class NavFrame(ctkFrame):
         self.app.ops_manager.save_vectores()  # type: ignore
         self.app.save_config()
         self.app.quit()
+        remove(path.join(ASSET_PATH, "func.png"))

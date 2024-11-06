@@ -7,7 +7,6 @@ from os import path
 from typing import (
     TYPE_CHECKING,
     Optional,
-    Union,
 )
 
 from tkinter import StringVar
@@ -19,7 +18,7 @@ from customtkinter import (
     set_default_color_theme,
 )
 
-from gauss_bot import THEMES_PATH
+from gauss_bot import THEMES_PATH, get_dict_key
 from gauss_bot.gui.custom.custom_frames import SuccessFrame
 from gauss_bot.gui.custom.custom_widgets import CustomDropdown
 
@@ -81,9 +80,9 @@ class ConfigFrame(ctkFrame):
         self.modos = list(self.modos_dict.keys())
         self.temas = list(self.temas_dict.keys())
 
-        self.escala_actual_key = self._get_dict_key(self.escalas_dict, self.app.escala_actual)
-        self.modo_actual_key = self._get_dict_key(self.modos_dict, self.app.modo_actual)
-        self.tema_actual_key = self._get_dict_key(self.temas_dict, self.app.tema_actual)
+        self.escala_actual_key = get_dict_key(self.escalas_dict, self.app.escala_actual)
+        self.modo_actual_key = get_dict_key(self.modos_dict, self.app.modo_actual)
+        self.tema_actual_key = get_dict_key(self.temas_dict, self.app.tema_actual)
 
         try:
             self.first_escala = StringVar(value=self.escala_actual_key)
@@ -172,24 +171,14 @@ class ConfigFrame(ctkFrame):
         set_default_color_theme(path.join(THEMES_PATH, self.app.tema_actual))
         self.app.update_idletasks()
 
-    def _get_dict_key(self, dict_lookup: dict, buscando: str) -> Union[str, None]:
-        """
-        Busca un valor en un diccionario y retorna su llave.
-        """
-
-        for key, value in dict_lookup.items():
-            if value == buscando:
-                return key
-        return None
-
     def update_frame(self) -> None:
         self.update_idletasks()
         if self.mensaje_frame is not None:
             self.mensaje_frame.destroy()
             self.mensaje_frame = None
-        self.modo_actual_key = self._get_dict_key(self.modos_dict, self.app.modo_actual)
-        self.escala_actual_key = self._get_dict_key(self.escalas_dict, self.app.escala_actual)
-        self.tema_actual_key = self._get_dict_key(self.temas_dict, self.app.tema_actual)
+        self.modo_actual_key = get_dict_key(self.modos_dict, self.app.modo_actual)
+        self.escala_actual_key = get_dict_key(self.escalas_dict, self.app.escala_actual)
+        self.tema_actual_key = get_dict_key(self.temas_dict, self.app.tema_actual)
         self.first_modo.set(self.modo_actual_key)  # type: ignore
         self.first_escala.set(self.escala_actual_key)  # type: ignore
         self.first_tema.set(self.tema_actual_key)  # type: ignore
