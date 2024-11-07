@@ -49,7 +49,7 @@ FUNCTIONS: dict[str, ctkImage] = {
     name[:-4]: ctkImage(
         size=open_img(path.join(ASSET_PATH, f"functions/dark_{name}")).size,
         dark_image=open_img(path.join(ASSET_PATH, f"functions/light_{name}")),
-        light_image=open_img(path.join(ASSET_PATH, f"functions/light_{name}")),
+        light_image=open_img(path.join(ASSET_PATH, f"functions/dark_{name}")),
     ) for name in set([
         name.split("_")[1]
         for _, _, files in walk(path.join(ASSET_PATH, "functions"))

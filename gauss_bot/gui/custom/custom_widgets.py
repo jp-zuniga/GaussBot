@@ -168,12 +168,11 @@ class CustomImageDropdown(CustomScrollableDropdown):
             "tan(x)": resizes["tan(x)"],
         }
 
-        imgs = [
-            img
-            for name, img in self.images.items()
-        ]
+        imgs = []
+        for img in self.images.values():
+            img.configure(light_image=img._dark_image)
+            imgs.append(img)
 
-        values = ["" for _ in imgs]
         self.options_button = ctkButton(
             master,
             width=width,
@@ -188,7 +187,7 @@ class CustomImageDropdown(CustomScrollableDropdown):
             attach=self.options_button,
             width=width * 3,
             height=height * 60,
-            values=values,
+            values=["" for _ in imgs],
             image_values=imgs,
             command=self._on_select,
             fg_color=self.app.ecuaciones.tabview._segmented_button.cget("unselected_color"),  # type: ignore
