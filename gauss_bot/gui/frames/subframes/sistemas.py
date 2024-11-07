@@ -160,7 +160,7 @@ class SistemasFrame(CustomScrollFrame):
             self.mensaje_frame.destroy()
             self.mensaje_frame = None
 
-        if sistema.solucion.count("!=") > 0:  # type: ignore
+        if "!=" in sistema.solucion:  # type: ignore
             self.mensaje_frame = ResultadoFrame(
                 self, header=sistema.solucion,  # type: ignore
                 resultado="", solo_header=True,

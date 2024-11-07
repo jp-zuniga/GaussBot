@@ -10,6 +10,7 @@ from os import path
 from typing import (
     TYPE_CHECKING,
     Optional,
+    Union,
 )
 
 from PIL.ImageOps import invert
@@ -36,9 +37,16 @@ from matplotlib.pyplot import (
     text,
 )
 
+from sympy.calculus.util import continuous_domain
 from sympy import (
+    Expr,
+    Interval,
+    Symbol,
+    lambdify,
     latex,
     parse_expr,
+    symbols,
+
 )
 
 from sympy.parsing.sympy_parser import (
@@ -71,7 +79,8 @@ if TYPE_CHECKING:
 
 TRANSFORMS = (standard_transformations + (implicit_multiplication_application,))
 
-MARGEN_ERROR = Fraction(1e-6)
+MARGEN_ERROR = Fraction(1, 10000)
+MAX_ITERACIONES = 1000
 
 
 class RaicesFrame(CustomScrollFrame):
@@ -104,6 +113,9 @@ class RaicesFrame(CustomScrollFrame):
         self.signos: list[CustomDropdown] = []
         self.arg_entries: list[ctkEntry] = []
         self.func = ""
+
+        self.a_entry: ctkEntry
+        self.b_entry: ctkEntry
 
         self.collapse_button: Optional[ctkButton] = None
         self.mensaje_frame: Optional[ctkFrame] = None
@@ -160,6 +172,7 @@ class RaicesFrame(CustomScrollFrame):
         self.update_frame()
 
     def setup_terminos_frame(self) -> None:
+        self.terminos_frame.grid(row=1, column=0, columnspan=3, sticky="n")
         self.terminos_frame.columnconfigure(0, weight=1)
         self.terminos_frame.columnconfigure(1, weight=1)
         for widget in self.terminos_frame.winfo_children():
@@ -190,7 +203,6 @@ class RaicesFrame(CustomScrollFrame):
                 self, "Debe ingresar números enteros positivos para la cantidad de términos!"
             )
             self.mensaje_frame.grid(row=1, column=0, columnspan=3, padx=5, pady=5, sticky="n")
-            self.update_scrollbar_visibility()
             return
 
         if self.mensaje_frame is not None:
@@ -235,7 +247,7 @@ class RaicesFrame(CustomScrollFrame):
             signo = CustomDropdown(
                 self.terminos_frame,
                 width=60,
-                values=["+", "-"],
+                values=["+", "−"],
                 font=("Roboto", 18),
                 dropdown_font=("Roboto", 18),
                 dynamic_resizing=False,
@@ -259,7 +271,6 @@ class RaicesFrame(CustomScrollFrame):
             self.terminos_frame, text="Leer función", command=self.mostrar_func
         )
 
-        self.terminos_frame.grid(row=1, column=0, columnspan=3, sticky="n")
         leer_func_button.grid(row=num_terminos + 2, column=0, columnspan=3, pady=5, sticky="n")
         sep2.grid(row=num_terminos + 3, column=0, columnspan=3, sticky="n")
         self.collapsed_terminos = False
@@ -283,19 +294,21 @@ class RaicesFrame(CustomScrollFrame):
 
     def leer_arg_entries(self) -> str:
         func = ""
+        print(func)
         for sig_entry, arg_entry in zip(self.signos, self.arg_entries):
             signo = sig_entry.get()
             arg = arg_entry.get()
-            if arg[0] not in ("+", "-"):
+            print("what the fuck", arg)
+            if arg[0] not in ("+", "−"):
                 arg = f"+{arg}"
 
             signos_iguales = (
                 arg[0] == "+" and signo == "+" or
-                arg[0] == "-" and signo == "-"
+                arg[0] == "-" and signo == "−"
             )
 
             signos_distintos = (
-                arg[0] == "+" and signo == "-" or
+                arg[0] == "+" and signo == "−" or
                 arg[0] == "-" and signo == "+"
             )
 
@@ -303,16 +316,15 @@ class RaicesFrame(CustomScrollFrame):
                 func += f"+{arg[1:]}"
             elif signos_distintos:
                 func += f"-{arg[1:]}"
+        print(func)
         return func
 
     def leer_func(self) -> None:
         self.func = self.leer_arg_entries()
-        print(self.func)
-        if self.func.count("sen") > 0:
+        if "sen" in self.func:
             self.func = self.func.replace("sen", "sin")
-        if self.func.count("^") > 0:
+        if "^" in self.func:
             self.func = self.func.replace("^", "**")
-        print(self.func)
 
     def mostrar_func(self) -> None:
         for widget in self.func_frame.winfo_children():
@@ -358,6 +370,7 @@ class RaicesFrame(CustomScrollFrame):
         self.setup_calc_frame()
 
     def setup_calc_frame(self) -> None:
+        self.calc_frame.grid(row=4, column=0, columnspan=3, padx=5, pady=5, sticky="n")
         self.calc_frame.columnconfigure(0, weight=1)
         self.calc_frame.columnconfigure(3, weight=1)
 
@@ -365,24 +378,120 @@ class RaicesFrame(CustomScrollFrame):
             self.calc_frame, text="Encontrar las raíces de f(x) entre:"
         )
 
-        a_entry = ctkEntry(self.calc_frame, width=40, placeholder_text="-10")
+        self.a_entry = ctkEntry(self.calc_frame, width=40, placeholder_text="-10")
         and_label = ctkLabel(self.calc_frame, text="y")
-        b_entry = ctkEntry(self.calc_frame, width=40, placeholder_text="10")
+        self.b_entry = ctkEntry(self.calc_frame, width=40, placeholder_text="10")
 
         calc_button = ctkButton(
             self.calc_frame,
             text="Calcular por método de bisección",
-            command=lambda: biseccion(
-                self.func, Fraction(a_entry.get()), Fraction(b_entry.get())
-            ),
+            command=self.encontrar_raiz
         )
 
-        self.calc_frame.grid(row=4, column=0, columnspan=3, padx=5, pady=5, sticky="n")
         encontrar_label.grid(row=0, column=0, padx=5, pady=5, sticky="ne")
-        a_entry.grid(row=0, column=1, padx=5, pady=5, sticky="ne")
+        self.a_entry.grid(row=0, column=1, padx=5, pady=5, sticky="ne")
         and_label.grid(row=0, column=2, padx=5, pady=5, sticky="nw")
-        b_entry.grid(row=0, column=3, padx=5, pady=5, sticky="nw")
+        self.b_entry.grid(row=0, column=3, padx=5, pady=5, sticky="nw")
         calc_button.grid(row=1, column=0, columnspan=4, padx=5, pady=5, sticky="n")
+
+    def encontrar_raiz(self) -> None:
+        if self.mensaje_frame is not None:
+            self.mensaje_frame.destroy()
+            self.mensaje_frame = None
+
+        try:
+            a = Fraction(self.a_entry.get())
+            b = Fraction(self.b_entry.get())
+        except ValueError:
+            self.mensaje_frame = ErrorFrame(
+                self, "Debe ingresar números reales para el intervalo!"
+            )
+            self.mensaje_frame.grid(row=5, column=0, columnspan=4, padx=5, pady=5, sticky="n")
+            return
+
+        if self.mensaje_frame is not None:
+            self.mensaje_frame.destroy()
+            self.mensaje_frame = None
+
+        resultado = biseccion(self.func, (a, b))
+        if resultado is False:
+            self.mensaje_frame = ErrorFrame(
+                self, f"La función no es continua en el intervalo [{a}, {b}]!"
+            )
+            self.mensaje_frame.grid(row=5, column=0, columnspan=4, padx=5, pady=5, sticky="n")
+            return
+        elif resultado is True:
+            self.mensaje_frame = ErrorFrame(
+                self, f"La función no cambia de signo en el intervalo [{a}, {b}]!"
+            )
+            self.mensaje_frame.grid(row=5, column=0, columnspan=4, padx=5, pady=5, sticky="n")
+            return
+
+        if self.mensaje_frame is not None:
+            self.mensaje_frame.destroy()
+            self.mensaje_frame = None
+
+        x, f_x, i = resultado
+        x = Fraction(x)
+        f_x = Fraction(x)
+        func_img = latex_to_png(
+            latex_str=rf"f({latexify_frac(str(x))}) = {latexify_frac(str(f_x))}",
+            output_file=path.join(ASSET_PATH, "func.png")
+        )
+
+        if i == -1:
+            self.mensaje_frame = ResultadoFrame(
+                self, solo_header=True, resultado="",
+                header=f"Despues de {MAX_ITERACIONES} iteraciones, no se encontro " +
+                       f"una raíz dentro del margen de error {MARGEN_ERROR}!\n" +
+                        "Raíz aproximada encontrada:",
+                border_color="#ff3131",
+            )
+
+            img_label = ctkLabel(self.mensaje_frame, text="", image=func_img)
+            img_label.grid(row=1, column=0, padx=5, pady=3, sticky="n")
+            self.mensaje_frame.grid(
+                row=5,
+                column=0,
+                columnspan=4,
+                ipadx=10,
+                ipady=10,
+                padx=5,
+                pady=5,
+                sticky="n",
+            )
+            return
+
+        if self.mensaje_frame is not None:
+            self.mensaje_frame.destroy()
+            self.mensaje_frame = None
+
+        self.mensaje_frame = ResultadoFrame(
+            self, header="", resultado="", solo_header=True
+        )
+
+        img_label = ctkLabel(self.mensaje_frame, text="", image=func_img)
+        tipo_raiz = "" if x == 0 else "aproximada "
+
+        interpretacion_label = ctkLabel(
+            self.mensaje_frame,
+            text=f"El metodo de bisección converge despues de {i} iteraciones!\n" +
+                 f"Raíz {tipo_raiz}encontrada: ",
+        )
+
+        interpretacion_label.grid(row=0, column=0, padx=5, pady=(10, 3), sticky="n")
+        img_label.grid(row=1, column=0, padx=10, pady=(3, 10), sticky="n")
+        self.mensaje_frame.grid(
+            row=5,
+            column=0,
+            columnspan=4,
+            ipadx=10,
+            ipady=10,
+            padx=5,
+            pady=5,
+            sticky="n",
+        )
+
 
     def bind_entry_keys(self, entry: ctkEntry, i: int) -> None:
         entry.bind("<Up>", lambda _: self.entry_move_up(i))
@@ -406,10 +515,47 @@ class RaicesFrame(CustomScrollFrame):
         self.update_idletasks()
 
 
+def es_continua(sp_func: Expr, var: Symbol, intervalo: tuple[Fraction, Fraction]) -> bool:
+    intervalo_set = Interval(intervalo[0], intervalo[1])
+    dominio = continuous_domain(sp_func, var, intervalo_set)
+    return intervalo_set.is_subset(dominio)
+
+
 def biseccion(
-    func_str: str, a: Fraction, b: Fraction, tol: Fraction = MARGEN_ERROR
-) -> tuple[Fraction, int]:
-    return (Fraction(0), 0)
+    func_str: str,
+    intervalo: tuple[Fraction, Fraction],
+    margen_e: Fraction = MARGEN_ERROR
+) -> Union[bool, tuple[Fraction, Fraction, int]]:
+
+    a, b = intervalo
+    x = symbols("x", real=True)
+    parsed_func: Expr = parse_expr(func_str, transformations=TRANSFORMS)
+    f = lambdify(x, parsed_func)
+
+    try:
+        if not es_continua(parsed_func, x, intervalo):
+            return False
+    except NotImplementedError:
+        return False
+
+    f_a = f(float(a))
+    f_b = f(float(b))
+    if f_a * f_b > 0:
+        return True
+
+    i = 0
+    while True:
+        i += 1
+        c = (a + b) / 2
+        f_c = f(float(c))
+        if f_c == 0 or abs(f_c) < margen_e:
+            return (c, f_c, i)
+        elif f_a * f_c < 0:
+            b = c
+        elif f_b * f_c < 0:
+            a = c
+        elif i == MAX_ITERACIONES:
+            return (c, f_c, -1)
 
 
 def valid_rand(start: int, end: int) -> list[int]:
@@ -436,6 +582,13 @@ def generate_placeholders(func_key: str) -> str:
     }
 
     return placeholders[func_key]
+
+
+def latexify_frac(frac: str) -> str:
+    if "/" in frac:
+        a, b = frac.split("/")
+        return rf"\frac{{{a}}}{{{b}}}"
+    return frac
 
 
 def latex_to_png(latex_str: str, output_file: str) -> ctkImage:
