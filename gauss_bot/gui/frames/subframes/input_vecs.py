@@ -19,15 +19,11 @@ from customtkinter import (
     CTkLabel as ctkLabel,
 )
 
-from gauss_bot.models.vector import Vector
-from gauss_bot.managers.vecs_manager import VectoresManager
-
-from gauss_bot.gui.custom.custom_widgets import (
+from gauss_bot.models import Vector
+from gauss_bot.managers import VectoresManager
+from gauss_bot.gui.custom import (
     CustomEntry,
     CustomDropdown,
-)
-
-from gauss_bot.gui.custom.custom_frames import (
     CustomScrollFrame,
     ErrorFrame,
     SuccessFrame,
@@ -35,8 +31,8 @@ from gauss_bot.gui.custom.custom_frames import (
 )
 
 if TYPE_CHECKING:
-    from gauss_bot.gui.gui import GaussUI
-    from gauss_bot.gui.frames.inputs import ManejarVecs
+    from gauss_bot.gui import GaussUI
+    from gauss_bot.gui.frames import ManejarVecs
 
 
 class AgregarVecs(CustomScrollFrame):

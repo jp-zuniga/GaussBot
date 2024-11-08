@@ -13,12 +13,13 @@ from customtkinter import (
     CTkTabview as ctkTabview,
 )
 
-from gauss_bot.managers.mats_manager import MatricesManager
-from gauss_bot.managers.vecs_manager import VectoresManager
+from gauss_bot.managers import (
+    MatricesManager,
+    VectoresManager,
+)
 
-from gauss_bot.gui.custom.custom_frames import CustomScrollFrame
-
-from gauss_bot.gui.frames.subframes.operaciones_mats import (
+from gauss_bot.gui.custom import CustomScrollFrame
+from gauss_bot.gui.frames.subframes import (
     SumaRestaTab,
     MultiplicacionTab,
     TransposicionTab,
@@ -27,7 +28,7 @@ from gauss_bot.gui.frames.subframes.operaciones_mats import (
 )
 
 if TYPE_CHECKING:
-    from gauss_bot.gui.gui import GaussUI
+    from gauss_bot.gui import GaussUI
 
 
 class MatricesFrame(ctkFrame):

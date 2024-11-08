@@ -16,8 +16,10 @@ from copy import deepcopy
 from fractions import Fraction
 # from typing import Union
 
-from gauss_bot.models.matriz import Matriz
-from gauss_bot.models.sistema_ecuaciones import SistemaEcuaciones
+from gauss_bot.models import (
+    Matriz,
+    SistemaEcuaciones,
+)
 
 
 class MatricesManager:

@@ -18,12 +18,18 @@ from customtkinter import (
     set_default_color_theme,
 )
 
-from gauss_bot import THEMES_PATH, get_dict_key
-from gauss_bot.gui.custom.custom_frames import SuccessFrame
-from gauss_bot.gui.custom.custom_widgets import CustomDropdown
+from gauss_bot import (
+    THEMES_PATH,
+    get_dict_key,
+)
+
+from gauss_bot.gui.custom import (
+    CustomDropdown,
+    SuccessFrame,
+)
 
 if TYPE_CHECKING:
-    from gauss_bot.gui.gui import GaussUI
+    from gauss_bot.gui import GaussUI
 
 
 class ConfigFrame(ctkFrame):

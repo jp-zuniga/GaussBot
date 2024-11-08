@@ -12,7 +12,7 @@ from customtkinter import (
 )
 
 if TYPE_CHECKING:
-    from gauss_bot.gui.gui import GaussUI
+    from gauss_bot.gui import GaussUI
 
 
 class HomeFrame(ctkFrame):

@@ -11,7 +11,7 @@ Operaciones implementadas:
 
 from fractions import Fraction
 
-from gauss_bot.models.vector import Vector
+from gauss_bot.models import Vector
 
 
 class VectoresManager:

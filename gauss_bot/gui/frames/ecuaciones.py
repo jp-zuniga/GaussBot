@@ -14,13 +14,14 @@ from customtkinter import (
     CTkTabview as ctkTabview,
 )
 
-from gauss_bot.managers.mats_manager import MatricesManager
-
-from gauss_bot.gui.frames.subframes.sistemas import SistemasFrame
-from gauss_bot.gui.frames.subframes.raices import RaicesFrame
+from gauss_bot.managers import MatricesManager
+from gauss_bot.gui.frames.subframes import (
+    SistemasFrame,
+    RaicesFrame,
+)
 
 if TYPE_CHECKING:
-    from gauss_bot.gui.gui import GaussUI
+    from gauss_bot.gui import GaussUI
 
 
 class EcuacionesFrame(ctkFrame):

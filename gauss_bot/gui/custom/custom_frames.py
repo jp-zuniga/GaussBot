@@ -10,7 +10,6 @@ from typing import (
 )
 
 from PIL.Image import open as open_img
-
 from customtkinter import (
     CTkFrame as ctkFrame,
     CTkImage as ctkImage,
@@ -21,7 +20,7 @@ from customtkinter import (
 from gauss_bot import ASSET_PATH
 
 if TYPE_CHECKING:
-    from gauss_bot.gui.gui import GaussUI
+    from gauss_bot import GaussUI
 
 
 class CustomScrollFrame(ctkScrollFrame):

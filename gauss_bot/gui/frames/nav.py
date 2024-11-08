@@ -7,7 +7,6 @@ from os import path, remove
 from typing import TYPE_CHECKING
 
 from PIL.Image import open as open_img
-
 from customtkinter import (
     CTkButton as ctkButton,
     CTkFont as ctkFont,

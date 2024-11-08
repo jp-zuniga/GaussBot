@@ -30,29 +30,18 @@ from customtkinter import (
 )
 
 from matplotlib.pyplot import (
-    axis,
-    close,
-    rc,
-    savefig,
-    subplots,
-    text,
+    axis, close,
+    rc, savefig,
+    subplots, text,
 )
 
 from sympy import (
-    And,
-    Expr,
-    FiniteSet,
-    Interval,
-    log,
-    Set,
-    Symbol,
-    Pow,
-    lambdify,
-    latex,
-    parse_expr,
-    solve,
-    sqrt,
-    symbols,
+    And, Expr, FiniteSet,
+    Interval, log, Set,
+    Symbol, Pow,
+    lambdify, latex,
+    parse_expr, solve,
+    sqrt, symbols,
 )
 
 from sympy.parsing.sympy_parser import (
@@ -64,27 +53,22 @@ from gauss_bot import (
     ASSET_PATH,
     FUNCTIONS,
     get_dict_key,
-)
-
-from gauss_bot.gui.custom.custom_widgets import (
-    CustomDropdown,
-    CustomImageDropdown,
     resize_image,
 )
 
-from gauss_bot.gui.custom.custom_frames import (
+from gauss_bot.gui.custom import (
+    CustomDropdown,
+    CustomImageDropdown,
     CustomScrollFrame,
     ErrorFrame,
     ResultadoFrame,
 )
 
 if TYPE_CHECKING:
-    from gauss_bot.gui.gui import GaussUI
-    from gauss_bot.gui.frames.ecuaciones import EcuacionesFrame
-
+    from gauss_bot.gui import GaussUI
+    from gauss_bot.gui.frames import EcuacionesFrame
 
 TRANSFORMS = (standard_transformations + (implicit_multiplication_application,))
-
 MARGEN_ERROR = Fraction(1, 1000000)
 MAX_ITERACIONES = 1000
 

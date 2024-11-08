@@ -17,7 +17,6 @@ from tkinter import (
 )
 
 from PIL.Image import open as open_img
-
 from customtkinter import (
     CTkBaseClass as ctkBase,
     CTkButton as ctkButton,
@@ -29,16 +28,11 @@ from customtkinter import (
 )
 
 from gauss_bot import ASSET_PATH
-
-from gauss_bot.models.matriz import Matriz
-from gauss_bot.managers.mats_manager import MatricesManager
-
-from gauss_bot.gui.custom.custom_widgets import (
+from gauss_bot.models import Matriz
+from gauss_bot.managers import MatricesManager
+from gauss_bot.gui.custom import (
     CustomEntry,
     CustomDropdown,
-)
-
-from gauss_bot.gui.custom.custom_frames import (
     CustomScrollFrame,
     ErrorFrame,
     SuccessFrame,
@@ -46,8 +40,8 @@ from gauss_bot.gui.custom.custom_frames import (
 )
 
 if TYPE_CHECKING:
-    from gauss_bot.gui.gui import GaussUI
-    from gauss_bot.gui.frames.inputs import ManejarMats
+    from gauss_bot.gui import GaussUI
+    from gauss_bot.gui.frames import ManejarMats
 
 
 class AgregarMats(CustomScrollFrame):

@@ -15,19 +15,18 @@ from customtkinter import (
     CTkLabel as ctkLabel,
 )
 
-from gauss_bot.models.sistema_ecuaciones import SistemaEcuaciones
-from gauss_bot.managers.mats_manager import MatricesManager
-
-from gauss_bot.gui.custom.custom_widgets import CustomDropdown
-from gauss_bot.gui.custom.custom_frames import (
+from gauss_bot.models import SistemaEcuaciones
+from gauss_bot.managers import MatricesManager
+from gauss_bot.gui.custom import (
+    CustomDropdown,
     CustomScrollFrame,
     ErrorFrame,
     ResultadoFrame,
 )
 
 if TYPE_CHECKING:
-    from gauss_bot.gui.gui import GaussUI
-    from gauss_bot.gui.frames.ecuaciones import EcuacionesFrame
+    from gauss_bot.gui import GaussUI
+    from gauss_bot.gui.frames import EcuacionesFrame
 
 
 class SistemasFrame(CustomScrollFrame):

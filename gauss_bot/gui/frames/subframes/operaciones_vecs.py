@@ -17,25 +17,21 @@ from customtkinter import (
     CTkTabview as ctkTabview,
 )
 
-from gauss_bot.managers.vecs_manager import VectoresManager
-
-from gauss_bot.gui.custom.custom_widgets import (
+from gauss_bot.managers import VectoresManager
+from gauss_bot.gui.custom import (
     CustomEntry,
     CustomDropdown,
-)
-
-from gauss_bot.gui.custom.custom_frames import (
     CustomScrollFrame,
     ErrorFrame,
     ResultadoFrame,
 )
 
 if TYPE_CHECKING:
-    from gauss_bot.gui.gui import GaussUI
-    from gauss_bot.gui.frames.vectores import VectoresFrame
+    from gauss_bot.gui import GaussUI
+    from gauss_bot.gui.frames import VectoresFrame
 
 
-class SumaRestaTab(CustomScrollFrame):
+class VSumaRestaTab(CustomScrollFrame):
     """
     Frame para sumar y restar vectores ingresados por el usuario.
     """
@@ -239,7 +235,7 @@ class SumaRestaTab(CustomScrollFrame):
         self.vec2 = valor
 
 
-class MultiplicacionTab(CustomScrollFrame):
+class VMultiplicacionTab(CustomScrollFrame):
     """
     Frame para realizar multiplicaciones de vectores por escalares,
     producto punto y producto matriz-vector.

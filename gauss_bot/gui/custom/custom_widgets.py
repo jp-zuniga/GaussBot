@@ -9,8 +9,6 @@ from typing import (
     Union,
 )
 
-from PIL.Image import LANCZOS
-
 from customtkinter import (
     CTkButton as ctkButton,
     CTkEntry as ctkEntry,
@@ -23,30 +21,13 @@ from customtkinter import (
 from gauss_bot import (
     DROPDOWN_ARROW,
     FUNCTIONS,
+    resize_image,
 )
 
-from gauss_bot.gui.custom.scrollable_dropdown import CustomScrollableDropdown
+from gauss_bot.gui.custom import CustomScrollableDropdown
 
 if TYPE_CHECKING:
     from gauss_bot.gui.gui import GaussUI
-
-
-def resize_image(img: ctkImage, divisors: tuple = (4, 8)) -> ctkImage:
-    div1, div2 = divisors
-    dark = img._dark_image
-    light = img._light_image
-
-    width, height = img._size
-    new_width = int(width // div1)
-    new_height = int(height // div1)
-
-    dark_img = dark.resize((new_width, new_height), LANCZOS)
-    light_img = light.resize((new_width, new_height), LANCZOS)
-    return ctkImage(
-        dark_image=dark_img,
-        light_image=light_img,
-        size=(int(new_width // div2), int(new_height // div2)),
-    )
 
 
 class CustomEntry(ctkEntry):

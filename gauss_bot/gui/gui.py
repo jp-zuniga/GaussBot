@@ -16,18 +16,19 @@ from customtkinter import (
 from gauss_bot import (
     ASSET_PATH,
     CONFIG_PATH,
-    THEMES_PATH
+    THEMES_PATH,
 )
 
-from gauss_bot.managers.ops_manager import OpsManager
-
-from gauss_bot.gui.frames.home import HomeFrame
-from gauss_bot.gui.frames.inputs import InputsFrame
-from gauss_bot.gui.frames.matrices import MatricesFrame
-from gauss_bot.gui.frames.vectores import VectoresFrame
-from gauss_bot.gui.frames.config import ConfigFrame
-from gauss_bot.gui.frames.ecuaciones import EcuacionesFrame
-from gauss_bot.gui.frames.nav import NavFrame
+from gauss_bot.managers import OpsManager
+from gauss_bot.gui.frames import (
+    HomeFrame,
+    InputsFrame,
+    MatricesFrame,
+    VectoresFrame,
+    ConfigFrame,
+    EcuacionesFrame,
+    NavFrame,
+)
 
 
 class GaussUI(ctk):

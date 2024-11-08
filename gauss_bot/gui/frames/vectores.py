@@ -13,16 +13,18 @@ from customtkinter import (
     CTkTabview as ctkTabview,
 )
 
-from gauss_bot.managers.vecs_manager import VectoresManager
-from gauss_bot.managers.mats_manager import MatricesManager
+from gauss_bot.managers import (
+    MatricesManager,
+    VectoresManager,
+)
 
-from gauss_bot.gui.frames.subframes.operaciones_vecs import (
-    SumaRestaTab,
-    MultiplicacionTab,
+from gauss_bot.gui.frames.subframes import (
+    VSumaRestaTab,
+    VMultiplicacionTab,
 )
 
 if TYPE_CHECKING:
-    from gauss_bot.gui.gui import GaussUI
+    from gauss_bot.gui import GaussUI
 
 
 class VectoresFrame(ctkFrame):
@@ -64,8 +66,8 @@ class VectoresFrame(ctkFrame):
 
         self.instances: list[Union[ctkFrame, ctkScrollFrame]] = []
         self.tabs = [
-            ("Suma y Resta", SumaRestaTab),
-            ("Multiplicación", MultiplicacionTab),
+            ("Suma y Resta", VSumaRestaTab),
+            ("Multiplicación", VMultiplicacionTab),
         ]
 
         for nombre, cls in self.tabs:
