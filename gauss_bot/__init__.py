@@ -82,8 +82,7 @@ ASSET_PATH = path.join(
 )
 
 THEMES_PATH = path.join(
-    path.dirname(path.realpath(__file__)),
-    "themes"
+    ASSET_PATH, "themes"
 )
 
 DATA_PATH = path.join(
