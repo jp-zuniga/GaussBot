@@ -361,6 +361,7 @@ class MultiplicacionTab(CustomScrollFrame):
 
         instruct_e = ctkLabel(tab, text="Seleccione la matriz e ingrese el escalar:")
         operador_label = ctkLabel(tab, text="*")
+        operador_label._font.configure(size=16)
 
         self.select_escalar_mat = CustomDropdown(
             tab,
@@ -384,7 +385,7 @@ class MultiplicacionTab(CustomScrollFrame):
         instruct_e.grid(row=0, column=0, columnspan=3, padx=5, pady=5, sticky="n")
 
         self.escalar_entry.grid(row=1, column=0, ipadx=5, padx=5, pady=5, sticky="e")
-        operador_label.grid(row=1, column=1, padx=5, pady=5, sticky="ew")
+        operador_label.grid(row=1, column=1, padx=3, pady=5, sticky="ew")
         self.select_escalar_mat.grid(
             row=1, column=2, padx=5, pady=5, sticky="w"
         )
@@ -676,7 +677,7 @@ class TransposicionTab(CustomScrollFrame):
             return
 
         placeholder = Variable(self, value=self.master_frame.nombres_matrices[0])
-        instruct_t = ctkLabel(self, text="Seleccione la matriz para transponer:")
+        instruct_t = ctkLabel(self, text="Seleccione una matriz para transponer:")
 
         self.select_tmat = CustomDropdown(
             self,
@@ -775,7 +776,7 @@ class DeterminanteTab(CustomScrollFrame):
             return
 
         placeholder = Variable(self, value=self.master_frame.nombres_matrices[0])
-        instruct_d = ctkLabel(self, text="Seleccione la matriz para transponer:")
+        instruct_d = ctkLabel(self, text="Seleccione una matriz para calcular su determinante:")
 
         self.select_dmat = CustomDropdown(
             self,
@@ -790,7 +791,7 @@ class DeterminanteTab(CustomScrollFrame):
         button = ctkButton(
             self,
             height=30,
-            text="Transponer",
+            text="Calcular",
             command=lambda: self.calcular_determinante(self.dmat),
         )
 
@@ -884,7 +885,7 @@ class InversaTab(CustomScrollFrame):
             return
 
         placeholder = Variable(self, value=self.master_frame.nombres_matrices[0])
-        instruct_i = ctkLabel(self, text="Seleccione la matriz para transponer:")
+        instruct_i = ctkLabel(self, text="Seleccione una matriz para encontrar su inversa:")
 
         self.select_imat = CustomDropdown(
             self,
@@ -899,7 +900,7 @@ class InversaTab(CustomScrollFrame):
         button = ctkButton(
             self,
             height=30,
-            text="Transponer",
+            text="Encontrar",
             command=lambda: self.encontrar_inversa(self.imat),
         )
 
@@ -932,7 +933,7 @@ class InversaTab(CustomScrollFrame):
 
         if not any(inversa == mat for mat in self.mats_manager.mats_ingresadas.values()):
             self.mats_manager.mats_ingresadas[nombre_inversa] = inversa
-            self.app.inputs_frame.instances[0].update_frame()  # type: ignore
+            self.app.inputs_frame.instances[0].update_all()  # type: ignore
             self.master_frame.update_all()
             self.app.vectores.update_all()  # type: ignore
 

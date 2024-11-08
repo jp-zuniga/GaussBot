@@ -139,7 +139,7 @@ class Matriz:
         matriz = ""
         for i in range(self.filas):
             for j in range(self.columnas):
-                valor = str(self.valores[i][j]).center(max_len)
+                valor = str(self.valores[i][j].limit_denominator(10000)).center(max_len)
                 if j == 0 and j == self.columnas - 1:
                     matriz += f"( {valor} )"
                 elif j == 0:

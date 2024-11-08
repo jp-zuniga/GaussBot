@@ -410,7 +410,7 @@ class MultiplicacionTab(CustomScrollFrame):
             placeholder2 = placeholder1
 
         instruct_v = ctkLabel(tab, text="Seleccione los vectores para multiplicar:")
-        operador_label = ctkLabel(tab, text="*")
+        operador_label = ctkLabel(tab, text=".")
 
         self.select_vec1 = CustomDropdown(
             tab,

@@ -20,6 +20,7 @@ from PIL.Image import (
     open as open_img,
 )
 
+from tkinter import TclError
 from customtkinter import (
     CTkButton as ctkButton,
     CTkEntry as ctkEntry,
@@ -37,16 +38,21 @@ from matplotlib.pyplot import (
     text,
 )
 
-from sympy.calculus.util import continuous_domain
 from sympy import (
+    And,
     Expr,
+    FiniteSet,
     Interval,
+    log,
+    Set,
     Symbol,
+    Pow,
     lambdify,
     latex,
     parse_expr,
+    solve,
+    sqrt,
     symbols,
-
 )
 
 from sympy.parsing.sympy_parser import (
@@ -79,7 +85,7 @@ if TYPE_CHECKING:
 
 TRANSFORMS = (standard_transformations + (implicit_multiplication_application,))
 
-MARGEN_ERROR = Fraction(1, 10000)
+MARGEN_ERROR = Fraction(1, 1000000)
 MAX_ITERACIONES = 1000
 
 
@@ -116,14 +122,15 @@ class RaicesFrame(CustomScrollFrame):
 
         self.a_entry: ctkEntry
         self.b_entry: ctkEntry
+        self.error_entry: ctkEntry
 
         self.collapse_button: Optional[ctkButton] = None
         self.mensaje_frame: Optional[ctkFrame] = None
         self.collapsed_terminos = True
 
         self.terminos_frame = ctkFrame(self)
-        self.calc_frame = ctkFrame(self)
         self.func_frame = ctkFrame(self)
+        self.calc_frame = ctkFrame(self)
 
         terminos_label = ctkLabel(self, text="¿Cuántos términos tendrá la función?")
         self.terminos_entry = ctkEntry(self, width=30, placeholder_text="3")
@@ -287,13 +294,13 @@ class RaicesFrame(CustomScrollFrame):
 
     def leer_arg_entries(self) -> str:
         func = ""
-        # print(self.signos)
-        # print(self.arg_entries)
+        print(self.signos)
+        print(self.arg_entries)
         for sig_entry, arg_entry in zip(self.signos, self.arg_entries):
             signo = sig_entry.get()
             arg = arg_entry.get()
-            # print("what the fuck", arg)
-            if arg[0] not in ("+", "−"):
+            print("what the fuck", arg)
+            if "+" not in arg or "−" not in arg:
                 arg = f"+{arg}"
 
             signos_iguales = (
@@ -310,7 +317,7 @@ class RaicesFrame(CustomScrollFrame):
                 func += f"+{arg[1:]}"
             elif signos_distintos:
                 func += f"-{arg[1:]}"
-        # print(func)
+        print(func)
         return func
 
     def leer_func(self) -> None:
@@ -325,11 +332,22 @@ class RaicesFrame(CustomScrollFrame):
             widget.destroy()
         for widget in self.calc_frame.winfo_children():
             widget.destroy()
+        for widget in self.winfo_children():  # type: ignore
+            if isinstance(widget, ctkLabel) and "converge" in widget._text:
+                widget.destroy()
+
 
         self.func_frame.grid_remove()
         self.calc_frame.grid_remove()
         if self.collapse_button is not None:
             self.collapse_button.destroy()
+
+        if self.mensaje_frame is not None:
+            try:
+                self.mensaje_frame.destroy()
+            except TclError:
+                pass
+            self.mensaje_frame = None
 
         self.leer_func()
         parsed_func = parse_expr(self.func, transformations=TRANSFORMS)
@@ -364,6 +382,12 @@ class RaicesFrame(CustomScrollFrame):
         self.setup_calc_frame()
 
     def setup_calc_frame(self) -> None:
+        for widget in self.calc_frame.winfo_children():
+            widget.destroy()
+        for widget in self.winfo_children():  # type: ignore
+            if isinstance(widget, ctkLabel) and "converge" in widget._text:
+                widget.destroy()
+
         self.calc_frame.grid(row=4, column=0, columnspan=3, padx=5, pady=5, sticky="n")
         self.calc_frame.columnconfigure(0, weight=1)
         self.calc_frame.columnconfigure(3, weight=1)
@@ -376,6 +400,10 @@ class RaicesFrame(CustomScrollFrame):
         and_label = ctkLabel(self.calc_frame, text="y")
         self.b_entry = ctkEntry(self.calc_frame, width=40, placeholder_text="10")
 
+        error_label = ctkLabel(self.calc_frame, text="con un margen de error de:")
+        self.error_entry = ctkEntry(self.calc_frame, width=80)
+        self.error_entry.insert(0, f"{float(MARGEN_ERROR):.6f}")
+
         self.a_entry.bind("<Right>", lambda _: self.b_entry.focus_set())
         self.b_entry.bind("<Left>", lambda _: self.a_entry.focus_set())
         self.a_entry.bind("<Return>", lambda _: self.encontrar_raiz())
@@ -387,11 +415,13 @@ class RaicesFrame(CustomScrollFrame):
             command=self.encontrar_raiz
         )
 
-        encontrar_label.grid(row=0, column=0, padx=5, pady=5, sticky="ne")
-        self.a_entry.grid(row=0, column=1, padx=5, pady=5, sticky="ne")
-        and_label.grid(row=0, column=2, padx=5, pady=5, sticky="nw")
-        self.b_entry.grid(row=0, column=3, padx=5, pady=5, sticky="nw")
-        calc_button.grid(row=1, column=0, columnspan=4, padx=5, pady=5, sticky="n")
+        encontrar_label.grid(row=0, column=0, padx=5, pady=(5, 2), sticky="ne")
+        self.a_entry.grid(row=0, column=1, padx=5, pady=(5, 2), sticky="ne")
+        and_label.grid(row=0, column=2, padx=5, pady=(5, 2), sticky="nw")
+        self.b_entry.grid(row=0, column=3, padx=5, pady=(5, 2), sticky="nw")
+        error_label.grid(row=1, column=0, padx=5, pady=(2, 5), sticky="ne")
+        self.error_entry.grid(row=1, column=1, columnspan=3, padx=5, pady=(2, 5), sticky="nw")
+        calc_button.grid(row=2, column=0, columnspan=4, padx=5, pady=5, sticky="n")
 
     def encontrar_raiz(self) -> None:
         if self.mensaje_frame is not None:
@@ -401,9 +431,10 @@ class RaicesFrame(CustomScrollFrame):
         try:
             a = Fraction(self.a_entry.get())
             b = Fraction(self.b_entry.get())
+            error = Fraction(self.error_entry.get())
         except ValueError:
             self.mensaje_frame = ErrorFrame(
-                self, "Debe ingresar números reales para el intervalo!"
+                self, "Debe ingresar números reales para el intervalo/margen de error!"
             )
             self.mensaje_frame.grid(row=5, column=0, columnspan=3, padx=5, pady=5, sticky="n")
             return
@@ -412,7 +443,7 @@ class RaicesFrame(CustomScrollFrame):
             self.mensaje_frame.destroy()
             self.mensaje_frame = None
 
-        resultado = biseccion(self.func, (a, b))
+        resultado = biseccion(self.func, (a, b), margen_e=error)
         if resultado is False:
             self.mensaje_frame = ErrorFrame(
                 self, f"La función no es continua en el intervalo [{a}, {b}]!"
@@ -433,16 +464,26 @@ class RaicesFrame(CustomScrollFrame):
         x, f_x, i = resultado
         x = Fraction(x).limit_denominator()
         f_x = Fraction(f_x).limit_denominator()
+
+        error_str = r"\textnormal{Margen de error: }" + rf"{float(error):.6f}"
+        x_igual = rf"x = {float(x):6f}"
+        f_x_igual = rf"f({float(x):6f}) = {float(f_x):6f}"
+
         func_img = latex_to_png(
-            latex_str=rf"f({latexify_frac(str(x))}) = {latexify_frac(str(f_x))}",
-            output_file=path.join(ASSET_PATH, "func.png")
+            latex_str= rf"{error_str}" +
+                       r"\\[1em]" +
+                       rf"{x_igual}" +
+                       r"\\[1em]" +
+                       rf"{f_x_igual}",
+            output_file=path.join(ASSET_PATH, "func.png"),
+            font_size=60,
         )
 
         if i == -1:
             self.mensaje_frame = ResultadoFrame(
                 self, solo_header=True, resultado="",
-                header=f"Despues de {MAX_ITERACIONES} iteraciones, no se encontro " +
-                       f"una raíz dentro del margen de error {float(MARGEN_ERROR)}!\n" +
+                header=f"Despues de {MAX_ITERACIONES} iteraciones, no se encontró " +
+                       f"una raíz dentro del margen de error {float(error):.6f}!\n" +
                         "Raíz aproximada encontrada:",
                 border_color="#ff3131",
             )
@@ -514,8 +555,43 @@ class RaicesFrame(CustomScrollFrame):
 
 def es_continua(sp_func: Expr, var: Symbol, intervalo: tuple[Fraction, Fraction]) -> bool:
     intervalo_set = Interval(intervalo[0], intervalo[1])
-    dominio = continuous_domain(sp_func, var, intervalo_set)
-    return intervalo_set.is_subset(dominio)
+    discontinuities = FiniteSet()
+
+    for term in sp_func.atoms(Pow):
+        if term.exp.is_negative:
+            solutions = solve(term.base, var)
+            if isinstance(solutions, Set):
+                discontinuities = discontinuities.union(solutions)
+            elif isinstance(solutions, And):
+                for sol in solutions.args:
+                    discontinuities = discontinuities.union(FiniteSet(sol))
+            else:
+                discontinuities = discontinuities.union(FiniteSet(*solutions))
+
+    for term in sp_func.atoms(log):
+        solutions = solve(term.args[0] <= 0, var)
+        if isinstance(solutions, Set):
+            discontinuities = discontinuities.union(solutions)
+        elif isinstance(solutions, And):
+            for sol in solutions.args:
+                discontinuities = discontinuities.union(FiniteSet(sol))
+        else:
+            discontinuities = discontinuities.union(FiniteSet(*solutions))
+
+    for term in sp_func.atoms(sqrt):
+        solutions = solve(term.args[0] < 0, var)
+        if isinstance(solutions, Set):
+            discontinuities = discontinuities.union(solutions)
+        elif isinstance(solutions, And):
+            for sol in solutions.args:
+                discontinuities = discontinuities.union(FiniteSet(sol))
+        else:
+            discontinuities = discontinuities.union(FiniteSet(*solutions))
+
+    for point in discontinuities:
+        if intervalo_set.contains(point):
+            return False
+    return True
 
 
 def biseccion(
@@ -529,10 +605,7 @@ def biseccion(
     parsed_func: Expr = parse_expr(func_str, transformations=TRANSFORMS)
     f = lambdify(x, parsed_func)
 
-    try:
-        if not es_continua(parsed_func, x, intervalo):
-            return False
-    except NotImplementedError:
+    if not es_continua(parsed_func, x, intervalo):
         return False
 
     f_a = f(float(a))
@@ -588,14 +661,16 @@ def latexify_frac(frac: str) -> str:
     return frac
 
 
-def latex_to_png(latex_str: str, output_file: str) -> ctkImage:
+def latex_to_png(latex_str: str, output_file: str, font_size: int = 75) -> ctkImage:
     rc("text", usetex=True)
     rc("font", family="serif")
 
     fig_length = 12 + (len(latex_str) // 10)
+    fig_height = 2 if r"\\" not in latex_str else 2 + int(latex_str.count(r"\\") * 2)
     img_length = fig_length * 22
+    img_height = fig_height * 22
 
-    fig, _ = subplots(figsize=(fig_length, 2))
+    fig, _ = subplots(figsize=(fig_length, fig_height))
     axis("off")
     text(
         0.5,
@@ -603,7 +678,7 @@ def latex_to_png(latex_str: str, output_file: str) -> ctkImage:
         f"${latex_str}$",
         horizontalalignment="center",
         verticalalignment="center",
-        fontsize=75,
+        fontsize=font_size,
     )
 
     savefig(
@@ -621,7 +696,7 @@ def latex_to_png(latex_str: str, output_file: str) -> ctkImage:
     return ctkImage(
         dark_image=img_inverted,
         light_image=img,
-        size=(img_length, 40),
+        size=(img_length, img_height),
     )
 
 

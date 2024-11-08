@@ -31,21 +31,21 @@ if TYPE_CHECKING:
     from gauss_bot.gui.gui import GaussUI
 
 
-def resize_image(img: ctkImage, divisors: tuple[int, int] = (4, 8)) -> ctkImage:
+def resize_image(img: ctkImage, divisors: tuple = (4, 8)) -> ctkImage:
     div1, div2 = divisors
     dark = img._dark_image
     light = img._light_image
 
     width, height = img._size
-    new_width = width // div1
-    new_height = height // div1
+    new_width = int(width // div1)
+    new_height = int(height // div1)
 
     dark_img = dark.resize((new_width, new_height), LANCZOS)
     light_img = light.resize((new_width, new_height), LANCZOS)
     return ctkImage(
         dark_image=dark_img,
         light_image=light_img,
-        size=(new_width // div2, new_height // div2),
+        size=(int(new_width // div2), int(new_height // div2)),
     )
 
 
@@ -152,11 +152,18 @@ class CustomImageDropdown(CustomScrollableDropdown):
     ) -> None:
 
         self.app = app
+
         resizes = {
-            name: resize_image(img)
-            for name, img in sorted(FUNCTIONS.items())
+            name: resize_image(
+                img,
+                (4, 8)
+                if name not in ("k", "x^n", "b^x", "e^x")
+                else (3.6, 7.6)
+            )
+            for name, img in FUNCTIONS.items()
         }
 
+        resizes["k"] = resize_image(FUNCTIONS["k"], (3.5, 7.5))
         self.images: dict[str, ctkImage] = {
             "k": resizes["k"],
             "x^n": resizes["x^n"],
@@ -185,8 +192,8 @@ class CustomImageDropdown(CustomScrollableDropdown):
 
         super().__init__(
             attach=self.options_button,
-            width=width * 3,
-            height=height * 60,
+            width=int(width * 2.5),
+            height=height * 250,
             values=["" for _ in imgs],
             image_values=imgs,
             command=self._on_select,
@@ -201,6 +208,7 @@ class CustomImageDropdown(CustomScrollableDropdown):
                 command=lambda _, drop=self, img=button._image:
                 self.app.ecuaciones.instances[1].extract_func(drop, img),  # type: ignore
             )
+            self.frame.configure(width=self.options_button.winfo_width())
 
     def _on_select(self, img: ctkImage) -> None:
         self.options_button.configure(

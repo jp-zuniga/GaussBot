@@ -211,4 +211,7 @@ class NavFrame(ctkFrame):
         self.app.ops_manager.save_vectores()  # type: ignore
         self.app.save_config()
         self.app.quit()
-        remove(path.join(ASSET_PATH, "func.png"))
+        try:
+            remove(path.join(ASSET_PATH, "func.png"))
+        except FileNotFoundError:
+            pass
