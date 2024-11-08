@@ -6,19 +6,27 @@ la barra de navegación de la aplicación.
 from os import path, remove
 from typing import TYPE_CHECKING
 
-from PIL.Image import open as open_img
 from customtkinter import (
     CTkButton as ctkButton,
     CTkFont as ctkFont,
     CTkFrame as ctkFrame,
     CTkLabel as ctkLabel,
-    CTkImage as ctkImage,
 )
 
-from gauss_bot import ASSET_PATH
+from gauss_bot import (
+    DATA_PATH,
+    LOGO,
+    HOME_ICON,
+    INPUTS_ICON,
+    ECUACIONES_ICON,
+    MATRIZ_ICON,
+    VECTOR_ICON,
+    CONFIG_ICON,
+    QUIT_ICON,
+)
 
 if TYPE_CHECKING:
-    from gauss_bot.gui.gui import GaussUI
+    from gauss_bot.gui import GaussUI
 
 
 class NavFrame(ctkFrame):
@@ -37,48 +45,7 @@ class NavFrame(ctkFrame):
         self.columnconfigure(1, weight=1)
         self.configure(fg_color=self.app.theme_config["CTk"]["fg_color"])
 
-        self.logo = ctkImage(
-            dark_image=open_img(path.join(ASSET_PATH, "light_logo.png")),
-            light_image=open_img(path.join(ASSET_PATH, "dark_logo.png"))
-        )
-
-        self.home_icon = ctkImage(
-            dark_image=open_img(path.join(ASSET_PATH, "light_home_icon.png")),
-            light_image=open_img(path.join(ASSET_PATH, "dark_home_icon.png"))
-        )
-
-        self.inputs_icon = ctkImage(
-            dark_image=open_img(path.join(ASSET_PATH, "light_input_icon.png")),
-            light_image=open_img(path.join(ASSET_PATH, "dark_input_icon.png"))
-        )
-
-        self.ecuaciones_icon = ctkImage(
-            dark_image=open_img(path.join(ASSET_PATH, "light_ecuaciones_icon.png")),
-            light_image=open_img(path.join(ASSET_PATH, "dark_ecuaciones_icon.png"))
-        )
-
-        self.matriz_icon = ctkImage(
-            dark_image=open_img(path.join(ASSET_PATH, "light_matriz_icon.png")),
-            light_image=open_img(path.join(ASSET_PATH, "dark_matriz_icon.png"))
-        )
-
-        self.vector_icon = ctkImage(
-            dark_image=open_img(path.join(ASSET_PATH, "light_vector_icon.png")),
-            light_image=open_img(path.join(ASSET_PATH, "dark_vector_icon.png"))
-        )
-
-        self.config_icon = ctkImage(
-            dark_image=open_img(path.join(ASSET_PATH, "light_config_icon.png")),
-            light_image=open_img(path.join(ASSET_PATH, "dark_config_icon.png"))
-        )
-
-        self.quit_icon = ctkImage(
-            dark_image=open_img(path.join(ASSET_PATH, "light_quit_icon.png")),
-            light_image=open_img(path.join(ASSET_PATH, "dark_quit_icon.png"))
-        )
-
-
-        self.logo_label = ctkLabel(self, image=self.logo, text="")
+        self.logo_label = ctkLabel(self, image=LOGO, text="")
         self.logo_text = ctkLabel(
             self, text="GaussBot",
             font=ctkFont(size=18, weight="bold"),
@@ -88,7 +55,7 @@ class NavFrame(ctkFrame):
             self, corner_radius=0, height=40, border_spacing=10,
             text="Inicio", fg_color="transparent",
             text_color=("gray10", "gray90"), hover_color=("gray70", "gray30"),
-            image=self.home_icon, anchor="w",
+            image=HOME_ICON, anchor="w",
             command=self.home_button_event,
         )
 
@@ -96,7 +63,7 @@ class NavFrame(ctkFrame):
             self, corner_radius=0, height=40, border_spacing=10,
             text="Menú de Datos", fg_color="transparent",
             text_color=("gray10", "gray90"), hover_color=("gray70", "gray30"),
-            image=self.inputs_icon, anchor="w",
+            image=INPUTS_ICON, anchor="w",
             command=self.inputs_button_event,
         )
 
@@ -104,7 +71,7 @@ class NavFrame(ctkFrame):
             self, corner_radius=0, height=40, border_spacing=10,
             text="Menú de Ecuaciones", fg_color="transparent",
             text_color=("gray10", "gray90"), hover_color=("gray70", "gray30"),
-            image=self.ecuaciones_icon, anchor="w",
+            image=ECUACIONES_ICON, anchor="w",
             command=self.ecuaciones_button_event,
         )
 
@@ -112,7 +79,7 @@ class NavFrame(ctkFrame):
             self, corner_radius=0, height=40, border_spacing=10,
             text="Menú de Matrices", fg_color="transparent",
             text_color=("gray10", "gray90"), hover_color=("gray70", "gray30"),
-            image=self.matriz_icon, anchor="w",
+            image=MATRIZ_ICON, anchor="w",
             command=self.matrices_button_event,
         )
 
@@ -120,7 +87,7 @@ class NavFrame(ctkFrame):
             self, corner_radius=0, height=40, border_spacing=10,
             text="Menú de Vectores", fg_color="transparent",
             text_color=("gray10", "gray90"), hover_color=("gray70", "gray30"),
-            image=self.vector_icon, anchor="w",
+            image=VECTOR_ICON, anchor="w",
             command=self.vectores_button_event,
         )
 
@@ -128,7 +95,7 @@ class NavFrame(ctkFrame):
             self, corner_radius=0, height=40, border_spacing=10,
             text="Configuración", fg_color="transparent",
             text_color=("gray10", "gray90"), hover_color=("gray70", "gray30"),
-            image=self.config_icon, anchor="w",
+            image=CONFIG_ICON, anchor="w",
             command=self.config_button_event,
         )
 
@@ -136,7 +103,7 @@ class NavFrame(ctkFrame):
             self, corner_radius=0, height=40, border_spacing=10,
             text="Cerrar", fg_color="transparent",
             text_color=("gray10", "gray90"), hover_color=("gray70", "gray30"),
-            image=self.quit_icon, anchor="w",
+            image=QUIT_ICON, anchor="w",
             command=self.quit_event,
         )
 
@@ -211,6 +178,6 @@ class NavFrame(ctkFrame):
         self.app.save_config()
         self.app.quit()
         try:
-            remove(path.join(ASSET_PATH, "func.png"))
+            remove(path.join(DATA_PATH, "func.png"))
         except FileNotFoundError:
             pass

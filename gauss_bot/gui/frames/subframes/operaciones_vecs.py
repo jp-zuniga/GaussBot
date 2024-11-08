@@ -17,6 +17,7 @@ from customtkinter import (
     CTkTabview as ctkTabview,
 )
 
+from gauss_bot import delete_msg_frame
 from gauss_bot.managers import VectoresManager
 from gauss_bot.gui.custom import (
     CustomEntry,
@@ -73,32 +74,21 @@ class VSumaRestaTab(CustomScrollFrame):
             for widget in tab.winfo_children():  # type: ignore
                 widget.destroy()  # type: ignore
 
-        num_vectores = len(self.master_frame.nombres_vectores)
         self.resultado_suma = ctkFrame(self.tab_sumar)
         self.resultado_resta = ctkFrame(self.tab_restar)
 
-        if num_vectores >= 1:
-            self.setup_suma_resta(self.tab_sumar, "Sumar")
-            self.setup_suma_resta(self.tab_restar, "Restar")
-        if num_vectores == 0:
-            for tab in self.tabview.winfo_children():
-                tab.columnconfigure(0, weight=1)  # type: ignore
-                no_vectores = ErrorFrame(tab, "No hay vectores guardados!")
-                no_vectores.grid(row=0, column=0, padx=5, pady=5, sticky="n")
+        self.setup_suma_resta(self.tab_sumar, "Sumar")
+        self.setup_suma_resta(self.tab_restar, "Restar")
         self.update_scrollbar_visibility()
 
     def setup_suma_resta(self, tab: ctkFrame, operacion: str) -> None:
         """
-        Configura pestañas para sumar o restar vectores.
+        Configura las pestañas para sumar o restar vectores.
         """
 
-        if self.mensaje_frame is not None:
-            self.mensaje_frame.destroy()
-            self.mensaje_frame = None
-
+        delete_msg_frame(self.mensaje_frame)
         tab.columnconfigure(0, weight=1)
         tab.columnconfigure(2, weight=1)
-        num_vectores = len(self.master_frame.nombres_vectores)
 
         if operacion == "Sumar":
             operador = "+"
@@ -106,10 +96,11 @@ class VSumaRestaTab(CustomScrollFrame):
             operador = "−"
 
         placeholder1 = Variable(tab, value=self.master_frame.nombres_vectores[0])
-        if num_vectores == 1:
-            placeholder2 = placeholder1
-        else:
-            placeholder2 = Variable(tab, value=self.master_frame.nombres_vectores[1])
+        placeholder2 = (
+            placeholder1
+            if len(self.master_frame.nombres_vectores) == 1
+            else Variable(tab, value=self.master_frame.nombres_vectores[1])
+        )
 
         instruct_sr = ctkLabel(tab, text=f"Seleccione los vectores a {operacion.lower()}:")
         operador_label = ctkLabel(tab, text=operador)
@@ -147,9 +138,19 @@ class VSumaRestaTab(CustomScrollFrame):
         ejecutar_button.grid(row=2, column=0, columnspan=3, padx=5, pady=10, sticky="n")
 
         if operacion == "Sumar":
-            self.resultado_suma.grid(row=3, column=0, columnspan=3, padx=5, pady=5, sticky="n")
+            self.resultado_suma.grid(
+                row=3, column=0,
+                columnspan=3,
+                padx=5, pady=5,
+                sticky="n",
+            )
         elif operacion == "Restar":
-            self.resultado_resta.grid(row=3, column=0, columnspan=3, padx=5, pady=5, sticky="n")
+            self.resultado_resta.grid(
+                row=3, column=0,
+                columnspan=3,
+                padx=5, pady=5,
+                sticky="n",
+            )
 
     def ejecutar_operacion(self, operacion, nombre_vec1, nombre_vec2) -> None:
         """
@@ -170,10 +171,7 @@ class VSumaRestaTab(CustomScrollFrame):
         Suma los vectores seleccionados.
         """
 
-        if self.mensaje_frame is not None:
-            self.mensaje_frame.destroy()
-            self.mensaje_frame = None
-
+        delete_msg_frame(self.mensaje_frame)
         try:
             header, resultado = self.vecs_manager.sumar_vecs(nombre_vec1, nombre_vec2)
         except ArithmeticError as e:
@@ -181,10 +179,7 @@ class VSumaRestaTab(CustomScrollFrame):
             self.mensaje_frame.grid(row=0, column=0, columnspan=3, padx=5, pady=5)
             self.update_scrollbar_visibility()
             return
-
-        if self.mensaje_frame is not None:
-            self.mensaje_frame.destroy()
-            self.mensaje_frame = None
+        delete_msg_frame(self.mensaje_frame)
 
         self.mensaje_frame = ResultadoFrame(
             self.resultado_suma, header=f"{header}:", resultado=str(resultado)
@@ -196,10 +191,7 @@ class VSumaRestaTab(CustomScrollFrame):
         Resta los vectores seleccionados.
         """
 
-        if self.mensaje_frame is not None:
-            self.mensaje_frame.destroy()
-            self.mensaje_frame = None
-
+        delete_msg_frame(self.mensaje_frame)
         try:
             header, resultado = self.vecs_manager.restar_vecs(nombre_vec1, nombre_vec2)
         except ArithmeticError as e:
@@ -207,10 +199,7 @@ class VSumaRestaTab(CustomScrollFrame):
             self.mensaje_frame.grid(row=0, column=0, columnspan=3, padx=5, pady=5)
             self.update_scrollbar_visibility()
             return
-
-        if self.mensaje_frame is not None:
-            self.mensaje_frame.destroy()
-            self.mensaje_frame = None
+        delete_msg_frame(self.mensaje_frame)
 
         self.mensaje_frame = ResultadoFrame(
             self.resultado_resta, header=f"{header}:", resultado=str(resultado)
@@ -256,8 +245,6 @@ class VMultiplicacionTab(CustomScrollFrame):
         self.columnconfigure(0, weight=1)
 
         self.mensaje_frame: Optional[ctkFrame] = None
-        self.input_guardians: list[ctkFrame] = []
-
         self.select_escalar_vec: CustomDropdown
         self.escalar_entry: CustomEntry
         self.select_vec1: CustomDropdown
@@ -284,75 +271,33 @@ class VMultiplicacionTab(CustomScrollFrame):
         Wrapper para llamar todos los métodos de configuración de tabs.
         """
 
+        delete_msg_frame(self.mensaje_frame)
+        num_matrices = len(self.master_frame.nombres_matrices)
+
         for tab in self.tabview.winfo_children():
             tab.columnconfigure(0, weight=1)  # type: ignore
             tab.columnconfigure(2, weight=1)  # type: ignore
-
-        num_matrices = len(self.master_frame.nombres_matrices)
-        num_vectores = len(self.master_frame.nombres_vectores)
-
-        no_vectores_escalar = ErrorFrame(self.tab_escalar, "No hay vectores guardados!")
-        no_vectores_mult = ErrorFrame(self.tab_vector, "No hay vectores guardados!")
-        no_vectores_mat = ErrorFrame(self.tab_matriz_vector, "No hay vectores guardados!")
-        no_matrices = ErrorFrame(self.tab_matriz_vector, "No hay matrices guardadas!")
-        no_mats_vecs = ErrorFrame(self.tab_matriz_vector, "No hay matrices o vectores guardados!")
 
         self.resultado_escalar = ctkFrame(self.tab_escalar)
         self.resultado_vectores = ctkFrame(self.tab_vector)
         self.resultado_mat_vec = ctkFrame(self.tab_matriz_vector)
 
-        if num_vectores >= 1:
-            for frame in self.input_guardians:
-                if frame.master == self.tab_escalar or frame.master == self.tab_vector:
-                    frame.destroy()
-                    self.input_guardians.remove(frame)
-            self.setup_escalar_tab(self.tab_escalar)
-            self.setup_vector_tab(self.tab_vector)
+        self.setup_escalar_tab(self.tab_escalar)
+        self.setup_vector_tab(self.tab_vector)
 
-        if num_matrices >= 1 and num_vectores >= 1:
-            for frame in self.input_guardians:
-                if frame.master == self.tab_matriz_vector:
-                    frame.destroy()
-                    self.input_guardians.remove(frame)
+        if num_matrices >= 1:
             self.setup_matriz_vector_tab(self.tab_matriz_vector)
-
-        if num_matrices == 0 and num_vectores == 0:
-            self.input_guardians = [
-                no_vectores_escalar,
-                no_vectores_mult,
-                no_mats_vecs
-            ]
-
-            for frame in self.input_guardians:
-                frame.grid(row=0, column=0, columnspan=3, padx=5, pady=5, sticky="n")
-            self.update_scrollbar_visibility()
-            return
-        if num_vectores == 0:
-            self.input_guardians = [
-                no_vectores_escalar,
-                no_vectores_mult,
-                no_vectores_mat
-            ]
-
-            for frame in self.input_guardians:
-                frame.grid(row=0, column=0, columnspan=3, padx=5, pady=5, sticky="n")
-            self.update_scrollbar_visibility()
-            return
-        if num_matrices == 0:
-            no_matrices.grid(row=0, column=0, columnspan=3, padx=5, pady=5, sticky="n")
-            self.input_guardians = [no_matrices]
-        self.update_scrollbar_visibility()
+        else:
+            self.mensaje_frame = ErrorFrame(self.tab_matriz_vector, "No hay matrices guardadas!")
+            self.mensaje_frame.grid(row=0, column=0, columnspan=3, padx=5, pady=5, sticky="n")
 
     def setup_escalar_tab(self, tab: ctkFrame) -> None:
         """
         Setup de la tab para multiplicar un vector por un escalar.
         """
 
+        delete_msg_frame(self.mensaje_frame)
         placeholder1 = Variable(tab, value=self.master_frame.nombres_vectores[0])
-        if self.mensaje_frame is not None:
-            self.mensaje_frame.destroy()
-            self.mensaje_frame = None
-
         instruct_e = ctkLabel(tab, text="Seleccione el vector e ingrese el escalar:")
         operador_label = ctkLabel(tab, text="*")
 
@@ -391,21 +336,15 @@ class VMultiplicacionTab(CustomScrollFrame):
         Setup de la tab para multiplicar vectores.
         """
 
-        num_vectores = len(self.master_frame.nombres_vectores)
+        delete_msg_frame(self.mensaje_frame)
+        placeholder1 = Variable(tab, value=self.master_frame.nombres_vectores[0])
+        placeholder2 = (
+            placeholder1
+            if len(self.master_frame.nombres_vectores) == 1
+            else Variable(tab, value=self.master_frame.nombres_vectores[1])
+        )
 
-        if self.mensaje_frame is not None:
-            self.mensaje_frame.destroy()
-            self.mensaje_frame = None
-
-        placeholder1 = placeholder2 = None
-        if num_vectores > 1:
-            placeholder1 = Variable(tab, value=self.master_frame.nombres_vectores[0])
-            placeholder2 = Variable(tab, value=self.master_frame.nombres_vectores[1])
-        elif num_vectores == 1:
-            placeholder1 = Variable(tab, value=self.master_frame.nombres_vectores[0])
-            placeholder2 = placeholder1
-
-        instruct_v = ctkLabel(tab, text="Seleccione los vectores para multiplicar:")
+        instruct_v = ctkLabel(tab, text="Seleccione los vectores a multiplicar:")
         operador_label = ctkLabel(tab, text=".")
 
         self.select_vec1 = CustomDropdown(
@@ -431,7 +370,7 @@ class VMultiplicacionTab(CustomScrollFrame):
             tab,
             height=30,
             text="Multiplicar",
-            command=lambda: self.mult_vectores(self.vec1, self.vec2),
+            command=lambda: self.prod_punto(self.vec1, self.vec2),
         )
 
         instruct_v.grid(row=0, column=0, columnspan=3, padx=5, pady=5, sticky="n")
@@ -450,14 +389,11 @@ class VMultiplicacionTab(CustomScrollFrame):
         Setup de la tab para multiplicar matrices y vectores.
         """
 
-        if self.mensaje_frame is not None:
-            self.mensaje_frame.destroy()
-            self.mensaje_frame = None
-
+        delete_msg_frame(self.mensaje_frame)
         placeholder1 = Variable(tab, value=self.master_frame.nombres_matrices[0])
         placeholder2 = Variable(tab, value=self.master_frame.nombres_vectores[0])
 
-        instruct_mv = ctkLabel(tab, text="Seleccione la matriz y el vector para multiplicar:")
+        instruct_mv = ctkLabel(tab, text="Seleccione la matriz y el vector a multiplicar:")
         operador_label = ctkLabel(tab, text="*")
 
         self.select_vmat = CustomDropdown(
@@ -503,10 +439,7 @@ class VMultiplicacionTab(CustomScrollFrame):
         """
 
         vec = self.select_escalar_vec.get()  # type: ignore
-
-        if self.mensaje_frame is not None:
-            self.mensaje_frame.destroy()
-            self.mensaje_frame = None
+        delete_msg_frame(self.mensaje_frame)
 
         try:
             escalar = Fraction(self.escalar_entry.get())  # type: ignore
@@ -526,17 +459,14 @@ class VMultiplicacionTab(CustomScrollFrame):
             self.update_scrollbar_visibility()
             return
 
-        if self.mensaje_frame is not None:
-            self.mensaje_frame.destroy()
-            self.mensaje_frame = None
-
+        delete_msg_frame(self.mensaje_frame)
         self.mensaje_frame = ResultadoFrame(
             self.resultado_escalar, header=f"{header}:", resultado=str(resultado)
         )
         self.mensaje_frame.grid(row=0, column=0, padx=5, pady=5)
         self.update_scrollbar_visibility()
 
-    def mult_vectores(self, nombre_vec1: str, nombre_vec2: str) -> None:
+    def prod_punto(self, nombre_vec1: str, nombre_vec2: str) -> None:
         """
         Realiza el producto punto de dos vectores.
         """
@@ -544,10 +474,7 @@ class VMultiplicacionTab(CustomScrollFrame):
         nombre_vec1 = self.select_vec1.get()  # type: ignore
         nombre_vec2 = self.select_vec2.get()  # type: ignore
 
-        if self.mensaje_frame is not None:
-            self.mensaje_frame.destroy()
-            self.mensaje_frame = None
-
+        delete_msg_frame(self.mensaje_frame)
         try:
             header, resultado = self.vecs_manager.producto_punto(nombre_vec1, nombre_vec2)
         except ArithmeticError as e:
@@ -555,10 +482,7 @@ class VMultiplicacionTab(CustomScrollFrame):
             self.mensaje_frame.grid(row=0, column=0, padx=5, pady=5)
             self.update_scrollbar_visibility()
             return
-
-        if self.mensaje_frame is not None:
-            self.mensaje_frame.destroy()
-            self.mensaje_frame = None
+        delete_msg_frame(self.mensaje_frame)
 
         self.mensaje_frame = ResultadoFrame(
             self.resultado_vectores, header=f"{header}:", resultado=str(resultado)
@@ -574,10 +498,7 @@ class VMultiplicacionTab(CustomScrollFrame):
         nombre_mat = self.select_vmat.get()  # type: ignore
         nombre_vec = self.select_mvec.get()  # type: ignore
 
-        if self.mensaje_frame is not None:
-            self.mensaje_frame.destroy()
-            self.mensaje_frame = None
-
+        delete_msg_frame(self.mensaje_frame)
         try:
             header, resultado = self.app.ops_manager.matriz_por_vector(  # type: ignore
                 nombre_mat, nombre_vec
@@ -587,10 +508,7 @@ class VMultiplicacionTab(CustomScrollFrame):
             self.mensaje_frame.grid(row=0, column=0, padx=5, pady=5)
             self.update_scrollbar_visibility()
             return
-
-        if self.mensaje_frame is not None:
-            self.mensaje_frame.destroy()
-            self.mensaje_frame = None
+        delete_msg_frame(self.mensaje_frame)
 
         self.mensaje_frame = ResultadoFrame(
             self.resultado_mat_vec, header=f"{header}:", resultado=str(resultado)
@@ -599,15 +517,9 @@ class VMultiplicacionTab(CustomScrollFrame):
         self.update_scrollbar_visibility()
 
     def update_frame(self) -> None:
-        if not any(widget.master == self.tab_escalar for widget in self.input_guardians):
-            for widget_e in self.tab_escalar.winfo_children():
-                widget_e.destroy()  # type: ignore
-        if not any(widget.master == self.tab_vector for widget in self.input_guardians):
-            for widget_v in self.tab_vector.winfo_children():
-                widget_v.destroy()  # type: ignore
-        if not any(widget.master == self.tab_matriz_vector for widget in self.input_guardians):
-            for widget_m in self.tab_matriz_vector.winfo_children():
-                widget_m.destroy()  # type: ignore
+        for tab in self.tabview.winfo_children():
+            for widget in tab.winfo_children():
+                widget.destroy()
 
         self.setup_tabs()
         self.tabview.configure(bg_color="transparent")

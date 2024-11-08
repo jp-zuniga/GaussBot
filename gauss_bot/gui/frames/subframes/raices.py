@@ -51,6 +51,7 @@ from sympy.parsing.sympy_parser import (
 
 from gauss_bot import (
     ASSET_PATH,
+    DATA_PATH,
     FUNCTIONS,
     get_dict_key,
     resize_image,
@@ -58,7 +59,7 @@ from gauss_bot import (
 
 from gauss_bot.gui.custom import (
     CustomDropdown,
-    CustomImageDropdown,
+    FuncDropdown,
     CustomScrollFrame,
     ErrorFrame,
     ResultadoFrame,
@@ -99,7 +100,7 @@ class RaicesFrame(CustomScrollFrame):
             size=(18, 18),
         )
 
-        self.selectors: list[CustomImageDropdown] = []
+        self.selectors: list[FuncDropdown] = []
         self.signos: list[CustomDropdown] = []
         self.arg_entries: list[ctkEntry] = []
         self.func = ""
@@ -237,7 +238,7 @@ class RaicesFrame(CustomScrollFrame):
                 dynamic_resizing=False,
             )
 
-            dropdown = CustomImageDropdown(
+            dropdown = FuncDropdown(
                 master=self.terminos_frame,
                 app=self.app,
                 button_text="Seleccione una familia de funciones:",
@@ -259,11 +260,11 @@ class RaicesFrame(CustomScrollFrame):
         sep2.grid(row=num_terminos + 3, column=0, columnspan=3, sticky="n")
         self.collapsed_terminos = False
 
-    def extract_func(self, dropdown: CustomImageDropdown, img: ctkImage) -> None:
+    def extract_func(self, dropdown: FuncDropdown, img: ctkImage) -> None:
         func_key = get_dict_key(dropdown.images, img)
         self.crear_arg_entry(dropdown, func_key)  # type: ignore
 
-    def crear_arg_entry(self, dropdown: CustomImageDropdown, func_key: str) -> None:
+    def crear_arg_entry(self, dropdown: FuncDropdown, func_key: str) -> None:
         row, column = dropdown.options_button.grid_info()["row"], 2
         arg_entry = ctkEntry(
             self.terminos_frame,
@@ -337,7 +338,7 @@ class RaicesFrame(CustomScrollFrame):
         parsed_func = parse_expr(self.func, transformations=TRANSFORMS)
         latex_func = latex(parsed_func, ln_notation=True)
         latex_func = r"f(x) = " + latex_func
-        img = latex_to_png(latex_func, path.join(ASSET_PATH, "func.png"))
+        img = latex_to_png(latex_func, path.join(DATA_PATH, "func.png"))
 
         func_label = ctkLabel(
             self.func_frame,
@@ -459,7 +460,7 @@ class RaicesFrame(CustomScrollFrame):
                        rf"{x_igual}" +
                        r"\\[1em]" +
                        rf"{f_x_igual}",
-            output_file=path.join(ASSET_PATH, "func.png"),
+            output_file=path.join(DATA_PATH, "func.png"),
             font_size=60,
         )
 

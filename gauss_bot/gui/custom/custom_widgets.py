@@ -121,7 +121,7 @@ class CustomDropdown(ctkOptionMenu):
         self.icon_label.configure(fg_color=color, bg_color=color)
 
 
-class CustomImageDropdown(CustomScrollableDropdown):
+class FuncDropdown(CustomScrollableDropdown):
     def __init__(
         self,
         master: Any,
@@ -138,10 +138,11 @@ class CustomImageDropdown(CustomScrollableDropdown):
             name: resize_image(
                 img,
                 (4, 8)
-                if name not in ("k", "x^n", "b^x", "e^x")
+                if name not in ("x^n", "b^x", "e^x")
                 else (3.6, 7.6)
             )
             for name, img in FUNCTIONS.items()
+            if name != "k"
         }
 
         resizes["k"] = resize_image(FUNCTIONS["k"], (3.5, 7.5))
@@ -197,5 +198,4 @@ class CustomImageDropdown(CustomScrollableDropdown):
             compound="center",
             text="",
         )
-
         self.update_idletasks()

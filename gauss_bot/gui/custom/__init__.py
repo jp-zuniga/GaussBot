@@ -9,7 +9,7 @@ from .custom_frames import (
 from .custom_widgets import (
     CustomEntry,
     CustomDropdown,
-    CustomImageDropdown,
+    FuncDropdown,
 )
 
 __all__ = [
@@ -19,6 +19,6 @@ __all__ = [
     "ResultadoFrame",
     "CustomEntry",
     "CustomDropdown",
-    "CustomImageDropdown",
+    "FuncDropdown",
     "CustomScrollableDropdown",
 ]
