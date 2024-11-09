@@ -3,7 +3,6 @@ Implementación de los subframes de ManejarMats.
 """
 
 from fractions import Fraction
-from os import path
 from random import randint
 from typing import (
     TYPE_CHECKING,
@@ -11,29 +10,30 @@ from typing import (
     Union,
 )
 
-from tkinter import (
-    Variable,
-    TclError,
-)
-
-from PIL.Image import open as open_img
+from tkinter import Variable
 from customtkinter import (
-    CTkBaseClass as ctkBase,
-    CTkButton as ctkButton,
-    CTkCheckBox as ctkCheckBox,
     CTkEntry as ctkEntry,
     CTkFrame as ctkFrame,
-    CTkImage as ctkImage,
     CTkLabel as ctkLabel,
 )
 
-from gauss_bot import ASSET_PATH
+from gauss_bot import (
+    ENTER_ICON,
+    SHUFFLE_ICON,
+    ACEPTAR_ICON,
+    LIMPIAR_ICON,
+    MOSTRAR_ICON,
+    ELIMINAR_ICON,
+    delete_msg_frame,
+)
+
 from gauss_bot.models import Matriz
 from gauss_bot.managers import MatricesManager
 from gauss_bot.gui.custom import (
     CustomEntry,
     CustomDropdown,
     CustomScrollFrame,
+    IconButton,
     ErrorFrame,
     SuccessFrame,
     ResultadoFrame,
@@ -61,52 +61,49 @@ class AgregarMats(CustomScrollFrame):
         self.app = app
         self.master_frame = master_frame
         self.mats_manager = mats_manager
-
         self.columnconfigure(0, weight=1)
-        self.columnconfigure(1, weight=1)
 
-        self.aumentada = False
         self.mensaje_frame: Optional[ctkFrame] = None
         self.input_entries: list[list[CustomEntry]] = []
-        self.post_matriz_widgets: list[ctkBase] = []
 
-        checkbox_label = ctkLabel(self, text="¿Es un sistema de ecuaciones?")
-        self.check_aumentada = ctkCheckBox(self, text="", command=self.toggle_aumentada)
-        filas_label = ctkLabel(self, text="Número de filas:")
-        self.filas_entry = ctkEntry(self, width=60, placeholder_text="3")
-        columnas_label = ctkLabel(self, text="Número de columnas:")
-        self.columnas_entry = ctkEntry(self, width=60, placeholder_text="3")
+        self.pre_mat_frame = ctkFrame(self)
+        self.matriz_frame = ctkFrame(self)
+        self.post_mat_frame = ctkFrame(self)
+        self.nombre_entry: ctkEntry
 
-        ingresar_button = ctkButton(
-            self, height=30, text="Ingresar datos", command=self.generar_casillas
+        filas_label = ctkLabel(self.pre_mat_frame, text="Filas:")
+        self.filas_entry = ctkEntry(self.pre_mat_frame, width=30, placeholder_text="3")
+        columnas_label = ctkLabel(self.pre_mat_frame, text="Columnas:")
+        self.columnas_entry = ctkEntry(self.pre_mat_frame, width=30, placeholder_text="3")
+
+        ingresar_button = IconButton(
+            self.pre_mat_frame, self.app,
+            image=ENTER_ICON,
+            command=self.generar_casillas
         )
 
-        aleatoria_button = ctkButton(
-            self,
-            height=30,
-            text="Generar matriz aleatoria",
+        aleatoria_button = IconButton(
+            self.pre_mat_frame, self.app,
+            image=SHUFFLE_ICON,
             command=self.generar_aleatoria,
         )
 
-        self.matriz_frame = ctkFrame(self)
-
         self.filas_entry.bind("<Return>", lambda _: self.generar_casillas())
-        self.filas_entry.bind("<Up>", lambda _: self.focus_set_columnas())
-        self.filas_entry.bind("<Down>", lambda _: self.focus_set_columnas())
+        self.filas_entry.bind("<Left>", lambda _: self.focus_set_columnas())
+        self.filas_entry.bind("<Right>", lambda _: self.focus_set_columnas())
+        self.filas_entry.bind("<Down>", lambda _: self.move_down())
         self.columnas_entry.bind("<Return>", lambda _: self.generar_casillas())
-        self.columnas_entry.bind("<Up>", lambda _: self.focus_set_filas())
-        self.columnas_entry.bind("<Down>", lambda _: self.columnas_move_down())
+        self.columnas_entry.bind("<Left>", lambda _: self.focus_set_filas())
+        self.columnas_entry.bind("<Right>", lambda _: self.focus_set_filas())
+        self.columnas_entry.bind("<Down>", lambda _: self.move_down())
 
-        checkbox_label.grid(row=0, column=0, padx=5, pady=5, sticky="e")
-        self.check_aumentada.grid(row=0, column=1, padx=5, pady=5, sticky="w")
-        filas_label.grid(row=1, column=0, padx=5, pady=5, sticky="e")
-        self.filas_entry.grid(row=1, column=1, padx=5, pady=5, sticky="w")
-        columnas_label.grid(row=2, column=0, padx=5, pady=5, sticky="e")
-        self.columnas_entry.grid(row=2, column=1, padx=5, pady=5, sticky="w")
-        ingresar_button.grid(row=3, column=0, padx=5, pady=5, sticky="e")
-        aleatoria_button.grid(row=3, column=1, padx=5, pady=5, sticky="w")
-        self.matriz_frame.grid(row=4, column=0, columnspan=2, padx=5, pady=5, sticky="ns")
-        self.update_scrollbar_visibility()
+        self.pre_mat_frame.grid(row=0, column=0, padx=5, pady=5, sticky="n")
+        filas_label.grid(row=0, column=0, padx=5, pady=5)
+        self.filas_entry.grid(row=0, column=1, padx=5, pady=5)
+        columnas_label.grid(row=0, column=2, padx=5, pady=5)
+        self.columnas_entry.grid(row=0, column=3, padx=5, pady=5)
+        ingresar_button.grid(row=0, column=4, padx=3, pady=5)
+        aleatoria_button.grid(row=0, column=5, padx=3, pady=5)
 
     def limpiar_casillas(self) -> None:
         """
@@ -116,30 +113,19 @@ class AgregarMats(CustomScrollFrame):
         for fila_entries in self.input_entries:
             for entry in fila_entries:
                 entry.delete(0, "end")
-        self.input_entries.clear()
-        try:
-            self.nombre_entry.delete(0, "end")
-        except AttributeError:
-            pass
+        self.nombre_entry.delete(0, "end")
 
     def generar_casillas(self) -> None:
         """
         Genera casillas para ingresar una matriz de las dimensiones indicadas.
         """
 
-        try:
-            self.limpiar_casillas()
-            for widget in self.matriz_frame.winfo_children():
-                widget.destroy()  # type: ignore
-            for widget in self.post_matriz_widgets:
-                widget.destroy()
-        except TclError:
-            pass
+        for widget in self.matriz_frame.winfo_children():
+            widget.destroy()  # type: ignore
+        for widget in self.post_mat_frame.winfo_children():
+            widget.destroy()
 
-        if self.mensaje_frame is not None:
-            self.mensaje_frame.destroy()
-            self.mensaje_frame = None
-
+        delete_msg_frame(self.mensaje_frame)
         try:
             filas = int(self.filas_entry.get())
             columnas = int(self.columnas_entry.get())
@@ -149,64 +135,47 @@ class AgregarMats(CustomScrollFrame):
             self.mensaje_frame = ErrorFrame(
                 self, "Debe ingresar números enteros positivos como filas y columnas!"
             )
-            self.mensaje_frame.grid(row=4, column=0, columnspan=2, padx=5, pady=5, sticky="n")
-            self.update_scrollbar_visibility()
+            self.mensaje_frame.grid(row=1, column=0, padx=5, pady=5, sticky="n")
             return
+        delete_msg_frame(self.mensaje_frame)
 
-        if self.mensaje_frame is not None:
-            self.mensaje_frame.destroy()
-            self.mensaje_frame = None
-
-        if self.aumentada:
-            columnas += 1
-
-        height = 35 * filas
-        sep_icon = ctkImage(
-            dark_image=open_img(
-                path.join(ASSET_PATH, "light_vseparator.png")
-            ),
-            light_image=open_img(
-                path.join(ASSET_PATH, "dark_vseparator.png")
-            ),
-            size=(35, height),
-        )
-
+        self.input_entries.clear()
+        self.input_entries = []
         for i in range(filas):
             fila_entries = []
             for j in range(columnas):
                 input_entry = CustomEntry(self.matriz_frame, width=60)
-                if not self.aumentada or j != columnas - 1:
-                    input_entry.grid(row=i, column=j, padx=5, pady=5)
-                elif self.aumentada and j == columnas - 1:
-                    sep_placed = ctkLabel(self.matriz_frame, image=sep_icon, text="")
-                    sep_placed.grid(row=0, rowspan=filas, column=j)
-                    input_entry.grid(row=i, column=j+1, padx=5, pady=5)
+                input_entry.grid(row=i, column=j, padx=5, pady=5)
                 self.bind_entry_keys(input_entry, i, j)
                 fila_entries.append(input_entry)
             self.input_entries.append(fila_entries)
 
-        nombre_label = ctkLabel(self, text="Nombre de la matriz:")
-        self.nombre_entry = ctkEntry(self, width=25, placeholder_text="A")
-        agregar_button = ctkButton(self, height=30, text="Agregar", command=self.agregar_matriz)
-        limpiar_button = ctkButton(
-            self, height=30, text="Limpiar casillas", command=self.limpiar_casillas
+        nombre_label = ctkLabel(self.post_mat_frame, text="Nombre de la matriz:")
+        self.nombre_entry = ctkEntry(self.post_mat_frame, width=30, placeholder_text="A")
+
+        agregar_button = IconButton(
+            self.post_mat_frame,
+            self.app,
+            image=ACEPTAR_ICON,
+            command=self.agregar_matriz
         )
 
-        nombre_label.grid(row=5, column=0, padx=5, pady=5, sticky="e")
-        self.nombre_entry.grid(row=5, column=1, padx=5, pady=5, sticky="w")
-        agregar_button.grid(row=6, column=0, padx=5, pady=5, sticky="e")
-        limpiar_button.grid(row=6, column=1, padx=5, pady=5, sticky="w")
+        limpiar_button = IconButton(
+            self.post_mat_frame,
+            self.app,
+            image=LIMPIAR_ICON,
+            command=self.limpiar_casillas
+        )
+
+        self.matriz_frame.grid(row=1, column=0, columnspan=2, padx=5, pady=5, sticky="n")
+        self.post_mat_frame.grid(row=2, column=0, columnspan=2, padx=5, pady=5, sticky="n")
+        nombre_label.grid(row=0, column=0, padx=5, pady=5)
+        self.nombre_entry.grid(row=0, column=1, padx=5, pady=5)
+        agregar_button.grid(row=0, column=2, padx=2, pady=5)
+        limpiar_button.grid(row=0, column=3, padx=2, pady=5)
 
         self.nombre_entry.bind("<Up>", lambda _: self.nombre_entry_up())
         self.nombre_entry.bind("<Return>", lambda _: self.agregar_matriz())
-        self.update_scrollbar_visibility()
-
-        self.post_matriz_widgets = [
-            nombre_label,
-            self.nombre_entry,
-            agregar_button,
-            limpiar_button,
-        ]
 
     def generar_aleatoria(self) -> None:
         """
@@ -217,14 +186,14 @@ class AgregarMats(CustomScrollFrame):
         self.generar_casillas()
         for fila_entries in self.input_entries:
             for entry in fila_entries:
-                entry.delete(0, "end")
-                entry.insert(0, str(randint(-15, 15)))
+                entry.insert(0, randint(-15, 15))
 
     def agregar_matriz(self) -> None:
         """
         Agrega la matriz ingresada a la lista de matrices ingresadas.
         """
 
+        delete_msg_frame(self.mensaje_frame)
         try:
             filas = int(self.filas_entry.get())
             columnas = int(self.columnas_entry.get())
@@ -234,16 +203,13 @@ class AgregarMats(CustomScrollFrame):
             self.mensaje_frame = ErrorFrame(
                 self, "Debe ingresar números enteros positivos como filas y columnas!"
             )
-            self.mensaje_frame.grid(row=7, column=0, columnspan=2, padx=5, pady=5, sticky="n")
-            self.update_scrollbar_visibility()
+            self.mensaje_frame.grid(row=3, column=0, padx=5, pady=5, sticky="n")
             return
 
         input_f = len(self.input_entries)
         input_c = len(self.input_entries[0])
         dimensiones_validas = (
             filas == input_f and columnas == input_c
-            if not self.aumentada
-            else filas == input_f and input_c - 1 == columnas
         )
 
         if not dimensiones_validas:
@@ -251,12 +217,8 @@ class AgregarMats(CustomScrollFrame):
                 self,
                 "Las dimensiones de la matriz ingresada no coinciden con las dimensions indicadas!"
             )
-            self.mensaje_frame.grid(row=7, column=0, columnspan=2, padx=5, pady=5, sticky="n")
-            self.update_scrollbar_visibility()
+            self.mensaje_frame.grid(row=3, column=0, padx=5, pady=5, sticky="n")
             return
-
-        if self.aumentada:
-            columnas += 1
 
         valores = []
         for fila_entries in self.input_entries:
@@ -269,66 +231,54 @@ class AgregarMats(CustomScrollFrame):
                         self, "Todos los valores deben ser números racionales!"
                     )
                     self.mensaje_frame.grid(
-                        row=7, column=0, columnspan=2, padx=5, pady=5, sticky="n"
+                        row=3, column=0, padx=5, pady=5, sticky="n"
                     )
-                    self.update_scrollbar_visibility()
                     return
                 except ZeroDivisionError:
                     self.mensaje_frame = ErrorFrame(
                         self, "El denominador no puede ser 0!"
                     )
                     self.mensaje_frame.grid(
-                        row=7, column=0, columnspan=2, padx=5, pady=5, sticky="n"
+                        row=3, column=0, padx=5, pady=5, sticky="n"
                     )
-                    self.update_scrollbar_visibility()
                     return
                 fila_valores.append(valor)
             valores.append(fila_valores)
 
-        if self.mensaje_frame is not None:
-            self.mensaje_frame.destroy()
-            self.mensaje_frame = None
-
+        delete_msg_frame(self.mensaje_frame)
         nombre_nueva_matriz = self.nombre_entry.get()
         nueva_matriz = Matriz(
-            aumentada=self.aumentada, filas=filas,
+            aumentada=False, filas=filas,
             columnas=columnas, valores=valores
         )
 
+        nombre_repetido = nombre_nueva_matriz in self.mats_manager.mats_ingresadas
         nombre_valido = (
             nombre_nueva_matriz.isalpha()
             and nombre_nueva_matriz.isupper()
             and len(nombre_nueva_matriz) == 1
         )
 
-        if not nombre_valido:
-            self.mensaje_frame = ErrorFrame(
-                self, "El nombre de la matriz debe ser una letra mayúscula!"
+        if not nombre_valido or nombre_repetido:
+            msj = (
+                "El nombre de la matriz debe ser una letra mayúscula!"
+                if not nombre_valido
+                else f"Ya existe una matriz nombrada '{nombre_nueva_matriz}'!"
             )
-            self.mensaje_frame.grid(row=7, column=0, columnspan=2, padx=5, pady=5, sticky="n")
-            self.update_scrollbar_visibility()
-            return
-        if nombre_nueva_matriz in self.mats_manager.mats_ingresadas:
-            self.mensaje_frame = ErrorFrame(
-                self, f"Ya existe una matriz llamada '{nombre_nueva_matriz}'!"
-            )
-            self.mensaje_frame.grid(row=7, column=0, columnspan=2, padx=5, pady=5, sticky="n")
-            self.update_scrollbar_visibility()
+
+            self.mensaje_frame = ErrorFrame(self, msj)
+            self.mensaje_frame.grid(row=3, column=0, padx=5, pady=5, sticky="n")
             return
 
         self.mats_manager.mats_ingresadas[nombre_nueva_matriz] = nueva_matriz
         self.mensaje_frame = SuccessFrame(
             self, "La matriz se ha agregado exitosamente!"
         )
-        self.mensaje_frame.grid(row=7, column=0, columnspan=2, padx=5, pady=5, sticky="n")
+
+        self.mensaje_frame.grid(row=3, column=0, padx=5, pady=5, sticky="n")
         self.master_frame.update_all()
-        self.app.ecuaciones.update_all()  # type: ignore
         self.app.matrices.update_all()  # type: ignore
         self.app.vectores.update_all()  # type: ignore
-        self.update_scrollbar_visibility()
-
-    def toggle_aumentada(self) -> None:
-        self.aumentada = not self.aumentada
 
     def focus_set_columnas(self) -> None:
         self.columnas_entry.focus_set()
@@ -336,11 +286,11 @@ class AgregarMats(CustomScrollFrame):
     def focus_set_filas(self) -> None:
         self.filas_entry.focus_set()
 
-    def columnas_move_down(self) -> None:
-        if len(self.matriz_frame.winfo_children()) == 0:
-            self.focus_set_filas()
-        else:
+    def move_down(self) -> None:
+        try:
             self.input_entries[0][0].focus_set()
+        except IndexError:
+            pass
 
     def bind_entry_keys(self, entry: CustomEntry, i: int, j: int) -> None:
         entry.bind("<Up>", lambda _: self.entry_move_up(i, j))
@@ -352,7 +302,7 @@ class AgregarMats(CustomScrollFrame):
         if i > 0:
             self.input_entries[i - 1][j].focus_set()
         elif i == 0:
-            self.focus_set_columnas()
+            self.focus_set_filas()
 
     def entry_move_down(self, i: int, j: int) -> None:
         if i < len(self.input_entries) - 1:
@@ -381,7 +331,6 @@ class AgregarMats(CustomScrollFrame):
 
     def update_frame(self) -> None:
         self.update_idletasks()
-        self.update_scrollbar_visibility()
 
 
 class MostrarMats(CustomScrollFrame):
@@ -402,6 +351,7 @@ class MostrarMats(CustomScrollFrame):
         self.master_frame = master_frame
         self.mats_manager = mats_manager
         self.columnconfigure(0, weight=1)
+        self.columnconfigure(1, weight=1)
 
         self.options: dict[str, tuple[int, int]] = {
             "Mostrar todo": (-1, -1),
@@ -419,48 +369,50 @@ class MostrarMats(CustomScrollFrame):
         )
 
         self.option_seleccionada = self.options[self.select_option.get()]
-        mostrar_button = ctkButton(
-            self, height=30, text="Mostrar", command=self.setup_mostrar
+        mostrar_button = IconButton(
+            self, self.app,
+            image=MOSTRAR_ICON,
+            command=self.setup_mostrar
         )
 
-        self.mostrar_frame = ctkFrame(self)
         self.print_frame: Optional[Union[ErrorFrame, ResultadoFrame]] = None
 
-        select_label.grid(row=0, column=0, padx=5, pady=5, sticky="n")
-        self.select_option.grid(row=1, column=0, ipadx=10, padx=5, pady=5, sticky="n")
-        mostrar_button.grid(row=2, column=0, padx=5, pady=5, sticky="n")
-        self.mostrar_frame.grid(row=3, column=0, padx=5, pady=5, sticky="n")
-        self.update_scrollbar_visibility()
+        select_label.grid(row=0, column=0, columnspan=2, padx=5, pady=5, sticky="n")
+        self.select_option.grid(row=1, column=0, ipadx=10, padx=5, pady=5, sticky="e")
+        mostrar_button.grid(row=1, column=1, padx=5, pady=5, sticky="w")
 
     def setup_mostrar(self) -> None:
+        delete_msg_frame(self.print_frame)
         self.update_option(self.select_option.get())
+
         aumentada, calculada = self.option_seleccionada
-        mats_text: str = self.mats_manager.get_matrices(aumentada, calculada)
+        mats_text = self.mats_manager.get_matrices(aumentada, calculada)
 
-        if self.print_frame is not None:
-            self.print_frame.destroy()
-            self.print_frame = None
-
-        if mats_text.startswith("No"):
-            self.print_frame = ErrorFrame(self.mostrar_frame, mats_text)
-            self.print_frame.grid(row=0, column=0, padx=10, pady=10, sticky="n")
+        if "!" in mats_text:
+            self.print_frame = ErrorFrame(self, mats_text)
+            self.print_frame.grid(row=0, column=0, columnspan=2, padx=10, pady=10, sticky="n")
         else:
             self.print_frame = ResultadoFrame(
-                self.mostrar_frame, header=mats_text, resultado="", solo_header=True
+                self,
+                header=mats_text,
+                resultado="",
+                solo_header=True
             )
             self.print_frame.grid(
                 row=0, column=0,
-                padx=10, pady=10, sticky="n",
+                columnspan=2,
+                padx=10, pady=10,
+                sticky="n",
             )
             self.print_frame.header.grid(ipadx=10, ipady=10)
         self.print_frame.columnconfigure(0, weight=1)
-        self.update_scrollbar_visibility()
+        self.print_frame.grid(row=2, column=0, columnspan=2, padx=5, pady=5, sticky="n")
 
     def update_frame(self) -> None:
-        for widget in self.mostrar_frame.winfo_children():
-            widget.destroy()  # type: ignore
-        self.update_idletasks()
-        self.update_scrollbar_visibility()
+        try:
+            self.print_frame.destroy()  # type: ignore
+        except AttributeError:
+            pass
 
     def update_option(self, valor: str) -> None:
         self.option_seleccionada = self.options[valor]
@@ -480,33 +432,26 @@ class EliminarMats(CustomScrollFrame):
         self.master_frame = master_frame
         self.mats_manager = mats_manager
         self.columnconfigure(0, weight=1)
+        self.columnconfigure(1, weight=1)
 
-        self.nombres_matrices = list(self.mats_manager.mats_ingresadas.keys())
-        self.mensaje_frame: Optional[ctkFrame] = None
+        self.nombres_matrices = [
+            nombre
+            for nombre, mat in self.mats_manager.mats_ingresadas.items()
+            if not mat.aumentada
+        ]
+
+        self.mensaje_frame: Optional[Union[ErrorFrame, SuccessFrame]] = None
         self.select_mat: CustomDropdown
         self.mat_seleccionada = ""
         self.setup_frame()
 
     def setup_frame(self) -> None:
-        if self.mensaje_frame is not None:
-            self.mensaje_frame.destroy()
-            self.mensaje_frame = None
-
+        delete_msg_frame(self.mensaje_frame)
         if len(self.nombres_matrices) == 0:
             if isinstance(self.mensaje_frame, ErrorFrame):
                 return
-            
-            try:
-                for widget in self.winfo_children():
-                    if isinstance(widget, SuccessFrame):
-                        old_mensaje_frame = SuccessFrame(self, widget.mensaje_exito.cget("text"))
-                    widget.destroy()
-                old_mensaje_frame.grid(row=0, column=0, padx=5, pady=5, sticky="n")
-            except UnboundLocalError:
-                pass
-            
             self.mensaje_frame = ErrorFrame(self, "No hay matrices guardadas!")
-            self.after(1000, self.mensaje_frame.grid(row=1, column=0, padx=5, pady=5, sticky="n"))
+            self.mensaje_frame.grid(row=1, column=0, columnspan=2, padx=5, pady=5, sticky="n")
             return
 
         placeholder = Variable(self, value=self.nombres_matrices[0])
@@ -521,18 +466,17 @@ class EliminarMats(CustomScrollFrame):
             command=self.update_mat,
         )
 
-        button = ctkButton(
-            self,
-            height=30,
-            text="Eliminar",
+        button = IconButton(
+            self, self.app,
+            image=ELIMINAR_ICON,
             command=lambda: self.eliminar_matriz(),
         )
 
         self.mat_seleccionada = self.select_mat.get()
 
-        instruct_eliminar.grid(row=0, column=0, padx=5, pady=5, sticky="n")
-        self.select_mat.grid(row=1, column=0, padx=5, pady=5, sticky="n")
-        button.grid(row=2, column=0, padx=5, pady=5, sticky="n")
+        instruct_eliminar.grid(row=0, column=0, columnspan=2, padx=5, pady=5, sticky="n")
+        self.select_mat.grid(row=1, column=0, padx=5, pady=5, sticky="e")
+        button.grid(row=1, column=1, padx=5, pady=5, sticky="w")
         self.update_scrollbar_visibility()
 
     def eliminar_matriz(self) -> None:
@@ -540,28 +484,45 @@ class EliminarMats(CustomScrollFrame):
         Elimina la matriz seleccionada.
         """
 
-        if self.mensaje_frame is not None:
-            self.mensaje_frame.destroy()
-            self.mensaje_frame = None
-
+        delete_msg_frame(self.mensaje_frame)
         self.update_mat(self.select_mat.get())
         self.mats_manager.mats_ingresadas.pop(self.mat_seleccionada)
 
         self.mensaje_frame = SuccessFrame(
-            self, message=f"Matriz '{self.mat_seleccionada}' eliminada!"
+            self,
+            message=f"Matriz '{self.mat_seleccionada}' eliminada!"
         )
-        self.mensaje_frame.grid(row=3, column=0, padx=5, pady=5)
-        self.update_scrollbar_visibility()
+
+        self.mensaje_frame.grid(row=3, column=0, columnspan=2, padx=5, pady=5)
         self.master_frame.update_all()
-        self.app.ecuaciones.update_all()  # type: ignore
         self.app.matrices.update_all()  # type: ignore
         self.app.vectores.update_all()  # type: ignore
 
     def update_frame(self) -> None:
         self.nombres_matrices = list(self.mats_manager.mats_ingresadas.keys())
-        self.update_idletasks()
-        self.setup_frame()
-        self.update_idletasks()
+        if len(self.nombres_matrices) == 0 and isinstance(self.mensaje_frame, SuccessFrame):
+            delete_msg_frame(self.mensaje_frame)
+            self.mensaje_frame = ErrorFrame(self, "No hay matrices guardadas!")
+            self.after(
+                1000,
+                self.mensaje_frame.grid(
+                    row=0, column=0,
+                    columnspan=2,
+                    padx=5, pady=5,
+                    sticky="n"
+                ),
+            )
+
+            for widget in self.winfo_children():
+                if not isinstance(widget, ctkFrame):
+                    widget.destroy()
+
+        elif isinstance(self.mensaje_frame, ErrorFrame):
+            self.setup_frame()
+        else:
+            delete_msg_frame(self.mensaje_frame)
+            self.select_mat.configure(values=self.nombres_matrices)
+            self.select_mat.configure(variable=Variable(value=self.nombres_matrices[0]))
 
     def update_mat(self, valor: str) -> None:
         self.mat_seleccionada = valor

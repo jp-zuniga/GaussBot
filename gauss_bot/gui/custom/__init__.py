@@ -10,6 +10,7 @@ from .custom_widgets import (
     CustomEntry,
     CustomDropdown,
     FuncDropdown,
+    IconButton,
 )
 
 __all__ = [
@@ -20,5 +21,6 @@ __all__ = [
     "CustomEntry",
     "CustomDropdown",
     "FuncDropdown",
+    "IconButton",
     "CustomScrollableDropdown",
 ]

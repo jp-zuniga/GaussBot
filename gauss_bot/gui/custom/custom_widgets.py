@@ -19,7 +19,7 @@ from customtkinter import (
 )
 
 from gauss_bot import (
-    DROPDOWN_ARROW,
+    DROPDOWN_ICON,
     FUNCTIONS,
     resize_image,
 )
@@ -80,8 +80,9 @@ class CustomDropdown(ctkOptionMenu):
         self.icon_label: ctkLabel
         self._text_label.configure(anchor=text_anchor)
 
+        light_dropdown = ctkImage(DROPDOWN_ICON._dark_image)
         self.grid_configure(ipadx=5)
-        self.set_dropdown_icon(DROPDOWN_ARROW)
+        self.set_dropdown_icon(light_dropdown)
 
     def set_dropdown_icon(self, image: ctkImage, right_distance: int = 5) -> None:
         self.icon_label = ctkLabel(
@@ -167,7 +168,7 @@ class FuncDropdown(CustomScrollableDropdown):
             width=width,
             height=height,
             text=button_text,
-            image=DROPDOWN_ARROW,
+            image=DROPDOWN_ICON,
             compound="right",
             **kwargs,
         )
@@ -199,3 +200,31 @@ class FuncDropdown(CustomScrollableDropdown):
             text="",
         )
         self.update_idletasks()
+
+
+class IconButton(ctkButton):
+    def __init__(
+        self,
+        master: Any,
+        app: "GaussUI",
+        image: ctkImage,
+        text: str = "",
+        width: int = 20,
+        height: int = 20,
+        **kwargs
+    ) -> None:
+
+        self.app = app
+        super().__init__(
+            master,
+            width=width,
+            height=height,
+            text=text,
+            image=image,
+            border_width=0,
+            border_spacing=0,
+            fg_color="transparent",
+            bg_color="transparent",
+            hover_color=self.app.theme_config["CTkFrame"]["top_fg_color"],
+            **kwargs,
+        )

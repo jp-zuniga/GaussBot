@@ -62,15 +62,15 @@ class SumaRestaTab(CustomScrollFrame):
 
         self.tabview = ctkTabview(self)
         self.tabview.pack(expand=True, fill="both")
-
-        self.tab_sumar = self.tabview.add("Sumar")
-        self.tab_restar = self.tabview.add("Restar")
         self.setup_tabs()
 
     def setup_tabs(self) -> None:
         for tab in self.tabview.winfo_children():
             for widget in tab.winfo_children():  # type: ignore
                 widget.destroy()  # type: ignore
+
+        self.tab_sumar = self.tabview.add("Sumar")
+        self.tab_restar = self.tabview.add("Restar")
 
         self.resultado_suma = ctkFrame(self.tab_sumar)
         self.resultado_resta = ctkFrame(self.tab_restar)
@@ -93,14 +93,14 @@ class SumaRestaTab(CustomScrollFrame):
             operador = "−"
 
         placeholder1 = Variable(tab, value=self.master_frame.nombres_matrices[0])
-        placeholder2 = (
-            placeholder1
-            if len(self.master_frame.nombres_vectores) == 1
-            else Variable(tab, value=self.master_frame.nombres_vectores[1])
-        )
+        if len(self.master_frame.nombres_matrices) == 1:
+            placeholder2 = placeholder1
+        else:
+            placeholder2 = Variable(tab, value=self.master_frame.nombres_matrices[1])
 
         instruct_sr = ctkLabel(tab, text=f"Seleccione las matrices a {operacion.lower()}:")
         operador_label = ctkLabel(tab, text=operador)
+        operador_label._font.configure(size=16)
 
         self.select_1 = CustomDropdown(
             tab,
@@ -194,13 +194,10 @@ class SumaRestaTab(CustomScrollFrame):
         self.mensaje_frame.grid(row=0, column=0, columnspan=3, padx=5, pady=5)
 
     def update_frame(self) -> None:
-        self.update_idletasks()
-        for widget_s in self.tab_sumar.winfo_children():
-            widget_s.destroy()  # type: ignore
-        for widget_r in self.tab_restar.winfo_children():
-            widget_r.destroy()  # type: ignore
+        for tab in self.tabview.winfo_children():
+            for widget in tab.winfo_children():
+                widget.destroy()
 
-        self.update_idletasks()
         self.setup_tabs()
         self.tabview.configure(bg_color="transparent")
         self.tabview.configure(fg_color="transparent")
@@ -325,15 +322,15 @@ class MultiplicacionTab(CustomScrollFrame):
         """
 
         delete_msg_frame(self.mensaje_frame)
-        placeholder1 = Variable(tab, value=self.master_frame.nombres_vectores[0])
-        placeholder2 = (
-            placeholder1
-            if len(self.master_frame.nombres_vectores) == 1
-            else Variable(tab, value=self.master_frame.nombres_vectores[1])
-        )
+        placeholder1 = Variable(tab, value=self.master_frame.nombres_matrices[0])
+        if len(self.master_frame.nombres_matrices) == 1:
+            placeholder2 = placeholder1
+        else:
+            placeholder2 = Variable(tab, value=self.master_frame.nombres_matrices[1])
 
         instruct_ms = ctkLabel(tab, text="Seleccione las matrices para multiplicar:")
         operador_label = ctkLabel(tab, text="*")
+        operador_label._font.configure(size=16)
 
         self.select_mat1 = CustomDropdown(
             tab,
@@ -383,6 +380,7 @@ class MultiplicacionTab(CustomScrollFrame):
 
         instruct_mv = ctkLabel(tab, text="Seleccione la matriz y el vector para multiplicar:")
         operador_label = ctkLabel(tab, text="*")
+        operador_label._font.configure(size=16)
 
         self.select_vmat = CustomDropdown(
             tab,
@@ -503,12 +501,10 @@ class MultiplicacionTab(CustomScrollFrame):
         self.update_scrollbar_visibility()
 
     def update_frame(self) -> None:
-        self.update_idletasks()
         for tab in self.tabview.winfo_children():
             for widget in tab.winfo_children():
                 widget.destroy()
 
-        self.update_idletasks()
         self.setup_tabs()
         self.tabview.configure(bg_color="transparent")
         self.tabview.configure(fg_color="transparent")

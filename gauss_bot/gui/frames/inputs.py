@@ -96,17 +96,17 @@ class ManejarMats(ctkFrame):
         self.tabview = ctkTabview(self)
         self.tabview.pack(expand=True, fill="both")
 
-        self.instances: list[Union[ctkFrame, CustomScrollFrame]] = []
-        self.tabs = [
+        self.instances: list[CustomScrollFrame] = []
+        tabs = [
             ("Agregar", AgregarMats),
             ("Mostrar", MostrarMats),
             # ("Editar", EditarMats),
             ("Eliminar", EliminarMats)
         ]
 
-        for nombre, cls in self.tabs:
+        for nombre, cls in tabs:
             tab = self.tabview.add(nombre)
-            tab_instance: Union[ctkFrame, CustomScrollFrame] = (
+            tab_instance: CustomScrollFrame = (
                 cls(self.app, tab, self, self.mats_manager)
             )
 
@@ -142,17 +142,17 @@ class ManejarVecs(ctkFrame):
         self.tabview = ctkTabview(self)
         self.tabview.pack(expand=True, fill="both")
 
-        self.instances: list[Union[ctkFrame, CustomScrollFrame]] = []
-        self.tabs = [
+        self.instances: list[CustomScrollFrame] = []
+        tabs = [
             ("Agregar", AgregarVecs),
             ("Mostrar", MostrarVecs),
             # ("Editar", EditarVecs),
             ("Eliminar", EliminarVecs)
         ]
 
-        for nombre, cls in self.tabs:
+        for nombre, cls in tabs:
             tab = self.tabview.add(nombre)
-            tab_instance: Union[ctkFrame, CustomScrollFrame] = (
+            tab_instance: CustomScrollFrame = (
                 cls(self.app, tab, self, self.vecs_manager)
             )
 

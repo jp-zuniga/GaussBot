@@ -11,6 +11,7 @@ from os import (
 
 from PIL.Image import (
     LANCZOS,
+    Image,
     open as open_img,
 )
 
@@ -26,6 +27,7 @@ __all__ = [
     "CONFIG_PATH",
     "MATRICES_PATH",
     "VECTORES_PATH",
+    "FUNC_PATH",
     "LOGO",
     "HOME_ICON",
     "INPUTS_ICON",
@@ -34,10 +36,20 @@ __all__ = [
     "VECTOR_ICON",
     "CONFIG_ICON",
     "QUIT_ICON",
-    "DROPDOWN_ARROW",
+    "ENTER_ICON",
+    "SHUFFLE_ICON",
+    "ACEPTAR_ICON",
+    "LIMPIAR_ICON",
+    "MOSTRAR_ICON",
+    "ELIMINAR_ICON",
+    "DROPDOWN_ICON",
+    "DROPUP_ICON",
     "FUNCTIONS",
+    "F_ICON",
+    "delete_msg_frame",
     "get_dict_key",
     "resize_image",
+    "generate_sep",
 ]
 
 
@@ -76,6 +88,25 @@ def resize_image(img: ctkImage, divisors: tuple = (4, 8)) -> ctkImage:
     )
 
 
+def generate_sep(orientation: bool, size: tuple[int, int]) -> ctkImage:
+    seps: dict[bool, tuple[Image, Image]] = {
+        True: (
+            open_img(path.join(ASSET_PATH, "dark_vseparator.png")),
+            open_img(path.join(ASSET_PATH, "light_vseparator.png")),
+        ),
+        False: (
+            open_img(path.join(ASSET_PATH, "dark_hseparator.png")),
+            open_img(path.join(ASSET_PATH, "light_hseparator.png")),
+        ),
+    }
+
+    return ctkImage(
+        size=size,
+        dark_image=seps[orientation][1],
+        light_image=seps[orientation][0],
+    )
+
+
 ASSET_PATH = path.join(
     path.dirname(path.realpath(__file__)),
     "assets"
@@ -101,6 +132,11 @@ MATRICES_PATH = path.join(
 VECTORES_PATH = path.join(
     DATA_PATH, "vectores.json"
 )
+
+FUNC_PATH = path.join(
+    ASSET_PATH, "functions"
+)
+
 
 LOGO = ctkImage(
     dark_image=open_img(path.join(ASSET_PATH, "light_logo.png")),
@@ -142,18 +178,65 @@ QUIT_ICON = ctkImage(
     light_image=open_img(path.join(ASSET_PATH, "dark_quit_icon.png"))
 )
 
-DROPDOWN_ARROW = ctkImage(
-    open_img(path.join(ASSET_PATH, "light_dropdown_icon.png"))
+ENTER_ICON = ctkImage(
+    dark_image=open_img(path.join(ASSET_PATH, "light_enter_icon.png")),
+    light_image=open_img(path.join(ASSET_PATH, "dark_enter_icon.png")),
+    size=(18, 18),
 )
+
+SHUFFLE_ICON = ctkImage(
+    dark_image=open_img(path.join(ASSET_PATH, "light_shuffle_icon.png")),
+    light_image=open_img(path.join(ASSET_PATH, "dark_shuffle_icon.png")),
+    size=(18, 18),
+)
+
+ACEPTAR_ICON = ctkImage(
+    dark_image=open_img(path.join(ASSET_PATH, "light_aceptar_icon.png")),
+    light_image=open_img(path.join(ASSET_PATH, "dark_aceptar_icon.png")),
+    size=(18, 18),
+)
+
+LIMPIAR_ICON = ctkImage(
+    dark_image=open_img(path.join(ASSET_PATH, "light_limpiar_icon.png")),
+    light_image=open_img(path.join(ASSET_PATH, "dark_limpiar_icon.png")),
+    size=(25, 18),
+)
+
+MOSTRAR_ICON = ctkImage(
+    dark_image=open_img(path.join(ASSET_PATH, "light_mostrar_icon.png")),
+    light_image=open_img(path.join(ASSET_PATH, "dark_mostrar_icon.png")),
+    size=(18, 18),
+)
+
+ELIMINAR_ICON = ctkImage(
+    dark_image=open_img(path.join(ASSET_PATH, "light_eliminar_icon.png")),
+    light_image=open_img(path.join(ASSET_PATH, "dark_eliminar_icon.png")),
+    size=(18, 18),
+)
+
+DROPDOWN_ICON = ctkImage(
+    dark_image=open_img(path.join(ASSET_PATH, "light_dropdown_icon.png")),
+    light_image=open_img(path.join(ASSET_PATH, "dark_dropdown_icon.png")),
+    size=(18, 18),
+)
+
+DROPUP_ICON = ctkImage(
+    dark_image=open_img(path.join(ASSET_PATH, "light_dropup_icon.png")),
+    light_image=open_img(path.join(ASSET_PATH, "dark_dropup_icon.png")),
+    size=(18, 18),
+)
+
 
 FUNCTIONS: dict[str, ctkImage] = {
     name[:-4]: ctkImage(
-        size=open_img(path.join(ASSET_PATH, f"functions/light_{name}")).size,
-        dark_image=open_img(path.join(ASSET_PATH, f"functions/light_{name}")),
-        light_image=open_img(path.join(ASSET_PATH, f"functions/dark_{name}"))
+        size=open_img(path.join(FUNC_PATH, f"light_{name}")).size,
+        dark_image=open_img(path.join(FUNC_PATH, f"light_{name}")),
+        light_image=open_img(path.join(FUNC_PATH, f"dark_{name}"))
     ) for name in set([
         name.split("_")[1]
-        for _, _, files in walk(path.join(ASSET_PATH, "functions"))
+        for _, _, files in walk(FUNC_PATH)
         for name in files
     ])
 }
+
+FX_ICON = resize_image(FUNCTIONS["f(x)"], (3, 7))

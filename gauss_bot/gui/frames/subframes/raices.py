@@ -50,16 +50,20 @@ from sympy.parsing.sympy_parser import (
 )
 
 from gauss_bot import (
-    ASSET_PATH,
     DATA_PATH,
-    FUNCTIONS,
+    ENTER_ICON,
+    DROPDOWN_ICON,
+    DROPUP_ICON,
+    FX_ICON,
+    delete_msg_frame,
     get_dict_key,
-    resize_image,
+    generate_sep,
 )
 
 from gauss_bot.gui.custom import (
     CustomDropdown,
     FuncDropdown,
+    IconButton,
     CustomScrollFrame,
     ErrorFrame,
     ResultadoFrame,
@@ -88,18 +92,6 @@ class RaicesFrame(CustomScrollFrame):
         self.columnconfigure(0, weight=1)
         self.columnconfigure(2, weight=1)
 
-        self.dropup_icon = ctkImage(
-            dark_image=open_img(path.join(ASSET_PATH, "light_dropup_icon.png")),
-            light_image=open_img(path.join(ASSET_PATH, "dark_dropup_icon.png")),
-            size=(18, 18),
-        )
-
-        self.dropdown_icon = ctkImage(
-            dark_image=open_img(path.join(ASSET_PATH, "light_dropdown_icon.png")),
-            light_image=open_img(path.join(ASSET_PATH, "dark_dropdown_icon.png")),
-            size=(18, 18),
-        )
-
         self.selectors: list[FuncDropdown] = []
         self.signos: list[CustomDropdown] = []
         self.arg_entries: list[ctkEntry] = []
@@ -121,23 +113,9 @@ class RaicesFrame(CustomScrollFrame):
         self.terminos_entry = ctkEntry(self, width=30, placeholder_text="3")
         self.terminos_entry.bind("<Return>", lambda _: self.setup_terminos_frame())
 
-        enter_icon = ctkImage(
-            dark_image=open_img(path.join(ASSET_PATH, "light_enter_icon.png")),
-            light_image=open_img(path.join(ASSET_PATH, "dark_enter_icon.png")),
-            size=(18, 18),
-        )
-
-        ingresar_button = ctkButton(
-            self,
-            width=20,
-            height=20,
-            border_width=0,
-            border_spacing=0,
-            image=enter_icon,
-            fg_color="transparent",
-            bg_color="transparent",
-            hover_color=self.app.theme_config["CTkFrame"]["top_fg_color"],
-            text="",
+        ingresar_button = IconButton(
+            self, self.app,
+            image=ENTER_ICON,
             command=self.setup_terminos_frame,
         )
 
@@ -149,11 +127,11 @@ class RaicesFrame(CustomScrollFrame):
         if self.collapsed_terminos:
             self.terminos_frame.grid()
             if self.collapse_button is not None:
-                self.collapse_button.configure(image=self.dropup_icon)
+                self.collapse_button.configure(image=DROPUP_ICON)
         else:
             self.terminos_frame.grid_remove()
             if self.collapse_button is not None:
-                self.collapse_button.configure(image=self.dropdown_icon)
+                self.collapse_button.configure(image=DROPDOWN_ICON)
         self.collapsed_terminos = not self.collapsed_terminos
         self.update_frame()
 
@@ -171,9 +149,7 @@ class RaicesFrame(CustomScrollFrame):
         if self.collapse_button is not None:
             self.collapse_button.destroy()
 
-        if self.mensaje_frame is not None:
-            self.mensaje_frame.destroy()
-            self.mensaje_frame = None
+        delete_msg_frame(self.mensaje_frame)
 
         self.func_frame.grid_remove()
         self.calc_frame.grid_remove()
@@ -191,37 +167,24 @@ class RaicesFrame(CustomScrollFrame):
             self.mensaje_frame.grid(row=1, column=0, columnspan=3, padx=5, pady=5, sticky="n")
             return
 
-        if self.mensaje_frame is not None:
-            self.mensaje_frame.destroy()
-            self.mensaje_frame = None
-
-        sep_icon = ctkImage(
-            dark_image=open_img(
-                path.join(ASSET_PATH, "light_hseparator.png")
-            ),
-            light_image=open_img(
-                path.join(ASSET_PATH, "dark_hseparator.png")
-            ),
-            size=(300, 20),
-        )
+        delete_msg_frame(self.mensaje_frame)
 
         sep1 = ctkLabel(
             self.terminos_frame,
-            image=sep_icon,
+            image=generate_sep(False, (300, 20)),
             text="",
         )
 
         sep2 = ctkLabel(
             self.terminos_frame,
-            image=sep_icon,
+            image=generate_sep(False, (300, 20)),
             text="",
         )
 
-        fx = resize_image(FUNCTIONS["f(x)"], (3, 7))
         fx_label = ctkLabel(
             self.terminos_frame,
             corner_radius=10,
-            image=fx,
+            image=FX_ICON,
             text="",
         )
 
@@ -327,12 +290,10 @@ class RaicesFrame(CustomScrollFrame):
         if self.collapse_button is not None:
             self.collapse_button.destroy()
 
-        if self.mensaje_frame is not None:
-            try:
-                self.mensaje_frame.destroy()
-            except TclError:
-                pass
-            self.mensaje_frame = None
+        try:
+            delete_msg_frame(self.mensaje_frame)
+        except TclError:
+            pass
 
         self.leer_func()
         parsed_func = parse_expr(self.func, transformations=TRANSFORMS)
@@ -346,17 +307,9 @@ class RaicesFrame(CustomScrollFrame):
             text="",
         )
 
-        self.collapse_button = ctkButton(
-            self,
-            width=20,
-            height=20,
-            border_width=0,
-            border_spacing=0,
-            image=self.dropup_icon,
-            fg_color="transparent",
-            bg_color="transparent",
-            hover_color=self.app.theme_config["CTkFrame"]["top_fg_color"],
-            text="",
+        self.collapse_button = IconButton(
+            self, self.app,
+            image=DROPUP_ICON,
             command=self.toggle_terminos_frame,
         )
 
@@ -396,6 +349,7 @@ class RaicesFrame(CustomScrollFrame):
 
         calc_button = ctkButton(
             self.calc_frame,
+            height=30,
             text="Calcular por método de bisección",
             command=self.encontrar_raiz
         )
@@ -409,55 +363,43 @@ class RaicesFrame(CustomScrollFrame):
         calc_button.grid(row=2, column=0, columnspan=4, padx=5, pady=5, sticky="n")
 
     def encontrar_raiz(self) -> None:
-        if self.mensaje_frame is not None:
-            self.mensaje_frame.destroy()
-            self.mensaje_frame = None
-
+        delete_msg_frame(self.mensaje_frame)
         try:
             a = Fraction(self.a_entry.get())
             b = Fraction(self.b_entry.get())
             error = Fraction(self.error_entry.get())
         except ValueError:
             self.mensaje_frame = ErrorFrame(
-                self, "Debe ingresar números reales para el intervalo/margen de error!"
+                self, "Debe ingresar números reales para el intervalo y margen de error!"
             )
             self.mensaje_frame.grid(row=5, column=0, columnspan=3, padx=5, pady=5, sticky="n")
             return
-
-        if self.mensaje_frame is not None:
-            self.mensaje_frame.destroy()
-            self.mensaje_frame = None
+        delete_msg_frame(self.mensaje_frame)
 
         resultado = biseccion(self.func, (a, b), margen_e=error)
         if resultado is False:
             self.mensaje_frame = ErrorFrame(
-                self, f"La función no es continua en el intervalo [{a}, {b}]!"
+                self, f"La función no es continua en el intervalo [{float(a):.4f}, {float(b):.4f}]!"
             )
             self.mensaje_frame.grid(row=5, column=0, columnspan=3, padx=5, pady=5, sticky="n")
             return
         elif resultado is True:
             self.mensaje_frame = ErrorFrame(
-                self, f"La función no cambia de signo en el intervalo [{a}, {b}]!"
+                self, f"La función no cambia de signo en el intervalo [{float(a):.4f}, {float(b):.4f}]!"
             )
             self.mensaje_frame.grid(row=5, column=0, columnspan=3, padx=5, pady=5, sticky="n")
             return
-
-        if self.mensaje_frame is not None:
-            self.mensaje_frame.destroy()
-            self.mensaje_frame = None
+        delete_msg_frame(self.mensaje_frame)
 
         x, f_x, i = resultado
         x = Fraction(x).limit_denominator()
         f_x = Fraction(f_x).limit_denominator()
 
-        error_str = r"\textnormal{Margen de error: }" + rf"{float(error):.6f}"
         x_igual = rf"x = {float(x):6f}"
-        f_x_igual = rf"f({float(x):6f}) = {float(f_x):6f}"
+        f_x_igual = rf"f(x) = {float(f_x):6f}"
 
         func_img = latex_to_png(
-            latex_str= rf"{error_str}" +
-                       r"\\[1em]" +
-                       rf"{x_igual}" +
+            latex_str= rf"{x_igual}" +
                        r"\\[1em]" +
                        rf"{f_x_igual}",
             output_file=path.join(DATA_PATH, "func.png"),
@@ -487,9 +429,7 @@ class RaicesFrame(CustomScrollFrame):
             )
             return
 
-        if self.mensaje_frame is not None:
-            self.mensaje_frame.destroy()
-            self.mensaje_frame = None
+        delete_msg_frame(self.mensaje_frame)
 
         self.mensaje_frame = ResultadoFrame(
             self, header="", resultado="", solo_header=True
@@ -497,7 +437,7 @@ class RaicesFrame(CustomScrollFrame):
 
         self.mensaje_frame.columnconfigure(0, weight=1)
         img_label = ctkLabel(self.mensaje_frame, text="", image=func_img)
-        tipo_raiz = "" if x == 0 else "aproximada "
+        tipo_raiz = "" if f_x == 0 else "aproximada "
 
         interpretacion_label = ctkLabel(
             self,

@@ -96,14 +96,14 @@ class VSumaRestaTab(CustomScrollFrame):
             operador = "−"
 
         placeholder1 = Variable(tab, value=self.master_frame.nombres_vectores[0])
-        placeholder2 = (
-            placeholder1
-            if len(self.master_frame.nombres_vectores) == 1
-            else Variable(tab, value=self.master_frame.nombres_vectores[1])
-        )
+        if len(self.master_frame.nombres_vectores) == 1:
+            placeholder2 = placeholder1
+        else:
+            placeholder2 = Variable(tab, value=self.master_frame.nombres_vectores[1])
 
         instruct_sr = ctkLabel(tab, text=f"Seleccione los vectores a {operacion.lower()}:")
         operador_label = ctkLabel(tab, text=operador)
+        operador_label._font.configure(size=16)
 
         self.select_1 = CustomDropdown(
             tab,
@@ -207,11 +207,6 @@ class VSumaRestaTab(CustomScrollFrame):
         self.mensaje_frame.grid(row=0, column=0, columnspan=3, padx=5, pady=5)
 
     def update_frame(self) -> None:
-        for widget_s in self.tab_sumar.winfo_children():
-            widget_s.destroy()  # type: ignore
-        for widget_r in self.tab_restar.winfo_children():
-            widget_r.destroy()  # type: ignore
-
         self.setup_tabs()
         self.tabview.configure(bg_color="transparent")
         self.tabview.configure(fg_color="transparent")
@@ -300,6 +295,7 @@ class VMultiplicacionTab(CustomScrollFrame):
         placeholder1 = Variable(tab, value=self.master_frame.nombres_vectores[0])
         instruct_e = ctkLabel(tab, text="Seleccione el vector e ingrese el escalar:")
         operador_label = ctkLabel(tab, text="*")
+        operador_label._font.configure(size=16)
 
         self.select_escalar_vec = CustomDropdown(
             tab,
@@ -338,14 +334,14 @@ class VMultiplicacionTab(CustomScrollFrame):
 
         delete_msg_frame(self.mensaje_frame)
         placeholder1 = Variable(tab, value=self.master_frame.nombres_vectores[0])
-        placeholder2 = (
-            placeholder1
-            if len(self.master_frame.nombres_vectores) == 1
-            else Variable(tab, value=self.master_frame.nombres_vectores[1])
-        )
+        if len(self.master_frame.nombres_vectores) == 1:
+            placeholder2 = placeholder1
+        else:
+            placeholder2 = Variable(tab, value=self.master_frame.nombres_vectores[1])
 
         instruct_v = ctkLabel(tab, text="Seleccione los vectores a multiplicar:")
         operador_label = ctkLabel(tab, text=".")
+        operador_label._font.configure(size=16)
 
         self.select_vec1 = CustomDropdown(
             tab,
@@ -395,6 +391,7 @@ class VMultiplicacionTab(CustomScrollFrame):
 
         instruct_mv = ctkLabel(tab, text="Seleccione la matriz y el vector a multiplicar:")
         operador_label = ctkLabel(tab, text="*")
+        operador_label._font.configure(size=16)
 
         self.select_vmat = CustomDropdown(
             tab,
@@ -517,10 +514,6 @@ class VMultiplicacionTab(CustomScrollFrame):
         self.update_scrollbar_visibility()
 
     def update_frame(self) -> None:
-        for tab in self.tabview.winfo_children():
-            for widget in tab.winfo_children():
-                widget.destroy()
-
         self.setup_tabs()
         self.tabview.configure(bg_color="transparent")
         self.tabview.configure(fg_color="transparent")

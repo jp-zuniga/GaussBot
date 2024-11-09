@@ -105,6 +105,7 @@ class MatricesFrame(ctkFrame):
             self.mensaje_frame = ErrorFrame(self.dummy_frame, message="No hay matrices ingresadas!")
             agregar_button = ctkButton(
                 self.dummy_frame,
+                height=30,
                 text="Agregar datos",
                 image=INPUTS_ICON,
                 command=lambda: self.app.home_frame.ir_a_matriz(mostrar=False),  # type: ignore
@@ -164,7 +165,9 @@ class MatricesFrame(ctkFrame):
             if not mat.aumentada
         ]
 
-        if self.mensaje_frame is not None:
+        if (self.mensaje_frame is not None
+            or len(self.nombres_matrices) == 0
+            or self.instances == []):
             self.setup_tabview()
 
         for tab in self.instances:

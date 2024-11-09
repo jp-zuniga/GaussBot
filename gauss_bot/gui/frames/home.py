@@ -80,9 +80,13 @@ class HomeFrame(ctkFrame):
         self.app.inputs_frame.tabview.set("Matrices")  # type: ignore
         if mostrar:
             self.app.inputs_frame.instances[0].tabview.set("Mostrar")  # type: ignore
+        else:
+            self.app.inputs_frame.instances[0].tabview.set("Agregar")  # type: ignore
     
     def ir_a_vector(self, mostrar: bool):
         self.app.nav_frame.seleccionar_frame("inputs")  # type: ignore
         self.app.inputs_frame.tabview.set("Vectores")  # type: ignore
         if mostrar:
             self.app.inputs_frame.instances[1].tabview.set("Mostrar")  # type: ignore
+        else:
+            self.app.inputs_frame.instances[1].tabview.set("Agregar")  # type: ignore

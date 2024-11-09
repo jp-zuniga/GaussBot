@@ -20,6 +20,7 @@ from customtkinter import (
 
 from gauss_bot import (
     THEMES_PATH,
+    delete_msg_frame,
     get_dict_key,
 )
 
@@ -118,12 +119,13 @@ class ConfigFrame(ctkFrame):
         if self.escalas_dict[escala_seleccionada] == self.app.escala_actual:
             return
 
+        self.app.update_idletasks()
         self.app.escala_actual = self.escalas_dict[escala_seleccionada]
         set_widget_scaling(self.app.escala_actual)
-        self.app.inputs_frame.update_all()  # type: ignore
-        self.app.ecuaciones.update_all()  # type: ignore
-        self.app.matrices.update_all()  # type: ignore
-        self.app.vectores.update_all()  # type: ignore
+        # self.app.inputs_frame.update_all()  # type: ignore
+        # self.app.ecuaciones.update_all()  # type: ignore
+        # self.app.matrices.update_all()  # type: ignore
+        # self.app.vectores.update_all()  # type: ignore
         self.app.update_idletasks()
 
     def cambiar_modo(self, modo_seleccionado: str) -> None:
@@ -133,7 +135,8 @@ class ConfigFrame(ctkFrame):
 
         if self.modos_dict[modo_seleccionado] == self.app.modo_actual:
             return
-            
+
+        self.app.update_idletasks()
         self.app.modo_actual = self.modos_dict[modo_seleccionado]
         set_appearance_mode(self.app.modo_actual)
         self.app.set_icon(self.app.modo_actual)
@@ -152,28 +155,28 @@ class ConfigFrame(ctkFrame):
         if self.temas_dict[tema_seleccionado] == self.app.tema_actual:
             return
 
+        self.app.update_idletasks()
         self.app.tema_actual = self.temas_dict[tema_seleccionado]
+        set_default_color_theme(path.join(THEMES_PATH, self.app.tema_actual))
         self.mensaje_frame = SuccessFrame(
             self,
             message="Tema cambiado exitosamente!\n" +
-                    "Cambios tomarán efecto al reiniciar la aplicación."
+                    "Cambio tomará efecto al reiniciar la aplicación."
         )
+
         self.mensaje_frame.grid(row=3, column=1, pady=30)
-        set_default_color_theme(path.join(THEMES_PATH, self.app.tema_actual))
         self.app.update_idletasks()
 
     def update_frame(self) -> None:
         self.update_idletasks()
-        if self.mensaje_frame is not None:
-            self.mensaje_frame.destroy()
-            self.mensaje_frame = None
-        self.modo_actual_key = get_dict_key(self.modos_dict, self.app.modo_actual)
-        self.escala_actual_key = get_dict_key(self.escalas_dict, self.app.escala_actual)
-        self.tema_actual_key = get_dict_key(self.temas_dict, self.app.tema_actual)
-        self.first_modo.set(self.modo_actual_key)  # type: ignore
-        self.first_escala.set(self.escala_actual_key)  # type: ignore
-        self.first_tema.set(self.tema_actual_key)  # type: ignore
-        self.desplegar_escalas.configure(variable=self.first_escala)
-        self.desplegar_modos.configure(variable=self.first_modo)
-        self.desplegar_temas.configure(variable=self.first_tema)
+        delete_msg_frame(self.mensaje_frame)
+        # self.modo_actual_key = get_dict_key(self.modos_dict, self.app.modo_actual)
+        # self.escala_actual_key = get_dict_key(self.escalas_dict, self.app.escala_actual)
+        # self.tema_actual_key = get_dict_key(self.temas_dict, self.app.tema_actual)
+        # self.first_modo.set(self.modo_actual_key)  # type: ignore
+        # self.first_escala.set(self.escala_actual_key)  # type: ignore
+        # self.first_tema.set(self.tema_actual_key)  # type: ignore
+        # self.desplegar_escalas.configure(variable=self.first_escala)
+        # self.desplegar_modos.configure(variable=self.first_modo)
+        # self.desplegar_temas.configure(variable=self.first_tema)
         self.update_idletasks()
