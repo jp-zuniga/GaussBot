@@ -27,11 +27,10 @@ from customtkinter import (
 )
 
 from sympy import (
-    And, Derivative, Expr,
-    FiniteSet, Interval,
-    log, Set,
-    Symbol, Pow,
-    lambdify, latex,
+    And, Expr, FiniteSet,
+    Interval, log,
+    Set, Symbol, Pow,
+    diff, lambdify, latex,
     parse_expr, solve,
     sqrt, symbols,
 )
@@ -256,8 +255,8 @@ class RaicesFrame(CustomScrollFrame):
         for sig_entry, arg_entry in zip(self.signos, self.arg_entries):
             signo = sig_entry.get()
             arg = arg_entry.get()
-            print("what the fuck", arg)
-            if "+" not in arg or "−" not in arg:
+            print("arg:", arg)
+            if arg[0] not in ("+", "−"):
                 arg = f"+{arg}"
 
             signos_iguales = (
@@ -359,7 +358,7 @@ class RaicesFrame(CustomScrollFrame):
                 or isinstance(widget, ResultadoFrame)):
                 widget.destroy()
         for widget in self.winfo_children():  # type: ignore
-            if isinstance(widget, ctkLabel) and "converge" in widget._text:
+            if isinstance(widget, ctkLabel) and "aíz" in widget._text:
                 widget.destroy()
 
         match metodo:
@@ -368,7 +367,7 @@ class RaicesFrame(CustomScrollFrame):
             case "Método de Newton":
                 self.setup_newton()
             case _:
-                raise ValueError("esto nunca deberia pasar, pero por si acaso")
+                raise ValueError("Método inválido!")
 
     def setup_biseccion(self) -> None:
         intervalo_label = ctkLabel(self.calc_frame, text="Intervalo:")
@@ -486,18 +485,26 @@ class RaicesFrame(CustomScrollFrame):
         )
 
         if i == -1:
+            interpretacion_label = ctkLabel(
+                self,
+                text=f"Después de {MAX_ITERACIONES} iteraciones, no se encontró " +
+                     f"una raíz dentro del margen de error {float(error):.6f}!\n" +
+                      "Raíz aproximada encontrada:"
+            )
+
             self.mensaje_frame = ResultadoFrame(
-                self, solo_header=True, resultado="",
-                header=f"Después de {MAX_ITERACIONES} iteraciones, no se encontró " +
-                       f"una raíz dentro del margen de error {float(error):.6f}!\n" +
-                        "Raíz aproximada encontrada:",
+                self, solo_header=True,
+                resultado="", header="",
                 border_color="#ff3131",
             )
 
+            self.mensaje_frame.columnconfigure(0, weight=1)
             img_label = ctkLabel(self.mensaje_frame, text="", image=func_img)
-            img_label.grid(row=1, column=0, padx=20, pady=(3, 10), sticky="n")
+
+            interpretacion_label.grid(row=5, column=0, columnspan=3, padx=5, pady=5, sticky="n")
+            img_label.grid(row=0, column=0, padx=10, pady=(3, 10), sticky="n")
             self.mensaje_frame.grid(
-                row=5,
+                row=6,
                 column=0,
                 columnspan=3,
                 ipadx=10,
@@ -510,19 +517,19 @@ class RaicesFrame(CustomScrollFrame):
             return
         delete_msg_frame(self.mensaje_frame)
 
+        tipo_raiz = "" if fx == 0 else "aproximada "
+        interpretacion_label = ctkLabel(
+            self,
+            text=f"El método de bisección converge después de {i} iteraciones!\n" +
+                 f"Raíz {tipo_raiz}encontrada: ",
+        )
+
         self.mensaje_frame = ResultadoFrame(
             self, header="", resultado="", solo_header=True
         )
 
         self.mensaje_frame.columnconfigure(0, weight=1)
         img_label = ctkLabel(self.mensaje_frame, text="", image=func_img)
-        tipo_raiz = "" if fx == 0 else "aproximada "
-
-        interpretacion_label = ctkLabel(
-            self,
-            text=f"El método de bisección converge después de {i} iteraciones!\n" +
-                 f"Raíz {tipo_raiz}encontrada: ",
-        )
 
         interpretacion_label.grid(row=5, column=0, columnspan=3, padx=5, pady=5, sticky="n")
         img_label.grid(row=0, column=0, padx=5, pady=5, sticky="n")
@@ -577,16 +584,23 @@ class RaicesFrame(CustomScrollFrame):
                 f"una raíz dentro del margen de error {float(error):.6f}!"
             )
 
+            interpretacion_label = ctkLabel(
+                self, text=msj + "\nRaíz aproximada encontrada:"
+            )
+
             self.mensaje_frame = ResultadoFrame(
-                self, solo_header=True, resultado="",
-                header=msj + "\nRaíz aproximada encontrada:",
+                self, solo_header=True,
+                resultado="", header="",
                 border_color="#ff3131",
             )
 
+            self.mensaje_frame.columnconfigure(0, weight=1)
             img_label = ctkLabel(self.mensaje_frame, text="", image=func_img)
-            img_label.grid(row=1, column=0, padx=20, pady=(3, 10), sticky="n")
+
+            interpretacion_label.grid(row=5, column=0, columnspan=3, padx=5, pady=5, sticky="n")
+            img_label.grid(row=0, column=0, padx=5, sticky="n")
             self.mensaje_frame.grid(
-                row=5,
+                row=6,
                 column=0,
                 columnspan=3,
                 ipadx=10,
@@ -696,7 +710,7 @@ def biseccion(
 ) -> Union[bool, tuple[Fraction, Fraction, int]]:
 
     a, b = intervalo
-    x = symbols("x", real=True)
+    x = symbols("x")
     parsed_func: Expr = parse_expr(func_str, transformations=TRANSFORMS)
     f = lambdify(x, parsed_func)
 
@@ -730,25 +744,25 @@ def newton(
     max_its: int = MAX_ITERACIONES
 ) -> Union[tuple[Fraction, Fraction, int, bool]]:
 
-    x = symbols("x", real=True)
+    x = symbols("x")
     parsed_func: Expr = parse_expr(func_str, transformations=TRANSFORMS)
+
     f = lambdify(x, parsed_func)
-    f_prima = lambdify(x, parsed_func.diff(x))
+    f_prima = lambdify(x, diff(parsed_func, x))
 
-    i = 0
-    f_xi = f(xi)
-    if f_xi == 0 or abs(f_xi) < error:
-        return (xi, f_xi, 1, False)
-    del i
+    fxi = f(float(xi))
+    if abs(fxi) < error:
+        return (xi, fxi, 1, False)
 
-    for i in range(2, max_its + 2):
-        y = f(xi)
-        y_prima = f_prima(xi)
-        if y_prima == 0 or y_prima < error:
-            return (xi, y, i, True)
+    for i in range(2, max_its + 1):
+        fxi = f(float(xi))
+        fxi_prima = f_prima(float(xi))
 
-        xi -= y / y_prima
-        f_xi = f(xi)
-        if f_xi == 0 or abs(f_xi) < error:
-            return (xi, f_xi, i, False)
-    return (xi, f_xi, max_its, False)
+        if fxi_prima == 0:
+            return (xi, fxi, i, True)
+
+        xi -= fxi / fxi_prima
+        fxi = f(float(xi))
+        if abs(fxi) < error:
+            return (xi, fxi, i, False)
+    return (xi, fxi, max_its, False)
