@@ -6,13 +6,18 @@ las raíces de funciones matemáticas.
 
 from fractions import Fraction
 from os import path
+from random import randint
 from typing import (
     TYPE_CHECKING,
     Optional,
     Union,
 )
 
-from tkinter import TclError
+from tkinter import (
+    TclError,
+    Variable,
+)
+
 from customtkinter import (
     CTkButton as ctkButton,
     CTkEntry as ctkEntry,
@@ -22,7 +27,7 @@ from customtkinter import (
 )
 
 from sympy import (
-    And, Expr,
+    And, Derivative, Expr,
     FiniteSet, Interval,
     log, Set,
     Symbol, Pow,
@@ -50,6 +55,7 @@ from gauss_bot import (
 )
 
 from gauss_bot.gui.custom import (
+    CustomEntry,
     CustomDropdown,
     FuncDropdown,
     IconButton,
@@ -65,7 +71,7 @@ if TYPE_CHECKING:
 
 TRANSFORMS = (standard_transformations + (implicit_multiplication_application,))
 MARGEN_ERROR = Fraction(1, 1000000)
-MAX_ITERACIONES = 1000
+MAX_ITERACIONES = 500
 
 
 class RaicesFrame(CustomScrollFrame):
@@ -87,9 +93,16 @@ class RaicesFrame(CustomScrollFrame):
         self.arg_entries: list[ctkEntry] = []
         self.func = ""
 
-        self.a_entry: ctkEntry
-        self.b_entry: ctkEntry
-        self.error_entry: ctkEntry
+        self.metodos: list[str] = [
+            "Método de Bisección",
+            "Método de Newton",
+        ]
+
+        self.a_entry: CustomEntry
+        self.b_entry: CustomEntry
+        self.xi_entry: CustomEntry
+        self.error_entry: CustomEntry
+        self.iteraciones_entry: CustomEntry
 
         self.collapse_button: Optional[ctkButton] = None
         self.mensaje_frame: Optional[ctkFrame] = None
@@ -119,11 +132,17 @@ class RaicesFrame(CustomScrollFrame):
         if self.collapsed_terminos:
             self.terminos_frame.grid()
             if self.collapse_button is not None:
-                self.collapse_button.configure(image=DROPUP_ICON)
+                self.collapse_button.configure(
+                    image=DROPUP_ICON,
+                    tooltip_text="Colapsar"
+                )
         else:
             self.terminos_frame.grid_remove()
             if self.collapse_button is not None:
-                self.collapse_button.configure(image=DROPDOWN_ICON)
+                self.collapse_button.configure(
+                    image=DROPDOWN_ICON,
+                    tooltip_text="Expandir"
+                )
         self.collapsed_terminos = not self.collapsed_terminos
         self.update_frame()
 
@@ -234,8 +253,6 @@ class RaicesFrame(CustomScrollFrame):
 
     def leer_arg_entries(self) -> str:
         func = ""
-        print(self.signos)
-        print(self.arg_entries)
         for sig_entry, arg_entry in zip(self.signos, self.arg_entries):
             signo = sig_entry.get()
             arg = arg_entry.get()
@@ -244,19 +261,24 @@ class RaicesFrame(CustomScrollFrame):
                 arg = f"+{arg}"
 
             signos_iguales = (
-                arg[0] == "+" and signo == "+" or
+                arg[0] == "+" and signo == "+"
+                or
                 arg[0] == "-" and signo == "−"
             )
 
             signos_distintos = (
-                arg[0] == "+" and signo == "−" or
+                arg[0] == "+" and signo == "−"
+                or
                 arg[0] == "-" and signo == "+"
             )
 
+            if arg[0] in ("+", "−"):
+                arg = arg[1:]
+
             if signos_iguales:
-                func += f"+{arg[1:]}"
+                func += f"+{arg}"
             elif signos_distintos:
-                func += f"-{arg[1:]}"
+                func += f"-{arg}"
         print(func)
         return func
 
@@ -322,40 +344,104 @@ class RaicesFrame(CustomScrollFrame):
         self.calc_frame.grid(row=4, column=0, columnspan=3, padx=5, pady=5, sticky="n")
         self.calc_frame.columnconfigure(0, weight=1)
         self.calc_frame.columnconfigure(3, weight=1)
-
-        encontrar_label = ctkLabel(
-            self.calc_frame, text="Encontrar las raíces de f(x) entre:"
+        select_metodo = CustomDropdown(
+            self.calc_frame,
+            variable=Variable(value="Seleccione un método:"),
+            values=self.metodos,
+            command=self.setup_metodo,
         )
 
-        self.a_entry = ctkEntry(self.calc_frame, width=40, placeholder_text="-10")
-        and_label = ctkLabel(self.calc_frame, text="y")
-        self.b_entry = ctkEntry(self.calc_frame, width=40, placeholder_text="10")
+        select_metodo.grid(row=0, column=0, columnspan=4, padx=5, pady=5, sticky="n")
 
-        error_label = ctkLabel(self.calc_frame, text="con un margen de error de:")
-        self.error_entry = ctkEntry(self.calc_frame, width=80)
+    def setup_metodo(self, metodo: str) -> None:
+        for widget in self.calc_frame.winfo_children():
+            if (not isinstance(widget, CustomDropdown)
+                or isinstance(widget, ResultadoFrame)):
+                widget.destroy()
+        for widget in self.winfo_children():  # type: ignore
+            if isinstance(widget, ctkLabel) and "converge" in widget._text:
+                widget.destroy()
+
+        match metodo:
+            case "Método de Bisección":
+                self.setup_biseccion()
+            case "Método de Newton":
+                self.setup_newton()
+            case _:
+                raise ValueError("esto nunca deberia pasar, pero por si acaso")
+
+    def setup_biseccion(self) -> None:
+        intervalo_label = ctkLabel(self.calc_frame, text="Intervalo:")
+        self.a_entry = CustomEntry(
+            self.calc_frame,
+            width=40,
+            placeholder_text=randint(-10, -1)
+        )
+
+        and_label = ctkLabel(self.calc_frame, text=",", font=("Roboto", 18))
+        self.b_entry = CustomEntry(
+            self.calc_frame,
+            width=40,
+            placeholder_text=randint(1, 10)
+        )
+
+        error_label = ctkLabel(self.calc_frame, text="Margen de error:")
+        self.error_entry = CustomEntry(self.calc_frame, width=102)
         self.error_entry.insert(0, f"{float(MARGEN_ERROR):.6f}")
 
         self.a_entry.bind("<Right>", lambda _: self.b_entry.focus_set())
         self.b_entry.bind("<Left>", lambda _: self.a_entry.focus_set())
-        self.a_entry.bind("<Return>", lambda _: self.encontrar_raiz())
-        self.b_entry.bind("<Return>", lambda _: self.encontrar_raiz())
+        self.a_entry.bind("<Return>", lambda _: self.raiz_biseccion())
+        self.b_entry.bind("<Return>", lambda _: self.raiz_biseccion())
 
-        calc_button = ctkButton(
+        encontrar_button = ctkButton(
             self.calc_frame,
             height=30,
-            text="Calcular por método de bisección",
-            command=self.encontrar_raiz
+            text="Encontrar raíz",
+            command=self.raiz_biseccion
         )
 
-        encontrar_label.grid(row=0, column=0, padx=5, pady=(5, 2), sticky="ne")
-        self.a_entry.grid(row=0, column=1, padx=5, pady=(5, 2), sticky="ne")
-        and_label.grid(row=0, column=2, padx=5, pady=(5, 2), sticky="nw")
-        self.b_entry.grid(row=0, column=3, padx=5, pady=(5, 2), sticky="nw")
-        error_label.grid(row=1, column=0, padx=5, pady=(2, 5), sticky="ne")
-        self.error_entry.grid(row=1, column=1, columnspan=3, padx=5, pady=(2, 5), sticky="nw")
-        calc_button.grid(row=2, column=0, columnspan=4, padx=5, pady=5, sticky="n")
+        intervalo_label.grid(row=1, column=0, padx=5, pady=(5, 2), sticky="ne")
+        self.a_entry.grid(row=1, column=1, padx=5, pady=(5, 2), sticky="ne")
+        and_label.grid(row=1, column=2, padx=3, pady=(5, 2), sticky="nw")
+        self.b_entry.grid(row=1, column=3, padx=5, pady=(5, 2), sticky="nw")
+        error_label.grid(row=2, column=0, padx=5, pady=(2, 5), sticky="ne")
+        self.error_entry.grid(row=2, column=1, columnspan=3, padx=5, pady=(2, 5), sticky="nw")
+        encontrar_button.grid(row=3, column=0, columnspan=4, padx=5, pady=5, sticky="n")
 
-    def encontrar_raiz(self) -> None:
+    def setup_newton(self) -> None:
+        inicial_label = ctkLabel(self.calc_frame, text="Valor inicial:")
+        self.xi_entry = CustomEntry(
+            self.calc_frame,
+            width=102,
+            placeholder_text=randint(-10, 10)
+        )
+
+        error_label = ctkLabel(self.calc_frame, text="Margen de error:")
+        self.error_entry = CustomEntry(self.calc_frame, width=102)
+        iteraciones_label = ctkLabel(self.calc_frame, text="Máximo de iteraciones:")
+        self.iteraciones_entry = CustomEntry(self.calc_frame, width=102)
+
+        self.xi_entry.bind("<Return>", lambda _: self.raiz_newton())
+        self.error_entry.insert(0, f"{float(MARGEN_ERROR):.6f}")
+        self.iteraciones_entry.insert(0, MAX_ITERACIONES)
+
+        encontrar_button = ctkButton(
+            self.calc_frame,
+            height=30,
+            text="Encontrar raíz",
+            command=self.raiz_newton
+        )
+
+        inicial_label.grid(row=1, column=0, padx=5, pady=(5, 2), sticky="ne")
+        self.xi_entry.grid(row=1, column=1, columnspan=3, padx=5, pady=(5, 2), sticky="nw")
+        error_label.grid(row=2, column=0, padx=5, pady=2, sticky="ne")
+        self.error_entry.grid(row=2, column=1, columnspan=3, padx=5, pady=2, sticky="nw")
+        iteraciones_label.grid(row=3, column=0, padx=5, pady=(2, 5), sticky="ne")
+        self.iteraciones_entry.grid(row=3, column=1, columnspan=3, padx=5, pady=(2, 5), sticky="nw")
+        encontrar_button.grid(row=4, column=0, columnspan=4, padx=5, pady=5, sticky="n")
+
+    def raiz_biseccion(self) -> None:
         delete_msg_frame(self.mensaje_frame)
         try:
             a = Fraction(self.a_entry.get())
@@ -369,7 +455,7 @@ class RaicesFrame(CustomScrollFrame):
             return
         delete_msg_frame(self.mensaje_frame)
 
-        resultado = biseccion(self.func, (a, b), margen_e=error)
+        resultado = biseccion(self.func, (a, b), error)
         if resultado is False:
             self.mensaje_frame = ErrorFrame(
                 self, f"La función no es continua en el intervalo [{float(a):.4f}, {float(b):.4f}]!"
@@ -384,12 +470,12 @@ class RaicesFrame(CustomScrollFrame):
             return
         delete_msg_frame(self.mensaje_frame)
 
-        x, f_x, i = resultado
+        x, fx, i = resultado
         x = Fraction(x).limit_denominator()
-        f_x = Fraction(f_x).limit_denominator()
+        fx = Fraction(fx).limit_denominator()
 
         x_igual = rf"x = {float(x):6f}"
-        f_x_igual = rf"f(x) = {float(f_x):6f}"
+        f_x_igual = rf"f(x) = {float(fx):6f}"
 
         func_img = latex_to_png(
             latex_str= rf"{x_igual}" +
@@ -402,7 +488,7 @@ class RaicesFrame(CustomScrollFrame):
         if i == -1:
             self.mensaje_frame = ResultadoFrame(
                 self, solo_header=True, resultado="",
-                header=f"Despues de {MAX_ITERACIONES} iteraciones, no se encontró " +
+                header=f"Después de {MAX_ITERACIONES} iteraciones, no se encontró " +
                        f"una raíz dentro del margen de error {float(error):.6f}!\n" +
                         "Raíz aproximada encontrada:",
                 border_color="#ff3131",
@@ -420,8 +506,8 @@ class RaicesFrame(CustomScrollFrame):
                 pady=5,
                 sticky="n",
             )
-            return
 
+            return
         delete_msg_frame(self.mensaje_frame)
 
         self.mensaje_frame = ResultadoFrame(
@@ -430,11 +516,99 @@ class RaicesFrame(CustomScrollFrame):
 
         self.mensaje_frame.columnconfigure(0, weight=1)
         img_label = ctkLabel(self.mensaje_frame, text="", image=func_img)
-        tipo_raiz = "" if f_x == 0 else "aproximada "
+        tipo_raiz = "" if fx == 0 else "aproximada "
 
         interpretacion_label = ctkLabel(
             self,
-            text=f"El metodo de bisección converge despues de {i} iteraciones!\n" +
+            text=f"El método de bisección converge después de {i} iteraciones!\n" +
+                 f"Raíz {tipo_raiz}encontrada: ",
+        )
+
+        interpretacion_label.grid(row=5, column=0, columnspan=3, padx=5, pady=5, sticky="n")
+        img_label.grid(row=0, column=0, padx=5, pady=5, sticky="n")
+        self.mensaje_frame.grid(
+            row=6,
+            column=0,
+            columnspan=3,
+            padx=5,
+            pady=5,
+            sticky="n",
+        )
+
+    def raiz_newton(self) -> None:
+        delete_msg_frame(self.mensaje_frame)
+        try:
+            xi = Fraction(self.xi_entry.get())
+            error = Fraction(self.error_entry.get())
+            iteraciones = int(self.iteraciones_entry.get())
+        except ValueError as v:
+            v_str = str(v)
+            if "Fraction" in v_str:
+                msj = "Debe ingresar números reales para el valor inicial y margen de error!"
+            elif "int" in v_str:
+                msj = "Debe ingresar un número entero positivo para el máximo de iteraciones!"
+
+            self.mensaje_frame = ErrorFrame(self, msj)
+            self.mensaje_frame.grid(row=5, column=0, columnspan=3, padx=5, pady=5, sticky="n")
+            return
+        delete_msg_frame(self.mensaje_frame)
+
+        x, fx, i, division_cero = newton(self.func, xi, error, iteraciones)
+        x = Fraction(x).limit_denominator()
+        fx = Fraction(fx).limit_denominator()
+
+        x_igual = rf"x = {float(x):6f}"
+        fx_igual = rf"f(x) = {float(fx):6f}"
+
+        func_img = latex_to_png(
+            latex_str= rf"{x_igual}" +
+                       r"\\[1em]" +
+                       rf"{fx_igual}",
+            output_file=path.join(DATA_PATH, "func.png"),
+            font_size=60,
+        )
+
+        if division_cero or i == iteraciones:
+            msj = (
+                f"En la iteración {i}, la derivada de la función en el valor inicial es 0!"
+                if division_cero
+                else
+                f"Después de {iteraciones} iteraciones, no se encontró " +
+                f"una raíz dentro del margen de error {float(error):.6f}!"
+            )
+
+            self.mensaje_frame = ResultadoFrame(
+                self, solo_header=True, resultado="",
+                header=msj + "\nRaíz aproximada encontrada:",
+                border_color="#ff3131",
+            )
+
+            img_label = ctkLabel(self.mensaje_frame, text="", image=func_img)
+            img_label.grid(row=1, column=0, padx=20, pady=(3, 10), sticky="n")
+            self.mensaje_frame.grid(
+                row=5,
+                column=0,
+                columnspan=3,
+                ipadx=10,
+                ipady=10,
+                padx=5,
+                sticky="n",
+            )
+
+            return
+        delete_msg_frame(self.mensaje_frame)
+
+        self.mensaje_frame = ResultadoFrame(
+            self, header="", resultado="", solo_header=True
+        )
+
+        self.mensaje_frame.columnconfigure(0, weight=1)
+        img_label = ctkLabel(self.mensaje_frame, text="", image=func_img)
+        tipo_raiz = "" if fx == 0 else "aproximada "
+
+        interpretacion_label = ctkLabel(
+            self,
+            text=f"El método de Newton converge después de {i} iteraciones!\n" +
                  f"Raíz {tipo_raiz}encontrada: ",
         )
 
@@ -518,7 +692,7 @@ def es_continua(sp_func: Expr, var: Symbol, intervalo: tuple[Fraction, Fraction]
 def biseccion(
     func_str: str,
     intervalo: tuple[Fraction, Fraction],
-    margen_e: Fraction = MARGEN_ERROR
+    error: Fraction = MARGEN_ERROR
 ) -> Union[bool, tuple[Fraction, Fraction, int]]:
 
     a, b = intervalo
@@ -529,8 +703,8 @@ def biseccion(
     if not es_continua(parsed_func, x, intervalo):
         return False
 
-    f_a = f(float(a))
-    f_b = f(float(b))
+    f_a = Fraction(f(float(a)))
+    f_b = Fraction(f(float(b)))
     if f_a * f_b > 0:
         return True
 
@@ -538,8 +712,8 @@ def biseccion(
     while True:
         i += 1
         c = (a + b) / 2
-        f_c = f(float(c))
-        if f_c == 0 or abs(f_c) < margen_e:
+        f_c = Fraction(f(float(c)))
+        if f_c == 0 or abs(f_c) < error:
             return (c, f_c, i)
         elif f_a * f_c < 0:
             b = c
@@ -547,3 +721,34 @@ def biseccion(
             a = c
         if i == MAX_ITERACIONES:
             return (c, f_c, -1)
+
+
+def newton(
+    func_str: str,
+    xi: Fraction,
+    error: Fraction = MARGEN_ERROR,
+    max_its: int = MAX_ITERACIONES
+) -> Union[tuple[Fraction, Fraction, int, bool]]:
+
+    x = symbols("x", real=True)
+    parsed_func: Expr = parse_expr(func_str, transformations=TRANSFORMS)
+    f = lambdify(x, parsed_func)
+    f_prima = lambdify(x, parsed_func.diff(x))
+
+    i = 0
+    f_xi = f(xi)
+    if f_xi == 0 or abs(f_xi) < error:
+        return (xi, f_xi, 1, False)
+    del i
+
+    for i in range(2, max_its + 2):
+        y = f(xi)
+        y_prima = f_prima(xi)
+        if y_prima == 0 or y_prima < error:
+            return (xi, y, i, True)
+
+        xi -= y / y_prima
+        f_xi = f(xi)
+        if f_xi == 0 or abs(f_xi) < error:
+            return (xi, f_xi, i, False)
+    return (xi, f_xi, max_its, False)

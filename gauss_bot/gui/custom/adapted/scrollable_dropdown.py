@@ -169,8 +169,7 @@ class ScrollableDropdown(ctkTop):
             border_width=frame_border_width,
         )
 
-        self.frame._scrollbar.grid_configure(padx=2)
-        self.frame._scrollbar._current_width -= 4
+        self.frame._scrollbar.grid_configure(padx=5)
         self.frame.pack(expand=True, fill="both")
 
         self.height = height

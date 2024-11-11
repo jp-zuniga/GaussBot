@@ -580,7 +580,7 @@ class TransposicionTab(CustomScrollFrame):
         nombre_transpuesta, transpuesta = self.mats_manager.transponer_matriz(nombre_tmat)
         if not any(transpuesta == mat for mat in self.mats_manager.mats_ingresadas.values()):
             self.mats_manager.mats_ingresadas[nombre_transpuesta] = transpuesta
-            self.app.inputs_frame.instances[0].update_all()  # type: ignore
+            self.app.inputs_frame.instances[1].update_all()  # type: ignore
             self.master_frame.update_all()
             self.app.vectores.update_all()  # type: ignore
 
@@ -758,7 +758,7 @@ class InversaTab(CustomScrollFrame):
 
         if not any(inversa == mat for mat in self.mats_manager.mats_ingresadas.values()):
             self.mats_manager.mats_ingresadas[nombre_inversa] = inversa
-            self.app.inputs_frame.instances[0].update_all()  # type: ignore
+            self.app.inputs_frame.instances[1].update_all()  # type: ignore
             self.master_frame.update_all()
             self.app.vectores.update_all()  # type: ignore
 

@@ -5,14 +5,11 @@ Implementaciones de widgets personalizadas.
 from typing import (
     TYPE_CHECKING,
     Any,
-    Optional,
-    Union,
 )
 
 from customtkinter import (
     CTkButton as ctkButton,
     CTkEntry as ctkEntry,
-    CTkFont as ctkFont,
     CTkImage as ctkImage,
     CTkLabel as ctkLabel,
     CTkOptionMenu as ctkOptionMenu,
@@ -39,11 +36,6 @@ class CustomEntry(ctkEntry):
         master: Any,
         width: int = 140,
         height: int = 28,
-        corner_radius: Optional[Union[int]] = None,
-        bg_color: Union[str, tuple[str, str]] = "transparent",
-        fg_color: Optional[Union[str, tuple[str, str]]] = None,
-        text_color: Optional[Union[str, tuple[str, str]]] = None,
-        font: Optional[Union[tuple, ctkFont]] = None,
         justify: str = "center",
         **kwargs
     ) -> None:
@@ -52,11 +44,6 @@ class CustomEntry(ctkEntry):
             master,
             width=width,
             height=height,
-            corner_radius=corner_radius,
-            bg_color=bg_color,
-            fg_color=fg_color,
-            text_color=text_color,
-            font=font,
             **kwargs,
         )
 
@@ -237,3 +224,8 @@ class IconButton(ctkButton):
     def destroy(self):
         self.tooltip.destroy()
         super().destroy()
+    
+    def configure(self, **kwargs):
+        if "tooltip_text" in kwargs:
+            self.tooltip.configure_tooltip(message=kwargs.pop("tooltip_text"))
+        super().configure(**kwargs)
