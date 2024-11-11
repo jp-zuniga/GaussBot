@@ -11,16 +11,25 @@ from json import (
     JSONDecodeError
 )
 
-from os import path, makedirs
+from os import (
+    path,
+    makedirs,
+)
 
-from gauss_bot import MATRICES_PATH, VECTORES_PATH
-
-from gauss_bot.models.fraction_encoding import FractionEncoder, FractionDecoder
-from gauss_bot.models.matriz import Matriz
-from gauss_bot.models.vector import Vector
+from gauss_bot import (
+    SISTEMAS_PATH,
+    MATRICES_PATH,
+    VECTORES_PATH,
+)
 
 from gauss_bot.managers.mats_manager import MatricesManager
 from gauss_bot.managers.vecs_manager import VectoresManager
+from gauss_bot.models import (
+    FractionEncoder,
+    FractionDecoder,
+    Matriz,
+    Vector,
+)
 
 
 class OpsManager:
@@ -38,7 +47,7 @@ class OpsManager:
             raise TypeError("Argumento inválido para 'vecs_manager'!")
 
         self.mats_manager = (
-            MatricesManager(self._load_matrices())
+            MatricesManager(self._load_matrices(), self._load_sistemas())
             if mats_manager is None
             else mats_manager
         )
@@ -71,6 +80,32 @@ class OpsManager:
         mat_resultante = Matriz(False, mat.filas, len(vec), multiplicacion)
         nombre_mat_resultante = f"{nombre_mat}{nombre_vec}"
         return (nombre_mat_resultante, mat_resultante)
+
+    def save_sistemas(self) -> None:
+        """
+        Escribe el diccionario de sistemas ingresados al archivo sistemas.json,
+        utilizando FractionEncoder para escribir objetos Fraction().
+        """
+
+        sistemas_dict = {
+            nombre: {
+                "aumentada": mat.aumentada,
+                "filas": mat.filas,
+                "columnas": mat.columnas,
+                "valores": mat.valores
+            } for nombre, mat in self.mats_manager.sis_ingresados.items()
+        }
+
+        if not path.exists(SISTEMAS_PATH):
+            makedirs(path.dirname(SISTEMAS_PATH), exist_ok=True)
+
+        if sistemas_dict == {}:
+            with open(SISTEMAS_PATH, "w", encoding="utf-8") as _:
+                pass
+            return
+
+        with open(SISTEMAS_PATH, mode="w", encoding="utf-8") as sistemas_file:
+            dump(sistemas_dict, sistemas_file, indent=4, sort_keys=True, cls=FractionEncoder)
 
     def save_matrices(self) -> None:
         """
@@ -120,6 +155,33 @@ class OpsManager:
         with open(VECTORES_PATH, "w", encoding="utf-8") as vectores_file:
             dump(vectores_dict, vectores_file, indent=4, sort_keys=True, cls=FractionEncoder)
 
+    def _load_sistemas(self) -> dict[str, Matriz]:
+        """
+        Carga los sistemas guardados en el archivo sistemas.json,
+        utilizando FractionDecoder para leer objetos Fraction(),
+        y los retorna como un diccionario.
+        """
+
+        if not path.exists(SISTEMAS_PATH):
+            return {}
+
+        with open(SISTEMAS_PATH, mode="r", encoding="utf-8") as sistemas_file:
+            try:
+                sistemas_dict: dict = load(sistemas_file, cls=FractionDecoder)
+            except JSONDecodeError:
+                return {}
+
+            sistemas_file.seek(0)
+            sistemas_dict = load(sistemas_file, cls=FractionDecoder)
+            return {
+                nombre: Matriz(
+                    matriz["aumentada"],
+                    matriz["filas"],
+                    matriz["columnas"],
+                    matriz["valores"],
+                ) for nombre, matriz in sistemas_dict.items()
+            }
+
     def _load_matrices(self) -> dict[str, Matriz]:
         """
         Carga las matrices guardadas en el archivo matrices.json,
@@ -132,7 +194,7 @@ class OpsManager:
 
         with open(MATRICES_PATH, mode="r", encoding="utf-8") as matrices_file:
             try:
-                matrices_dict = load(matrices_file, cls=FractionDecoder)
+                matrices_dict: dict = load(matrices_file, cls=FractionDecoder)
             except JSONDecodeError:
                 return {}
 
@@ -159,7 +221,7 @@ class OpsManager:
 
         with open(VECTORES_PATH, mode="r", encoding="utf-8") as vectores_file:
             try:
-                vectores_dict = load(vectores_file, cls=FractionDecoder)
+                vectores_dict: dict = load(vectores_file, cls=FractionDecoder)
             except JSONDecodeError:
                 return {}
 

@@ -18,8 +18,13 @@ class Matriz:
     se puede indicar que incluye una columna aumentada.
     """
 
-    def __init__(self, aumentada: bool, filas: int, columnas: int,
-                 valores: Optional[list[list[Fraction]]] = None) -> None:
+    def __init__(
+        self,
+        aumentada: bool,
+        filas: int,
+        columnas: int,
+        valores: Optional[list[list[Fraction]]] = None,
+    ) -> None:
 
         if filas < 1 or columnas < 1:
             raise ValueError("Las dimensiones de la matriz deben ser positivas!")
@@ -139,7 +144,7 @@ class Matriz:
         matriz = ""
         for i in range(self.filas):
             for j in range(self.columnas):
-                valor = str(self.valores[i][j]).center(max_len)
+                valor = str(self.valores[i][j].limit_denominator(10000)).center(max_len)
                 if j == 0 and j == self.columnas - 1:
                     matriz += f"( {valor} )"
                 elif j == 0:

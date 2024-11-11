@@ -16,8 +16,10 @@ from copy import deepcopy
 from fractions import Fraction
 # from typing import Union
 
-from gauss_bot.models.matriz import Matriz
-from gauss_bot.models.sistema_ecuaciones import SistemaEcuaciones
+from gauss_bot.models import (
+    Matriz,
+    SistemaEcuaciones,
+)
 
 
 class MatricesManager:
@@ -26,7 +28,7 @@ class MatricesManager:
     realizar operaciones con ellas, y retornar los resultados.
     """
 
-    def __init__(self, mats_ingresadas=None) -> None:
+    def __init__(self, mats_ingresadas=None, sis_ingresados=None) -> None:
         if mats_ingresadas is None:
             self.mats_ingresadas: dict[str, Matriz] = {}
         elif (isinstance(mats_ingresadas, dict)
@@ -36,71 +38,105 @@ class MatricesManager:
         else:
             raise TypeError("Argumento inválido para 'mats_ingresadas'!")
 
-    def get_matrices(self, aumentada: int, calculada: int) -> str:
+        if sis_ingresados is None:
+            self.sis_ingresados: dict[str, Matriz] = {}
+        elif (isinstance(sis_ingresados, dict)
+              and all(isinstance(n, str) for n in sis_ingresados.keys())
+              and all(isinstance(m, Matriz) for m in sis_ingresados.values())):
+            self.sis_ingresados = sis_ingresados
+        else:
+            raise TypeError("Argumento inválido para 'sis_ingresados'!")
+
+    def get_matrices(self, calculada: int) -> str:
         """
         Obtiene las matrices guardadas en self.mats_ingresadas y las retorna como string.
-        - aumentada: 0 para no mostrar aumentadas,
-                     1 para mostrar solo aumentadas,
-                    -1 para mostrar todas
-        - calculada: True para mostrar solo matrices calculadas,
-                     False para mostrar matrices ingresadas
+        - calculada: 0 para no mostrar matrices calculadas,
+                     1 para mostrar solo matrices calculadas,
+                    -1 para mostrar todas las matrices guardadas
 
-        * ValueError: si aumentada o calculada no estan en (-1, 0, 1)
+        * ValueError: si calculada no esta en (-1, 0, 1)
         """
 
-        if aumentada not in (-1, 0, 1):
-            raise ValueError("Argumento inválido para 'aumentada'!")
         if calculada not in (-1, 0, 1):
             raise ValueError("Argumento inválido para 'calculada'!")
 
         if not self._validar_mats_ingresadas():
-            return "No hay matrices ingresadas!"
+            return "No hay matrices guardadas!"
 
         if calculada == 1:
             header = "Matrices calculadas:"
-        elif aumentada == 1:
-            header = "Sistemas de ecuaciones ingresadas:"
-        elif calculada == 0 or aumentada == 0:
-            header = "Matrices ingresadas:"
-        elif calculada == -1 or aumentada == -1:
+        elif calculada <= 0:
             header = "Matrices guardadas:"
 
         matrices = f"{header}\n"
         matrices += "---------------------------------------------"
         for nombre, mat in self.mats_ingresadas.items():
-            if (aumentada == 1 and not mat.aumentada) or (aumentada == 0 and mat.aumentada):
-                continue
-            if (calculada == 0 and len(nombre) > 1) or (calculada == 1 and len(nombre) == 1):
+            if (calculada == 0 and len(nombre) > 1 or
+                calculada == 1 and len(nombre) == 1):
                 continue
             matrices += f"\n{nombre}:\n"
             matrices += str(mat)
         matrices += "---------------------------------------------"
 
-        if matrices.count("(") == 0:
-            if calculada:
+        if "(" not in matrices:
+            if calculada == 1:
                 return "No hay matrices calculadas guardadas!"
-            elif aumentada == 1:
-                return "No hay sistemas de ecuaciones guardados!"
-            elif not calculada or aumentada in (-1, 0):
+            elif calculada <= 0:
                 return "No hay matrices guardadas!"
-            elif calculada and aumentada == 1:
-                return "No hay sistemas de ecuaciones guardados!"
         return matrices
 
-    def resolver_sistema(self, nombre_mat: str, metodo: str) -> SistemaEcuaciones:
+    def get_sistemas(self, calculado: int) -> str:
+        """
+        Obtiene las sistemas guardados en self.sis_ingresados y las retorna como string.
+        - calculado: 0 para no mostrar sistemas calculados,
+                     1 para mostrar solo sistemas calculados,
+                    -1 para mostrar todas las sistemas guardados
+
+        * ValueError: si calculado no esta en (-1, 0, 1)
+        """
+
+        if calculado not in (-1, 0, 1):
+            raise ValueError("Argumento inválido para 'calculado'!")
+
+        if not self._validar_sis_ingresados():
+            return "No hay sistemas de ecuaciones ingresados!"
+
+        if calculado == 1:
+            header = "Sistemas calculados:"
+        elif calculado <= 0:
+            header = "Sistemas guardados:"
+
+        sistemas = f"{header}\n"
+        sistemas += "---------------------------------------------"
+        for nombre, sis in self.sis_ingresados.items():
+            if (calculado == 0 and len(nombre) > 1 or
+                calculado == 1 and len(nombre) == 1):
+                continue
+            sistemas += f"\n{nombre}:\n"
+            sistemas += str(sis)
+        sistemas += "---------------------------------------------"
+
+        if "(" not in sistemas:
+            if calculado == 1:
+                return "No hay sistemas calculados guardados!"
+            elif calculado <= 0:
+                return "No hay sistemas de ecuaciones guardados!"
+        return sistemas
+
+    def resolver_sistema(self, nombre_sis: str, metodo: str) -> SistemaEcuaciones:
         """
         Resuelve un sistema de ecuaciones representado por la matriz ingresada.
-        * nombre_mat: nombre de la matriz que representa el sistema de ecuaciones
+        * nombre_sis: nombre de la matriz que representa el sistema de ecuaciones
         * metodo: método a utilizar para resolver el sistema ("gj" o "c")
         """
 
-        mat_copia = deepcopy(self.mats_ingresadas[nombre_mat])
+        mat_copia = deepcopy(self.sis_ingresados[nombre_sis])
         sistema = SistemaEcuaciones(mat_copia)
 
         if metodo == "gj":
             sistema.gauss_jordan()
         elif metodo == "c":
-            sistema.cramer(nombre_mat)
+            sistema.cramer(nombre_sis)
         else:
             raise ValueError("Argumento inválido para 'metodo'!")
 
@@ -206,5 +242,14 @@ class MatricesManager:
         """
 
         if self.mats_ingresadas == {}:
+            return False
+        return True
+
+    def _validar_sis_ingresados(self) -> bool:
+        """
+        Valida si el diccionario de sistemas de eucaciones ingresados esta vacío o no.
+        """
+
+        if self.sis_ingresados == {}:
             return False
         return True

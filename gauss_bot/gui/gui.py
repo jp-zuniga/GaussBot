@@ -16,16 +16,19 @@ from customtkinter import (
 from gauss_bot import (
     ASSET_PATH,
     CONFIG_PATH,
-    THEMES_PATH
+    THEMES_PATH,
 )
 
-from gauss_bot.managers.ops_manager import OpsManager
-
-from gauss_bot.gui.frames.ecuaciones import EcuacionesFrame
-from gauss_bot.gui.frames.matrices import MatricesFrame
-from gauss_bot.gui.frames.vectores import VectoresFrame
-from gauss_bot.gui.frames.config import ConfigFrame
-from gauss_bot.gui.frames.nav import NavFrame
+from gauss_bot.managers import OpsManager
+from gauss_bot.gui.frames import (
+    HomeFrame,
+    InputsFrame,
+    MatricesFrame,
+    VectoresFrame,
+    ConfigFrame,
+    EcuacionesFrame,
+    NavFrame,
+)
 
 
 class GaussUI(ctk):
@@ -40,7 +43,7 @@ class GaussUI(ctk):
         self.set_icon(self.modo_actual)
 
         self.title("GaussBot")
-        self.geometry("1200x600")
+        self.geometry("1280x720")
         self.grid_rowconfigure(0, weight=1)
         self.grid_columnconfigure(1, weight=1)
 
@@ -48,11 +51,37 @@ class GaussUI(ctk):
         self.mats_manager = self.ops_manager.mats_manager
         self.vecs_manager = self.ops_manager.vecs_manager
 
-        self.ecuaciones = EcuacionesFrame(master=self, app=self, mats_manager=self.mats_manager)
-        self.matrices = MatricesFrame(master=self, app=self, mats_manager=self.mats_manager)
-        self.vectores = VectoresFrame(master=self, app=self, vecs_manager=self.vecs_manager)
+        self.home_frame = HomeFrame(master=self, app=self)
+        self.inputs_frame = InputsFrame(
+            master=self,
+            app=self,
+            mats_manager=self.mats_manager,
+            vecs_manager=self.vecs_manager,
+        )
+
+        self.matrices = MatricesFrame(
+            master=self,
+            app=self,
+            mats_manager=self.mats_manager,
+            vecs_manager=self.vecs_manager,
+        )
+
+        self.vectores = VectoresFrame(
+            master=self,
+            app=self,
+            vecs_manager=self.vecs_manager,
+            mats_manager=self.mats_manager,
+        )
+
+        self.ecuaciones = EcuacionesFrame(
+            master=self, app=self, mats_manager=self.mats_manager
+        )
+
         self.config_frame = ConfigFrame(master=self, app=self)
         self.nav_frame = NavFrame(master=self, app=self)
+        self.nav_frame.seleccionar_frame("home")
+
+        self.protocol("WM_DELETE_WINDOW", self.nav_frame.quit_event)
 
     def load_config(self) -> None:
         """
@@ -68,7 +97,7 @@ class GaussUI(ctk):
             self.config_options = {
                 "escala": 1.0,
                 "modo": "light",
-                "tema": "marsh.json"
+                "tema": "sky.json"
             }
 
         self.escala_actual = self.config_options["escala"]

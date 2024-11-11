@@ -1,33 +1,43 @@
 """
-Implementación de frames personalizados para
-mostrar diferentes tipos de mensajes al usuario.
+Implementaciones de frames personalizados.
 """
 
-from os import path
-from typing import Union
+from typing import (
+    TYPE_CHECKING,
+    Any,
+    Union,
+)
 
-from PIL import Image
 from customtkinter import (
     CTkFrame as ctkFrame,
-    CTkImage as ctkImage,
     CTkLabel as ctkLabel,
     CTkScrollableFrame as ctkScrollFrame,
 )
 
-from gauss_bot import ASSET_PATH
+from gauss_bot import (
+    CHECK_ICON,
+    ERROR_ICON,
+)
+
+if TYPE_CHECKING:
+    from gauss_bot.gui import GaussUI
 
 
 class CustomScrollFrame(ctkScrollFrame):
-    def __init__(self, app, master, **kwargs) -> None:
-        super().__init__(master, **kwargs)
+    def __init__(
+        self,
+        app: "GaussUI",
+        master: Any,
+        **kwargs
+    ) -> None:
+
+        super().__init__(
+            master,
+            **kwargs
+        )
+
         self.app = app
         self.bind("<Configure>", self._on_frame_configure)
-    
-    def _on_frame_configure(self, event) -> None:
-        self.update_idletasks()
-        self._fit_frame_dimensions_to_canvas(event)
-        self._parent_canvas.configure(scrollregion=self._parent_canvas.bbox("all"))
-        self.update_scrollbar_visibility()
 
     def update_scrollbar_visibility(self) -> None:
         self.update_idletasks()
@@ -37,17 +47,21 @@ class CustomScrollFrame(ctkScrollFrame):
         else:
             self._scrollbar.grid_remove()
 
+    def _on_frame_configure(self, event) -> None:
+        self.update_idletasks()
+        self._fit_frame_dimensions_to_canvas(event)
+        self._parent_canvas.configure(scrollregion=self._parent_canvas.bbox("all"))
+        self.update_scrollbar_visibility()
+
     def _calculate_heights(self) -> tuple[int, int]:
         total_padding = 0
         for widget in self.winfo_children():
-            if not isinstance(widget, ctkFrame):
-                total_padding += 5
-            else:
-                for subwidget in widget.winfo_children():
-                    if subwidget.grid_info()["column"] == 0:
-                        total_padding += 5
+            total_padding += 10
+            if isinstance(widget, ctkFrame):
+                for _ in widget.winfo_children():
+                    total_padding += 10
 
-        frame_height = self.app._current_height + total_padding
+        frame_height = self.app._current_height
         content_height = 0
 
         for widget in self.winfo_children():
@@ -56,7 +70,6 @@ class CustomScrollFrame(ctkScrollFrame):
                 content_height += sum(
                     subwidget.winfo_reqheight()
                     for subwidget in widget.winfo_children()
-                    if subwidget.grid_info()["column"] == 0
                 )
         content_height -= total_padding
         return (content_height, frame_height)
@@ -72,8 +85,7 @@ class ErrorFrame(ctkFrame):
         self.rowconfigure(0, weight=1)
         self.columnconfigure(0, weight=1)
 
-        self.error_icon = ctkImage(Image.open(path.join(ASSET_PATH, "error_icon.png")))
-        self.error_icon_label = ctkLabel(self, text="", image=self.error_icon)
+        self.error_icon_label = ctkLabel(self, text="", image=ERROR_ICON)
         self.mensaje_error = ctkLabel(self, text=message)
 
         self.error_icon_label.grid(row=0, column=0, padx=(15, 5), pady=10, sticky="w")
@@ -94,8 +106,7 @@ class SuccessFrame(ctkFrame):
         self.rowconfigure(0, weight=1)
         self.columnconfigure(0, weight=1)
 
-        self.check_icon = ctkImage(Image.open(path.join(ASSET_PATH, "check_icon.png")))
-        self.check_icon_label = ctkLabel(self, text="", image=self.check_icon)
+        self.check_icon_label = ctkLabel(self, text="", image=CHECK_ICON)
         self.mensaje_exito = ctkLabel(self, text=message)
 
         self.check_icon_label.grid(row=0, column=0, padx=(15, 5), pady=10, sticky="w")
@@ -111,9 +122,14 @@ class ResultadoFrame(ctkFrame):
     Frame personalizado para mostrar resultados de operaciones.
     """
 
-    def __init__(self, parent: Union[ctkFrame, CustomScrollFrame],
-                 header: str, resultado: str, solo_header=False,
-                 border_color="#18c026") -> None:
+    def __init__(
+        self,
+        parent: Union[ctkFrame, CustomScrollFrame],
+        header: str,
+        resultado: str,
+        solo_header: bool =False,
+        border_color: str = "#18c026",
+    ) -> None:
 
         super().__init__(parent, corner_radius=8, border_width=2, border_color=border_color)
 
