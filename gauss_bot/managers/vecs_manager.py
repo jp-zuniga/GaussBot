@@ -48,9 +48,7 @@ class VectoresManager:
 
         if calculado == 1:
             header = "Vectores calculados:"
-        elif calculado == 0:
-            header = "Vectores ingresados:"
-        elif calculado == -1:
+        elif calculado <= 0:
             header = "Vectores guardados:"
 
         vectores = f"{header}\n"
@@ -62,12 +60,10 @@ class VectoresManager:
             vectores += str(vec) + "\n"
         vectores += "---------------------------------------------"
 
-        if vectores.count("[") == 0:
+        if "[" not in vectores:
             if calculado == 1:
                 return "No hay vectores calculados!"
-            elif calculado == 0:
-                return "No hay vectores ingresados!"
-            elif calculado == -1:
+            elif calculado <= 0:
                 return "No hay vectores guardados!"
         return vectores
 

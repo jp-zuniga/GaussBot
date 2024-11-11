@@ -57,6 +57,7 @@ class MatricesFrame(ctkFrame):
         self.mats_manager = mats_manager
         self.vecs_manager = vecs_manager
 
+        self.dummy_frame: ctkFrame
         self.mensaje_frame: Optional[ctkFrame] = None
         self.nombres_vectores = list(self.vecs_manager.vecs_ingresados.keys())
         self.nombres_matrices = [
@@ -88,7 +89,6 @@ class MatricesFrame(ctkFrame):
             ]
         ]
 
-        self.dummy_frame: ctkFrame
         self.tabview: ctkTabview
         self.setup_tabview()
 
@@ -106,7 +106,7 @@ class MatricesFrame(ctkFrame):
             agregar_button = ctkButton(
                 self.dummy_frame,
                 height=30,
-                text="Agregar datos",
+                text="Agregar matrices",
                 image=INPUTS_ICON,
                 command=lambda: self.app.home_frame.ir_a_matriz(mostrar=False),  # type: ignore
             )
@@ -147,7 +147,6 @@ class MatricesFrame(ctkFrame):
         Actualiza todos los frames del tabview.
         """
 
-        self.update_idletasks()
         self.mats_manager.mats_ingresadas = {
             nombre: mat
             for nombre, mat in sorted(self.mats_manager.mats_ingresadas.items())
@@ -159,20 +158,15 @@ class MatricesFrame(ctkFrame):
         }
 
         self.nombres_vectores = list(self.vecs_manager.vecs_ingresados.keys())
-        self.nombres_matrices = [
-            nombre
-            for nombre, mat in self.mats_manager.mats_ingresadas.items()
-            if not mat.aumentada
-        ]
+        self.nombres_matrices = list(self.mats_manager.mats_ingresadas.keys())
 
         if (self.mensaje_frame is not None
             or len(self.nombres_matrices) == 0
             or self.instances == []):
             self.setup_tabview()
+            return
 
         for tab in self.instances:
             tab.update_frame()  # type: ignore
             for widget in tab.winfo_children():
                 widget.configure(bg_color="transparent")  # type: ignore
-        self.app.ecuaciones.update_all()  # type: ignore
-        self.update_idletasks()

@@ -7,6 +7,7 @@ Modified by: Joaquín Zúñiga, on 11/4/2024
 Heavily simplified for the purpose of this project.
 """
 
+from sys import platform
 from typing import (
     Any,
     Callable,
@@ -22,7 +23,7 @@ from customtkinter import (
 )
 
 
-class CustomScrollableDropdown(ctkTop):
+class ScrollableDropdown(ctkTop):
     def __init__(
         self,
         attach: ctkButton,
@@ -62,9 +63,19 @@ class CustomScrollableDropdown(ctkTop):
         self.withdraw()
         self.update()
 
-        self.after(100, lambda: self.overrideredirect(True))
-        self.transparent_color = self._apply_appearance_mode(self._fg_color)
-        self.attributes("-transparentcolor", self.transparent_color)
+        if platform.startswith("win"):
+            self.after(100, lambda: self.overrideredirect(True))
+            self.transparent_color = self._apply_appearance_mode(self._fg_color)
+            self.attributes("-transparentcolor", self.transparent_color)
+        elif platform.startswith("darwin"):
+            self.overrideredirect(True)
+            self.transparent_color = "systemTransparent"
+            self.attributes("-transparent", True)
+        else:
+            self.overrideredirect(True)
+            self.transparent_color = "#000001"
+            self.corner = 0
+            self.withdraw()
 
         self.attach.bind(
             "<Button-1>",
@@ -78,11 +89,11 @@ class CustomScrollableDropdown(ctkTop):
             add="+"
         )
 
-        # self.attach.bind(
-        #     "<Configure>",
-        #     lambda _: self._withdraw(),
-        #     add="+",
-        # )
+        self.attach.bind(
+            "<Configure>",
+            lambda _: self._withdraw(),
+            add="+",
+        )
 
         self.attach.winfo_toplevel().bind(
             "<Configure>",
@@ -91,16 +102,16 @@ class CustomScrollableDropdown(ctkTop):
         )
 
         # self.attach.winfo_toplevel().bind(
-        #     "<ButtonPress>",
+        #     "<Button-1>",
         #     lambda _: self._withdraw(),
         #     add="+",
         # )
 
-        # self.bind(
-        #     "<Escape>",
-        #     lambda _: self._withdraw(),
-        #     add="+",
-        # )
+        self.bind(
+            "<Escape>",
+            lambda _: self._withdraw(),
+            add="+",
+        )
 
         self.fg_color = (
             ThemeManager.theme["CTkFrame"]["fg_color"]
@@ -191,7 +202,6 @@ class CustomScrollableDropdown(ctkTop):
         self.update_idletasks()
 
     def place_dropdown(self):
-        # print("placing dropdown")  # debug
         self.x_pos = (
             self.attach.winfo_rootx()
             if self.x is None
@@ -227,31 +237,24 @@ class CustomScrollableDropdown(ctkTop):
         self._withdraw()
 
     def _deiconify(self):
-        # print("deiconifying")  # debug
         if len(self.values) > 0:
             self.deiconify()
 
     def _iconify(self):
-        # print(f"Iconify called, hide state: {self.hide}")  # debug
         if self.attach.cget("state") == "disabled":
-            # print("cant iconify")  # debug
             return
         if self.hide:
-            # print("Showing dropdown")  # debug
             self.event_generate("<<Opened>>")
             self.focus()
             self.hide = False
             self.place_dropdown()
             self._deiconify()
         else:
-            # print("Hiding dropdown")  # debug
             self._withdraw()
 
     def _withdraw(self):
         if not self.winfo_exists() or not self.winfo_viewable():
-            # print("cant withdraw")  # debug
             return
-        # print("withdrawing")  # debug
         self.withdraw()
         self.event_generate("<<Closed>>")
         self.hide = True

@@ -3,6 +3,7 @@ from .ecuaciones import EcuacionesFrame
 from .home import HomeFrame
 from .inputs import (
     InputsFrame,
+    ManejarSistemas,
     ManejarMats,
     ManejarVecs,
 )
@@ -16,6 +17,7 @@ __all__ = [
     "EcuacionesFrame",
     "HomeFrame",
     "InputsFrame",
+    "ManejarSistemas",
     "ManejarMats",
     "ManejarVecs",
     "NavFrame",

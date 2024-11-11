@@ -1,3 +1,9 @@
+from .input_sis import (
+    AgregarSistemas,
+    MostrarSistemas,
+    EliminarSistemas,
+)
+
 from .input_mats import (
     AgregarMats,
     MostrarMats,
@@ -27,6 +33,9 @@ from .sistemas import SistemasFrame
 from .raices import RaicesFrame
 
 __all__ = [
+    "AgregarSistemas",
+    "MostrarSistemas",
+    "EliminarSistemas",
     "AgregarMats",
     "MostrarMats",
     "EliminarMats",

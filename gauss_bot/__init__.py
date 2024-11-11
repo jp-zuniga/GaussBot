@@ -25,6 +25,7 @@ __all__ = [
     "THEMES_PATH",
     "DATA_PATH",
     "CONFIG_PATH",
+    "SISTEMAS_PATH",
     "MATRICES_PATH",
     "VECTORES_PATH",
     "FUNC_PATH",
@@ -36,6 +37,12 @@ __all__ = [
     "VECTOR_ICON",
     "CONFIG_ICON",
     "QUIT_ICON",
+    "CHECK_ICON",
+    "ERROR_ICON",
+    "WARNING_ICON",
+    "INFO_ICON",
+    "QUESTION_ICON",
+    "MSGBOX_ICONS",
     "ENTER_ICON",
     "SHUFFLE_ICON",
     "ACEPTAR_ICON",
@@ -125,6 +132,10 @@ CONFIG_PATH = path.join(
     DATA_PATH, "config.json",
 )
 
+SISTEMAS_PATH = path.join(
+    DATA_PATH, "sistemas.json"
+)
+
 MATRICES_PATH = path.join(
     DATA_PATH, "matrices.json"
 )
@@ -177,6 +188,37 @@ QUIT_ICON = ctkImage(
     dark_image=open_img(path.join(ASSET_PATH, "light_quit_icon.png")),
     light_image=open_img(path.join(ASSET_PATH, "dark_quit_icon.png"))
 )
+
+
+CHECK_ICON = ctkImage(
+    open_img(path.join(ASSET_PATH, "check_icon.png")),
+)
+
+ERROR_ICON = ctkImage(
+    open_img(path.join(ASSET_PATH, "error_icon.png")),
+)
+
+WARNING_ICON = ctkImage(
+    open_img(path.join(ASSET_PATH, "warning_icon.png")),
+)
+
+INFO_ICON = ctkImage(
+    open_img(path.join(ASSET_PATH, "info_icon.png")),
+)
+
+QUESTION_ICON = ctkImage(
+    open_img(path.join(ASSET_PATH, "question_icon.png")),
+)
+
+MSGBOX_ICONS = {
+    "check": CHECK_ICON,
+    "cancel": ERROR_ICON,
+    "info": INFO_ICON,
+    "question": QUESTION_ICON,
+    "warning": WARNING_ICON,
+}
+
+
 
 ENTER_ICON = ctkImage(
     dark_image=open_img(path.join(ASSET_PATH, "light_enter_icon.png")),

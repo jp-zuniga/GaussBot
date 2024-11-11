@@ -18,13 +18,16 @@ from customtkinter import (
     CTkOptionMenu as ctkOptionMenu,
 )
 
+from gauss_bot.gui.custom import (
+    ScrollableDropdown,
+    Tooltip,
+)
+
 from gauss_bot import (
     DROPDOWN_ICON,
     FUNCTIONS,
     resize_image,
 )
-
-from gauss_bot.gui.custom import CustomScrollableDropdown
 
 if TYPE_CHECKING:
     from gauss_bot.gui.gui import GaussUI
@@ -122,7 +125,7 @@ class CustomDropdown(ctkOptionMenu):
         self.icon_label.configure(fg_color=color, bg_color=color)
 
 
-class FuncDropdown(CustomScrollableDropdown):
+class FuncDropdown(ScrollableDropdown):
     def __init__(
         self,
         master: Any,
@@ -208,7 +211,7 @@ class IconButton(ctkButton):
         master: Any,
         app: "GaussUI",
         image: ctkImage,
-        text: str = "",
+        tooltip_text: str,
         width: int = 20,
         height: int = 20,
         **kwargs
@@ -219,8 +222,8 @@ class IconButton(ctkButton):
             master,
             width=width,
             height=height,
-            text=text,
             image=image,
+            text="",
             border_width=0,
             border_spacing=0,
             fg_color="transparent",
@@ -228,3 +231,9 @@ class IconButton(ctkButton):
             hover_color=self.app.theme_config["CTkFrame"]["top_fg_color"],
             **kwargs,
         )
+
+        self.tooltip = Tooltip(self, tooltip_text)
+    
+    def destroy(self):
+        self.tooltip.destroy()
+        super().destroy()

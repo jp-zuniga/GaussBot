@@ -1,4 +1,10 @@
-from .scrollable_dropdown import CustomScrollableDropdown
+from .adapted import (
+    ScrollableDropdown,
+    # CustomScrollFrame,
+    CustomMessagebox,
+    Tooltip,
+)
+
 from .custom_frames import (
     CustomScrollFrame,
     ErrorFrame,
@@ -14,6 +20,9 @@ from .custom_widgets import (
 )
 
 __all__ = [
+    "ScrollableDropdown",
+    "CustomMessagebox",
+    "Tooltip",
     "CustomScrollFrame",
     "ErrorFrame",
     "SuccessFrame",
@@ -22,5 +31,4 @@ __all__ = [
     "CustomDropdown",
     "FuncDropdown",
     "IconButton",
-    "CustomScrollableDropdown",
 ]

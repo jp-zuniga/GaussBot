@@ -80,7 +80,8 @@ class GaussUI(ctk):
         self.config_frame = ConfigFrame(master=self, app=self)
         self.nav_frame = NavFrame(master=self, app=self)
         self.nav_frame.seleccionar_frame("home")
-        self.update_idletasks()
+
+        self.protocol("WM_DELETE_WINDOW", self.nav_frame.quit_event)
 
     def load_config(self) -> None:
         """

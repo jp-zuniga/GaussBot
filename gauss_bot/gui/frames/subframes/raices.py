@@ -114,8 +114,10 @@ class RaicesFrame(CustomScrollFrame):
         self.terminos_entry.bind("<Return>", lambda _: self.setup_terminos_frame())
 
         ingresar_button = IconButton(
-            self, self.app,
+            self,
+            self.app,
             image=ENTER_ICON,
+            tooltip_text="Ingresar términos",
             command=self.setup_terminos_frame,
         )
 
@@ -308,15 +310,16 @@ class RaicesFrame(CustomScrollFrame):
         )
 
         self.collapse_button = IconButton(
-            self, self.app,
+            self,
+            self.app,
             image=DROPUP_ICON,
+            tooltip_text="Colapsar",
             command=self.toggle_terminos_frame,
         )
 
         self.collapse_button.grid(row=2, column=0, columnspan=3, padx=5, sticky="n")
         self.func_frame.grid(row=3, column=0, columnspan=3, padx=5, pady=1, sticky="n")
         func_label.grid(row=0, column=0, padx=5, pady=5)
-        self.update_idletasks()
         self.setup_calc_frame()
 
     def setup_calc_frame(self) -> None:
@@ -474,8 +477,11 @@ class RaicesFrame(CustomScrollFrame):
             self.arg_entries[0].focus_set()
 
     def update_frame(self):
-        self.update_scrollbar_visibility()
-        self.update_idletasks()
+        for widget in self.winfo_children():
+            widget.configure(bg_color="transparent")
+            if isinstance(widget, ctkFrame):
+                for subwidget in widget.winfo_children():
+                    subwidget.configure(bg_color="transparent")
 
 
 def es_continua(sp_func: Expr, var: Symbol, intervalo: tuple[Fraction, Fraction]) -> bool:
@@ -577,13 +583,6 @@ def generate_placeholders(func_key: str) -> str:
     }
 
     return placeholders[func_key]
-
-
-def latexify_frac(frac: str) -> str:
-    if "/" in frac:
-        a, b = frac.split("/")
-        return rf"\frac{{{a}}}{{{b}}}"
-    return frac
 
 
 def latex_to_png(latex_str: str, output_file: str, font_size: int = 75) -> ctkImage:

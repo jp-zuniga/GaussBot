@@ -64,20 +64,11 @@ class SistemasFrame(CustomScrollFrame):
         self.setup_frame()
 
     def setup_frame(self) -> None:
-        if len(self.mats_manager.mats_ingresadas) == 0:
-            self.rowconfigure(0, weight=1)
-            self.mensaje_frame = ErrorFrame(self, "No hay matrices ingresadas!")
-            self.mensaje_frame.grid(row=0, column=0, columnspan=2, padx=5, pady=5)
+        if not self.check_matrices():
             return
-
-        if len(self.master_frame.nombres_sistemas) == 0:
-            self.rowconfigure(0, weight=1)
-            self.mensaje_frame = ErrorFrame(self, "No hay sistemas de ecuaciones ingresados!")
-            self.mensaje_frame.grid(row=0, column=0, columnspan=2, padx=5, pady=5)
-            return
-
         delete_msg_frame(self.mensaje_frame)
         self.rowconfigure(0, weight=0)
+
         instruct_se = ctkLabel(self, text="Seleccione el sistema de ecuaciones a resolver:")
         self.select_sis_mat = CustomDropdown(
             self,
@@ -128,18 +119,18 @@ class SistemasFrame(CustomScrollFrame):
             return
 
         sistema: Optional[SistemaEcuaciones] = None
-        if self.mats_manager.mats_ingresadas[self.sis_mat].es_matriz_cero():
+        if self.mats_manager.sis_ingresados[self.sis_mat].es_matriz_cero():
             self.gauss_jordan = True
             self.cramer = False
 
         if self.gauss_jordan:
             sistema = (
-                self.mats_manager.resolver_sistema(nombre_mat=self.sis_mat, metodo="gj")
+                self.mats_manager.resolver_sistema(self.sis_mat, "gj")
             )
         elif self.cramer:
             try:
                 sistema = (
-                    self.mats_manager.resolver_sistema(nombre_mat=self.sis_mat, metodo="c")
+                    self.mats_manager.resolver_sistema(self.sis_mat, "c")
                 )
             except (TypeError, ArithmeticError, ZeroDivisionError) as e:
                 self.mensaje_frame = ErrorFrame(self, str(e))
@@ -168,10 +159,31 @@ class SistemasFrame(CustomScrollFrame):
     def toggle_cramer(self) -> None:
         self.cramer = not self.cramer
 
+    def check_matrices(self, mostrar_error=True) -> bool:
+        if len(self.master_frame.nombres_sistemas) == 0:
+            if mostrar_error:
+                self.display_error()
+            return False
+        return True
+
+    def display_error(self) -> None:
+        self.rowconfigure(0, weight=1)
+        self.mensaje_frame = ErrorFrame(self, "No hay sistemas de ecuaciones ingresados!")
+        self.mensaje_frame.grid(row=0, column=0, columnspan=2, padx=5, pady=5)
+
     def update_frame(self) -> None:
-        for widget in self.winfo_children():
-            widget.destroy()  # type: ignore
-        self.setup_frame()
+        if isinstance(self.mensaje_frame, ErrorFrame):
+            for widget in self.winfo_children():
+                widget.destroy()  # type: ignore
+            self.setup_frame()
+        elif not self.check_matrices(mostrar_error=False):
+            for widget in self.winfo_children():
+                widget.destroy()  # type: ignore
+            self.check_matrices(mostrar_error=True)
+        else:
+            self.select_sis_mat.configure(values=self.master_frame.nombres_sistemas)
+            for widget in self.winfo_children():
+                widget.configure(bg_color="transparent")  # type: ignore
 
     def update_sis_mat(self, valor: str) -> None:
         self.sis_mat = valor

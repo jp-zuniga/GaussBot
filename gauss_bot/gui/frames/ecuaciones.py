@@ -35,12 +35,7 @@ class EcuacionesFrame(ctkFrame):
         super().__init__(master, corner_radius=0, fg_color="transparent")
         self.app = app
         self.mats_manager = mats_manager
-        self.nombres_sistemas = [
-            nombre
-            for nombre, mat in self.mats_manager.mats_ingresadas.items()
-            if mat.aumentada
-        ]
-
+        self.nombres_sistemas = list(self.mats_manager.sis_ingresados.keys())
         self.setup_tabview()
 
     def setup_tabview(self) -> None:
@@ -66,9 +61,12 @@ class EcuacionesFrame(ctkFrame):
             self.instances.append(tab_instance)
 
     def update_all(self):
+        self.mats_manager.sis_ingresados = {
+            nombre: sis
+            for nombre, sis in sorted(self.mats_manager.sis_ingresados.items())
+        }
+
+        self.nombres_sistemas = list(self.mats_manager.sis_ingresados.keys())
         for tab in self.instances:
             tab.update_frame()
-            for widget in tab.winfo_children():
-                widget.configure(bg_color="transparent")  # type: ignore
         self.tabview.configure(fg_color="transparent")
-        self.update_idletasks()

@@ -2,22 +2,22 @@
 Implementaciones de frames personalizados.
 """
 
-from os import path
 from typing import (
     TYPE_CHECKING,
     Any,
     Union,
 )
 
-from PIL.Image import open as open_img
 from customtkinter import (
     CTkFrame as ctkFrame,
-    CTkImage as ctkImage,
     CTkLabel as ctkLabel,
     CTkScrollableFrame as ctkScrollFrame,
 )
 
-from gauss_bot import ASSET_PATH
+from gauss_bot import (
+    CHECK_ICON,
+    ERROR_ICON,
+)
 
 if TYPE_CHECKING:
     from gauss_bot.gui import GaussUI
@@ -85,8 +85,7 @@ class ErrorFrame(ctkFrame):
         self.rowconfigure(0, weight=1)
         self.columnconfigure(0, weight=1)
 
-        self.error_icon = ctkImage(open_img(path.join(ASSET_PATH, "error_icon.png")))
-        self.error_icon_label = ctkLabel(self, text="", image=self.error_icon)
+        self.error_icon_label = ctkLabel(self, text="", image=ERROR_ICON)
         self.mensaje_error = ctkLabel(self, text=message)
 
         self.error_icon_label.grid(row=0, column=0, padx=(15, 5), pady=10, sticky="w")
@@ -107,8 +106,7 @@ class SuccessFrame(ctkFrame):
         self.rowconfigure(0, weight=1)
         self.columnconfigure(0, weight=1)
 
-        self.check_icon = ctkImage(open_img(path.join(ASSET_PATH, "check_icon.png")))
-        self.check_icon_label = ctkLabel(self, text="", image=self.check_icon)
+        self.check_icon_label = ctkLabel(self, text="", image=CHECK_ICON)
         self.mensaje_exito = ctkLabel(self, text=message)
 
         self.check_icon_label.grid(row=0, column=0, padx=(15, 5), pady=10, sticky="w")

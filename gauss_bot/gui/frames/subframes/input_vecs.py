@@ -4,6 +4,7 @@ Implementación de los subframes de ManejarVecs.
 
 from fractions import Fraction
 from random import randint
+from time import sleep
 from typing import (
     TYPE_CHECKING,
     Optional,
@@ -76,14 +77,18 @@ class AgregarVecs(CustomScrollFrame):
         self.dimension_entry = ctkEntry(self.pre_vec_frame, width=30, placeholder_text="3")
 
         ingresar_button = IconButton(
-            self.pre_vec_frame, self.app,
+            self.pre_vec_frame,
+            self.app,
             image=ENTER_ICON,
+            tooltip_text="Ingresar datos del vector",
             command=self.generar_casillas
         )
 
         aleatorio_button = IconButton(
-            self.pre_vec_frame, self.app,
+            self.pre_vec_frame,
+            self.app,
             image=SHUFFLE_ICON,
+            tooltip_text="Generar vector con valores aleatorios",
             command=self.generar_aleatorio
         )
 
@@ -140,14 +145,18 @@ class AgregarVecs(CustomScrollFrame):
         self.nombre_entry = ctkEntry(self.post_vec_frame, width=30, placeholder_text="u")
 
         agregar_button = IconButton(
-            self.post_vec_frame, self.app,
+            self.post_vec_frame,
+            self.app,
             image=ACEPTAR_ICON,
+            tooltip_text="Agregar vector",
             command=self.agregar_vector
         )
 
         limpiar_button = IconButton(
-            self.post_vec_frame, self.app,
+            self.post_vec_frame,
+            self.app,
             image=LIMPIAR_ICON,
+            tooltip_text="Limpiar casillas",
             command=self.limpiar_casillas
         )
 
@@ -266,7 +275,11 @@ class AgregarVecs(CustomScrollFrame):
         self.input_entries[-1].focus_set()
 
     def update_frame(self) -> None:
-        self.update_idletasks()
+        for widget in self.winfo_children():
+            widget.configure(bg_color="transparent")  # type: ignore
+            if isinstance(widget, ctkFrame):
+                for subwidget in widget.winfo_children():
+                    subwidget.configure(bg_color="transparent")  # type: ignore
 
 
 class MostrarVecs(CustomScrollFrame):
@@ -305,8 +318,10 @@ class MostrarVecs(CustomScrollFrame):
 
         self.option_seleccionada = self.options[self.select_option.get()]
         mostrar_button = IconButton(
-            self, self.app,
+            self,
+            self.app,
             image=MOSTRAR_ICON,
+            tooltip_text="Mostrar",
             command=self.setup_mostrar
         )
 
@@ -348,6 +363,8 @@ class MostrarVecs(CustomScrollFrame):
             self.print_frame.destroy()  # type: ignore
         except AttributeError:
             pass
+        for widget in self.winfo_children():
+            widget.configure(bg_color="transparent")  # type: ignore
 
     def update_option(self, valor: str) -> None:
         self.option_seleccionada = self.options[valor]
@@ -378,8 +395,6 @@ class EliminarVecs(CustomScrollFrame):
     def setup_frame(self) -> None:
         delete_msg_frame(self.mensaje_frame)
         if len(self.nombres_vectores) == 0:
-            if isinstance(self.mensaje_frame, ErrorFrame):
-                return
             self.mensaje_frame = ErrorFrame(self, "No hay vectores guardados!")
             self.mensaje_frame.grid(row=1, column=0, columnspan=2, padx=5, pady=5, sticky="n")
             return
@@ -397,8 +412,10 @@ class EliminarVecs(CustomScrollFrame):
         )
 
         button = IconButton(
-            self, self.app,
+            self,
+            self.app,
             image=ELIMINAR_ICON,
+            tooltip_text="Eliminar vector",
             command=lambda: self.eliminar_vector(),
         )
 
@@ -429,20 +446,14 @@ class EliminarVecs(CustomScrollFrame):
     def update_frame(self) -> None:
         self.nombres_vectores = list(self.vecs_manager.vecs_ingresados.keys())
         if len(self.nombres_vectores) == 0 and isinstance(self.mensaje_frame, SuccessFrame):
-            SuccessFrame(
-                self, self.mensaje_frame.mensaje_exito.cget("text")
-            ).grid(row=0, column=0, padx=5, columnspan=2, pady=5, sticky="n")
-
+            sleep(1.5)
             delete_msg_frame(self.mensaje_frame)
             self.mensaje_frame = ErrorFrame(self, "No hay vectores guardados!")
-            self.after(
-                1000,
-                self.mensaje_frame.grid(
-                    row=1, column=0,
-                    columnspan=2,
-                    padx=5, pady=5,
-                    sticky="n"
-                ),
+            self.mensaje_frame.grid(
+                row=1, column=0,
+                columnspan=2,
+                padx=5, pady=5,
+                sticky="n"
             )
 
             for widget in self.winfo_children():
@@ -452,8 +463,13 @@ class EliminarVecs(CustomScrollFrame):
         elif isinstance(self.mensaje_frame, ErrorFrame):
             self.setup_frame()
         else:
-            self.select_vec.configure(values=self.nombres_vectores)
-            self.select_vec.configure(variable=Variable(value=self.nombres_vectores[0]))
+            for widget in self.winfo_children():
+                widget.configure(bg_color="transparent")  # type: ignore
+            self.select_vec.configure(
+                variable=Variable(value=self.nombres_vectores[0]),
+                values=self.nombres_vectores,
+            )
+            self.after(1500, lambda: delete_msg_frame(self.mensaje_frame))
 
     def update_vec(self, valor: str) -> None:
         self.vec_seleccionada = valor

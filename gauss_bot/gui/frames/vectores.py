@@ -54,13 +54,10 @@ class VectoresFrame(ctkFrame):
         self.vecs_manager = vecs_manager
         self.mats_manager = mats_manager
 
+        self.dummy_frame: ctkFrame
         self.mensaje_frame: Optional[ctkFrame] = None
         self.nombres_vectores = list(self.vecs_manager.vecs_ingresados.keys())
-        self.nombres_matrices = [
-            nombre
-            for nombre, mat in self.mats_manager.mats_ingresadas.items()
-            if not mat.aumentada
-        ]
+        self.nombres_matrices = list(self.mats_manager.mats_ingresadas.keys())
 
         self.instances: list[
             Union[
@@ -79,7 +76,6 @@ class VectoresFrame(ctkFrame):
             ]
         ]
 
-        self.dummy_frame: ctkFrame
         self.tabview: ctkTabview
         self.setup_tabview()
 
@@ -97,7 +93,7 @@ class VectoresFrame(ctkFrame):
             agregar_button = ctkButton(
                 self.dummy_frame,
                 height=30,
-                text="Agregar datos",
+                text="Agregar vectores",
                 image=INPUTS_ICON,
                 command=lambda: self.app.home_frame.ir_a_vector(mostrar=False),  # type: ignore
             )
@@ -135,7 +131,6 @@ class VectoresFrame(ctkFrame):
         Actualiza los datos de todos los frames del tabview.
         """
 
-        self.update_idletasks()
         self.mats_manager.mats_ingresadas = {
             nombre: mat
             for nombre, mat in sorted(self.mats_manager.mats_ingresadas.items())
@@ -147,19 +142,15 @@ class VectoresFrame(ctkFrame):
         }
 
         self.nombres_vectores = list(self.vecs_manager.vecs_ingresados.keys())
-        self.nombres_matrices = [
-            nombre
-            for nombre, mat in self.mats_manager.mats_ingresadas.items()
-            if not mat.aumentada
-        ]
+        self.nombres_matrices = list(self.mats_manager.mats_ingresadas.keys())
 
         if (self.mensaje_frame is not None
             or len(self.nombres_vectores) == 0
             or self.instances == []):
             self.setup_tabview()
+            return
 
         for tab in self.instances:
             tab.update_frame()  # type: ignore
             for widget in tab.winfo_children():
                 widget.configure(bg_color="transparent")  # type: ignore
-        self.update_idletasks()

@@ -17,7 +17,12 @@ from customtkinter import (
     CTkTabview as ctkTabview,
 )
 
-from gauss_bot import delete_msg_frame
+from gauss_bot import (
+    INPUTS_ICON,
+    delete_msg_frame,
+    get_dict_key,
+)
+
 from gauss_bot.managers import MatricesManager
 from gauss_bot.gui.custom import (
     CustomEntry,
@@ -50,60 +55,51 @@ class SumaRestaTab(CustomScrollFrame):
         self.master_frame = master_frame
         self.mats_manager = mats_manager
         self.columnconfigure(0, weight=1)
+        self.columnconfigure(2, weight=1)
 
         self.mensaje_frame: Optional[ctkFrame] = None
+        self.operaciones: dict[str, str] = {
+            "Sumar": "+",
+            "Restar": "−",
+        }
+
+        self.instruct_sr: ctkLabel
+        self.select_operacion: CustomDropdown
         self.select_1: CustomDropdown
         self.select_2: CustomDropdown
-        self.resultado_suma: ctkFrame
-        self.resultado_resta: ctkFrame
+        self.ejecutar_button: ctkButton
+        self.resultado_frame: ctkFrame
 
+        self.operacion = "Sumar"
         self.mat1 = ""
         self.mat2 = ""
 
-        self.tabview = ctkTabview(self)
-        self.tabview.pack(expand=True, fill="both")
-        self.setup_tabs()
+        self.setup_frame()
 
-    def setup_tabs(self) -> None:
-        for tab in self.tabview.winfo_children():
-            for widget in tab.winfo_children():  # type: ignore
-                widget.destroy()  # type: ignore
-
-        self.tab_sumar = self.tabview.add("Sumar")
-        self.tab_restar = self.tabview.add("Restar")
-
-        self.resultado_suma = ctkFrame(self.tab_sumar)
-        self.resultado_resta = ctkFrame(self.tab_restar)
-
-        self.setup_suma_resta(self.tab_sumar, "Sumar")
-        self.setup_suma_resta(self.tab_restar, "Restar")
-
-    def setup_suma_resta(self, tab: ctkFrame, operacion: str) -> None:
-        """
-        Configura pestañas para sumar o restar matrices.
-        """
-
+    def setup_frame(self, default: str = "Sumar") -> None:
         delete_msg_frame(self.mensaje_frame)
-        tab.columnconfigure(0, weight=1)
-        tab.columnconfigure(2, weight=1)
-
-        if operacion == "Sumar":
-            operador = "+"
-        elif operacion == "Restar":
-            operador = "−"
-
-        placeholder1 = Variable(tab, value=self.master_frame.nombres_matrices[0])
+        placeholder1 = Variable(self, value=self.master_frame.nombres_matrices[0])
         if len(self.master_frame.nombres_matrices) == 1:
             placeholder2 = placeholder1
         else:
-            placeholder2 = Variable(tab, value=self.master_frame.nombres_matrices[1])
+            placeholder2 = Variable(self, value=self.master_frame.nombres_matrices[1])
 
-        instruct_sr = ctkLabel(tab, text=f"Seleccione las matrices a {operacion.lower()}:")
-        operador_label = ctkLabel(tab, text=operador)
-        operador_label._font.configure(size=16)
+        self.instruct_sr = ctkLabel(
+            self,
+            text=f"Seleccione las matrices a {default.lower()}:"
+        )
+
+        self.select_operacion = CustomDropdown(
+            self,
+            width=40,
+            font=("Roboto", 16),
+            values=list(self.operaciones.values()),
+            variable=Variable(value=self.operaciones[default]),
+            command=self.update_operacion,
+        )
 
         self.select_1 = CustomDropdown(
-            tab,
+            self,
             width=60,
             values=self.master_frame.nombres_matrices,
             variable=placeholder1,
@@ -111,97 +107,84 @@ class SumaRestaTab(CustomScrollFrame):
         )
 
         self.select_2 = CustomDropdown(
-            tab,
+            self,
             width=60,
             values=self.master_frame.nombres_matrices,
             variable=placeholder2,
             command=self.update_select2,
         )
 
-        ejecutar_button = ctkButton(
-            tab,
+        self.ejecutar_button = ctkButton(
+            self,
             height=30,
-            text=operacion,
-            command=lambda: self.ejecutar_operacion(operacion, self.mat1, self.mat2),
+            text=default,
+            command=lambda: self.ejecutar_operacion(
+                self.operacion, self.mat1, self.mat2
+            ),
         )
+
+        self.resultado_frame = ctkFrame(self)
 
         self.mat1 = self.select_1.get()
         self.mat2 = self.select_2.get()
 
-        instruct_sr.grid(row=0, column=0, columnspan=3, padx=5, pady=5, sticky="n")
+        self.instruct_sr.grid(row=0, column=0, columnspan=3, padx=5, pady=5, sticky="n")
         self.select_1.grid(row=1, column=0, padx=5, pady=5, sticky="e")
-        operador_label.grid(row=1, column=1, padx=5, pady=5, sticky="ew")
+        self.select_operacion.grid(row=1, column=1, padx=5, pady=5, sticky="ew")
         self.select_2.grid(row=1, column=2, padx=5, pady=5, sticky="w")
-        ejecutar_button.grid(row=2, column=0, columnspan=3, padx=5, pady=10, sticky="n")
-
-        if operacion == "Sumar":
-            self.resultado_suma.grid(row=3, column=0, columnspan=3, padx=5, pady=5, sticky="n")
-        elif operacion == "Restar":
-            self.resultado_resta.grid(row=3, column=0, columnspan=3, padx=5, pady=5, sticky="n")
+        self.ejecutar_button.grid(row=2, column=0, columnspan=3, padx=5, pady=10, sticky="n")
+        self.resultado_frame.grid(row=3, column=0, columnspan=3, padx=5, pady=5, sticky="n")
 
     def ejecutar_operacion(self, operacion, nombre_mat1, nombre_mat2) -> None:
         """
         Suma o resta las matrices seleccionadas.
         """
 
+        operacion = self.select_operacion.get()
         nombre_mat1 = self.select_1.get()
         nombre_mat2 = self.select_2.get()
 
-        if operacion == "Sumar":
-            self.ejecutar_suma(nombre_mat1, nombre_mat2)
-        if operacion == "Restar":
-            self.ejecutar_resta(nombre_mat1, nombre_mat2)
-        self.update_scrollbar_visibility()
-
-    def ejecutar_suma(self, nombre_mat1, nombre_mat2) -> None:
-        """
-        Suma las matrices seleccionadas.
-        """
-
         delete_msg_frame(self.mensaje_frame)
         try:
-            header, resultado = self.mats_manager.sumar_matrices(nombre_mat1, nombre_mat2)
+            if operacion == "+":
+                header, resultado = self.mats_manager.sumar_matrices(
+                    nombre_mat1, nombre_mat2
+                )
+            elif operacion == "−":
+                header, resultado = self.mats_manager.restar_matrices(
+                    nombre_mat1, nombre_mat2
+                )
         except ArithmeticError as e:
-            self.mensaje_frame = ErrorFrame(self.resultado_suma, str(e))
+            self.mensaje_frame = ErrorFrame(self.resultado_frame, str(e))
             self.mensaje_frame.grid(row=0, column=0, columnspan=3, padx=5, pady=5)
-            self.update_scrollbar_visibility()
             return
         delete_msg_frame(self.mensaje_frame)
 
         self.mensaje_frame = ResultadoFrame(
-            self.resultado_suma, header=f"{header}:", resultado=str(resultado)
-        )
-        self.mensaje_frame.grid(row=0, column=0, columnspan=3, padx=5, pady=5)
-
-    def ejecutar_resta(self, nombre_mat1, nombre_mat2) -> None:
-        """
-        Resta las matrices seleccionadas.
-        """
-
-        delete_msg_frame(self.mensaje_frame)
-        try:
-            header, resultado = self.mats_manager.restar_matrices(nombre_mat1, nombre_mat2)
-        except ArithmeticError as e:
-            self.mensaje_frame = ErrorFrame(self.resultado_resta, str(e))
-            self.mensaje_frame.grid(row=0, column=0, columnspan=3, padx=5, pady=5)
-            self.update_scrollbar_visibility()
-            return
-        delete_msg_frame(self.mensaje_frame)
-
-        self.mensaje_frame = ResultadoFrame(
-            self.resultado_resta, header=f"{header}:", resultado=str(resultado)
+            self.resultado_frame,
+            header=f"{header}:",
+            resultado=str(resultado)
         )
         self.mensaje_frame.grid(row=0, column=0, columnspan=3, padx=5, pady=5)
 
     def update_frame(self) -> None:
-        for tab in self.tabview.winfo_children():
-            for widget in tab.winfo_children():
-                widget.destroy()
+        for widget in self.winfo_children():
+            widget.configure(bg_color="transparent")  # type: ignore
 
-        self.setup_tabs()
-        self.tabview.configure(bg_color="transparent")
-        self.tabview.configure(fg_color="transparent")
-        self.update_idletasks()
+        placeholder1 = Variable(self, value=self.master_frame.nombres_matrices[0])
+        if len(self.master_frame.nombres_matrices) == 1:
+            placeholder2 = placeholder1
+        else:
+            placeholder2 = Variable(self, value=self.master_frame.nombres_matrices[1])
+
+        self.select_1.configure(variable=placeholder1, values=self.master_frame.nombres_matrices)
+        self.select_2.configure(variable=placeholder2, values=self.master_frame.nombres_matrices)
+
+    def update_operacion(self, valor: str) -> None:
+        self.operacion = valor
+        op_text: str = get_dict_key(self.operaciones, valor)  # type: ignore
+        self.instruct_sr.configure(text=f"Seleccione las matrices a {op_text.lower()}:")
+        self.ejecutar_button.configure(text=op_text)
 
     def update_select1(self, valor: str) -> None:
         self.mat1 = valor
@@ -258,6 +241,9 @@ class MultiplicacionTab(CustomScrollFrame):
         """
 
         delete_msg_frame(self.mensaje_frame)
+        for widget in self.tab_matriz_vector.winfo_children():
+            widget.destroy()  # type: ignore
+
         for tab in self.tabview.winfo_children():
             tab.columnconfigure(0, weight=1)  # type: ignore
             tab.columnconfigure(2, weight=1)  # type: ignore
@@ -270,9 +256,20 @@ class MultiplicacionTab(CustomScrollFrame):
         self.setup_escalar_tab(self.tab_escalar)
         self.setup_mult_matrices_tab(self.tab_matriz)
 
-        if num_vectores == 0:
+        if num_vectores >= 1:
+            self.setup_matriz_vector_tab(self.tab_matriz_vector)
+        else:
             self.mensaje_frame = ErrorFrame(self.tab_matriz_vector, "No hay vectores guardados!")
+            agregar_button = ctkButton(
+                self.tab_matriz_vector,
+                height=30,
+                text="Agregar vectores",
+                image=INPUTS_ICON,
+                command=lambda: self.app.home_frame.ir_a_vector(mostrar=False),  # type: ignore
+            )
+
             self.mensaje_frame.grid(row=0, column=0, columnspan=3, padx=5, pady=5, sticky="n")
+            agregar_button.grid(row=1, column=0, columnspan=3, padx=5, pady=5, sticky="n")
 
     def setup_escalar_tab(self, tab: ctkFrame) -> None:
         """
@@ -434,14 +431,12 @@ class MultiplicacionTab(CustomScrollFrame):
             self.mensaje_frame = ErrorFrame(
                 self.resultado_escalar, "El escalar debe ser un número racional!"
             )
-            self.update_scrollbar_visibility()
             self.mensaje_frame.grid(row=0, column=0, padx=5, pady=5)
             return
         except ZeroDivisionError:
             self.mensaje_frame = ErrorFrame(
                 self.resultado_escalar, "El denominador no puede ser 0!"
             )
-            self.update_scrollbar_visibility()
             self.mensaje_frame.grid(row=0, column=0, padx=5, pady=5)
             return
         delete_msg_frame(self.mensaje_frame)
@@ -450,7 +445,6 @@ class MultiplicacionTab(CustomScrollFrame):
             self.resultado_escalar, header=f"{header}:", resultado=str(resultado)
         )
         self.mensaje_frame.grid(row=0, column=0, padx=5, pady=5)
-        self.update_scrollbar_visibility()
 
     def mult_matrices(self, nombre_mat1: str, nombre_mat2: str) -> None:
         """
@@ -466,7 +460,6 @@ class MultiplicacionTab(CustomScrollFrame):
         except ArithmeticError as e:
             self.mensaje_frame = ErrorFrame(self.resultado_mats, str(e))
             self.mensaje_frame.grid(row=0, column=0, padx=5, pady=5)
-            self.update_scrollbar_visibility()
             return
         delete_msg_frame(self.mensaje_frame)
 
@@ -474,7 +467,6 @@ class MultiplicacionTab(CustomScrollFrame):
             self.resultado_mats, header=f"{header}:", resultado=str(resultado)
         )
         self.mensaje_frame.grid(row=0, column=0, padx=5, pady=5)
-        self.update_scrollbar_visibility()
 
     def matriz_vector(self, nombre_mat: str, nombre_vec: str) -> None:
         """
@@ -490,7 +482,6 @@ class MultiplicacionTab(CustomScrollFrame):
         except ArithmeticError as e:
             self.mensaje_frame = ErrorFrame(self.resultado_mat_vec, str(e))
             self.mensaje_frame.grid(row=0, column=0, padx=5, pady=5)
-            self.update_scrollbar_visibility()
             return
         delete_msg_frame(self.mensaje_frame)
 
@@ -498,7 +489,6 @@ class MultiplicacionTab(CustomScrollFrame):
             self.resultado_mat_vec, header=f"{header}:", resultado=str(resultado)
         )
         self.mensaje_frame.grid(row=0, column=0, padx=5, pady=5)
-        self.update_scrollbar_visibility()
 
     def update_frame(self) -> None:
         for tab in self.tabview.winfo_children():
@@ -508,7 +498,6 @@ class MultiplicacionTab(CustomScrollFrame):
         self.setup_tabs()
         self.tabview.configure(bg_color="transparent")
         self.tabview.configure(fg_color="transparent")
-        self.update_idletasks()
 
     def update_escalar_mat(self, valor: str) -> None:
         self.escalar_mat = valor
@@ -581,7 +570,6 @@ class TransposicionTab(CustomScrollFrame):
         self.select_tmat.grid(row=1, column=0, padx=5, pady=5, sticky="n")
         button.grid(row=2, column=0, padx=5, pady=5, sticky="n")
         self.resultado.grid(row=3, column=0, padx=5, pady=5, sticky="n")
-        self.update_scrollbar_visibility()
 
     def encontrar_transpuesta(self, nombre_tmat: str) -> None:
         """
@@ -600,12 +588,9 @@ class TransposicionTab(CustomScrollFrame):
             self.resultado, header=f"{nombre_transpuesta}:", resultado=str(transpuesta)
         )
         self.mensaje_frame.grid(row=0, column=0, padx=5, pady=5)
-        self.update_scrollbar_visibility()
 
     def update_frame(self) -> None:
-        self.update_idletasks()
-        self.setup_frame()
-        self.update_idletasks()
+        self.select_tmat.configure(values=self.master_frame.nombres_matrices)
 
     def update_tmat(self, valor: str) -> None:
         self.tmat = valor
@@ -666,7 +651,6 @@ class DeterminanteTab(CustomScrollFrame):
         self.select_dmat.grid(row=1, column=0, padx=5, pady=5, sticky="n")
         button.grid(row=2, column=0, padx=5, pady=5, sticky="n")
         self.resultado.grid(row=3, column=0, padx=5, pady=5, sticky="n")
-        self.update_scrollbar_visibility()
 
     def calcular_determinante(self, nombre_dmat: str) -> None:
         """
@@ -685,7 +669,6 @@ class DeterminanteTab(CustomScrollFrame):
         except ArithmeticError as e:
             self.mensaje_frame = ErrorFrame(self.resultado, str(e))
             self.mensaje_frame.grid(row=0, column=0, padx=5, pady=5)
-            self.update_scrollbar_visibility()
             return
 
         self.mensaje_frame = ResultadoFrame(
@@ -695,12 +678,9 @@ class DeterminanteTab(CustomScrollFrame):
             solo_header=True,
         )
         self.mensaje_frame.grid(row=0, column=0, padx=5, pady=5)
-        self.update_scrollbar_visibility()
 
     def update_frame(self) -> None:
-        self.update_idletasks()
-        self.setup_frame()
-        self.update_idletasks()
+        self.select_dmat.configure(values=self.master_frame.nombres_matrices)
 
     def update_dmat(self, valor: str) -> None:
         self.dmat = valor
@@ -761,7 +741,6 @@ class InversaTab(CustomScrollFrame):
         self.select_imat.grid(row=1, column=0, padx=5, pady=5, sticky="n")
         button.grid(row=2, column=0, padx=5, pady=5, sticky="n")
         self.resultado.grid(row=3, column=0, padx=5, pady=5, sticky="n")
-        self.update_scrollbar_visibility()
 
     def encontrar_inversa(self, nombre_imat: str) -> None:
         """
@@ -775,7 +754,6 @@ class InversaTab(CustomScrollFrame):
         except (ArithmeticError, ZeroDivisionError) as e:
             self.mensaje_frame = ErrorFrame(self.resultado, str(e))
             self.mensaje_frame.grid(row=0, column=0, padx=5, pady=5)
-            self.update_scrollbar_visibility()
             return
 
         if not any(inversa == mat for mat in self.mats_manager.mats_ingresadas.values()):
@@ -790,12 +768,9 @@ class InversaTab(CustomScrollFrame):
             resultado=str(inversa)
         )
         self.mensaje_frame.grid(row=0, column=0, padx=5, pady=5)
-        self.update_scrollbar_visibility()
 
     def update_frame(self) -> None:
-        self.update_idletasks()
-        self.setup_frame()
-        self.update_idletasks()
+        self.select_imat.configure(values=self.master_frame.nombres_matrices)
 
     def update_imat(self, valor: str) -> None:
         self.imat = valor
