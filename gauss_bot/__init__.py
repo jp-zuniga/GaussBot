@@ -1,8 +1,8 @@
-from matplotlib.pyplot import (
-    axis, close,
-    rc, savefig,
-    subplots, text,
-)
+"""
+GaussBot es una aplicación para realizar cálculos
+de álgebra lineal, como resolver sistemas de ecuaciones,
+operaciones con matrices y vectores, y análisis númerico.
+"""
 
 from os import (
     path,
@@ -16,64 +16,77 @@ from typing import (
     Union,
 )
 
-from PIL.ImageOps import invert
-from PIL.Image import (
-    LANCZOS,
-    Image,
-    merge,
-    open as open_img,
-)
-
 from customtkinter import (
     CTkFrame as ctkFrame,
     CTkImage as ctkImage,
 )
 
+from matplotlib.pyplot import (
+    axis, close,
+    rc, savefig,
+    subplots, text,
+)
+
+from PIL.ImageOps import invert
+from PIL.Image import (  # pylint: disable=no-name-in-module
+    LANCZOS,  # definido en PIL.Image.pyi (stub file)
+    Image,
+    merge,
+    open as open_img,
+)
+
 __all__ = [
-    "ASSET_PATH",
-    "THEMES_PATH",
-    "DATA_PATH",
-    "CONFIG_PATH",
-    "SISTEMAS_PATH",
-    "MATRICES_PATH",
-    "VECTORES_PATH",
-    "FUNC_PATH",
-    "LOGO",
-    "HOME_ICON",
-    "INPUTS_ICON",
-    "ECUACIONES_ICON",
-    "MATRIZ_ICON",
-    "VECTOR_ICON",
-    "CONFIG_ICON",
-    "QUIT_ICON",
-    "CHECK_ICON",
-    "ERROR_ICON",
-    "WARNING_ICON",
-    "INFO_ICON",
-    "QUESTION_ICON",
-    "MSGBOX_ICONS",
-    "ENTER_ICON",
-    "SHUFFLE_ICON",
+    "delete_msg_frame",
+    "generate_funcs",
+    "generate_range",
+    "generate_sep",
+    "get_dict_key",
+    "latex_to_png",
+    "resize_image",
+    "transparent_invert",
     "ACEPTAR_ICON",
-    "LIMPIAR_ICON",
-    "MOSTRAR_ICON",
-    "ELIMINAR_ICON",
+    "ASSET_PATH",
+    "CHECK_ICON",
+    "CONFIG_ICON",
+    "CONFIG_PATH",
+    "DATA_PATH",
     "DROPDOWN_ICON",
     "DROPUP_ICON",
+    "ECUACIONES_ICON",
+    "ELIMINAR_ICON",
+    "ENTER_ICON",
+    "ERROR_ICON",
+    "FUNC_PATH",
     "FUNCTIONS",
-    "F_ICON",
-    "delete_msg_frame",
-    "get_dict_key",
-    "resize_image",
-    "generate_sep",
-    "generate_funcs",
-    "valid_rand",
-    "latex_to_png",
-    "transparent_invert",
+    "FX_ICON",
+    "HOME_ICON",
+    "INFO_ICON",
+    "INPUTS_ICON",
+    "LIMPIAR_ICON",
+    "LOGO",
+    "MATRICES_PATH",
+    "MATRIZ_ICON",
+    "MOSTRAR_ICON",
+    "MSGBOX_ICONS",
+    "QUESTION_ICON",
+    "QUIT_ICON",
+    "SHUFFLE_ICON",
+    "SISTEMAS_PATH",
+    "THEMES_PATH",
+    "VECTOR_ICON",
+    "VECTORES_PATH",
+    "WARNING_ICON",
 ]
 
 
 def delete_msg_frame(msg_frame: Optional[ctkFrame]) -> None:
+    """
+    Elimina un frame de mensaje si existe.
+    Utilizado principalmente para eliminar mensajes
+    de tipo ErrorFrame, SuccessFrame, y ResultadoFrame.
+    * msg_frame: frame a eliminar
+    """
+
     if msg_frame is not None:
         msg_frame.destroy()
         msg_frame = None
@@ -82,33 +95,71 @@ def delete_msg_frame(msg_frame: Optional[ctkFrame]) -> None:
 def get_dict_key(dict_lookup: dict, buscando: Any) -> Union[Any, None]:
     """
     Busca un valor en un diccionario y retorna su llave.
+    * dict_lookup: diccionario a recorrer secuencialmente
+    * buscando: valor a buscar en el diccionario
     """
 
     for key, value in dict_lookup.items():
+        # usando == or is para comparar igualdad e identidad,
+        # en caso de que 'buscando' sea un objeto mutable pasado por referencia
         if value == buscando or value is buscando:
             return key
     return None
 
 
-def resize_image(img: ctkImage, divisors: tuple = (4, 8)) -> ctkImage:
-    div1, div2 = divisors
-    dark = img._dark_image
-    light = img._light_image
+def generate_funcs(func_key: str) -> str:
+    """
+    Genera funciones aleatorias para mostrar ejemplos
+    de como ingresar términos correctamente en RaicesFrame.
+    * func_key: función aleatoria a generar y retornar
+    """
 
-    width, height = img._size
-    new_width = int(width // div1)
-    new_height = int(height // div1)
+    neg_range = generate_range(-10, 10)
+    pos_range = generate_range(1, 10)
 
-    dark_img = dark.resize((new_width, new_height), LANCZOS)
-    light_img = light.resize((new_width, new_height), LANCZOS)
-    return ctkImage(
-        dark_image=dark_img,
-        light_image=light_img,
-        size=(int(new_width // div2), int(new_height // div2)),
-    )
+    placeholders: dict[str, str] = {
+        "k": f"{choice(neg_range)}",
+        "x^n": f"x^{choice(neg_range)}",
+        "b^x": f"{choice(neg_range)}^x",
+        "e^x": f"e^{choice(neg_range)}x",
+        "ln(x)": f"ln({choice(pos_range)}x)",
+        "log-b(x)": f"log_{choice(pos_range)}({choice(pos_range)}x)",
+        "sen(x)": f"sen({choice(neg_range)}x)-{choice(pos_range)}",
+        "cos(x)": f"cos({choice(neg_range)}x+{choice(pos_range)})",
+        "tan(x)": f"tan({choice(neg_range)}x-{choice(pos_range)})",
+    }
+
+    return placeholders[func_key]
+
+
+def generate_range(start: int, end: int) -> list[int]:
+    """
+    Genera una lista de enteros en un rango dado, excluyendo 0 y 1.
+    Utilizado para generar coeficientes válidos en generate_funcs().
+    """
+
+    valid = list(range(start + 1, end))
+    try:
+        valid.remove(0)
+        valid.remove(1)
+    except ValueError:
+        pass
+    return valid
 
 
 def generate_sep(orientation: bool, size: tuple[int, int]) -> ctkImage:
+    """
+    Retorna una CTkImage de un separador vertical u horizontal
+    del tamaño 'size' y orientación 'orientation.' Estos separadores
+    no pueden ser constantes porque su tamaño es variable.
+    * orientation, bool: True para vertical, False para horizontal.
+    * size, tuple[int, int]: tamaño de la CTkImage en pixeles (x, y)
+
+    Usado para separar:
+    * la columna de constantes de un sistema de ecuaciones en AgregarSistemas
+    * los inputs de funciones en RaicesFrame.
+    """
+
     seps: dict[bool, tuple[Image, Image]] = {
         True: (
             open_img(path.join(ASSET_PATH, "dark_vseparator.png")),
@@ -127,32 +178,14 @@ def generate_sep(orientation: bool, size: tuple[int, int]) -> ctkImage:
     )
 
 
-def generate_funcs(func_key: str) -> str:
-    placeholders: dict[str, str] = {
-        "k": f"{choice(valid_rand(-10, 10))}",
-        "x^n": f"x^{choice(valid_rand(-10, 10))}",
-        "b^x": f"{choice(valid_rand(-10, 10))}^x",
-        "e^x": f"e^{choice(valid_rand(-10, 10))}x",
-        "ln(x)": f"ln({choice(valid_rand(1, 10))}x)",
-        "log-b(x)": f"log_{choice(valid_rand(1, 10))}({choice(valid_rand(1, 10))}x)",
-        "sen(x)": f"sen({choice(valid_rand(-10, 10))}x)-{choice(valid_rand(1, 10))}",
-        "cos(x)": f"cos({choice(valid_rand(-10, 10))}x+{choice(valid_rand(1, 10))})",
-        "tan(x)": f"tan({choice(valid_rand(-10, 10))}x-{choice(valid_rand(1, 10))})",
-    }
-
-    return placeholders[func_key]
-
-def valid_rand(start: int, end: int) -> list[int]:
-    valid = list(range(start + 1, end))
-    try:
-        valid.remove(0)
-        valid.remove(1)
-    except ValueError:
-        pass
-    return valid
-
-
 def latex_to_png(latex_str: str, output_file: str, font_size: int = 75) -> ctkImage:
+    """
+    Toma un string en formato LaTeX y lo convierte en una imagen PNG.
+    * latex_str, str: string a convertir en PNG
+    * output_file, str: nombre del archivo de salida
+    * font_size, int: tamaño de la fuente en la imagen PNG
+    """
+
     rc("text", usetex=True)
     rc("font", family="serif")
 
@@ -191,19 +224,56 @@ def latex_to_png(latex_str: str, output_file: str, font_size: int = 75) -> ctkIm
     )
 
 
+def resize_image(img: ctkImage, divisors: tuple = (4, 8)) -> ctkImage:
+    """
+    Recibe una CTkImage y retorna una nueva CTkImage
+    con un tamaño reducido en base a los divisores dados.
+    * img: imagen a redimensionar
+    * divisors: divisores para controlar el tamaño de la nueva imagen
+    """
+
+    div1, div2 = divisors
+    dark = img._dark_image  # pylint: disable=protected-access
+    light = img._light_image  # pylint: disable=protected-access
+
+    width, height = img._size  # pylint: disable=protected-access
+    new_width = int(width // div1)
+    new_height = int(height // div1)
+
+    dark_img = dark.resize((new_width, new_height), LANCZOS)
+    light_img = light.resize((new_width, new_height), LANCZOS)
+    return ctkImage(
+        dark_image=dark_img,
+        light_image=light_img,
+        size=(int(new_width // div2), int(new_height // div2)),
+    )
+
+
 def transparent_invert(img: Image) -> Image:
+    """
+    Invierte los colores de una imagen sin perder su transparencia.
+    La funcion invert() de PIL no soporta imagenes con un canal alpha,
+    entonces esta función toma un objeto Image RGBA, separa los canales,
+    invierte solamente los canales RBG, y retorna una nueva imagen con
+    los canales invertidos unidos con el canal alpha original.
+    * img: imagen RGBA a invertir
+    
+    Utilizada cuando se genera un PNG de un string LaTeX, para que
+    la imagen generada sea compatible con el modo claro y oscuro.
+    """
+
     r, g, b, a = img.split()
     rgb_inverted = invert(merge("RGB", (r, g, b)))
     return merge("RGBA", (*rgb_inverted.split(), a))
 
 
+################################################################################
+################################################################################
+###################   Paths y directorios de la aplicación   ###################
+
 ASSET_PATH = path.join(
     path.dirname(path.realpath(__file__)),
     "assets"
-)
-
-THEMES_PATH = path.join(
-    ASSET_PATH, "themes"
 )
 
 DATA_PATH = path.join(
@@ -213,6 +283,10 @@ DATA_PATH = path.join(
 
 CONFIG_PATH = path.join(
     DATA_PATH, "config.json",
+)
+
+THEMES_PATH = path.join(
+    ASSET_PATH, "themes"
 )
 
 SISTEMAS_PATH = path.join(
@@ -231,6 +305,9 @@ FUNC_PATH = path.join(
     ASSET_PATH, "functions"
 )
 
+################################################################################
+################################################################################
+############################   Íconos de NavFrame   ############################
 
 LOGO = ctkImage(
     dark_image=open_img(path.join(ASSET_PATH, "light_logo.png")),
@@ -272,6 +349,9 @@ QUIT_ICON = ctkImage(
     light_image=open_img(path.join(ASSET_PATH, "dark_quit_icon.png"))
 )
 
+################################################################################
+################################################################################
+########################   Íconos de CustomMessagebox   ########################
 
 CHECK_ICON = ctkImage(
     open_img(path.join(ASSET_PATH, "check_icon.png")),
@@ -301,7 +381,9 @@ MSGBOX_ICONS = {
     "warning": WARNING_ICON,
 }
 
-
+################################################################################
+################################################################################
+############################   Íconos de botones   #############################
 
 ENTER_ICON = ctkImage(
     dark_image=open_img(path.join(ASSET_PATH, "light_enter_icon.png")),
@@ -351,6 +433,9 @@ DROPUP_ICON = ctkImage(
     size=(18, 18),
 )
 
+################################################################################
+################################################################################
+##########################   Imagenes de funciones   ###########################
 
 FUNCTIONS: dict[str, ctkImage] = {
     name[:-4]: ctkImage(
