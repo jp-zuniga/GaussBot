@@ -1,7 +1,7 @@
-from typing import (
-    Any,
-    Optional,
-    Union,
+from matplotlib.pyplot import (
+    axis, close,
+    rc, savefig,
+    subplots, text,
 )
 
 from os import (
@@ -9,9 +9,18 @@ from os import (
     walk,
 )
 
+from random import choice
+from typing import (
+    Any,
+    Optional,
+    Union,
+)
+
+from PIL.ImageOps import invert
 from PIL.Image import (
     LANCZOS,
     Image,
+    merge,
     open as open_img,
 )
 
@@ -57,6 +66,10 @@ __all__ = [
     "get_dict_key",
     "resize_image",
     "generate_sep",
+    "generate_funcs",
+    "valid_rand",
+    "latex_to_png",
+    "transparent_invert",
 ]
 
 
@@ -112,6 +125,76 @@ def generate_sep(orientation: bool, size: tuple[int, int]) -> ctkImage:
         dark_image=seps[orientation][1],
         light_image=seps[orientation][0],
     )
+
+
+def generate_funcs(func_key: str) -> str:
+    placeholders: dict[str, str] = {
+        "k": f"{choice(valid_rand(-10, 10))}",
+        "x^n": f"x^{choice(valid_rand(-10, 10))}",
+        "b^x": f"{choice(valid_rand(-10, 10))}^x",
+        "e^x": f"e^{choice(valid_rand(-10, 10))}x",
+        "ln(x)": f"ln({choice(valid_rand(1, 10))}x)",
+        "log-b(x)": f"log_{choice(valid_rand(1, 10))}({choice(valid_rand(1, 10))}x)",
+        "sen(x)": f"sen({choice(valid_rand(-10, 10))}x)-{choice(valid_rand(1, 10))}",
+        "cos(x)": f"cos({choice(valid_rand(-10, 10))}x+{choice(valid_rand(1, 10))})",
+        "tan(x)": f"tan({choice(valid_rand(-10, 10))}x-{choice(valid_rand(1, 10))})",
+    }
+
+    return placeholders[func_key]
+
+def valid_rand(start: int, end: int) -> list[int]:
+    valid = list(range(start + 1, end))
+    try:
+        valid.remove(0)
+        valid.remove(1)
+    except ValueError:
+        pass
+    return valid
+
+
+def latex_to_png(latex_str: str, output_file: str, font_size: int = 75) -> ctkImage:
+    rc("text", usetex=True)
+    rc("font", family="serif")
+
+    fig_length = 12 + (len(latex_str) // 10)
+    fig_height = 2 if r"\\" not in latex_str else 2 + int(latex_str.count(r"\\") * 2)
+    img_length = fig_length * 22
+    img_height = fig_height * 22
+
+    fig, _ = subplots(figsize=(fig_length, fig_height))
+    axis("off")
+    text(
+        0.5,
+        0.5,
+        f"${latex_str}$",
+        horizontalalignment="center",
+        verticalalignment="center",
+        fontsize=font_size,
+    )
+
+    savefig(
+        output_file,
+        format="png",
+        transparent=True,
+        pad_inches=0.5,
+        dpi=200,
+    )
+
+    close(fig)
+
+    img = open_img(output_file)
+    img_inverted = transparent_invert(img)
+    return ctkImage(
+        dark_image=img_inverted,
+        light_image=img,
+        size=(img_length, img_height),
+    )
+
+
+def transparent_invert(img: Image) -> Image:
+    r, g, b, a = img.split()
+    rgb_inverted = invert(merge("RGB", (r, g, b)))
+    return merge("RGBA", (*rgb_inverted.split(), a))
 
 
 ASSET_PATH = path.join(

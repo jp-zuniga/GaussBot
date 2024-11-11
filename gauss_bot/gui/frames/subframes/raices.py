@@ -5,19 +5,11 @@ las raíces de funciones matemáticas.
 """
 
 from fractions import Fraction
-from random import choice
 from os import path
 from typing import (
     TYPE_CHECKING,
     Optional,
     Union,
-)
-
-from PIL.ImageOps import invert
-from PIL.Image import (
-    Image,
-    merge,
-    open as open_img,
 )
 
 from tkinter import TclError
@@ -29,15 +21,10 @@ from customtkinter import (
     CTkLabel as ctkLabel,
 )
 
-from matplotlib.pyplot import (
-    axis, close,
-    rc, savefig,
-    subplots, text,
-)
-
 from sympy import (
-    And, Expr, FiniteSet,
-    Interval, log, Set,
+    And, Expr,
+    FiniteSet, Interval,
+    log, Set,
     Symbol, Pow,
     lambdify, latex,
     parse_expr, solve,
@@ -58,6 +45,8 @@ from gauss_bot import (
     delete_msg_frame,
     get_dict_key,
     generate_sep,
+    generate_funcs,
+    latex_to_png,
 )
 
 from gauss_bot.gui.custom import (
@@ -72,6 +61,7 @@ from gauss_bot.gui.custom import (
 if TYPE_CHECKING:
     from gauss_bot.gui import GaussUI
     from gauss_bot.gui.frames import EcuacionesFrame
+
 
 TRANSFORMS = (standard_transformations + (implicit_multiplication_application,))
 MARGEN_ERROR = Fraction(1, 1000000)
@@ -234,7 +224,7 @@ class RaicesFrame(CustomScrollFrame):
         arg_entry = ctkEntry(
             self.terminos_frame,
             width=80,
-            placeholder_text=generate_placeholders(func_key),
+            placeholder_text=generate_funcs(func_key),
         )
 
         self.arg_entries.append(arg_entry)
@@ -557,74 +547,3 @@ def biseccion(
             a = c
         if i == MAX_ITERACIONES:
             return (c, f_c, -1)
-
-
-def valid_rand(start: int, end: int) -> list[int]:
-    valid = list(range(start + 1, end))
-    try:
-        valid.remove(0)
-        valid.remove(1)
-    except ValueError:
-        pass
-    return valid
-
-
-def generate_placeholders(func_key: str) -> str:
-    placeholders: dict[str, str] = {
-        "k": f"{choice(valid_rand(-10, 10))}",
-        "x^n": f"x^{choice(valid_rand(-10, 10))}",
-        "b^x": f"{choice(valid_rand(-10, 10))}^x",
-        "e^x": f"e^{choice(valid_rand(-10, 10))}x",
-        "ln(x)": f"ln({choice(valid_rand(1, 10))}x)",
-        "log-b(x)": f"log_{choice(valid_rand(1, 10))}({choice(valid_rand(1, 10))}x)",
-        "sen(x)": f"sen({choice(valid_rand(-10, 10))}x)-{choice(valid_rand(1, 10))}",
-        "cos(x)": f"cos({choice(valid_rand(-10, 10))}x+{choice(valid_rand(1, 10))})",
-        "tan(x)": f"tan({choice(valid_rand(-10, 10))}x-{choice(valid_rand(1, 10))})",
-    }
-
-    return placeholders[func_key]
-
-
-def latex_to_png(latex_str: str, output_file: str, font_size: int = 75) -> ctkImage:
-    rc("text", usetex=True)
-    rc("font", family="serif")
-
-    fig_length = 12 + (len(latex_str) // 10)
-    fig_height = 2 if r"\\" not in latex_str else 2 + int(latex_str.count(r"\\") * 2)
-    img_length = fig_length * 22
-    img_height = fig_height * 22
-
-    fig, _ = subplots(figsize=(fig_length, fig_height))
-    axis("off")
-    text(
-        0.5,
-        0.5,
-        f"${latex_str}$",
-        horizontalalignment="center",
-        verticalalignment="center",
-        fontsize=font_size,
-    )
-
-    savefig(
-        output_file,
-        format="png",
-        transparent=True,
-        pad_inches=0.5,
-        dpi=200,
-    )
-
-    close(fig)
-
-    img = open_img(output_file)
-    img_inverted = transparent_invert(img)
-    return ctkImage(
-        dark_image=img_inverted,
-        light_image=img,
-        size=(img_length, img_height),
-    )
-
-
-def transparent_invert(img: Image) -> Image:
-    r, g, b, a = img.split()
-    rgb_inverted = invert(merge("RGB", (r, g, b)))
-    return merge("RGBA", (*rgb_inverted.split(), a))
