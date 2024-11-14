@@ -30,6 +30,13 @@ class Matriz:
         valores: Optional[list[list[Fraction]]] = None,
     ) -> None:
 
+        """
+        - aumentada: indica si la matriz representa un sistema de ecuaciones,
+                     para añadirle la columna de constantes
+        - filas/columnas: dimensiones de la matriz (ints positivos)
+        - valores: lista 2D de objetos Fraction() (opcional)
+        """
+
         if filas < 1 or columnas < 1:
             raise ValueError("Las dimensiones de la matriz deben ser positivas!")
 
@@ -49,7 +56,7 @@ class Matriz:
     @property
     def aumentada(self) -> bool:
         """
-        Propiedad para acceder al atributo privado '_aumentada'
+        Propiedad para acceder al atributo privado '_aumentada'.
         """
 
         return self._aumentada
@@ -57,7 +64,7 @@ class Matriz:
     @property
     def filas(self) -> int:
         """
-        Propiedad para acceder al atributo privado '_filas'
+        Propiedad para acceder al atributo privado '_filas'.
         """
 
         return self._filas
@@ -65,7 +72,7 @@ class Matriz:
     @property
     def columnas(self) -> int:
         """
-        Propiedad para acceder al atributo privado '_columnas'
+        Propiedad para acceder al atributo privado '_columnas'.
         """
 
         return self._columnas
@@ -73,7 +80,7 @@ class Matriz:
     @property
     def valores(self) -> list[list[Fraction]]:
         """
-        Propiedad para acceder al atributo privado '_valores'
+        Propiedad para acceder al atributo privado '_valores'.
         """
 
         return self._valores
@@ -96,7 +103,7 @@ class Matriz:
     @overload
     def __getitem__(self, indices: tuple[slice, slice]) -> list[list[Fraction]]: ...
 
-    def __getitem__(
+    def __getitem__(  # pylint: disable=too-many-branches
         self,
         indice: Union[
             int,
@@ -111,45 +118,83 @@ class Matriz:
         """
         Overloads para acceder a los elementos de la matriz
         sin tener que acceder al atributo 'valores' directamente.
-        Acepta cualquier índice que una lista aceptaría,
-        asi que se pueden acceder a los valores de la matriz con slices, e.g.
+        Acepta cualquier índice que una lista aceptaría, asi que
+        se pueden acceder a los valores de la matriz con slices, e.g.
         * Matriz()[0:2, 1:3]
         * en lugar de:
-        * Matriz().valores[0:2][1:3].
+        * Matriz().valores[0:2][1:3]
         """
 
-        if isinstance(indice, int) and -self.filas <= indice < self.filas:
+        if (
+            isinstance(indice, int) and
+           -self.filas <= indice < self.filas
+        ):
             return self.valores[indice]
 
         if isinstance(indice, slice):
-            _, _, step = indice.indices(self.filas)
-            if step != 0:
+            start, stop, step = indice.indices(self.filas)
+            if (
+                step != 0 and
+               -self.filas <= start < self.filas and
+               -self.filas <= stop <= self.filas
+            ):
                 return self.valores[indice]
 
         if isinstance(indice, tuple) and len(indice) == 2:
             fila, columna = indice
-            if (isinstance(fila, int)
-                and isinstance(columna, int)
-                and -self.filas <= fila < self.filas
-                and -self.columnas <= columna < self.columnas):
+            if (
+                isinstance(fila, int) and
+                isinstance(columna, int) and
+               -self.filas <= fila < self.filas and
+               -self.columnas <= columna < self.columnas
+            ):
                 return self.valores[fila][columna]
 
             if isinstance(fila, slice) and isinstance(columna, int):
-                _, _, step = fila.indices(self.filas)
-                if step != 0:
+                start, stop, step = fila.indices(self.filas)
+                if (
+                   -self.filas <= start < self.filas and
+                   -self.filas <= stop <= self.filas and
+                   -self.columnas <= columna < self.columnas
+                ):
+
+                    # intercambiar start/stop si se esta recorriendo en reversa
+                    if step < 0:
+                        start, stop = stop + 1, start + 1
                     return [fila[columna] for fila in self.valores[fila]]
 
             if isinstance(fila, int) and isinstance(columna, slice):
-                _, _, step = columna.indices(self.columnas)
-                if step != 0:
+                start, stop, step = columna.indices(self.columnas)
+                if (
+                   -self.filas <= start < self.filas and
+                   -self.filas <= stop <= self.filas and
+                   -self.filas <= fila < self.filas
+                ):
+
+                    # intercambiar start/stop si se esta recorriendo en reversa
+                    if step < 0:
+                        start, stop = stop + 1, start + 1
                     return self.valores[fila][columna]
 
             if isinstance(fila, slice) and isinstance(columna, slice):
-                _, _, step_fila = fila.indices(self.filas)
-                _, _, step_columna = columna.indices(self.columnas)
-                if step_fila != 0 and step_columna != 0:
+                start_f, stop_f, step_f = fila.indices(self.filas)
+                start_c, stop_c, step_c = columna.indices(self.columnas)
+                if (
+                   -self.filas <= start_f < self.filas and
+                   -self.filas <= stop_f <= self.filas and
+                   -self.columnas <= start_c < self.columnas and
+                   -self.columnas <= stop_c <= self.columnas
+                ):
+
+                    # intercambiar start/stop si se esta recorriendo en reversa
+                    if step_f < 0:
+                        start_f, stop_f = stop_f + 1, start_f + 1
+                    if step_c < 0:
+                        start_c, stop_c = stop_c + 1, start_c + 1
                     return [fila[columna] for fila in self.valores[fila]]
 
+        # si no se ha retornado, no se cumplieron las
+        # condiciones y el indice que se recibio es invalido
         raise IndexError("Índice inválido!")
 
     def __eq__(self, mat2: object) -> bool:
@@ -180,7 +225,7 @@ class Matriz:
 
         # longitud maxima para alinear los valores
         max_len = max(
-            len(str(self.valores[i][j]))
+            len(str(self[i, j]))
             for i in range(self.filas)
             for j in range(self.columnas)
         )
@@ -191,7 +236,7 @@ class Matriz:
                 # .limit_denominator() para evitar fracciones gigantes
                 # .center() alinea el valor dentro de max_len
                 valor = str(
-                    self.valores[i][j].limit_denominator(10000)
+                    self[i, j].limit_denominator(10000)
                 ).center(max_len)
 
                 # para matrices nx1, cerrar parentesis immediatamente
@@ -239,7 +284,9 @@ class Matriz:
         """
 
         if self.filas != mat2.filas or self.columnas != mat2.columnas:
-            raise ArithmeticError("Las matrices deben tener las mismas dimensiones!")
+            raise ArithmeticError(
+                "Las matrices deben tener las mismas dimensiones!"
+            )
 
         # restar todos los valores correspondientes de las matrices
         mat_restada = [
@@ -258,7 +305,7 @@ class Matriz:
 
     def __mul__(self, multiplicador: Union["Matriz", Fraction]) -> "Matriz":
         """
-        Overloads para multiplicar matrices o multiplicar matriz por escalar:
+        Overloads para multiplicar matrices o multiplicar matrices por escalares:
         * Matriz() * Matriz() -> Matriz()
         * Matriz() * Fraction() -> Matriz()
         * TypeError: si el tipo de dato es inválido
@@ -286,11 +333,12 @@ class Matriz:
                 for _ in range(self.filas)
             ]
 
+            # multiplicar las matrices
             for i in range(self.filas):
                 for j in range(multiplicador.columnas):
                     for k in range(self.columnas):
                         mat_multiplicada[i][j] += (
-                            self.valores[i][k] * multiplicador.valores[k][j]
+                            self[i, k] * multiplicador[k, j]
                         )
 
             return Matriz(
@@ -342,12 +390,12 @@ class Matriz:
         """
 
         diagonales_son_1 = all(
-            self.valores[i][i] == Fraction(1)
+            self[i, i] == Fraction(1)
             for i in range(self.filas)
         )
 
         resto_son_cero = all(
-            self.valores[i][j] == Fraction(0)
+            self[i, j] == Fraction(0)
             for i in range(self.filas)
             for j in range(self.columnas)
             if i != j
@@ -359,12 +407,15 @@ class Matriz:
         """
         Usada para calcular determinantes. Realiza operaciones de fila
         para convertir la matriz en una matriz triangular superior.
-        Retorna un nuevo objeto Matriz() con los valores modificados,
-        y un booleano que indica si hubo intercambio de filas.
+
+        Retorna:
+        * Matriz(): los valores modificados
+        * bool: si hubo intercambio de filas
         """
 
-        intercambio = False
+        # deepcopy() para no afectar self
         mat_triangular: list[list[Fraction]] = deepcopy(self.valores)
+        intercambio = False
 
         for i in range(self.filas):
             max_f = i
@@ -387,7 +438,10 @@ class Matriz:
 
             # hacer 0 los valores debajo de la diagonal principal
             for j in range(i + 1, self.filas):
-                factor = mat_triangular[j][i] / mat_triangular[i][i]
+                try:
+                    factor = mat_triangular[j][i] / mat_triangular[i][i]
+                except ZeroDivisionError:
+                    pass
                 for k in range(self.columnas):
                     mat_triangular[j][k] -= factor * mat_triangular[i][k]
 
@@ -403,7 +457,7 @@ class Matriz:
         """
 
         mat_transpuesta = [
-            [self.valores[j][i] for j in range(self.filas)]
+            [self[j, i] for j in range(self.filas)]
             for i in range(self.columnas)
         ]
 
@@ -413,6 +467,17 @@ class Matriz:
         """
         Calcula el determinante de la instancia.
         * ArithmeticError: si la matriz no es cuadrada
+
+        Para matrices 1x1 y 2x2, solo retorna el determinante.
+        Para matrices de nxn (n > 2), retorna:
+        * Fraction: determinante
+        * Matriz(): matriz triangular superior
+        * bool:     bandera de intercambio de filas
+
+        La matriz triangular superior y la bandera de intercambio
+        se utilizan para mostrar el procedimiento, pero si solo se necesita
+        el determinante, se pueden descartar los otros elementos de la tupla:
+        * det, _, _ = Matriz().calcular_det()
         """
 
         if not self.es_cuadrada():
@@ -444,8 +509,8 @@ class Matriz:
 
     def encontrar_adjunta(self) -> "Matriz":
         """
-        Encuentra la adjunta de la instancia.
-        La adjunta es la transposición de la matriz de cofactores de una matriz
+        Encuentra y retorna la adjunta de la instancia.
+        La adjunta es la transposición de la matriz de cofactores de una matriz.
         * ArithmeticError: si la matriz no es cuadrada
         """
 
@@ -463,7 +528,7 @@ class Matriz:
                 # eliminando la fila y columna actual
                 minor = [
                     [
-                        self.valores[m][n]
+                        self[m, n]
                         for n in range(self.columnas)
                         if n != j
                     ]
@@ -500,6 +565,11 @@ class Matriz:
         ocupando la formula: 1/det(A) * adj(A)
         * ArithmeticError: si la matriz no es cuadrada
         * ZeroDivisionError: si el determinante de la matriz es 0
+
+        Retorna una tupla con:
+        * Matriz(): inversa
+        * Matriz(): adjunta
+        * Fraction(): determinante
         """
 
         if not self.es_cuadrada():

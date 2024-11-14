@@ -82,6 +82,7 @@ class ErrorFrame(ctkFrame):
 
     def __init__(self, parent: Union[ctkFrame, CustomScrollFrame], message: str) -> None:
         super().__init__(parent, corner_radius=8, border_width=2, border_color="#ff3131")
+        self.parent = parent
         self.rowconfigure(0, weight=1)
         self.columnconfigure(0, weight=1)
 
@@ -103,6 +104,7 @@ class SuccessFrame(ctkFrame):
 
     def __init__(self, parent: Union[ctkFrame, CustomScrollFrame], message: str) -> None:
         super().__init__(parent, corner_radius=8, border_width=2, border_color="#18c026")
+        self.parent = parent
         self.rowconfigure(0, weight=1)
         self.columnconfigure(0, weight=1)
 
@@ -132,6 +134,7 @@ class ResultadoFrame(ctkFrame):
     ) -> None:
 
         super().__init__(parent, corner_radius=8, border_width=2, border_color=border_color)
+        self.parent = parent
 
         pady_tuple = (10, 10) if solo_header else (10, 3)
         self.header = ctkLabel(self, text=header)

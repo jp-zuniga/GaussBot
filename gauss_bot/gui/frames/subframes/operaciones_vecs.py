@@ -22,6 +22,7 @@ from gauss_bot import (
     delete_msg_frame,
     get_dict_key
 )
+
 from gauss_bot.managers import VectoresManager
 from gauss_bot.gui.custom import (
     CustomEntry,
@@ -146,12 +147,12 @@ class VSumaRestaTab(CustomScrollFrame):
         delete_msg_frame(self.mensaje_frame)
         try:
             if operacion == "+":
-                header, resultado = self.vecs_manager.sumar_vecs(
-                    nombre_vec1, nombre_vec2
+                header, resultado = self.vecs_manager.suma_resta_vecs(
+                    True, nombre_vec1, nombre_vec2
                 )
             elif operacion == "−":
-                header, resultado = self.vecs_manager.restar_vecs(
-                    nombre_vec1, nombre_vec2
+                header, resultado = self.vecs_manager.suma_resta_vecs(
+                    False, nombre_vec1, nombre_vec2
                 )
         except ArithmeticError as e:
             self.mensaje_frame = ErrorFrame(self.resultado_frame, str(e))
@@ -161,8 +162,8 @@ class VSumaRestaTab(CustomScrollFrame):
 
         self.mensaje_frame = ResultadoFrame(
             self.resultado_frame,
-            header=f"{header}:",
-            resultado=str(resultado)
+            header=f"{header}:",  # pylint: disable=possibly-used-before-assignment
+            resultado=str(resultado)  # pylint: disable=possibly-used-before-assignment
         )
         self.mensaje_frame.grid(row=0, column=0, columnspan=3, padx=5, pady=5)
 
@@ -278,7 +279,7 @@ class VMultiplicacionTab(CustomScrollFrame):
         delete_msg_frame(self.mensaje_frame)
         placeholder1 = Variable(tab, value=self.master_frame.nombres_vectores[0])
         instruct_e = ctkLabel(tab, text="Seleccione el vector e ingrese el escalar:")
-        operador_label = ctkLabel(tab, text="*")
+        operador_label = ctkLabel(tab, text="•")
         operador_label._font.configure(size=16)
 
         self.select_escalar_vec = CustomDropdown(
@@ -374,7 +375,7 @@ class VMultiplicacionTab(CustomScrollFrame):
         placeholder2 = Variable(tab, value=self.master_frame.nombres_vectores[0])
 
         instruct_mv = ctkLabel(tab, text="Seleccione la matriz y el vector a multiplicar:")
-        operador_label = ctkLabel(tab, text="*")
+        operador_label = ctkLabel(tab, text="•")
         operador_label._font.configure(size=16)
 
         self.select_vmat = CustomDropdown(
@@ -420,7 +421,15 @@ class VMultiplicacionTab(CustomScrollFrame):
         """
 
         vec = self.select_escalar_vec.get()  # type: ignore
-        delete_msg_frame(self.mensaje_frame)
+
+        try:
+            if self.mensaje_frame.parent in (  # type: ignore
+                self.tab_escalar,
+                self.resultado_escalar,
+            ):
+                delete_msg_frame(self.mensaje_frame)
+        except AttributeError:
+            pass
 
         try:
             escalar = Fraction(self.escalar_entry.get())  # type: ignore
@@ -438,7 +447,15 @@ class VMultiplicacionTab(CustomScrollFrame):
             self.mensaje_frame.grid(row=0, column=0, padx=5, pady=5)
             return
 
-        delete_msg_frame(self.mensaje_frame)
+        try:
+            if self.mensaje_frame.parent in (  # type: ignore
+                self.tab_escalar,
+                self.resultado_escalar,
+            ):
+                delete_msg_frame(self.mensaje_frame)
+        except AttributeError:
+            pass
+
         self.mensaje_frame = ResultadoFrame(
             self.resultado_escalar, header=f"{header}:", resultado=str(resultado)
         )
@@ -452,14 +469,30 @@ class VMultiplicacionTab(CustomScrollFrame):
         nombre_vec1 = self.select_vec1.get()  # type: ignore
         nombre_vec2 = self.select_vec2.get()  # type: ignore
 
-        delete_msg_frame(self.mensaje_frame)
+        try:
+            if self.mensaje_frame.parent in (  # type: ignore
+                self.tab_vector,
+                self.resultado_vectores,
+            ):
+                delete_msg_frame(self.mensaje_frame)
+        except AttributeError:
+            pass
+
         try:
             header, resultado = self.vecs_manager.producto_punto(nombre_vec1, nombre_vec2)
         except ArithmeticError as e:
             self.mensaje_frame = ErrorFrame(self.resultado_vectores, str(e))
             self.mensaje_frame.grid(row=0, column=0, padx=5, pady=5)
             return
-        delete_msg_frame(self.mensaje_frame)
+
+        try:
+            if self.mensaje_frame.parent in (  # type: ignore
+                self.tab_vector,
+                self.resultado_vectores,
+            ):
+                delete_msg_frame(self.mensaje_frame)
+        except AttributeError:
+            pass
 
         self.mensaje_frame = ResultadoFrame(
             self.resultado_vectores, header=f"{header}:", resultado=str(resultado)
@@ -474,7 +507,15 @@ class VMultiplicacionTab(CustomScrollFrame):
         nombre_mat = self.select_vmat.get()  # type: ignore
         nombre_vec = self.select_mvec.get()  # type: ignore
 
-        delete_msg_frame(self.mensaje_frame)
+        try:
+            if self.mensaje_frame.parent in (  # type: ignore
+                self.tab_matriz_vector,
+                self.resultado_mat_vec,
+            ):
+                delete_msg_frame(self.mensaje_frame)
+        except AttributeError:
+            pass
+
         try:
             header, resultado = self.app.ops_manager.matriz_por_vector(  # type: ignore
                 nombre_mat, nombre_vec
@@ -483,7 +524,15 @@ class VMultiplicacionTab(CustomScrollFrame):
             self.mensaje_frame = ErrorFrame(self.resultado_mat_vec, str(e))
             self.mensaje_frame.grid(row=0, column=0, padx=5, pady=5)
             return
-        delete_msg_frame(self.mensaje_frame)
+
+        try:
+            if self.mensaje_frame.parent in (  # type: ignore
+                self.tab_matriz_vector,
+                self.resultado_mat_vec,
+            ):
+                delete_msg_frame(self.mensaje_frame)
+        except AttributeError:
+            pass
 
         self.mensaje_frame = ResultadoFrame(
             self.resultado_mat_vec, header=f"{header}:", resultado=str(resultado)

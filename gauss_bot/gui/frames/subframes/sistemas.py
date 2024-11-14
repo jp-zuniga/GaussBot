@@ -132,7 +132,7 @@ class SistemasFrame(CustomScrollFrame):
                 sistema = (
                     self.mats_manager.resolver_sistema(self.sis_mat, "c")
                 )
-            except (TypeError, ArithmeticError, ZeroDivisionError) as e:
+            except (ValueError, ArithmeticError, ZeroDivisionError) as e:
                 self.mensaje_frame = ErrorFrame(self, str(e))
                 self.mensaje_frame.grid(
                     row=5, column=0, columnspan=2, sticky="n", padx=5, pady=5

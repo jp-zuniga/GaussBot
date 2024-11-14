@@ -7,6 +7,7 @@ from fractions import Fraction
 from typing import (
     TYPE_CHECKING,
     Optional,
+    Union,
 )
 
 from tkinter import Variable
@@ -57,7 +58,7 @@ class SumaRestaTab(CustomScrollFrame):
         self.columnconfigure(0, weight=1)
         self.columnconfigure(2, weight=1)
 
-        self.mensaje_frame: Optional[ctkFrame] = None
+        self.mensaje_frame: Optional[Union[ErrorFrame, ResultadoFrame]] = None
         self.operaciones: dict[str, str] = {
             "Sumar": "+",
             "Restar": "−",
@@ -147,12 +148,12 @@ class SumaRestaTab(CustomScrollFrame):
         delete_msg_frame(self.mensaje_frame)
         try:
             if operacion == "+":
-                header, resultado = self.mats_manager.sumar_matrices(
-                    nombre_mat1, nombre_mat2
+                header, resultado = self.mats_manager.suma_resta_mats(
+                    True, nombre_mat1, nombre_mat2
                 )
             elif operacion == "−":
-                header, resultado = self.mats_manager.restar_matrices(
-                    nombre_mat1, nombre_mat2
+                header, resultado = self.mats_manager.suma_resta_mats(
+                    False, nombre_mat1, nombre_mat2
                 )
         except ArithmeticError as e:
             self.mensaje_frame = ErrorFrame(self.resultado_frame, str(e))
@@ -162,8 +163,8 @@ class SumaRestaTab(CustomScrollFrame):
 
         self.mensaje_frame = ResultadoFrame(
             self.resultado_frame,
-            header=f"{header}:",
-            resultado=str(resultado)
+            header=f"{header}:",  # pylint: disable=possibly-used-before-assignment
+            resultado=str(resultado)  # pylint: disable=possibly-used-before-assignment
         )
         self.mensaje_frame.grid(row=0, column=0, columnspan=3, padx=5, pady=5)
 
@@ -213,7 +214,7 @@ class MultiplicacionTab(CustomScrollFrame):
         self.mats_manager = mats_manager
         self.columnconfigure(0, weight=1)
 
-        self.mensaje_frame: Optional[ctkFrame] = None
+        self.mensaje_frame: Optional[Union[ErrorFrame, ResultadoFrame]] = None
         self.select_escalar_mat: CustomDropdown
         self.escalar_entry: CustomEntry
         self.select_mat1: CustomDropdown
@@ -280,7 +281,7 @@ class MultiplicacionTab(CustomScrollFrame):
         placeholder1 = Variable(tab, value=self.master_frame.nombres_matrices[0])
 
         instruct_e = ctkLabel(tab, text="Seleccione la matriz e ingrese el escalar:")
-        operador_label = ctkLabel(tab, text="*")
+        operador_label = ctkLabel(tab, text="•")
         operador_label._font.configure(size=16)
 
         self.select_escalar_mat = CustomDropdown(
@@ -326,7 +327,7 @@ class MultiplicacionTab(CustomScrollFrame):
             placeholder2 = Variable(tab, value=self.master_frame.nombres_matrices[1])
 
         instruct_ms = ctkLabel(tab, text="Seleccione las matrices para multiplicar:")
-        operador_label = ctkLabel(tab, text="*")
+        operador_label = ctkLabel(tab, text="•")
         operador_label._font.configure(size=16)
 
         self.select_mat1 = CustomDropdown(
@@ -376,7 +377,7 @@ class MultiplicacionTab(CustomScrollFrame):
         placeholder2 = Variable(tab, value=self.master_frame.nombres_vectores[0])
 
         instruct_mv = ctkLabel(tab, text="Seleccione la matriz y el vector para multiplicar:")
-        operador_label = ctkLabel(tab, text="*")
+        operador_label = ctkLabel(tab, text="•")
         operador_label._font.configure(size=16)
 
         self.select_vmat = CustomDropdown(
@@ -423,7 +424,15 @@ class MultiplicacionTab(CustomScrollFrame):
 
         mat = self.select_escalar_mat.get()  # type: ignore
 
-        delete_msg_frame(self.mensaje_frame)
+        try:
+            if self.mensaje_frame.parent in (  # type: ignore
+                self.tab_escalar,
+                self.resultado_escalar,
+            ):
+                delete_msg_frame(self.mensaje_frame)
+        except AttributeError:
+            pass
+
         try:
             escalar = Fraction(self.escalar_entry.get())  # type: ignore
             header, resultado = self.mats_manager.escalar_por_matriz(escalar, mat)
@@ -439,7 +448,15 @@ class MultiplicacionTab(CustomScrollFrame):
             )
             self.mensaje_frame.grid(row=0, column=0, padx=5, pady=5)
             return
-        delete_msg_frame(self.mensaje_frame)
+
+        try:
+            if self.mensaje_frame.parent in (  # type: ignore
+                self.tab_escalar,
+                self.resultado_escalar,
+            ):
+                delete_msg_frame(self.mensaje_frame)
+        except AttributeError:
+            pass
 
         self.mensaje_frame = ResultadoFrame(
             self.resultado_escalar, header=f"{header}:", resultado=str(resultado)
@@ -454,14 +471,30 @@ class MultiplicacionTab(CustomScrollFrame):
         nombre_mat1 = self.select_mat1.get()  # type: ignore
         nombre_mat2 = self.select_mat2.get()  # type: ignore
 
-        delete_msg_frame(self.mensaje_frame)
+        try:
+            if self.mensaje_frame.parent in (  # type: ignore
+                self.tab_matriz,
+                self.resultado_mats,
+            ):
+                delete_msg_frame(self.mensaje_frame)
+        except AttributeError:
+            pass
+
         try:
             header, resultado = self.mats_manager.mult_matricial(nombre_mat1, nombre_mat2)
         except ArithmeticError as e:
             self.mensaje_frame = ErrorFrame(self.resultado_mats, str(e))
             self.mensaje_frame.grid(row=0, column=0, padx=5, pady=5)
             return
-        delete_msg_frame(self.mensaje_frame)
+
+        try:
+            if self.mensaje_frame.parent in (  # type: ignore
+                self.tab_matriz,
+                self.resultado_mats,
+            ):
+                delete_msg_frame(self.mensaje_frame)
+        except AttributeError:
+            pass
 
         self.mensaje_frame = ResultadoFrame(
             self.resultado_mats, header=f"{header}:", resultado=str(resultado)
@@ -476,14 +509,32 @@ class MultiplicacionTab(CustomScrollFrame):
         nombre_mat = self.select_vmat.get()  # type: ignore
         nombre_vec = self.select_mvec.get()  # type: ignore
 
-        delete_msg_frame(self.mensaje_frame)
         try:
-            header, resultado = self.app.ops_manager.matriz_por_vector(nombre_mat, nombre_vec)  # type: ignore
+            if self.mensaje_frame.parent in (  # type: ignore
+                self.tab_matriz_vector,
+                self.resultado_mat_vec,
+            ):
+                delete_msg_frame(self.mensaje_frame)
+        except AttributeError:
+            pass
+
+        try:
+            header, resultado = self.app.ops_manager.matriz_por_vector(  # type: ignore
+                nombre_mat, nombre_vec
+            )
         except ArithmeticError as e:
             self.mensaje_frame = ErrorFrame(self.resultado_mat_vec, str(e))
             self.mensaje_frame.grid(row=0, column=0, padx=5, pady=5)
             return
-        delete_msg_frame(self.mensaje_frame)
+
+        try:
+            if self.mensaje_frame.parent in (  # type: ignore
+                self.tab_matriz_vector,
+                self.resultado_mat_vec,
+            ):
+                delete_msg_frame(self.mensaje_frame)
+        except AttributeError:
+            pass
 
         self.mensaje_frame = ResultadoFrame(
             self.resultado_mat_vec, header=f"{header}:", resultado=str(resultado)
@@ -534,7 +585,7 @@ class TransposicionTab(CustomScrollFrame):
         self.mats_manager = mats_manager
         self.columnconfigure(0, weight=1)
 
-        self.mensaje_frame: Optional[ctkFrame] = None
+        self.mensaje_frame: Optional[Union[ErrorFrame, ResultadoFrame]] = None
         self.select_tmat: CustomDropdown
         self.tmat = ""
         self.resultado: ctkFrame
@@ -580,9 +631,9 @@ class TransposicionTab(CustomScrollFrame):
         nombre_transpuesta, transpuesta = self.mats_manager.transponer_matriz(nombre_tmat)
         if not any(transpuesta == mat for mat in self.mats_manager.mats_ingresadas.values()):
             self.mats_manager.mats_ingresadas[nombre_transpuesta] = transpuesta
-            self.app.inputs_frame.instances[1].update_all()  # type: ignore
             self.master_frame.update_all()
             self.app.vectores.update_all()  # type: ignore
+            self.app.inputs_frame.instances[1].update_all()  # type: ignore
 
         self.mensaje_frame = ResultadoFrame(
             self.resultado, header=f"{nombre_transpuesta}:", resultado=str(transpuesta)
@@ -615,7 +666,7 @@ class DeterminanteTab(CustomScrollFrame):
         self.mats_manager = mats_manager
         self.columnconfigure(0, weight=1)
 
-        self.mensaje_frame: Optional[ctkFrame] = None
+        self.mensaje_frame: Optional[Union[ErrorFrame, ResultadoFrame]] = None
         self.select_dmat: CustomDropdown
         self.dmat = ""
         self.resultado: ctkFrame
@@ -705,7 +756,7 @@ class InversaTab(CustomScrollFrame):
         self.mats_manager = mats_manager
         self.columnconfigure(0, weight=1)
 
-        self.mensaje_frame: Optional[ctkFrame] = None
+        self.mensaje_frame: Optional[Union[ErrorFrame, ResultadoFrame]] = None
         self.select_imat: CustomDropdown
         self.imat = ""
         self.resultado: ctkFrame
@@ -758,9 +809,9 @@ class InversaTab(CustomScrollFrame):
 
         if not any(inversa == mat for mat in self.mats_manager.mats_ingresadas.values()):
             self.mats_manager.mats_ingresadas[nombre_inversa] = inversa
-            self.app.inputs_frame.instances[1].update_all()  # type: ignore
             self.master_frame.update_all()
             self.app.vectores.update_all()  # type: ignore
+            self.app.inputs_frame.instances[1].update_all()  # type: ignore
 
         self.mensaje_frame = ResultadoFrame(
             self.resultado,

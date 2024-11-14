@@ -4,8 +4,17 @@ de álgebra lineal, como resolver sistemas de ecuaciones,
 operaciones con matrices y vectores, y análisis númerico.
 """
 
+from logging import (
+    DEBUG,
+    Formatter,
+    FileHandler,
+    Logger,
+    getLogger,
+)
+
 from os import (
     path,
+    makedirs,
     walk,
 )
 
@@ -64,6 +73,8 @@ __all__ = [
     "INPUTS_ICON",
     "LIMPIAR_ICON",
     "LOGO",
+    "LOGGER",
+    "LOG_PATH",
     "MATRICES_PATH",
     "MATRIZ_ICON",
     "MOSTRAR_ICON",
@@ -77,6 +88,42 @@ __all__ = [
     "VECTORES_PATH",
     "WARNING_ICON",
 ]
+
+# objeto logger global para la aplicacion
+# configurado en la funcion log_setup()
+LOGGER: Logger = getLogger("GaussLogger")
+
+
+################################################################################
+################################################################################
+###################   Funciones generales de la aplicación   ###################
+
+def log_setup(logger=LOGGER) -> None:
+    """
+    Configura el logger de la aplicación y crea el archivo 'log.txt' si no existe.
+    """
+
+    handler = FileHandler(
+        LOG_PATH,
+        mode="a",
+        encoding="utf-8"
+    )
+
+    handler.setLevel(DEBUG)
+    handler.setFormatter(
+        Formatter(
+            "%(asctime)s - %(levelname)s:\n%(message)s\n"
+        )
+    )
+
+    logger.addHandler(handler)
+    logger.setLevel(DEBUG)
+
+    if not path.exists(LOG_PATH):
+        makedirs(DATA_PATH, exist_ok=True)
+        with open(LOG_PATH, mode="w", encoding="utf-8") as _:
+            logger.info("Archivo 'log.txt' creado...")
+    logger.info("Logger configurado...")
 
 
 def delete_msg_frame(msg_frame: Optional[ctkFrame]) -> None:
@@ -252,12 +299,12 @@ def resize_image(img: ctkImage, divisors: tuple = (4, 8)) -> ctkImage:
 def transparent_invert(img: Image) -> Image:
     """
     Invierte los colores de una imagen sin perder su transparencia.
-    La funcion invert() de PIL no soporta imagenes con un canal alpha,
+    La funcion invert() de PIL no acepta imagenes con un canal alpha,
     entonces esta función toma un objeto Image RGBA, separa los canales,
     invierte solamente los canales RBG, y retorna una nueva imagen con
     los canales invertidos unidos con el canal alpha original.
     * img: imagen RGBA a invertir
-    
+
     Utilizada cuando se genera un PNG de un string LaTeX, para que
     la imagen generada sea compatible con el modo claro y oscuro.
     """
@@ -304,6 +351,9 @@ VECTORES_PATH = path.join(
 FUNC_PATH = path.join(
     ASSET_PATH, "functions"
 )
+
+LOG_PATH = path.join(DATA_PATH, "log.txt")
+
 
 ################################################################################
 ################################################################################

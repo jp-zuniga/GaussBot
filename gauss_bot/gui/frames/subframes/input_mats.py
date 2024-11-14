@@ -283,9 +283,9 @@ class AgregarMats(CustomScrollFrame):
         )
 
         self.mensaje_frame.grid(row=3, column=0, padx=5, pady=5, sticky="n")
-        self.master_frame.update_all()
         self.app.matrices.update_all()  # type: ignore
         self.app.vectores.update_all()  # type: ignore
+        self.master_frame.update_all()
 
     def focus_set_columnas(self) -> None:
         self.columnas_entry.focus_set()
@@ -502,9 +502,9 @@ class EliminarMats(CustomScrollFrame):
         )
 
         self.mensaje_frame.grid(row=3, column=0, columnspan=2, padx=5, pady=5)
-        self.master_frame.update_all()
         self.app.matrices.update_all()  # type: ignore
         self.app.vectores.update_all()  # type: ignore
+        self.master_frame.update_all()
 
     def update_frame(self) -> None:
         self.nombres_matrices = list(self.mats_manager.mats_ingresadas.keys())

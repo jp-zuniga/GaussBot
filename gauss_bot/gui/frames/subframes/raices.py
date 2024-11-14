@@ -256,7 +256,7 @@ class RaicesFrame(CustomScrollFrame):
             signo = sig_entry.get()
             arg = arg_entry.get()
             print("arg:", arg)
-            if arg[0] not in ("+", "−"):
+            if not arg.startswith(("+", "−")):
                 arg = f"+{arg}"
 
             signos_iguales = (

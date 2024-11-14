@@ -9,7 +9,10 @@ from json import (
     JSONDecoder
 )
 
-from typing import Any, Union
+from typing import (
+    Any,
+    Union,
+)
 
 
 class FractionEncoder(JSONEncoder):
@@ -21,7 +24,7 @@ class FractionEncoder(JSONEncoder):
     # override del metodo default() de JSONEncoder:
     # se utiliza cuando json.load encuentra un objeto
     # que no puede ser serializado por defecto.
-    def default(self, o: Any) -> Union[dict[str, int], Any]:
+    def default(self, o: Any) -> Union[dict[str, Union[str, int]], Any]:
         if isinstance(o, Fraction):
             # si el objeto encontrado es una instancia de Fraction,
             # se serializa como un diccionario, que incluye
@@ -56,6 +59,6 @@ class FractionDecoder(JSONDecoder):
         # y se retorna una instancia de Fraction() con los valores del diccionario.
         if "__type__" in obj and obj["__type__"] == "Fraction":
             return Fraction(obj["numerator"], obj["denominator"])
-        
+
         # si no, retornar el diccionario a como se encuentra
         return obj
