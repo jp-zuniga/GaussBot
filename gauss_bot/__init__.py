@@ -95,13 +95,24 @@ LOGGER: Logger = getLogger("GaussLogger")
 
 
 ################################################################################
-################################################################################
 ###################   Funciones generales de la aplicación   ###################
+################################################################################
 
 def log_setup(logger=LOGGER) -> None:
     """
     Configura el logger de la aplicación y crea el archivo 'log.txt' si no existe.
     """
+
+    if not path.exists(LOG_PATH):
+        makedirs(DATA_PATH, exist_ok=True)
+        with open(LOG_PATH, mode="w", encoding="utf-8") as _:
+            pass
+
+    # si hay mas de 1000 lineas en el log, limpiarlo
+    with open(LOG_PATH, mode="r", encoding="utf-8") as log_file:
+        if len(log_file.readlines()) > 1000:
+            with open(LOG_PATH, mode="w", encoding="utf-8") as _:
+                pass
 
     handler = FileHandler(
         LOG_PATH,
@@ -119,10 +130,6 @@ def log_setup(logger=LOGGER) -> None:
     logger.addHandler(handler)
     logger.setLevel(DEBUG)
 
-    if not path.exists(LOG_PATH):
-        makedirs(DATA_PATH, exist_ok=True)
-        with open(LOG_PATH, mode="w", encoding="utf-8") as _:
-            logger.info("Archivo 'log.txt' creado...")
     logger.info("Logger configurado...")
 
 
@@ -315,8 +322,8 @@ def transparent_invert(img: Image) -> Image:
 
 
 ################################################################################
-################################################################################
 ###################   Paths y directorios de la aplicación   ###################
+################################################################################
 
 ASSET_PATH = path.join(
     path.dirname(path.realpath(__file__)),
@@ -356,8 +363,8 @@ LOG_PATH = path.join(DATA_PATH, "log.txt")
 
 
 ################################################################################
-################################################################################
 ############################   Íconos de NavFrame   ############################
+################################################################################
 
 LOGO = ctkImage(
     dark_image=open_img(path.join(ASSET_PATH, "light_logo.png")),
@@ -400,8 +407,8 @@ QUIT_ICON = ctkImage(
 )
 
 ################################################################################
-################################################################################
 ########################   Íconos de CustomMessagebox   ########################
+################################################################################
 
 CHECK_ICON = ctkImage(
     open_img(path.join(ASSET_PATH, "check_icon.png")),
@@ -425,15 +432,15 @@ QUESTION_ICON = ctkImage(
 
 MSGBOX_ICONS = {
     "check": CHECK_ICON,
-    "cancel": ERROR_ICON,
+    "error": ERROR_ICON,
     "info": INFO_ICON,
     "question": QUESTION_ICON,
     "warning": WARNING_ICON,
 }
 
 ################################################################################
-################################################################################
 ############################   Íconos de botones   #############################
+################################################################################
 
 ENTER_ICON = ctkImage(
     dark_image=open_img(path.join(ASSET_PATH, "light_enter_icon.png")),
@@ -484,8 +491,8 @@ DROPUP_ICON = ctkImage(
 )
 
 ################################################################################
-################################################################################
 ##########################   Imagenes de funciones   ###########################
+################################################################################
 
 FUNCTIONS: dict[str, ctkImage] = {
     name[:-4]: ctkImage(

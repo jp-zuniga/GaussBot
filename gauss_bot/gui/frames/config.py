@@ -71,35 +71,35 @@ class ConfigFrame(ctkFrame):
         self.modos = list(self.modos_dict.keys())
         self.temas = list(self.temas_dict.keys())
 
-        self.escala_actual_key = get_dict_key(self.escalas_dict, self.app.escala_actual)
-        self.modo_actual_key = get_dict_key(self.modos_dict, self.app.modo_actual)
-        self.tema_actual_key = get_dict_key(self.temas_dict, self.app.tema_actual)
+        escala_actual_key = get_dict_key(self.escalas_dict, self.app.escala_actual)
+        modo_actual_key = get_dict_key(self.modos_dict, self.app.modo_actual)
+        tema_actual_key = get_dict_key(self.temas_dict, self.app.tema_actual)
 
         try:
-            self.first_escala = StringVar(value=self.escala_actual_key)
-            self.first_modo = StringVar(value=self.modo_actual_key)
-            self.first_tema = StringVar(value=self.tema_actual_key)
+            first_escala = StringVar(value=escala_actual_key)
+            first_modo = StringVar(value=modo_actual_key)
+            first_tema = StringVar(value=tema_actual_key)
         except AttributeError:
-            self.first_escala = StringVar(value="100%")
-            self.first_modo = StringVar(value="Oscuro")
-            self.first_tema = StringVar(value="Metal")
+            first_escala = StringVar(value="100%")
+            first_modo = StringVar(value="Claro")
+            first_tema = StringVar(value="Sky")
 
         self.escala_label = ctkLabel(self, text="Escala:")
         self.modos_label = ctkLabel(self, text="Modo:")
         self.temas_label = ctkLabel(self, text="Tema:")
 
         self.desplegar_escalas = CustomDropdown(
-            self, width=105, variable=self.first_escala,
+            self, width=105, variable=first_escala,
             values=self.escalas, command=self.cambiar_escala,
         )
 
         self.desplegar_modos = CustomDropdown(
-            self, width=105, variable=self.first_modo,
+            self, width=105, variable=first_modo,
             values=self.modos, command=self.cambiar_modo
         )
 
         self.desplegar_temas = CustomDropdown(
-            self, width=105, variable=self.first_tema,
+            self, width=105, variable=first_tema,
             values=self.temas, command=self.cambiar_tema
         )
 
@@ -151,11 +151,11 @@ class ConfigFrame(ctkFrame):
         self.mensaje_frame = SuccessFrame(
             self,
             message="Tema cambiado exitosamente!\n" +
-                    "Cambio tomará efecto al reiniciar la aplicación."
+                    "El cambio tomará efecto al reiniciar la aplicación."
         )
 
         self.mensaje_frame.grid(row=3, column=1, pady=30)
-    
+
     def update_frame(self) -> None:
         for widget in self.winfo_children():
             widget.configure(bg_color="transparent")

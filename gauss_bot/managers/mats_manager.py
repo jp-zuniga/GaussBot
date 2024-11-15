@@ -9,7 +9,7 @@ Operaciones implementadas:
 * multiplicación matricial
 * transponer
 * calcular determinante
-* invertir
+* encontrar inversas
 """
 
 from fractions import Fraction

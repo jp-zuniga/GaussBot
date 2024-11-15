@@ -6,7 +6,7 @@ para leer y escribir objetos Fraction() a archivos .json.
 from fractions import Fraction
 from json import (
     JSONEncoder,
-    JSONDecoder
+    JSONDecoder,
 )
 
 from typing import (

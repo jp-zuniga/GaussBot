@@ -20,11 +20,7 @@ from gauss_bot.managers import (
     VectoresManager,
 )
 
-from gauss_bot.gui.custom import (
-    CustomScrollFrame,
-    ErrorFrame,
-)
-
+from gauss_bot.gui.custom import ErrorFrame
 from gauss_bot.gui.frames.subframes import (
     VSumaRestaTab,
     VMultiplicacionTab,
@@ -54,7 +50,7 @@ class VectoresFrame(ctkFrame):
         self.vecs_manager = vecs_manager
         self.mats_manager = mats_manager
 
-        self.dummy_frame: ctkFrame
+        self.dummy_frame: ctkFrame  # para pack mensaje de error inicial
         self.mensaje_frame: Optional[ctkFrame] = None
         self.nombres_vectores = list(self.vecs_manager.vecs_ingresados.keys())
         self.nombres_matrices = list(self.mats_manager.mats_ingresadas.keys())
@@ -63,16 +59,6 @@ class VectoresFrame(ctkFrame):
             Union[
                 VSumaRestaTab,
                 VMultiplicacionTab,
-            ]
-        ] = []
-
-        self.tabs: list[
-            tuple[
-                str,
-                Union[
-                    type[VSumaRestaTab],
-                    type[VMultiplicacionTab],
-                ]
             ]
         ]
 
@@ -88,8 +74,14 @@ class VectoresFrame(ctkFrame):
             widget.destroy()
 
         if len(self.nombres_vectores) == 0:
+            # si no hay vectores guardados, mostrar mensaje de error
+            # y agregar boton para que el usuario sepa donde agregarlos
             self.dummy_frame = ctkFrame(self, fg_color="transparent")
-            self.mensaje_frame = ErrorFrame(self.dummy_frame, message="No hay vectores ingresados!")
+            self.mensaje_frame = ErrorFrame(
+                self.dummy_frame,
+                message="No hay vectores ingresados!"
+            )
+
             agregar_button = ctkButton(
                 self.dummy_frame,
                 height=30,
@@ -103,54 +95,63 @@ class VectoresFrame(ctkFrame):
             agregar_button.pack(pady=5, anchor="center")
             return
 
+        # cleanup si el mensaje de error todavia existe
         if self.mensaje_frame is not None:
             for widget in self.winfo_children():
                 widget.destroy()
             self.mensaje_frame = None
 
-        self.tabview = ctkTabview(self)
+        # inicializar tabview, crear tabs y frames
+        self.tabview = ctkTabview(self, fg_color="transparent")
         self.tabview.pack(expand=True, fill="both")
 
-        self.instances = []
-        self.tabs = [
-            ("Suma y Resta", VSumaRestaTab),
-            ("Multiplicación", VMultiplicacionTab),
-        ]
+        tab_sr = self.tabview.add("Suma y Resta")
+        tab_m = self.tabview.add("Multiplicación")
 
-        for nombre, cls in self.tabs:
-            tab = self.tabview.add(nombre)
-            tab_instance: CustomScrollFrame = cls(
-                self.app, tab, self, self.vecs_manager
-            )
+        frame_sr = VSumaRestaTab(self.app, tab_sr, self, self.vecs_manager)
+        frame_m = VMultiplicacionTab(self.app, tab_m, self, self.vecs_manager)
 
-            tab_instance.pack(expand=True, fill="both")
-            self.instances.append(tab_instance)  # type: ignore
+        frame_sr.pack(expand=True, fill="both")
+        frame_m.pack(expand=True, fill="both")
+        self.instances = [frame_sr, frame_m]
 
     def update_all(self) -> None:
         """
         Actualiza los datos de todos los frames del tabview.
         """
 
-        self.mats_manager.mats_ingresadas = {
-            nombre: mat
-            for nombre, mat in sorted(self.mats_manager.mats_ingresadas.items())
-        }
+        # sort los diccionarios de datos para que esten alfabetizados
+        self.mats_manager.mats_ingresadas = dict(
+            sorted(
+                self.mats_manager.mats_ingresadas.items()
+            )
+        )
 
-        self.vecs_manager.vecs_ingresados = {
-            nombre: vec
-            for nombre, vec in sorted(self.vecs_manager.vecs_ingresados.items())
-        }
+        self.vecs_manager.vecs_ingresados = dict(
+            sorted(
+                self.vecs_manager.vecs_ingresados.items()
+            )
+        )
 
+        # actualizar atributos de nombres despues que cambiaron los dicts
         self.nombres_vectores = list(self.vecs_manager.vecs_ingresados.keys())
         self.nombres_matrices = list(self.mats_manager.mats_ingresadas.keys())
 
-        if (self.mensaje_frame is not None
-            or len(self.nombres_vectores) == 0
-            or self.instances == []):
+        if (
+            self.mensaje_frame is not None or
+            len(self.nombres_vectores) == 0 or
+            self.instances == []
+        ):
+            # si hay un mensaje de error,
+            # o ahora no hay vectores,
+            # o no se han inicializado los frames,
+            # correr el setup
             self.setup_tabview()
             return
 
+        # si no, actualizar todos los subframes
         for tab in self.instances:
-            tab.update_frame()  # type: ignore
+            tab.update_frame()
             for widget in tab.winfo_children():
+                # por si hubo cambio de modo de apariencia
                 widget.configure(bg_color="transparent")  # type: ignore

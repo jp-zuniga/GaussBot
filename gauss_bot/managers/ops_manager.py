@@ -6,14 +6,14 @@ los datos de MatricesManager y VectoresManager.
 
 from fractions import Fraction
 from json import (
+    JSONDecodeError,
     dump,
     load,
-    JSONDecodeError
 )
 
 from os import (
-    path,
     makedirs,
+    path,
 )
 
 from gauss_bot import (
@@ -133,7 +133,7 @@ class OpsManager:
         if sistemas_dict == {}:
             with open(SISTEMAS_PATH, "w", encoding="utf-8") as _:
                 LOGGER.info(
-                    "No hay sistemas de ecuacionespara guardar, " +
+                    "No hay sistemas de ecuaciones para guardar, " +
                     "dejando 'sistemas.json' vacío..."
                 )
             return

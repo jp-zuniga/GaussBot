@@ -8,9 +8,9 @@ from .inputs import (
     ManejarVecs,
 )
 
-from .nav import NavFrame
 from .matrices import MatricesFrame
 from .vectores import VectoresFrame
+from .nav import NavFrame
 
 __all__ = [
     "ConfigFrame",
@@ -20,7 +20,7 @@ __all__ = [
     "ManejarSistemas",
     "ManejarMats",
     "ManejarVecs",
-    "NavFrame",
     "MatricesFrame",
     "VectoresFrame",
+    "NavFrame",
 ]

@@ -16,14 +16,21 @@ if TYPE_CHECKING:
 
 
 class HomeFrame(ctkFrame):
+    """
+    Pantalla de bienvenida de la aplicación.
+    """
+
     def __init__(self, app: "GaussUI", master: "GaussUI") -> None:
         super().__init__(master, corner_radius=0)
         self.app = app
+
+        # para centrar widgets
         self.rowconfigure(0, weight=1)
         self.rowconfigure(2, weight=1)
         self.columnconfigure(0, weight=1)
         self.columnconfigure(1, weight=1)
 
+        # inicializar widgets
         welcome = ctkLabel(
             self,
             text="¡Bienvenido a GaussBot!",
@@ -69,21 +76,32 @@ class HomeFrame(ctkFrame):
             command=lambda: self.ir_a_vector(mostrar=True)
         )
 
+        # colocar en grid para mostrar
         welcome.grid(row=0, column=0, columnspan=2, padx=20, pady=20, sticky="s")
         agregar_matrices.grid(row=1, column=0, padx=20, pady=(20, 10), sticky="ne")
         agregar_vectores.grid(row=1, column=1, padx=20, pady=(20, 10), sticky="nw")
         mostrar_matrices.grid(row=2, column=0, padx=20, pady=(10, 20), sticky="ne")
         mostrar_vectores.grid(row=2, column=1, padx=20, pady=(10, 20), sticky="nw")
-    
+
     def ir_a_matriz(self, mostrar: bool):
+        """
+        Mostrar frame 'ManejarMats'.
+        * mostrar: si se quiere seleccionar la tab de mostrar o no
+        """
+
         self.app.nav_frame.seleccionar_frame("inputs")  # type: ignore
         self.app.inputs_frame.tabview.set("Matrices")  # type: ignore
         if mostrar:
             self.app.inputs_frame.instances[1].tabview.set("Mostrar")  # type: ignore
         else:
             self.app.inputs_frame.instances[1].tabview.set("Agregar")  # type: ignore
-    
+
     def ir_a_vector(self, mostrar: bool):
+        """
+        Mostrar frame 'ManejarVecs'.
+        * mostrar: si se quiere seleccionar la tab de mostrar o no
+        """
+
         self.app.nav_frame.seleccionar_frame("inputs")  # type: ignore
         self.app.inputs_frame.tabview.set("Vectores")  # type: ignore
         if mostrar:
