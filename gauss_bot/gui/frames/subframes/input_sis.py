@@ -295,7 +295,7 @@ class AgregarSistemas(CustomScrollFrame):
 
         self.mensaje_frame.grid(row=3, column=0, padx=5, pady=5, sticky="n")
         self.master_frame.update_all()
-        self.app.ecuaciones.update_all()  # type: ignore
+        self.app.sistemas.update_frame()  # type: ignore
 
     def focus_set_vars(self) -> None:
         self.vars_entry.focus_set()
@@ -514,7 +514,7 @@ class EliminarSistemas(CustomScrollFrame):
 
         self.mensaje_frame.grid(row=3, column=0, columnspan=2, padx=5, pady=5)
         self.master_frame.update_all()
-        self.app.ecuaciones.update_all()  # type: ignore
+        self.app.sistemas.update_frame()  # type: ignore
 
     def update_frame(self) -> None:
         self.nombres_sistemas = list(self.mats_manager.sis_ingresados.keys())

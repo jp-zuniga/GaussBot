@@ -31,13 +31,14 @@ from gauss_bot import (
 
 from gauss_bot.managers import OpsManager
 from gauss_bot.gui.frames import (
+    NavFrame,
     HomeFrame,
     InputsFrame,
+    SistemasFrame,
     MatricesFrame,
     VectoresFrame,
+    AnalisisFrame,
     ConfigFrame,
-    EcuacionesFrame,
-    NavFrame,
 )
 
 
@@ -71,34 +72,37 @@ class GaussUI(ctk):
         self.vecs_manager = self.ops_manager.vecs_manager
 
         # inicializar frames
-        self.home_frame = HomeFrame(master=self, app=self)
+        self.home_frame = HomeFrame(app=self, master=self)
         self.inputs_frame = InputsFrame(
-            master=self,
             app=self,
+            master=self,
             mats_manager=self.mats_manager,
             vecs_manager=self.vecs_manager,
         )
 
         self.matrices = MatricesFrame(
-            master=self,
             app=self,
+            master=self,
             mats_manager=self.mats_manager,
             vecs_manager=self.vecs_manager,
         )
 
         self.vectores = VectoresFrame(
-            master=self,
             app=self,
+            master=self,
             vecs_manager=self.vecs_manager,
             mats_manager=self.mats_manager,
         )
 
-        self.ecuaciones = EcuacionesFrame(
-            master=self, app=self, mats_manager=self.mats_manager
+        self.analisis = AnalisisFrame(app=self, master=self)
+        self.sistemas = SistemasFrame(
+            app=self,
+            master=self,
+            mats_manager=self.mats_manager
         )
 
-        self.config_frame = ConfigFrame(master=self, app=self)
-        self.nav_frame = NavFrame(master=self, app=self)
+        self.config_frame = ConfigFrame(app=self, master=self)
+        self.nav_frame = NavFrame(app=self, master=self)
 
         # seleccionar frame por defecto
         self.nav_frame.seleccionar_frame("home")

@@ -54,6 +54,7 @@ __all__ = [
     "resize_image",
     "transparent_invert",
     "ACEPTAR_ICON",
+    "ANALISIS_ICON",
     "ASSET_PATH",
     "CHECK_ICON",
     "CONFIG_ICON",
@@ -339,10 +340,6 @@ CONFIG_PATH = path.join(
     DATA_PATH, "config.json",
 )
 
-THEMES_PATH = path.join(
-    ASSET_PATH, "themes"
-)
-
 SISTEMAS_PATH = path.join(
     DATA_PATH, "sistemas.json"
 )
@@ -357,6 +354,10 @@ VECTORES_PATH = path.join(
 
 FUNC_PATH = path.join(
     ASSET_PATH, "functions"
+)
+
+THEMES_PATH = path.join(
+    ASSET_PATH, "themes"
 )
 
 LOG_PATH = path.join(DATA_PATH, "log.txt")
@@ -381,11 +382,6 @@ INPUTS_ICON = ctkImage(
     light_image=open_img(path.join(ASSET_PATH, "dark_input_icon.png"))
 )
 
-ECUACIONES_ICON = ctkImage(
-    dark_image=open_img(path.join(ASSET_PATH, "light_ecuaciones_icon.png")),
-    light_image=open_img(path.join(ASSET_PATH, "dark_ecuaciones_icon.png"))
-)
-
 MATRIZ_ICON = ctkImage(
     dark_image=open_img(path.join(ASSET_PATH, "light_matriz_icon.png")),
     light_image=open_img(path.join(ASSET_PATH, "dark_matriz_icon.png"))
@@ -394,6 +390,16 @@ MATRIZ_ICON = ctkImage(
 VECTOR_ICON = ctkImage(
     dark_image=open_img(path.join(ASSET_PATH, "light_vector_icon.png")),
     light_image=open_img(path.join(ASSET_PATH, "dark_vector_icon.png"))
+)
+
+ANALISIS_ICON = ctkImage(
+    dark_image=open_img(path.join(ASSET_PATH, "light_analisis_icon.png")),
+    light_image=open_img(path.join(ASSET_PATH, "dark_analisis_icon.png"))
+)
+
+ECUACIONES_ICON = ctkImage(
+    dark_image=open_img(path.join(ASSET_PATH, "light_ecuaciones_icon.png")),
+    light_image=open_img(path.join(ASSET_PATH, "dark_ecuaciones_icon.png"))
 )
 
 CONFIG_ICON = ctkImage(

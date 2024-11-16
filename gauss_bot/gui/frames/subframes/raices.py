@@ -65,7 +65,7 @@ from gauss_bot.gui.custom import (
 
 if TYPE_CHECKING:
     from gauss_bot.gui import GaussUI
-    from gauss_bot.gui.frames import EcuacionesFrame
+    from gauss_bot.gui.frames import AnalisisFrame
 
 
 TRANSFORMS = (standard_transformations + (implicit_multiplication_application,))
@@ -78,7 +78,7 @@ class RaicesFrame(CustomScrollFrame):
         self,
         app: "GaussUI",
         master_tab: ctkFrame,
-        master_frame: "EcuacionesFrame"
+        master_frame: "AnalisisFrame"
     ) -> None:
 
         super().__init__(app, master_tab, corner_radius=0, fg_color="transparent")

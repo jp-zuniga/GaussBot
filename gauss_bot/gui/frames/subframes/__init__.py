@@ -29,7 +29,6 @@ from .operaciones_vecs import (
     VMultiplicacionTab,
 )
 
-from .sistemas import SistemasFrame
 from .raices import RaicesFrame
 
 __all__ = [
@@ -49,6 +48,5 @@ __all__ = [
     "InversaTab",
     "VSumaRestaTab",
     "VMultiplicacionTab",
-    "SistemasFrame",
     "RaicesFrame",
 ]

@@ -1,6 +1,9 @@
-from .config import ConfigFrame
-from .ecuaciones import EcuacionesFrame
-from .home import HomeFrame
+"""
+Implementación de los parents frame de
+los módulos de la aplciación.
+"""
+
+from .nav import NavFrame
 from .inputs import (
     InputsFrame,
     ManejarSistemas,
@@ -8,19 +11,23 @@ from .inputs import (
     ManejarVecs,
 )
 
+from .home import HomeFrame
 from .matrices import MatricesFrame
 from .vectores import VectoresFrame
-from .nav import NavFrame
+from .analisis import AnalisisFrame
+from .ecuaciones import SistemasFrame
+from .config import ConfigFrame
 
 __all__ = [
-    "ConfigFrame",
-    "EcuacionesFrame",
-    "HomeFrame",
+    "NavFrame",
     "InputsFrame",
     "ManejarSistemas",
     "ManejarMats",
     "ManejarVecs",
+    "HomeFrame",
     "MatricesFrame",
     "VectoresFrame",
-    "NavFrame",
+    "AnalisisFrame",
+    "SistemasFrame",
+    "ConfigFrame",
 ]
