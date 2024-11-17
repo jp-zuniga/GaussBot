@@ -26,7 +26,7 @@ from gauss_bot.gui.custom import (
     CustomDropdown,
     CustomScrollFrame,
     ErrorFrame,
-    ResultadoFrame,
+    place_msg_frame,
 )
 
 if TYPE_CHECKING:
@@ -50,12 +50,14 @@ class SistemasFrame(CustomScrollFrame):
         super().__init__(app, master, corner_radius=0, fg_color="transparent")
         self.app = app
         self.mats_manager = mats_manager
-        self.nombres_sistemas = list(self.mats_manager.sis_ingresados.keys())
-
         self.columnconfigure(0, weight=1)
         self.columnconfigure(1, weight=1)
-        self.mensaje_frame: Optional[ctkFrame] = None
 
+        self.nombres_sistemas = list(self.mats_manager.sis_ingresados.keys())
+        self.dummy_frame: ctkFrame  # para pack mensaje de error inicial
+        self.msg_frame: Optional[ctkFrame] = None
+
+        # definir atributos, se inicializan en setup_frame
         self.select_sis_mat: CustomDropdown
         self.gauss_jordan_checkbox: ctkCheckBox
         self.cramer_checkbox: ctkCheckBox
@@ -78,7 +80,6 @@ class SistemasFrame(CustomScrollFrame):
 
         # por si habia un mensaje de error centrado
         self.rowconfigure(0, weight=0)
-        self.rowconfigure(1, weight=0)
         for widget in self.winfo_children():
             widget.destroy()  # type: ignore
 
@@ -141,13 +142,15 @@ class SistemasFrame(CustomScrollFrame):
         por el usuario, utilizando el método indicado.
         """
 
-        delete_msg_frame(self.mensaje_frame)
+        delete_msg_frame(self.msg_frame)
         if not self.validar_checkboxes():
             return
 
         self.update_sis_mat(self.select_sis_mat.get())  # type: ignore
         sistema: Optional[SistemaEcuaciones] = None
 
+        # si es matriz cero, cambiar a gauss_jordan
+        # para mostrar la explicacion del resultado
         if self.mats_manager.sis_ingresados[self.sis_mat].es_matriz_cero():
             self.gauss_jordan = True
             self.cramer = False
@@ -162,48 +165,40 @@ class SistemasFrame(CustomScrollFrame):
                     self.mats_manager.resolver_sistema(self.sis_mat, "c")
                 )
             except (ValueError, ArithmeticError, ZeroDivisionError) as e:
-                self.mensaje_frame = ErrorFrame(self, str(e))
-                self.mensaje_frame.grid(
+                self.msg_frame = place_msg_frame(
+                    parent_frame=self,
+                    msg_frame=self.msg_frame,
+                    msg=str(e),  # type: ignore
+                    tipo="error",
                     row=5,
-                    column=0,
                     columnspan=2,
-                    sticky="n",
-                    padx=5,
-                    pady=5
                 )
                 return
 
-        delete_msg_frame(self.mensaje_frame)
+        delete_msg_frame(self.msg_frame)
         if "!=" in sistema.solucion:  # type: ignore
             # si el sistema es inconsistente, habria un != en la solucion
             # entonces se muestra el resultado con un borde rojo
-            self.mensaje_frame = ResultadoFrame(
-                self, header=sistema.solucion,  # type: ignore
-                resultado="", solo_header=True,
-                border_color="#ff3131"
+            self.msg_frame = place_msg_frame(
+                parent_frame=self,
+                msg_frame=self.msg_frame,
+                msg=sistema.solucion,  # type: ignore
+                tipo="resultado",
+                row=5,
+                columnspan=2,
             )
-        else:
-            self.mensaje_frame = ResultadoFrame(
-                self, header=sistema.solucion,  # type: ignore
-                resultado="", solo_header=True
-            )
-        self.mensaje_frame.grid(
-            row=5, column=0, columnspan=2, sticky="n", padx=5, pady=5
+
+            self.msg_frame.configure(border_color="#ff3131")
+            return
+
+        self.msg_frame = place_msg_frame(
+            parent_frame=self,
+            msg_frame=self.msg_frame,
+            msg=sistema.solucion,  # type: ignore
+            tipo="resultado",
+            row=5,
+            columnspan=2,
         )
-
-    def toggle_gj(self) -> None:
-        """
-        Invierte el valor de self.gauss_jordan.
-        """
-
-        self.gauss_jordan = not self.gauss_jordan
-
-    def toggle_cramer(self) -> None:
-        """
-        Invierte el valor de self.cramer.
-        """
-
-        self.cramer = not self.cramer
 
     def validar_checkboxes(self) -> bool:
         """
@@ -214,36 +209,26 @@ class SistemasFrame(CustomScrollFrame):
 
         # si se seleccionaron ambos
         if all([self.gauss_jordan, self.cramer]):
-            self.mensaje_frame = ErrorFrame(
-                self,
-                "Únicamente debe seleccionar un método para resolver el sistema!",
-            )
-
-            self.mensaje_frame.grid(
+            self.msg_frame = place_msg_frame(
+                parent_frame=self,
+                msg_frame=self.msg_frame,
+                msg="Únicamente debe seleccionar un método para resolver el sistema!",
+                tipo="error",
                 row=5,
-                column=0,
                 columnspan=2,
-                sticky="n",
-                padx=5,
-                pady=5,
             )
 
             return False
 
         # si no se selecciono ninguno
         if not any([self.gauss_jordan, self.cramer]):
-            self.mensaje_frame = ErrorFrame(
-                self,
-                "Debe seleccionar un método para resolver el sistema!",
-            )
-
-            self.mensaje_frame.grid(
+            self.msg_frame = place_msg_frame(
+                parent_frame=self,
+                msg_frame=self.msg_frame,
+                msg="Debe seleccionar un método para resolver el sistema!",
+                tipo="error",
                 row=5,
-                column=0,
                 columnspan=2,
-                sticky="n",
-                padx=5,
-                pady=5,
             )
 
             return False
@@ -264,26 +249,42 @@ class SistemasFrame(CustomScrollFrame):
 
     def display_error(self) -> None:
         """
-        Inicializa self.mensaje_frame y muestra un
+        Inicializa self.msg_frame y muestra un
         botón para dirigir los usuarios adonde agregar sistemas.
         """
 
         self.rowconfigure(0, weight=1)
-        self.rowconfigure(1, weight=1)
-        self.mensaje_frame = ErrorFrame(
-            self,
-            "No hay sistemas de ecuaciones ingresados!"
+        self.dummy_frame = ctkFrame(self, fg_color="transparent")
+        self.msg_frame = ErrorFrame(
+            self.dummy_frame,
+            msg="No hay sistemas de ecuaciones ingresados!",
         )
 
         agregar_button = ctkButton(
-            self,
+            self.dummy_frame,
+            height=30,
             text="Agregar sistemas",
             image=INPUTS_ICON,
-            command=lambda: self.app.home_frame.ir_a_sistemas(mostrar=False),
+            command=lambda: self.app.home_frame.ir_a_sistemas(mostrar=False),  # type: ignore
         )
 
-        self.mensaje_frame.grid(row=0, column=0, columnspan=2, padx=5, pady=5, sticky="s")
-        agregar_button.grid(row=1, column=0, columnspan=2, padx=5, pady=5, sticky="n")
+        self.dummy_frame.grid(row=0, column=0, columnspan=2)
+        self.msg_frame.pack(pady=5, anchor="center")
+        agregar_button.pack(pady=5, anchor="center")
+
+    def toggle_gj(self) -> None:
+        """
+        Invierte el valor de self.gauss_jordan.
+        """
+
+        self.gauss_jordan = not self.gauss_jordan
+
+    def toggle_cramer(self) -> None:
+        """
+        Invierte el valor de self.cramer.
+        """
+
+        self.cramer = not self.cramer
 
     def update_frame(self) -> None:
         """
@@ -300,7 +301,7 @@ class SistemasFrame(CustomScrollFrame):
         # actualizar el atributo de nombres despues de cambiar el dict
         self.nombres_sistemas = list(self.mats_manager.sis_ingresados.keys())
 
-        if isinstance(self.mensaje_frame, ErrorFrame):
+        if isinstance(self.msg_frame, ErrorFrame):
             # si hay un error, limpiar el frame y correr el setup
             for widget in self.winfo_children():
                 widget.destroy()  # type: ignore

@@ -68,7 +68,7 @@ class AgregarVecs(CustomScrollFrame):
         self.columnconfigure(0, weight=1)
 
         self.key_binder = KeyBindingManager(es_matriz=False)
-        self.mensaje_frame: Optional[ctkFrame] = None
+        self.msg_frame: Optional[ctkFrame] = None
         self.input_entries: list[CustomEntry] = []
 
         # frames para contener secciones de la interfaz
@@ -133,12 +133,12 @@ class AgregarVecs(CustomScrollFrame):
         for widget in self.post_vec_frame.winfo_children():
             widget.destroy()  # type: ignore
 
-        delete_msg_frame(self.mensaje_frame)
+        delete_msg_frame(self.msg_frame)
         dimension = self.validar_dimensiones()
         if dimension is None:
             # hubo input invalido
             return
-        delete_msg_frame(self.mensaje_frame)
+        delete_msg_frame(self.msg_frame)
 
         # crear entries para ingresar el vector
         self.input_entries.clear()
@@ -206,25 +206,25 @@ class AgregarVecs(CustomScrollFrame):
         Crea un vector con los datos ingresados, y lo agrega al diccionario.
         """
 
-        delete_msg_frame(self.mensaje_frame)
+        delete_msg_frame(self.msg_frame)
         dimension = self.validar_dimensiones()
         if dimension is None:
             # hubo input invalido
             return
-        delete_msg_frame(self.mensaje_frame)
+        delete_msg_frame(self.msg_frame)
 
         # si los input de dimensiones cambio despues de generar las casillas
         if dimension != len(self.input_entries):
-            self.mensaje_frame = place_msg_frame(
+            self.msg_frame = place_msg_frame(
                 parent_frame=self,
-                msg_frame=self.mensaje_frame,
+                msg_frame=self.msg_frame,
                 msg="Las dimensiones del vector ingresado " +
                     "no coinciden con las dimensiones indicadas!",
                 tipo="error",
                 row=3,
             )
             return
-        delete_msg_frame(self.mensaje_frame)
+        delete_msg_frame(self.msg_frame)
 
         # recorrer entries para guardar los valores
         componentes = []
@@ -236,16 +236,16 @@ class AgregarVecs(CustomScrollFrame):
                     msg = "Todos los valores deben ser números racionales!"
                 else:
                     msg = "El denominador no puede ser 0!"
-                self.mensaje_frame = place_msg_frame(
+                self.msg_frame = place_msg_frame(
                     parent_frame=self,
-                    msg_frame=self.mensaje_frame,
+                    msg_frame=self.msg_frame,
                     msg=msg,
                     tipo="error",
                     row=3,
                 )
                 return
             componentes.append(valor)
-        delete_msg_frame(self.mensaje_frame)
+        delete_msg_frame(self.msg_frame)
 
         nombre_nuevo_vector = self.nombre_entry.get()
         nuevo_vector = Vector(componentes)
@@ -265,20 +265,20 @@ class AgregarVecs(CustomScrollFrame):
                 else f"Ya existe un vector con nombrada {nombre_nuevo_vector}!"
             )
 
-            self.mensaje_frame = place_msg_frame(
+            self.msg_frame = place_msg_frame(
                 parent_frame=self,
-                msg_frame=self.mensaje_frame,
+                msg_frame=self.msg_frame,
                 msg=msg,
                 tipo="error",
                 row=3,
             )
             return
-        delete_msg_frame(self.mensaje_frame)
+        delete_msg_frame(self.msg_frame)
 
         self.vecs_manager.vecs_ingresados[nombre_nuevo_vector] = nuevo_vector
-        self.mensaje_frame = place_msg_frame(
+        self.msg_frame = place_msg_frame(
             parent_frame=self,
-            msg_frame=self.mensaje_frame,
+            msg_frame=self.msg_frame,
             msg="El vector se ha agregado exitosamente!",
             tipo="success",
             row=3,
@@ -300,9 +300,9 @@ class AgregarVecs(CustomScrollFrame):
             if dimension <= 0:
                 raise ValueError
         except ValueError:
-            self.mensaje_frame = place_msg_frame(
+            self.msg_frame = place_msg_frame(
                 parent_frame=self,
-                msg_frame=self.mensaje_frame,
+                msg_frame=self.msg_frame,
                 msg="Debe ingresar un número entero " +
                     "positivo como dimensión!",
                 tipo="error",
@@ -450,7 +450,7 @@ class EliminarVecs(CustomScrollFrame):
         self.columnconfigure(1, weight=1)
 
         self.nombres_vectores = list(self.vecs_manager.vecs_ingresados.keys())
-        self.mensaje_frame: Optional[ctkFrame] = None
+        self.msg_frame: Optional[ctkFrame] = None
         self.select_vec: CustomDropdown
         self.vec_seleccionado = ""
         self.setup_frame()
@@ -460,14 +460,13 @@ class EliminarVecs(CustomScrollFrame):
         Crear y colocar las widgets del frame.
         """
 
-        delete_msg_frame(self.mensaje_frame)
+        delete_msg_frame(self.msg_frame)
         if len(self.nombres_vectores) == 0:
-            self.mensaje_frame = place_msg_frame(
+            self.msg_frame = place_msg_frame(
                 parent_frame=self,
-                msg_frame=self.mensaje_frame,
+                msg_frame=self.msg_frame,
                 msg="No hay vectores guardados!",
                 tipo="error",
-                row=0,
                 columnspan=2,
             )
             return
@@ -502,13 +501,13 @@ class EliminarVecs(CustomScrollFrame):
         Elimina el vector seleccionado.
         """
 
-        delete_msg_frame(self.mensaje_frame)
+        delete_msg_frame(self.msg_frame)
         self.update_vec(self.select_vec.get())
         self.vecs_manager.vecs_ingresados.pop(self.vec_seleccionado)
 
-        self.mensaje_frame = place_msg_frame(
+        self.msg_frame = place_msg_frame(
             parent_frame=self,
-            msg_frame=self.mensaje_frame,
+            msg_frame=self.msg_frame,
             msg=f"Vector '{self.vec_seleccionado}' eliminado!",
             tipo="success",
             row=2,
@@ -530,17 +529,16 @@ class EliminarVecs(CustomScrollFrame):
         if (
             len(self.nombres_vectores) == 0
             and
-            isinstance(self.mensaje_frame, SuccessFrame)
+            isinstance(self.msg_frame, SuccessFrame)
         ):
 
             def clear_after_wait() -> None:
-                delete_msg_frame(self.mensaje_frame)
-                self.mensaje_frame = place_msg_frame(
+                delete_msg_frame(self.msg_frame)
+                self.msg_frame = place_msg_frame(
                     parent_frame=self,
-                    msg_frame=self.mensaje_frame,
+                    msg_frame=self.msg_frame,
                     msg="No hay vectores guardados!",
                     tipo="error",
-                    row=0,
                     columnspan=2,
                 )
 
@@ -549,7 +547,7 @@ class EliminarVecs(CustomScrollFrame):
                         widget.destroy()
             self.after(2000, clear_after_wait)
 
-        elif isinstance(self.mensaje_frame, ErrorFrame):
+        elif isinstance(self.msg_frame, ErrorFrame):
             self.setup_frame()
         else:
             for widget in self.winfo_children():
@@ -559,7 +557,7 @@ class EliminarVecs(CustomScrollFrame):
                 values=self.nombres_vectores
             )
 
-            self.after(2000, lambda: delete_msg_frame(self.mensaje_frame))
+            self.after(2000, lambda: delete_msg_frame(self.msg_frame))
 
     def update_vec(self, valor: str) -> None:
         """

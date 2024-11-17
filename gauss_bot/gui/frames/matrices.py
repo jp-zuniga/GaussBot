@@ -58,7 +58,7 @@ class MatricesFrame(ctkFrame):
         self.vecs_manager = vecs_manager
 
         self.dummy_frame: ctkFrame  # para pack mensaje de error inicial
-        self.mensaje_frame: Optional[ctkFrame] = None
+        self.msg_frame: Optional[ctkFrame] = None
         self.nombres_vectores = list(self.vecs_manager.vecs_ingresados.keys())
         self.nombres_matrices = list(self.mats_manager.mats_ingresadas.keys())
 
@@ -102,7 +102,7 @@ class MatricesFrame(ctkFrame):
             # si no hay matrices guardadas, mostrar mensaje de error y
             # agregar boton para dirigir al usuario adonde se agregan
             self.dummy_frame = ctkFrame(self, fg_color="transparent")
-            self.mensaje_frame = ErrorFrame(
+            self.msg_frame = ErrorFrame(
                 self.dummy_frame, msg="No hay matrices ingresadas!"
             )
 
@@ -115,15 +115,15 @@ class MatricesFrame(ctkFrame):
             )
 
             self.dummy_frame.pack(expand=True, anchor="center")
-            self.mensaje_frame.pack(pady=5, anchor="center")
+            self.msg_frame.pack(pady=5, anchor="center")
             agregar_button.pack(pady=5, anchor="center")
             return
 
         # cleanup mensaje de error si todavia existe
-        if self.mensaje_frame is not None:
+        if self.msg_frame is not None:
             for widget in self.winfo_children():
                 widget.destroy()
-            self.mensaje_frame = None
+            self.msg_frame = None
 
         self.tabview = ctkTabview(self, fg_color="transparent")
         self.tabview.pack(expand=True, fill="both")
@@ -173,7 +173,7 @@ class MatricesFrame(ctkFrame):
         self.nombres_matrices = list(self.mats_manager.mats_ingresadas.keys())
 
         if (
-            self.mensaje_frame is not None or
+            self.msg_frame is not None or
             len(self.nombres_matrices) == 0 or
             self.instances == []
         ):

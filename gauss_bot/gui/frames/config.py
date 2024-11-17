@@ -40,7 +40,7 @@ class ConfigFrame(ctkFrame):
     def __init__(self, app: "GaussUI", master: "GaussUI") -> None:
         super().__init__(master, corner_radius=0, fg_color="transparent")
         self.app = app
-        self.mensaje_frame: Optional[SuccessFrame] = None
+        self.msg_frame: Optional[SuccessFrame] = None
 
         self.escalas_dict = {
             "100%": 1.0,
@@ -171,13 +171,13 @@ class ConfigFrame(ctkFrame):
         set_theme(path.join(THEMES_PATH, self.app.tema_actual))
 
         # explicar que se necesita reiniciar la app
-        self.mensaje_frame = SuccessFrame(
+        self.msg_frame = SuccessFrame(
             self,
             message="Tema cambiado exitosamente!\n" +
                     "El cambio tomará efecto al reiniciar la aplicación."
         )
 
-        self.mensaje_frame.grid(row=3, column=1, pady=30)
+        self.msg_frame.grid(row=3, column=1, pady=30)
 
     def update_frame(self) -> None:
         """

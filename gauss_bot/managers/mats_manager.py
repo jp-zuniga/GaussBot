@@ -77,7 +77,7 @@ class MatricesManager:
         elif calculada == -1:
             header = "Matrices guardadas:"
 
-        matrices = f"{header}\n"  # pylint: disable=possibly-used-before-assignment
+        matrices = f"{header}\n"  # pylint: disable=E0606
         matrices += "---------------------------------------------"
         for nombre, mat in self.mats_ingresadas.items():
             if (
@@ -88,7 +88,7 @@ class MatricesManager:
                 continue
             matrices += f"\n{nombre}:\n"
             matrices += str(mat)
-        matrices += "---------------------------------------------"
+        matrices += "\n---------------------------------------------"
 
         if "(" not in matrices:
             if calculada == 1:
@@ -121,7 +121,7 @@ class MatricesManager:
         elif calculado == -1:
             header = "Sistemas guardados:"
 
-        sistemas = f"{header}\n"  # pylint: disable=possibly-used-before-assignment
+        sistemas = f"{header}\n"  # pylint: disable=E0606
         sistemas += "---------------------------------------------"
         for nombre, sis in self.sis_ingresados.items():
             if (
@@ -132,7 +132,7 @@ class MatricesManager:
                 continue
             sistemas += f"\n{nombre}:\n"
             sistemas += str(sis)
-        sistemas += "---------------------------------------------"
+        sistemas += "\n---------------------------------------------"
 
         if "(" not in sistemas:
             if calculado == 1:

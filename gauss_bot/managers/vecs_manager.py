@@ -60,7 +60,7 @@ class VectoresManager:
         elif calculado == -1:
             header = "Vectores guardados:"
 
-        vectores = f"{header}\n"  # pylint: disable=possibly-used-before-assignment
+        vectores = f"{header}\n"  # pylint: disable=E0606
         vectores += "---------------------------------------------"
         for nombre, vec in self.vecs_ingresados.items():
             if (
@@ -70,8 +70,8 @@ class VectoresManager:
             ):
                 continue
             vectores += f"\n{nombre}:\n"
-            vectores += str(vec) + "\n"
-        vectores += "---------------------------------------------"
+            vectores += str(vec)
+        vectores += "\n---------------------------------------------"
 
         if "[" not in vectores:
             if calculado == 1:

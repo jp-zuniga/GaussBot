@@ -104,7 +104,7 @@ class RaicesFrame(CustomScrollFrame):
         self.iteraciones_entry: CustomEntry
 
         self.collapse_button: Optional[ctkButton] = None
-        self.mensaje_frame: Optional[ctkFrame] = None
+        self.msg_frame: Optional[ctkFrame] = None
         self.collapsed_terminos = True
 
         self.terminos_frame = ctkFrame(self)
@@ -159,7 +159,7 @@ class RaicesFrame(CustomScrollFrame):
         if self.collapse_button is not None:
             self.collapse_button.destroy()
 
-        delete_msg_frame(self.mensaje_frame)
+        delete_msg_frame(self.msg_frame)
 
         self.func_frame.grid_remove()
         self.calc_frame.grid_remove()
@@ -171,13 +171,13 @@ class RaicesFrame(CustomScrollFrame):
         try:
             num_terminos = int(self.terminos_entry.get())
         except ValueError:
-            self.mensaje_frame = ErrorFrame(
+            self.msg_frame = ErrorFrame(
                 self, "Debe ingresar números enteros positivos para la cantidad de términos!"
             )
-            self.mensaje_frame.grid(row=1, column=0, columnspan=3, padx=5, pady=5, sticky="n")
+            self.msg_frame.grid(row=1, column=0, columnspan=3, padx=5, pady=5, sticky="n")
             return
 
-        delete_msg_frame(self.mensaje_frame)
+        delete_msg_frame(self.msg_frame)
 
         sep1 = ctkLabel(
             self.terminos_frame,
@@ -304,7 +304,7 @@ class RaicesFrame(CustomScrollFrame):
             self.collapse_button.destroy()
 
         try:
-            delete_msg_frame(self.mensaje_frame)
+            delete_msg_frame(self.msg_frame)
         except TclError:
             pass
 
@@ -441,33 +441,33 @@ class RaicesFrame(CustomScrollFrame):
         encontrar_button.grid(row=4, column=0, columnspan=4, padx=5, pady=5, sticky="n")
 
     def raiz_biseccion(self) -> None:
-        delete_msg_frame(self.mensaje_frame)
+        delete_msg_frame(self.msg_frame)
         try:
             a = Fraction(self.a_entry.get())
             b = Fraction(self.b_entry.get())
             error = Fraction(self.error_entry.get())
         except ValueError:
-            self.mensaje_frame = ErrorFrame(
+            self.msg_frame = ErrorFrame(
                 self, "Debe ingresar números reales para el intervalo y margen de error!"
             )
-            self.mensaje_frame.grid(row=5, column=0, columnspan=3, padx=5, pady=5, sticky="n")
+            self.msg_frame.grid(row=5, column=0, columnspan=3, padx=5, pady=5, sticky="n")
             return
-        delete_msg_frame(self.mensaje_frame)
+        delete_msg_frame(self.msg_frame)
 
         resultado = biseccion(self.func, (a, b), error)
         if resultado is False:
-            self.mensaje_frame = ErrorFrame(
+            self.msg_frame = ErrorFrame(
                 self, f"La función no es continua en el intervalo [{float(a):.4f}, {float(b):.4f}]!"
             )
-            self.mensaje_frame.grid(row=5, column=0, columnspan=3, padx=5, pady=5, sticky="n")
+            self.msg_frame.grid(row=5, column=0, columnspan=3, padx=5, pady=5, sticky="n")
             return
         elif resultado is True:
-            self.mensaje_frame = ErrorFrame(
+            self.msg_frame = ErrorFrame(
                 self, f"La función no cambia de signo en el intervalo [{float(a):.4f}, {float(b):.4f}]!"
             )
-            self.mensaje_frame.grid(row=5, column=0, columnspan=3, padx=5, pady=5, sticky="n")
+            self.msg_frame.grid(row=5, column=0, columnspan=3, padx=5, pady=5, sticky="n")
             return
-        delete_msg_frame(self.mensaje_frame)
+        delete_msg_frame(self.msg_frame)
 
         x, fx, i = resultado
         x = Fraction(x).limit_denominator()
@@ -492,18 +492,18 @@ class RaicesFrame(CustomScrollFrame):
                       "Raíz aproximada encontrada:"
             )
 
-            self.mensaje_frame = ResultadoFrame(
+            self.msg_frame = ResultadoFrame(
                 self, solo_header=True,
                 resultado="", header="",
                 border_color="#ff3131",
             )
 
-            self.mensaje_frame.columnconfigure(0, weight=1)
-            img_label = ctkLabel(self.mensaje_frame, text="", image=func_img)
+            self.msg_frame.columnconfigure(0, weight=1)
+            img_label = ctkLabel(self.msg_frame, text="", image=func_img)
 
             interpretacion_label.grid(row=5, column=0, columnspan=3, padx=5, pady=5, sticky="n")
             img_label.grid(row=0, column=0, padx=10, pady=(3, 10), sticky="n")
-            self.mensaje_frame.grid(
+            self.msg_frame.grid(
                 row=6,
                 column=0,
                 columnspan=3,
@@ -515,7 +515,7 @@ class RaicesFrame(CustomScrollFrame):
             )
 
             return
-        delete_msg_frame(self.mensaje_frame)
+        delete_msg_frame(self.msg_frame)
 
         tipo_raiz = "" if fx == 0 else "aproximada "
         interpretacion_label = ctkLabel(
@@ -524,16 +524,16 @@ class RaicesFrame(CustomScrollFrame):
                  f"Raíz {tipo_raiz}encontrada: ",
         )
 
-        self.mensaje_frame = ResultadoFrame(
+        self.msg_frame = ResultadoFrame(
             self, header="", resultado="", solo_header=True
         )
 
-        self.mensaje_frame.columnconfigure(0, weight=1)
-        img_label = ctkLabel(self.mensaje_frame, text="", image=func_img)
+        self.msg_frame.columnconfigure(0, weight=1)
+        img_label = ctkLabel(self.msg_frame, text="", image=func_img)
 
         interpretacion_label.grid(row=5, column=0, columnspan=3, padx=5, pady=5, sticky="n")
         img_label.grid(row=0, column=0, padx=5, pady=5, sticky="n")
-        self.mensaje_frame.grid(
+        self.msg_frame.grid(
             row=6,
             column=0,
             columnspan=3,
@@ -543,7 +543,7 @@ class RaicesFrame(CustomScrollFrame):
         )
 
     def raiz_newton(self) -> None:
-        delete_msg_frame(self.mensaje_frame)
+        delete_msg_frame(self.msg_frame)
         try:
             xi = Fraction(self.xi_entry.get())
             error = Fraction(self.error_entry.get())
@@ -555,10 +555,10 @@ class RaicesFrame(CustomScrollFrame):
             elif "int" in v_str:
                 msj = "Debe ingresar un número entero positivo para el máximo de iteraciones!"
 
-            self.mensaje_frame = ErrorFrame(self, msj)
-            self.mensaje_frame.grid(row=5, column=0, columnspan=3, padx=5, pady=5, sticky="n")
+            self.msg_frame = ErrorFrame(self, msj)
+            self.msg_frame.grid(row=5, column=0, columnspan=3, padx=5, pady=5, sticky="n")
             return
-        delete_msg_frame(self.mensaje_frame)
+        delete_msg_frame(self.msg_frame)
 
         x, fx, i, division_cero = newton(self.func, xi, error, iteraciones)
         x = Fraction(x).limit_denominator()
@@ -588,18 +588,18 @@ class RaicesFrame(CustomScrollFrame):
                 self, text=msj + "\nRaíz aproximada encontrada:"
             )
 
-            self.mensaje_frame = ResultadoFrame(
+            self.msg_frame = ResultadoFrame(
                 self, solo_header=True,
                 resultado="", header="",
                 border_color="#ff3131",
             )
 
-            self.mensaje_frame.columnconfigure(0, weight=1)
-            img_label = ctkLabel(self.mensaje_frame, text="", image=func_img)
+            self.msg_frame.columnconfigure(0, weight=1)
+            img_label = ctkLabel(self.msg_frame, text="", image=func_img)
 
             interpretacion_label.grid(row=5, column=0, columnspan=3, padx=5, pady=5, sticky="n")
             img_label.grid(row=0, column=0, padx=5, sticky="n")
-            self.mensaje_frame.grid(
+            self.msg_frame.grid(
                 row=6,
                 column=0,
                 columnspan=3,
@@ -610,14 +610,14 @@ class RaicesFrame(CustomScrollFrame):
             )
 
             return
-        delete_msg_frame(self.mensaje_frame)
+        delete_msg_frame(self.msg_frame)
 
-        self.mensaje_frame = ResultadoFrame(
+        self.msg_frame = ResultadoFrame(
             self, header="", resultado="", solo_header=True
         )
 
-        self.mensaje_frame.columnconfigure(0, weight=1)
-        img_label = ctkLabel(self.mensaje_frame, text="", image=func_img)
+        self.msg_frame.columnconfigure(0, weight=1)
+        img_label = ctkLabel(self.msg_frame, text="", image=func_img)
         tipo_raiz = "" if fx == 0 else "aproximada "
 
         interpretacion_label = ctkLabel(
@@ -628,7 +628,7 @@ class RaicesFrame(CustomScrollFrame):
 
         interpretacion_label.grid(row=5, column=0, columnspan=3, padx=5, pady=5, sticky="n")
         img_label.grid(row=0, column=0, padx=5, pady=5, sticky="n")
-        self.mensaje_frame.grid(
+        self.msg_frame.grid(
             row=6,
             column=0,
             columnspan=3,

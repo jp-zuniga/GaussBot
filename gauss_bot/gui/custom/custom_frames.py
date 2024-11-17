@@ -155,7 +155,7 @@ class ResultadoFrame(ctkFrame):
 
         self.master = master
         self.msg_label = ctkLabel(self, text=msg)
-        self.msg_label.grid(row=0, column=0, padx=30, pady=30)
+        self.msg_label.grid(row=0, column=0, padx=20, pady=20)
 
     def destroy(self) -> None:
         self.forget()

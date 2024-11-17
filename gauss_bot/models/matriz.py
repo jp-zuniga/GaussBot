@@ -259,7 +259,7 @@ class Matriz:
                 else:
                     matriz += f"{valor}, "
             matriz += "\n"
-        return matriz
+        return matriz.rstrip()
 
     def __add__(self, mat2: "Matriz") -> "Matriz":
         """

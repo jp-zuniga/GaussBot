@@ -51,7 +51,7 @@ class VectoresFrame(ctkFrame):
         self.mats_manager = mats_manager
 
         self.dummy_frame: ctkFrame  # para pack mensaje de error inicial
-        self.mensaje_frame: Optional[ctkFrame] = None
+        self.msg_frame: Optional[ctkFrame] = None
         self.nombres_vectores = list(self.vecs_manager.vecs_ingresados.keys())
         self.nombres_matrices = list(self.mats_manager.mats_ingresadas.keys())
 
@@ -79,7 +79,7 @@ class VectoresFrame(ctkFrame):
             # si no hay vectores guardados, mostrar mensaje de error y
             # agregar boton para que el usuario sepa donde agregarlos
             self.dummy_frame = ctkFrame(self, fg_color="transparent")
-            self.mensaje_frame = ErrorFrame(
+            self.msg_frame = ErrorFrame(
                 self.dummy_frame,
                 msg="No hay vectores ingresados!"
             )
@@ -93,15 +93,15 @@ class VectoresFrame(ctkFrame):
             )
 
             self.dummy_frame.pack(expand=True, anchor="center")
-            self.mensaje_frame.pack(pady=5, anchor="center")
+            self.msg_frame.pack(pady=5, anchor="center")
             agregar_button.pack(pady=5, anchor="center")
             return
 
         # cleanup si el mensaje de error todavia existe
-        if self.mensaje_frame is not None:
+        if self.msg_frame is not None:
             for widget in self.winfo_children():
                 widget.destroy()
-            self.mensaje_frame = None
+            self.msg_frame = None
 
         # inicializar tabview, crear tabs y frames
         self.tabview = ctkTabview(self, fg_color="transparent")
@@ -140,7 +140,7 @@ class VectoresFrame(ctkFrame):
         self.nombres_matrices = list(self.mats_manager.mats_ingresadas.keys())
 
         if (
-            self.mensaje_frame is not None or
+            self.msg_frame is not None or
             len(self.nombres_vectores) == 0 or
             self.instances == []
         ):

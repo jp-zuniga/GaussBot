@@ -46,6 +46,7 @@ from PIL.Image import (  # pylint: disable=no-name-in-module
 
 __all__ = [
     "delete_msg_frame",
+    "delete_msg_if",
     "generate_funcs",
     "generate_range",
     "generate_sep",
@@ -111,6 +112,27 @@ def delete_msg_frame(msg_frame: Optional[ctkFrame]) -> None:
     if msg_frame is not None:
         msg_frame.destroy()
         msg_frame = None
+
+
+def delete_msg_if(
+    msg_frame: Optional[ctkFrame],
+    masters: tuple[ctkFrame, ctkFrame]
+) -> None:
+
+    """
+    Llama delete_msg_frame() si msg_frame
+    esta colocado en uno de los frames indicados.
+    * msg_frame: frame a eliminar
+    * masters: frames donde buscar msg_frame
+    """
+
+    try:
+        if msg_frame.master in masters:  # type: ignore
+            delete_msg_frame(msg_frame)
+    except AttributeError:
+        # si msg_frame == None,
+        # .master va a tirar error
+        pass
 
 
 def log_setup(logger=LOGGER) -> None:
