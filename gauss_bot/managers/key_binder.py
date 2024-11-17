@@ -8,10 +8,7 @@ from typing import (
     Union,
 )
 
-from customtkinter import CTkEntry as ctkEntry
 from gauss_bot.gui.custom import CustomEntry
-
-Entry = Union[ctkEntry, CustomEntry]
 
 
 class KeyBindingManager:
@@ -24,8 +21,8 @@ class KeyBindingManager:
     def __init__(
         self,
         es_matriz: bool,
-        entry_list: Optional[Union[list[Entry], list[list[Entry]]]] = None,
-        extra_entries: Optional[tuple[Entry, Entry]] = None,
+        entry_list: Optional[Union[list[CustomEntry], list[list[CustomEntry]]]] = None,
+        extra_entries: Optional[tuple[CustomEntry, CustomEntry]] = None,
     ) -> None:
         """
         - es_matriz: True si las entries son para una matriz,
@@ -75,7 +72,7 @@ class KeyBindingManager:
         self,
         row: int,
         column: int,
-        entry: Entry,
+        entry: CustomEntry,
     ) -> None:
 
         """
@@ -88,11 +85,12 @@ class KeyBindingManager:
         entry.bind("<Down>", lambda _: self._entry_move_down(row, column, nombre_entry))
         entry.bind("<Left>", lambda _: self._entry_move_left(row, column))
         entry.bind("<Right>", lambda _: self._entry_move_right(row, column))
+        entry.bind("<Control-Tab>", self.autocomplete_all)
 
     def _bind_vec_entry(
         self,
         row: int,
-        entry: Entry,
+        entry: CustomEntry,
     ) -> None:
 
         """
@@ -103,8 +101,9 @@ class KeyBindingManager:
         nombre_entry, dimensiones_entry = self.extra_entries  # type: ignore
         entry.bind("<Up>", lambda _: self._entry_move_up(row, -1, dimensiones_entry))
         entry.bind("<Down>", lambda _: self._entry_move_down(row, -1, nombre_entry))
+        entry.bind("<Control-Tab>", self.autocomplete_all)
 
-    def _entry_move_up(self, row: int, column: int, data_entry: Entry) -> None:
+    def _entry_move_up(self, row: int, column: int, data_entry: CustomEntry) -> None:
         """
         Cambia el foco a la entry por encima de la actual,
         o al entry de filas/dimensiones si ya se llegó al inicio.
@@ -125,7 +124,7 @@ class KeyBindingManager:
         self,
         row: int,
         column: int,
-        nombre_entry: Entry,
+        nombre_entry: CustomEntry,
     ) -> None:
 
         """
@@ -208,8 +207,23 @@ class KeyBindingManager:
         except IndexError:
             pass
 
+    def autocomplete_all(self, event) -> str:
+        """
+        Llama autocomplete_placeholder() para todos los entries.
+        """
+
+        del event
+        if self.es_matriz:
+            for row in self.entry_list:  # type: ignore
+                for entry in row:  # type: ignore
+                    entry.autocomplete_placeholder(event=None)  # type: ignore
+        else:
+            for entry in self.entry_list:  # type: ignore
+                entry.autocomplete_placeholder(event=None)  # type: ignore
+        return "break"
+
     @staticmethod
-    def focus_dimensiones(dimensiones_entry: Entry) -> None:
+    def focus_dimensiones(dimensiones_entry: CustomEntry) -> None:
         """
         Cambia el foco al entry de ingresar dimensiones.
         """
@@ -217,7 +231,7 @@ class KeyBindingManager:
         dimensiones_entry.focus_set()
 
     @staticmethod
-    def focus_filas(filas_entry: Entry) -> None:
+    def focus_filas(filas_entry: CustomEntry) -> None:
         """
         Cambia el foco al entry de ingresar filas.
         """
@@ -225,7 +239,7 @@ class KeyBindingManager:
         filas_entry.focus_set()
 
     @staticmethod
-    def focus_columnas(columnas_entry: Entry) -> None:
+    def focus_columnas(columnas_entry: CustomEntry) -> None:
         """
         Cambia el foco al entry de ingresar columnas.
         """

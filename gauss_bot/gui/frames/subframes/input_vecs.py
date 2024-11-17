@@ -3,7 +3,12 @@ Implementación de los subframes de ManejarVecs.
 """
 
 from fractions import Fraction
-from random import randint
+from random import (
+    choice,
+    randint,
+)
+
+from string import ascii_lowercase
 from typing import (
     TYPE_CHECKING,
     Optional,
@@ -11,7 +16,6 @@ from typing import (
 
 from tkinter import Variable
 from customtkinter import (
-    CTkEntry as ctkEntry,
     CTkFrame as ctkFrame,
     CTkLabel as ctkLabel,
 )
@@ -75,11 +79,11 @@ class AgregarVecs(CustomScrollFrame):
         self.pre_vec_frame = ctkFrame(self, fg_color="transparent")
         self.vector_frame = ctkFrame(self, fg_color="transparent")
         self.post_vec_frame = ctkFrame(self, fg_color="transparent")
-        self.nombre_entry: ctkEntry
+        self.nombre_entry: CustomEntry
 
         # crear widgets iniciales para ingresar dimensiones
         dimension_label = ctkLabel(self.pre_vec_frame, text="Dimensiones:")
-        self.dimension_entry = ctkEntry(
+        self.dimension_entry = CustomEntry(
             self.pre_vec_frame,
             width=30,
             placeholder_text="3",
@@ -146,7 +150,7 @@ class AgregarVecs(CustomScrollFrame):
             input_entry = CustomEntry(
                 self.vector_frame,
                 width=60,
-                placeholder_text=randint(-15, 15)
+                placeholder_text=str(randint(-15, 15))
             )
 
             input_entry.grid(row=i, column=0, padx=5, pady=5)
@@ -154,10 +158,14 @@ class AgregarVecs(CustomScrollFrame):
 
         # crear post_vec_frame widgets
         nombre_label = ctkLabel(self.post_vec_frame, text="Nombre del vector:")
-        self.nombre_entry = ctkEntry(
+        self.nombre_entry = CustomEntry(
             self.post_vec_frame,
             width=30,
-            placeholder_text="u",
+            placeholder_text=choice([
+                x
+                for x in ascii_lowercase
+                if x not in self.vecs_manager.vecs_ingresados.values()
+            ]),
         )
 
         agregar_button = IconButton(

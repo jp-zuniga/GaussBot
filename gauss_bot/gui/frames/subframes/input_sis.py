@@ -3,7 +3,12 @@ Implementación de los subframes de ManejarSistemas.
 """
 
 from fractions import Fraction
-from random import randint
+from random import (
+    choice,
+    randint,
+)
+
+from string import ascii_uppercase
 from typing import (
     TYPE_CHECKING,
     Optional,
@@ -11,7 +16,6 @@ from typing import (
 
 from tkinter import Variable
 from customtkinter import (
-    CTkEntry as ctkEntry,
     CTkFrame as ctkFrame,
     CTkLabel as ctkLabel,
 )
@@ -75,19 +79,19 @@ class AgregarSistemas(CustomScrollFrame):
         self.pre_sis_frame = ctkFrame(self, fg_color="transparent")
         self.sis_frame = ctkFrame(self, fg_color="transparent")
         self.post_sis_frame = ctkFrame(self, fg_color="transparent")
-        self.nombre_entry: ctkEntry
+        self.nombre_entry: CustomEntry
 
         # crear widgets iniciales para las dimensiones
         ecuaciones_label = ctkLabel(self.pre_sis_frame, text="Ecuaciones:")
         variables_label = ctkLabel(self.pre_sis_frame, text="Variables:")
 
-        self.ecuaciones_entry = ctkEntry(
+        self.ecuaciones_entry = CustomEntry(
             self.pre_sis_frame,
             width=30,
             placeholder_text="3"
         )
 
-        self.variables_entry = ctkEntry(
+        self.variables_entry = CustomEntry(
             self.pre_sis_frame,
             width=30,
             placeholder_text="3"
@@ -190,7 +194,7 @@ class AgregarSistemas(CustomScrollFrame):
                 input_entry = CustomEntry(
                     self.sis_frame,
                     width=60,
-                    placeholder_text=randint(-15, 15)
+                    placeholder_text=str(randint(-15, 15))
                 )
 
                 if j != variables - 1:
@@ -204,10 +208,14 @@ class AgregarSistemas(CustomScrollFrame):
 
         # crear post_sis_frame widgets
         nombre_label = ctkLabel(self.post_sis_frame, text="Nombre del sistema:")
-        self.nombre_entry = ctkEntry(
+        self.nombre_entry = CustomEntry(
             self.post_sis_frame,
             width=30,
-            placeholder_text="A",
+            placeholder_text=choice([
+                x
+                for x in ascii_uppercase
+                if x not in self.mats_manager.sis_ingresados.values()
+            ]),
         )
 
         agregar_button = IconButton(

@@ -3,7 +3,12 @@ Implementación de los subframes de ManejarMats.
 """
 
 from fractions import Fraction
-from random import randint
+from random import (
+    choice,
+    randint,
+)
+
+from string import ascii_uppercase
 from typing import (
     TYPE_CHECKING,
     Optional,
@@ -11,7 +16,6 @@ from typing import (
 
 from tkinter import Variable
 from customtkinter import (
-    CTkEntry as ctkEntry,
     CTkFrame as ctkFrame,
     CTkLabel as ctkLabel,
 )
@@ -74,19 +78,19 @@ class AgregarMats(CustomScrollFrame):
         self.pre_mat_frame = ctkFrame(self, fg_color="transparent")
         self.matriz_frame = ctkFrame(self, fg_color="transparent")
         self.post_mat_frame = ctkFrame(self, fg_color="transparent")
-        self.nombre_entry: ctkEntry
+        self.nombre_entry: CustomEntry
 
         # crear widgets iniciales para ingresar dimensiones de matriz
         filas_label = ctkLabel(self.pre_mat_frame, text="Filas:")
         columnas_label = ctkLabel(self.pre_mat_frame, text="Columnas:")
 
-        self.filas_entry = ctkEntry(
+        self.filas_entry = CustomEntry(
             self.pre_mat_frame,
             width=30,
             placeholder_text="3",
         )
 
-        self.columnas_entry = ctkEntry(
+        self.columnas_entry = CustomEntry(
             self.pre_mat_frame,
             width=30,
             placeholder_text="3",
@@ -182,7 +186,7 @@ class AgregarMats(CustomScrollFrame):
                 input_entry = CustomEntry(
                     self.matriz_frame,
                     width=60,
-                    placeholder_text=randint(-15, 15)
+                    placeholder_text=str(randint(-15, 15))
                 )
 
                 input_entry.grid(row=i, column=j, padx=5, pady=5)
@@ -191,10 +195,14 @@ class AgregarMats(CustomScrollFrame):
 
         # crear post_mat_frame widgets
         nombre_label = ctkLabel(self.post_mat_frame, text="Nombre de la matriz:")
-        self.nombre_entry = ctkEntry(
+        self.nombre_entry = CustomEntry(
             self.post_mat_frame,
             width=30,
-            placeholder_text="A",
+            placeholder_text=choice([
+                x
+                for x in ascii_uppercase
+                if x not in self.mats_manager.mats_ingresadas.values()
+            ]),
         )
 
         agregar_button = IconButton(

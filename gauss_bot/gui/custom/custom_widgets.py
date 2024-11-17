@@ -5,6 +5,7 @@ Implementaciones de widgets personalizadas.
 from typing import (
     TYPE_CHECKING,
     Any,
+    Optional,
 )
 
 from customtkinter import (
@@ -36,6 +37,7 @@ class CustomEntry(ctkEntry):
         master: Any,
         width: int = 140,
         height: int = 28,
+        placeholder_text: Optional[str] = None,
         justify: str = "center",
         **kwargs
     ) -> None:
@@ -44,10 +46,30 @@ class CustomEntry(ctkEntry):
             master,
             width=width,
             height=height,
+            placeholder_text=placeholder_text,
             **kwargs,
         )
 
         self.configure(justify=justify)
+        self.bind("<Tab>", self.autocomplete_placeholder)
+
+    def autocomplete_placeholder(self, event) -> str:
+        """
+        Inserta el placeholder en el entry si no hay texto
+        cuando el usuario presiona la tecla Tab.
+        """
+
+        del event
+        if self.get() == "" and self.cget("placeholder_text") is not None:
+            self.insert(0, self.cget("placeholder_text"))
+        return "break"
+
+    def grid(self, **kwargs):
+        if "ipadx" not in kwargs:
+            kwargs["ipadx"] = 0
+        if "ipady" not in kwargs:
+            kwargs["ipady"] = 0
+        super().grid(**kwargs)
 
 
 class CustomDropdown(ctkOptionMenu):
@@ -224,12 +246,12 @@ class IconButton(ctkButton):
         )
 
         self.tooltip = Tooltip(self, tooltip_text)
-    
+
     def destroy(self):
         self.tooltip.destroy()
         super().destroy()
-    
-    def configure(self, **kwargs):
+
+    def configure(self, require_redraw=False, **kwargs):
         if "tooltip_text" in kwargs:
             self.tooltip.configure_tooltip(message=kwargs.pop("tooltip_text"))
-        super().configure(**kwargs)
+        super().configure(require_redraw, **kwargs)
