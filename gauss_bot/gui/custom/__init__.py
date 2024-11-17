@@ -49,15 +49,15 @@ def place_msg_frame(
     msg: str,
     tipo: Literal["error", "success", "resultado"] = "error",
     **grid_kwargs,
-) -> None:
+) -> ctkFrame:
 
     """
-    Inicializa msj_frame y lo coloca en la interfaz con grid_kwargs.
-    * parent_frame: frame que contendrá msj_frame
-    * msj_frame: frame a colocar
-    * msj: mensaje a mostrar en el frame
+    Inicializa msg_frame y lo coloca en la interfaz con grid_kwargs.
+    * parent_frame: frame que contendrá msg_frame
+    * msg_frame: frame a colocar
+    * msg: mensaje a mostrar en el frame
     * tipo: tipo de frame a crear
-    * grid_kwargs: kwargs a pasar a msj_frame.grid()
+    * grid_kwargs: kwargs a pasar a msg_frame.grid()
     """
 
     # esta funcion esta aqui pq el hecho que tiene que inicializar un
@@ -85,3 +85,4 @@ def place_msg_frame(
         grid_kwargs["sticky"] = "n"
 
     msg_frame.grid(**grid_kwargs)
+    return msg_frame

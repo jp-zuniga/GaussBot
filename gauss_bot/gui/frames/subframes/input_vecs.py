@@ -4,11 +4,9 @@ Implementación de los subframes de ManejarVecs.
 
 from fractions import Fraction
 from random import randint
-from time import sleep
 from typing import (
     TYPE_CHECKING,
     Optional,
-    Union,
 )
 
 from tkinter import Variable
@@ -29,7 +27,11 @@ from gauss_bot import (
 )
 
 from gauss_bot.models import Vector
-from gauss_bot.managers import VectoresManager
+from gauss_bot.managers import (
+    KeyBindingManager,
+    VectoresManager,
+)
+
 from gauss_bot.gui.custom import (
     CustomEntry,
     CustomDropdown,
@@ -37,7 +39,7 @@ from gauss_bot.gui.custom import (
     IconButton,
     ErrorFrame,
     SuccessFrame,
-    ResultadoFrame,
+    place_msg_frame,
 )
 
 if TYPE_CHECKING:
@@ -65,16 +67,23 @@ class AgregarVecs(CustomScrollFrame):
         self.vecs_manager = vecs_manager
         self.columnconfigure(0, weight=1)
 
+        self.key_binder = KeyBindingManager(es_matriz=False)
         self.mensaje_frame: Optional[ctkFrame] = None
         self.input_entries: list[CustomEntry] = []
 
-        self.pre_vec_frame = ctkFrame(self)
-        self.vector_frame = ctkFrame(self)
-        self.post_vec_frame = ctkFrame(self)
+        # frames para contener secciones de la interfaz
+        self.pre_vec_frame = ctkFrame(self, fg_color="transparent")
+        self.vector_frame = ctkFrame(self, fg_color="transparent")
+        self.post_vec_frame = ctkFrame(self, fg_color="transparent")
         self.nombre_entry: ctkEntry
 
+        # crear widgets iniciales para ingresar dimensiones
         dimension_label = ctkLabel(self.pre_vec_frame, text="Dimensiones:")
-        self.dimension_entry = ctkEntry(self.pre_vec_frame, width=30, placeholder_text="3")
+        self.dimension_entry = ctkEntry(
+            self.pre_vec_frame,
+            width=30,
+            placeholder_text="3",
+        )
 
         ingresar_button = IconButton(
             self.pre_vec_frame,
@@ -92,9 +101,11 @@ class AgregarVecs(CustomScrollFrame):
             command=self.generar_aleatorio
         )
 
+        # crear bindings iniciales
         self.dimension_entry.bind("<Return>", lambda _: self.generar_casillas())
-        self.dimension_entry.bind("<Down>", lambda _: self.move_down())
+        self.dimension_entry.bind("<Down>", lambda _: self.key_binder.focus_first())
 
+        # colocar widgets
         self.pre_vec_frame.grid(row=0, column=0, padx=5, pady=5, sticky="n")
         dimension_label.grid(row=0, column=0, padx=5, pady=5)
         self.dimension_entry.grid(row=0, column=1, padx=5, pady=5)
@@ -115,34 +126,39 @@ class AgregarVecs(CustomScrollFrame):
         Genera las casillas para ingresar los valores del vector.
         """
 
+        # si habian widgets creadas debajo
+        # de self.pre_vec_frame, eliminarlas
         for widget in self.vector_frame.winfo_children():
             widget.destroy()  # type: ignore
         for widget in self.post_vec_frame.winfo_children():
-            widget.destroy()
+            widget.destroy()  # type: ignore
 
         delete_msg_frame(self.mensaje_frame)
-        try:
-            dimension = int(self.dimension_entry.get())
-            if dimension <= 0:
-                raise ValueError
-        except ValueError:
-            self.mensaje_frame = ErrorFrame(
-                self, "Debe ingresar un número entero positivo como dimensión!"
-            )
-            self.mensaje_frame.grid(row=1, column=0, columnspan=2, padx=5, pady=5, sticky="n")
+        dimension = self.validar_dimensiones()
+        if dimension is None:
+            # hubo input invalido
             return
         delete_msg_frame(self.mensaje_frame)
 
+        # crear entries para ingresar el vector
         self.input_entries.clear()
-        self.input_entries = []
         for i in range(dimension):
-            input_entry = CustomEntry(self.vector_frame, width=60)
+            input_entry = CustomEntry(
+                self.vector_frame,
+                width=60,
+                placeholder_text=randint(-15, 15)
+            )
+
             input_entry.grid(row=i, column=0, padx=5, pady=5)
-            self.bind_entry_keys(input_entry, i)
             self.input_entries.append(input_entry)
 
+        # crear post_vec_frame widgets
         nombre_label = ctkLabel(self.post_vec_frame, text="Nombre del vector:")
-        self.nombre_entry = ctkEntry(self.post_vec_frame, width=30, placeholder_text="u")
+        self.nombre_entry = ctkEntry(
+            self.post_vec_frame,
+            width=30,
+            placeholder_text="u",
+        )
 
         agregar_button = IconButton(
             self.post_vec_frame,
@@ -160,6 +176,7 @@ class AgregarVecs(CustomScrollFrame):
             command=self.limpiar_casillas
         )
 
+        # colocar widgets
         self.vector_frame.grid(row=1, column=0, padx=5, pady=5, sticky="n")
         self.post_vec_frame.grid(row=2, column=0, padx=5, pady=5, sticky="n")
         nombre_label.grid(row=0, column=0, padx=5, pady=5)
@@ -167,7 +184,12 @@ class AgregarVecs(CustomScrollFrame):
         agregar_button.grid(row=0, column=2, padx=2, pady=5)
         limpiar_button.grid(row=0, column=3, padx=2, pady=5)
 
-        self.nombre_entry.bind("<Up>", lambda _: self.nombre_entry_up())
+        # configurar atributos de self.key_binder y crear bindings
+        self.key_binder.entry_list = self.input_entries  # type: ignore
+        self.key_binder.extra_entries = (self.nombre_entry, self.dimension_entry)  # type: ignore
+        self.key_binder.create_key_bindings()
+
+        self.nombre_entry.bind("<Up>", lambda _: self.key_binder.focus_last())
         self.nombre_entry.bind("<Return>", lambda _: self.agregar_vector())
 
     def generar_aleatorio(self) -> None:
@@ -185,40 +207,42 @@ class AgregarVecs(CustomScrollFrame):
         """
 
         delete_msg_frame(self.mensaje_frame)
-        try:
-            dimension = int(self.dimension_entry.get())
-            if dimension <= 0:
-                raise ValueError
-        except ValueError:
-            self.mensaje_frame = ErrorFrame(
-                self, "Debe ingresar un número entero positivo como dimensión!"
-            )
-            self.mensaje_frame.grid(row=3, column=0, padx=5, pady=5, sticky="n")
+        dimension = self.validar_dimensiones()
+        if dimension is None:
+            # hubo input invalido
             return
-
-        input_d = len(self.input_entries)
-        if dimension != input_d:
-            self.mensaje_frame = ErrorFrame(
-                self,
-                "Las dimensiones del vector ingresado no coinciden con las dimensions indicadas!",
-            )
-            self.mensaje_frame.grid(row=3, column=0, padx=5, pady=5, sticky="n")
-            return
-
         delete_msg_frame(self.mensaje_frame)
+
+        # si los input de dimensiones cambio despues de generar las casillas
+        if dimension != len(self.input_entries):
+            self.mensaje_frame = place_msg_frame(
+                parent_frame=self,
+                msg_frame=self.mensaje_frame,
+                msg="Las dimensiones del vector ingresado " +
+                    "no coinciden con las dimensiones indicadas!",
+                tipo="error",
+                row=3,
+            )
+            return
+        delete_msg_frame(self.mensaje_frame)
+
+        # recorrer entries para guardar los valores
         componentes = []
         for entry in self.input_entries:
             try:
                 valor = Fraction(entry.get())
-            except ValueError:
-                self.mensaje_frame = ErrorFrame(
-                    self, "Todos los valores deben ser números racionales!"
+            except (ValueError, ZeroDivisionError) as e:
+                if isinstance(e, ValueError):
+                    msg = "Todos los valores deben ser números racionales!"
+                else:
+                    msg = "El denominador no puede ser 0!"
+                self.mensaje_frame = place_msg_frame(
+                    parent_frame=self,
+                    msg_frame=self.mensaje_frame,
+                    msg=msg,
+                    tipo="error",
+                    row=3,
                 )
-                self.mensaje_frame.grid(row=3, column=0, padx=5, pady=5, sticky="n")
-                return
-            except ZeroDivisionError:
-                self.mensaje_frame = ErrorFrame(self, "El denominador no puede ser 0!")
-                self.mensaje_frame.grid(row=3, column=0, padx=5, pady=5, sticky="n")
                 return
             componentes.append(valor)
         delete_msg_frame(self.mensaje_frame)
@@ -226,6 +250,7 @@ class AgregarVecs(CustomScrollFrame):
         nombre_nuevo_vector = self.nombre_entry.get()
         nuevo_vector = Vector(componentes)
 
+        # validar nombre
         nombre_repetido = nombre_nuevo_vector in self.vecs_manager.vecs_ingresados
         nombre_valido = (
             nombre_nuevo_vector.isalpha()
@@ -234,47 +259,64 @@ class AgregarVecs(CustomScrollFrame):
         )
 
         if not nombre_valido or nombre_repetido:
-            msj = (
+            msg = (
                 "El nombre del vector debe ser una letra minúscula!"
                 if not nombre_valido
                 else f"Ya existe un vector con nombrada {nombre_nuevo_vector}!"
             )
 
-            self.mensaje_frame = ErrorFrame(self, msj)
-            self.mensaje_frame.grid(row=3, column=0, padx=5, pady=5, sticky="n")
+            self.mensaje_frame = place_msg_frame(
+                parent_frame=self,
+                msg_frame=self.mensaje_frame,
+                msg=msg,
+                tipo="error",
+                row=3,
+            )
             return
+        delete_msg_frame(self.mensaje_frame)
 
         self.vecs_manager.vecs_ingresados[nombre_nuevo_vector] = nuevo_vector
-        self.mensaje_frame = SuccessFrame(self, "El vector se ha agregado exitosamente!")
-        self.mensaje_frame.grid(row=3, column=0, padx=5, pady=5, sticky="n")
+        self.mensaje_frame = place_msg_frame(
+            parent_frame=self,
+            msg_frame=self.mensaje_frame,
+            msg="El vector se ha agregado exitosamente!",
+            tipo="success",
+            row=3,
+        )
+
+        # mandar a actualizar los datos
         self.master_frame.update_all()
         self.app.vectores.update_all()  # type: ignore
         self.app.matrices.update_all()  # type: ignore
 
-    def move_down(self) -> None:
-        if len(self.vector_frame.winfo_children()) != 0:
-            self.input_entries[0].focus_set()
+    def validar_dimensiones(self) -> Optional[int]:
+        """
+        Valida si las dimensiones ingresadas por el usuario
+        son válidas y las retorna si lo son, o retorna None si son inválidas.
+        """
 
-    def bind_entry_keys(self, entry: CustomEntry, i: int) -> None:
-        entry.bind("<Up>", lambda event: self.entry_move_up(i))
-        entry.bind("<Down>", lambda event: self.entry_move_down(i))
-
-    def entry_move_up(self, i: int) -> None:
-        if i > 0:
-            self.input_entries[i - 1].focus_set()
-        elif i == 0:
-            self.dimension_entry.focus_set()
-
-    def entry_move_down(self, i: int) -> None:
-        if i < len(self.input_entries) - 1:
-            self.input_entries[i + 1].focus_set()
-        elif i == len(self.input_entries) - 1:
-            self.nombre_entry.focus_set()
-
-    def nombre_entry_up(self) -> None:
-        self.input_entries[-1].focus_set()
+        try:
+            dimension = int(self.dimension_entry.get())
+            if dimension <= 0:
+                raise ValueError
+        except ValueError:
+            self.mensaje_frame = place_msg_frame(
+                parent_frame=self,
+                msg_frame=self.mensaje_frame,
+                msg="Debe ingresar un número entero " +
+                    "positivo como dimensión!",
+                tipo="error",
+                row=1,
+            )
+            return None
+        return dimension
 
     def update_frame(self) -> None:
+        """
+        Actualiza los backgrounds de todas las widgets
+        por si hubo cambio de modo de apariencia.
+        """
+
         for widget in self.winfo_children():
             widget.configure(bg_color="transparent")  # type: ignore
             if isinstance(widget, ctkFrame):
@@ -284,7 +326,7 @@ class AgregarVecs(CustomScrollFrame):
 
 class MostrarVecs(CustomScrollFrame):
     """
-    Frame para mostrar todos los vectores ingresados por el usuario.
+    Frame para mostrar los vectores guardados.
     """
 
     def __init__(
@@ -302,63 +344,75 @@ class MostrarVecs(CustomScrollFrame):
         self.columnconfigure(0, weight=1)
         self.columnconfigure(1, weight=1)
 
-        self.options: dict[str, int] = {
+        self.print_frame: Optional[ctkFrame] = None
+
+        # definir los filtros que se mandaran
+        # a self.vecs_manager.get_vectores()
+        self.opciones: dict[str, int] = {
             "Mostrar todos": -1,
             "Vectores ingresados": 0,
             "Vectores calculados": 1
         }
 
+        # crear widgets
         select_label = ctkLabel(self, text="Seleccione un filtro:")
-        self.select_option = CustomDropdown(
+        self.select_opcion = CustomDropdown(
             self,
             height=30,
-            values=list(self.options.keys()),
-            command=self.update_option,
+            values=list(self.opciones.keys()),
+            command=self.update_opcion,
         )
 
-        self.option_seleccionada = self.options[self.select_option.get()]
+        self.opcion_seleccionada = self.opciones[self.select_opcion.get()]
         mostrar_button = IconButton(
             self,
             self.app,
             image=MOSTRAR_ICON,
             tooltip_text="Mostrar",
-            command=self.setup_mostrar
+            command=self.show_vecs
         )
 
-        self.print_frame: Optional[Union[ErrorFrame, ResultadoFrame]] = None
-
+        # colocar widgets
         select_label.grid(row=0, column=0, columnspan=2, padx=5, pady=5, sticky="n")
-        self.select_option.grid(row=1, column=0, ipadx=10, padx=5, pady=5, sticky="e")
+        self.select_opcion.grid(row=1, column=0, ipadx=10, padx=5, pady=5, sticky="e")
         mostrar_button.grid(row=1, column=1, padx=5, pady=5, sticky="w")
 
-    def setup_mostrar(self) -> None:
+    def show_vecs(self) -> None:
+        """
+        Muestra los vectores guardados, usando el filtro seleccionado.
+        """
+
         delete_msg_frame(self.print_frame)
-        self.update_option(self.select_option.get())
+        self.update_opcion(self.select_opcion.get())
 
-        calculado = self.option_seleccionada
-        vecs_text: str = self.vecs_manager.get_vectores(calculado)
-
+        vecs_text: str = self.vecs_manager.get_vectores(self.opcion_seleccionada)
         if "!" in vecs_text:
-            self.print_frame = ErrorFrame(self, vecs_text)
-            self.print_frame.grid(row=0, column=0, columnspan=2, padx=10, pady=10, sticky="n")
-        else:
-            self.print_frame = ResultadoFrame(
-                self,
-                header=vecs_text,
-                resultado="",
-                solo_header=True
-            )
-            self.print_frame.grid(
-                row=0, column=0,
+            self.print_frame = place_msg_frame(
+                parent_frame=self,
+                msg_frame=self.print_frame,
+                msg=vecs_text,
+                tipo="error",
+                row=2,
                 columnspan=2,
-                padx=10, pady=10,
-                sticky="n",
             )
-            self.print_frame.header.grid(ipadx=10, ipady=10)
-        self.print_frame.columnconfigure(0, weight=1)
-        self.print_frame.grid(row=2, column=0, columnspan=2, padx=5, pady=5, sticky="n")
+        else:
+            self.print_frame = place_msg_frame(
+                parent_frame=self,
+                msg_frame=self.print_frame,
+                msg=vecs_text,
+                tipo="resultado",
+                row=2,
+                columnspan=2,
+            )
+        self.print_frame.columnconfigure(0, weight=1)  # type: ignore
 
     def update_frame(self) -> None:
+        """
+        Eliminar self.print_frame y configurar los backgrounds.
+        """
+
+        # si print_frame no estaba inicializado,
+        # .destroy() tira error, pero no pasa nada
         try:
             self.print_frame.destroy()  # type: ignore
         except AttributeError:
@@ -366,11 +420,20 @@ class MostrarVecs(CustomScrollFrame):
         for widget in self.winfo_children():
             widget.configure(bg_color="transparent")  # type: ignore
 
-    def update_option(self, valor: str) -> None:
-        self.option_seleccionada = self.options[valor]
+    def update_opcion(self, valor: str) -> None:
+        """
+        Actualiza self.opcion_seleccionada
+        con la opción seleccionada en el dropdown
+        """
+
+        self.opcion_seleccionada = self.opciones[valor]
 
 
 class EliminarVecs(CustomScrollFrame):
+    """
+    Frame para eliminar vectores.
+    """
+
     def __init__(
         self,
         app: "GaussUI",
@@ -393,21 +456,29 @@ class EliminarVecs(CustomScrollFrame):
         self.setup_frame()
 
     def setup_frame(self) -> None:
+        """
+        Crear y colocar las widgets del frame.
+        """
+
         delete_msg_frame(self.mensaje_frame)
         if len(self.nombres_vectores) == 0:
-            self.mensaje_frame = ErrorFrame(self, "No hay vectores guardados!")
-            self.mensaje_frame.grid(row=1, column=0, columnspan=2, padx=5, pady=5, sticky="n")
+            self.mensaje_frame = place_msg_frame(
+                parent_frame=self,
+                msg_frame=self.mensaje_frame,
+                msg="No hay vectores guardados!",
+                tipo="error",
+                row=0,
+                columnspan=2,
+            )
             return
 
-        placeholder = Variable(self, value=self.nombres_vectores[0])
+        # crear widgets
         instruct_eliminar = ctkLabel(self, text="¿Cuál vector desea eliminar?")
-
         self.select_vec = CustomDropdown(
             self,
             height=30,
             width=60,
             values=self.nombres_vectores,
-            variable=placeholder,
             command=self.update_vec,
         )
 
@@ -416,11 +487,12 @@ class EliminarVecs(CustomScrollFrame):
             self.app,
             image=ELIMINAR_ICON,
             tooltip_text="Eliminar vector",
-            command=lambda: self.eliminar_vector(),
+            command=self.eliminar_vector,
         )
 
         self.vec_seleccionado = self.select_vec.get()
 
+        # colocar widgets
         instruct_eliminar.grid(row=0, column=0, columnspan=2, padx=5, pady=5, sticky="n")
         self.select_vec.grid(row=1, column=0, padx=5, pady=5, sticky="e")
         button.grid(row=1, column=1, padx=5, pady=5, sticky="w")
@@ -432,33 +504,50 @@ class EliminarVecs(CustomScrollFrame):
 
         delete_msg_frame(self.mensaje_frame)
         self.update_vec(self.select_vec.get())
-        self.vecs_manager.vecs_ingresados.pop(self.vec_seleccionada)
+        self.vecs_manager.vecs_ingresados.pop(self.vec_seleccionado)
 
-        self.mensaje_frame = SuccessFrame(
-            self, message=f"Vector '{self.vec_seleccionada}' eliminado!"
+        self.mensaje_frame = place_msg_frame(
+            parent_frame=self,
+            msg_frame=self.mensaje_frame,
+            msg=f"Vector '{self.vec_seleccionado}' eliminado!",
+            tipo="success",
+            row=2,
+            columnspan=2,
         )
 
-        self.mensaje_frame.grid(row=3, column=0, columnspan=2, padx=5, pady=5)
+        # mandar a actualizar los datos
         self.master_frame.update_all()
         self.app.matrices.update_all()  # type: ignore
         self.app.vectores.update_all()  # type: ignore
 
     def update_frame(self) -> None:
-        self.nombres_vectores = list(self.vecs_manager.vecs_ingresados.keys())
-        if len(self.nombres_vectores) == 0 and isinstance(self.mensaje_frame, SuccessFrame):
-            sleep(1.5)
-            delete_msg_frame(self.mensaje_frame)
-            self.mensaje_frame = ErrorFrame(self, "No hay vectores guardados!")
-            self.mensaje_frame.grid(
-                row=1, column=0,
-                columnspan=2,
-                padx=5, pady=5,
-                sticky="n"
-            )
+        """
+        Actualiza el frame y sus datos.
+        """
 
-            for widget in self.winfo_children():
-                if not isinstance(widget, ctkFrame):
-                    widget.destroy()
+        self.nombres_vectores = list(self.vecs_manager.vecs_ingresados.keys())
+
+        if (
+            len(self.nombres_vectores) == 0
+            and
+            isinstance(self.mensaje_frame, SuccessFrame)
+        ):
+
+            def clear_after_wait() -> None:
+                delete_msg_frame(self.mensaje_frame)
+                self.mensaje_frame = place_msg_frame(
+                    parent_frame=self,
+                    msg_frame=self.mensaje_frame,
+                    msg="No hay vectores guardados!",
+                    tipo="error",
+                    row=0,
+                    columnspan=2,
+                )
+
+                for widget in self.winfo_children():
+                    if not isinstance(widget, ctkFrame):
+                        widget.destroy()
+            self.after(2000, clear_after_wait)
 
         elif isinstance(self.mensaje_frame, ErrorFrame):
             self.setup_frame()
@@ -467,9 +556,14 @@ class EliminarVecs(CustomScrollFrame):
                 widget.configure(bg_color="transparent")  # type: ignore
             self.select_vec.configure(
                 variable=Variable(value=self.nombres_vectores[0]),
-                values=self.nombres_vectores,
+                values=self.nombres_vectores
             )
-            self.after(1500, lambda: delete_msg_frame(self.mensaje_frame))
+
+            self.after(2000, lambda: delete_msg_frame(self.mensaje_frame))
 
     def update_vec(self, valor: str) -> None:
-        self.vec_seleccionada = valor
+        """
+        Actualiza vec_seleccionado con el valor seleccionado en el dropdown.
+        """
+
+        self.vec_seleccionado = valor

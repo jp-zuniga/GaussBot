@@ -7,9 +7,9 @@ from random import randint
 from typing import (
     TYPE_CHECKING,
     Optional,
-    Union,
 )
 
+from tkinter import Variable
 from customtkinter import (
     CTkEntry as ctkEntry,
     CTkFrame as ctkFrame,
@@ -72,9 +72,9 @@ class AgregarSistemas(CustomScrollFrame):
         self.input_entries: list[list[CustomEntry]] = []
 
         # frames para contener secciones de la interfaz
-        self.pre_sis_frame = ctkFrame(self)
-        self.sis_frame = ctkFrame(self)
-        self.post_sis_frame = ctkFrame(self)
+        self.pre_sis_frame = ctkFrame(self, fg_color="transparent")
+        self.sis_frame = ctkFrame(self, fg_color="transparent")
+        self.post_sis_frame = ctkFrame(self, fg_color="transparent")
         self.nombre_entry: ctkEntry
 
         # crear widgets iniciales para las dimensiones
@@ -229,14 +229,12 @@ class AgregarSistemas(CustomScrollFrame):
         # colocar parent frames
         self.sis_frame.grid(
             row=1, column=0,
-            columnspan=2,
             padx=5, pady=5,
             sticky="n",
         )
 
         self.post_sis_frame.grid(
             row=2, column=0,
-            columnspan=2,
             padx=5, pady=5,
             sticky="n",
         )
@@ -289,7 +287,7 @@ class AgregarSistemas(CustomScrollFrame):
         )
 
         if not dimensiones_validas:
-            place_msg_frame(
+            self.mensaje_frame = place_msg_frame(
                 parent_frame=self,
                 msg_frame=self.mensaje_frame,
                 msg="Las dimensiones del sistema ingresado " +
@@ -298,6 +296,7 @@ class AgregarSistemas(CustomScrollFrame):
                 row=3,
             )
             return
+        delete_msg_frame(self.mensaje_frame)
 
         # recorrer las entries y guardar los valores
         valores = []
@@ -311,7 +310,7 @@ class AgregarSistemas(CustomScrollFrame):
                         msg = "Todos los valores deben ser números racionales!"
                     else:
                         msg = "El denominador no puede ser 0!"
-                    place_msg_frame(
+                    self.mensaje_frame = place_msg_frame(
                         parent_frame=self,
                         msg_frame=self.mensaje_frame,
                         msg=msg,
@@ -344,7 +343,7 @@ class AgregarSistemas(CustomScrollFrame):
                 else f"Ya existe un sistema nombrado '{nombre_nuevo_sis}'!"
             )
 
-            place_msg_frame(
+            self.mensaje_frame = place_msg_frame(
                 parent_frame=self,
                 msg_frame=self.mensaje_frame,
                 msg=msg,
@@ -355,7 +354,7 @@ class AgregarSistemas(CustomScrollFrame):
         delete_msg_frame(self.mensaje_frame)
 
         self.mats_manager.sis_ingresados[nombre_nuevo_sis] = nuevo_sis
-        place_msg_frame(
+        self.mensaje_frame = place_msg_frame(
             parent_frame=self,
             msg_frame=self.mensaje_frame,
             msg="El sistema se ha agregado exitosamente!",
@@ -382,7 +381,7 @@ class AgregarSistemas(CustomScrollFrame):
             if ecuaciones <= 0 or variables - 1 <= 0:
                 raise ValueError
         except ValueError:
-            place_msg_frame(
+            self.mensaje_frame = place_msg_frame(
                 parent_frame=self,
                 msg_frame=self.mensaje_frame,
                 msg="Debe ingresar números enteros " +
@@ -408,7 +407,7 @@ class AgregarSistemas(CustomScrollFrame):
 
 class MostrarSistemas(CustomScrollFrame):
     """
-    Frame para mostrar todos los sistemas ingresados.
+    Frame para mostrar los sistemas guardados.
     """
 
     def __init__(
@@ -469,21 +468,21 @@ class MostrarSistemas(CustomScrollFrame):
 
         sis_text = self.mats_manager.get_sistemas(self.opcion_seleccionada)
         if "!" in sis_text:
-            place_msg_frame(
+            self.print_frame = place_msg_frame(
                 parent_frame=self,
                 msg_frame=self.print_frame,
                 msg=sis_text,
                 tipo="error",
-                row=1,
+                row=2,
                 columnspan=2,
             )
         else:
-            place_msg_frame(
+            self.print_frame = place_msg_frame(
                 parent_frame=self,
                 msg_frame=self.print_frame,
                 msg=sis_text,
                 tipo="resultado",
-                row=1,
+                row=2,
                 columnspan=2,
             )
         self.print_frame.columnconfigure(0, weight=1)  # type: ignore
@@ -532,24 +531,25 @@ class EliminarSistemas(CustomScrollFrame):
         self.columnconfigure(1, weight=1)
 
         self.nombres_sistemas = list(self.mats_manager.sis_ingresados.keys())
-        self.mensaje_frame: Optional[Union[ErrorFrame, SuccessFrame]] = None
+        self.mensaje_frame: Optional[ctkFrame] = None
         self.select_sis: CustomDropdown
         self.sis_seleccionado = ""
         self.setup_frame()
 
     def setup_frame(self) -> None:
         """
-        Crear y colocar widgets del frame.
+        Crear y colocar las widgets del frame.
         """
 
         delete_msg_frame(self.mensaje_frame)
         if len(self.nombres_sistemas) == 0:
-            place_msg_frame(
+            self.mensaje_frame = place_msg_frame(
                 parent_frame=self,
                 msg_frame=self.mensaje_frame,
                 msg="No hay sistemas de ecuaciones guardados!",
                 tipo="error",
-                row=1,
+                row=0,
+                columnspan=2,
             )
             return
 
@@ -587,12 +587,12 @@ class EliminarSistemas(CustomScrollFrame):
         self.update_sis(self.select_sis.get())
         self.mats_manager.sis_ingresados.pop(self.sis_seleccionado)
 
-        place_msg_frame(
+        self.mensaje_frame = place_msg_frame(
             parent_frame=self,
             msg_frame=self.mensaje_frame,
             msg=f"Sistema '{self.sis_seleccionado}' eliminado!",
             tipo="success",
-            row=3,
+            row=2,
             columnspan=2,
         )
 
@@ -614,25 +614,31 @@ class EliminarSistemas(CustomScrollFrame):
 
             def clear_after_wait() -> None:
                 delete_msg_frame(self.mensaje_frame)
-                place_msg_frame(
+                self.mensaje_frame = place_msg_frame(
                     parent_frame=self,
                     msg_frame=self.mensaje_frame,
                     msg="No hay sistemas guardados!",
                     tipo="error",
+                    row=0,
+                    columnspan=2,
                 )
 
                 for widget in self.winfo_children():
                     if not isinstance(widget, ctkFrame):
                         widget.destroy()
-            self.after(3000, clear_after_wait)
+            self.after(2000, clear_after_wait)
 
         elif isinstance(self.mensaje_frame, ErrorFrame):
             self.setup_frame()
         else:
             for widget in self.winfo_children():
                 widget.configure(bg_color="transparent")  # type: ignore
-            self.select_sis.configure(values=self.nombres_sistemas)
-            self.after(3000, lambda: delete_msg_frame(self.mensaje_frame))
+            self.select_sis.configure(
+                variable=Variable(value=self.nombres_sistemas[0]),
+                values=self.nombres_sistemas
+            )
+
+            self.after(2000, lambda: delete_msg_frame(self.mensaje_frame))
 
     def update_sis(self, valor: str) -> None:
         """

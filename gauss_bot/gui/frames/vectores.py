@@ -68,18 +68,20 @@ class VectoresFrame(ctkFrame):
     def setup_tabview(self) -> None:
         """
         Crea un ctkTabview con pestañas para cada funcionalidad.
+        Se encarga de validar si hay vectores ingresados para que
+        los setups de los frames individuales no lo tengan que hacer.
         """
 
         for widget in self.winfo_children():
             widget.destroy()
 
         if len(self.nombres_vectores) == 0:
-            # si no hay vectores guardados, mostrar mensaje de error
-            # y agregar boton para que el usuario sepa donde agregarlos
+            # si no hay vectores guardados, mostrar mensaje de error y
+            # agregar boton para que el usuario sepa donde agregarlos
             self.dummy_frame = ctkFrame(self, fg_color="transparent")
             self.mensaje_frame = ErrorFrame(
                 self.dummy_frame,
-                message="No hay vectores ingresados!"
+                msg="No hay vectores ingresados!"
             )
 
             agregar_button = ctkButton(
@@ -152,6 +154,3 @@ class VectoresFrame(ctkFrame):
         # si no, actualizar todos los subframes
         for tab in self.instances:
             tab.update_frame()
-            for widget in tab.winfo_children():
-                # por si hubo cambio de modo de apariencia
-                widget.configure(bg_color="transparent")  # type: ignore

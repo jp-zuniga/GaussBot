@@ -7,9 +7,9 @@ from random import randint
 from typing import (
     TYPE_CHECKING,
     Optional,
-    Union,
 )
 
+from tkinter import Variable
 from customtkinter import (
     CTkEntry as ctkEntry,
     CTkFrame as ctkFrame,
@@ -171,7 +171,7 @@ class AgregarMats(CustomScrollFrame):
             filas, columnas = self.validar_dimensiones()  # type: ignore
         except TypeError:
             # hubo input invalido
-            pass
+            return
         delete_msg_frame(self.mensaje_frame)
 
         # crear entries para ingresar la matriz
@@ -216,14 +216,12 @@ class AgregarMats(CustomScrollFrame):
         # colocar parent frames
         self.matriz_frame.grid(
             row=1, column=0,
-            columnspan=2,
             padx=5, pady=5,
             sticky="n",
         )
 
         self.post_mat_frame.grid(
             row=2, column=0,
-            columnspan=2,
             padx=5, pady=5,
             sticky="n",
         )
@@ -276,7 +274,7 @@ class AgregarMats(CustomScrollFrame):
         )
 
         if not dimensiones_validas:
-            place_msg_frame(
+            self.mensaje_frame = place_msg_frame(
                 parent_frame=self,
                 msg_frame=self.mensaje_frame,
                 msg="Las dimensiones de la matriz ingresada " +
@@ -298,7 +296,7 @@ class AgregarMats(CustomScrollFrame):
                         msg = "Todos los valores deben ser números racionales!"
                     else:
                         msg = "El denominador no puede ser 0!"
-                    place_msg_frame(
+                    self.mensaje_frame = place_msg_frame(
                         parent_frame=self,
                         msg_frame=self.mensaje_frame,
                         msg=msg,
@@ -331,7 +329,7 @@ class AgregarMats(CustomScrollFrame):
                 else f"Ya existe una matriz nombrada '{nombre_nueva_matriz}'!"
             )
 
-            place_msg_frame(
+            self.mensaje_frame = place_msg_frame(
                 parent_frame=self,
                 msg_frame=self.mensaje_frame,
                 msg=msg,
@@ -342,7 +340,7 @@ class AgregarMats(CustomScrollFrame):
         delete_msg_frame(self.mensaje_frame)
 
         self.mats_manager.mats_ingresadas[nombre_nueva_matriz] = nueva_matriz
-        place_msg_frame(
+        self.mensaje_frame = place_msg_frame(
             parent_frame=self,
             msg_frame=self.mensaje_frame,
             msg="La matriz se ha agregado exitosamente!",
@@ -370,7 +368,7 @@ class AgregarMats(CustomScrollFrame):
             if filas <= 0 or columnas <= 0:
                 raise ValueError
         except ValueError:
-            place_msg_frame(
+            self.mensaje_frame = place_msg_frame(
                 parent_frame=self,
                 msg_frame=self.mensaje_frame,
                 msg="Debe ingresar números enteros " +
@@ -426,14 +424,14 @@ class MostrarMats(CustomScrollFrame):
 
         # crear widgets
         select_label = ctkLabel(self, text="Seleccione un filtro:")
-        self.select_option = CustomDropdown(
+        self.select_opcion = CustomDropdown(
             self,
             height=30,
             values=list(self.opciones.keys()),
-            command=self.update_option,
+            command=self.update_opcion,
         )
 
-        self.opcion_seleccionada = self.opciones[self.select_option.get()]
+        self.opcion_seleccionada = self.opciones[self.select_opcion.get()]
         mostrar_button = IconButton(
             self,
             self.app,
@@ -444,7 +442,7 @@ class MostrarMats(CustomScrollFrame):
 
         # colocar widgets
         select_label.grid(row=0, column=0, columnspan=2, padx=5, pady=5, sticky="n")
-        self.select_option.grid(row=1, column=0, ipadx=10, padx=5, pady=5, sticky="e")
+        self.select_opcion.grid(row=1, column=0, ipadx=10, padx=5, pady=5, sticky="e")
         mostrar_button.grid(row=1, column=1, padx=5, pady=5, sticky="w")
 
     def show_mats(self) -> None:
@@ -453,25 +451,25 @@ class MostrarMats(CustomScrollFrame):
         """
 
         delete_msg_frame(self.print_frame)
-        self.update_option(self.select_option.get())
+        self.update_opcion(self.select_opcion.get())
 
         mats_text = self.mats_manager.get_matrices(self.opcion_seleccionada)
         if "!" in mats_text:  # "!" significa que no hay matrices
-            place_msg_frame(
+            self.print_frame = place_msg_frame(
                 parent_frame=self,
                 msg_frame=self.print_frame,
                 msg=mats_text,
                 tipo="error",
-                row=1,
+                row=2,
                 columnspan=2,
             )
         else:
-            place_msg_frame(
+            self.print_frame = place_msg_frame(
                 parent_frame=self,
                 msg_frame=self.print_frame,
                 msg=mats_text,
                 tipo="resultado",
-                row=1,
+                row=2,
                 columnspan=2,
             )
         self.print_frame.columnconfigure(0, weight=1)  # type: ignore
@@ -490,7 +488,7 @@ class MostrarMats(CustomScrollFrame):
         for widget in self.winfo_children():
             widget.configure(bg_color="transparent")  # type: ignore
 
-    def update_option(self, valor: str) -> None:
+    def update_opcion(self, valor: str) -> None:
         """
         Actualiza self.opcion_seleccionada
         con la opción seleccionada en el dropdown
@@ -520,19 +518,19 @@ class EliminarMats(CustomScrollFrame):
         self.columnconfigure(1, weight=1)
 
         self.nombres_matrices = list(self.mats_manager.mats_ingresadas.keys())
-        self.mensaje_frame: Optional[Union[ErrorFrame, SuccessFrame]] = None
+        self.mensaje_frame: Optional[ctkFrame] = None
         self.select_mat: CustomDropdown
         self.mat_seleccionada = ""
         self.setup_frame()
 
     def setup_frame(self) -> None:
         """
-        Crear y colocar widgets del frame.
+        Crear y colocar las widgets del frame.
         """
 
         delete_msg_frame(self.mensaje_frame)
         if len(self.nombres_matrices) == 0:
-            place_msg_frame(
+            self.mensaje_frame = place_msg_frame(
                 parent_frame=self,
                 msg_frame=self.mensaje_frame,
                 msg="No hay matrices guardadas!",
@@ -575,7 +573,7 @@ class EliminarMats(CustomScrollFrame):
         self.update_mat(self.select_mat.get())
         self.mats_manager.mats_ingresadas.pop(self.mat_seleccionada)
 
-        place_msg_frame(
+        self.mensaje_frame = place_msg_frame(
             parent_frame=self,
             msg_frame=self.mensaje_frame,
             msg=f"Matriz '{self.mat_seleccionada}' eliminada!",
@@ -604,25 +602,31 @@ class EliminarMats(CustomScrollFrame):
 
             def clear_after_wait() -> None:
                 delete_msg_frame(self.mensaje_frame)
-                place_msg_frame(
+                self.mensaje_frame = place_msg_frame(
                     parent_frame=self,
                     msg_frame=self.mensaje_frame,
                     msg="No hay matrices guardadas!",
                     tipo="error",
+                    row=0,
+                    columnspan=2,
                 )
 
                 for widget in self.winfo_children():
                     if not isinstance(widget, ctkFrame):
                         widget.destroy()
-            self.after(3000, clear_after_wait)
+            self.after(2000, clear_after_wait)
 
         elif isinstance(self.mensaje_frame, ErrorFrame):
             self.setup_frame()
         else:
             for widget in self.winfo_children():
                 widget.configure(bg_color="transparent")  # type: ignore
-            self.select_mat.configure(values=self.nombres_matrices)
-            self.after(3000, lambda: delete_msg_frame(self.mensaje_frame))
+            self.select_mat.configure(
+                variable=Variable(value=self.nombres_matrices[0]),
+                values=self.nombres_matrices,
+            )
+
+            self.after(2000, lambda: delete_msg_frame(self.mensaje_frame))
 
     def update_mat(self, valor: str) -> None:
         """

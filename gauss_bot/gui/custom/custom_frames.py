@@ -80,21 +80,21 @@ class ErrorFrame(ctkFrame):
     Frame personalizado para mostrar mensajes de error.
     """
 
-    def __init__(self, parent: Union[ctkFrame, CustomScrollFrame], message: str) -> None:
+    def __init__(self, master: Union[ctkFrame, CustomScrollFrame], msg: str) -> None:
         super().__init__(
-            parent,
+            master,
             corner_radius=8,
             border_width=2,
             border_color="#ff3131",
             fg_color="transparent",
         )
 
-        self.parent = parent
+        self.master = master
         self.rowconfigure(0, weight=1)
         self.columnconfigure(0, weight=1)
 
         self.error_icon_label = ctkLabel(self, text="", image=ERROR_ICON)
-        self.mensaje_error = ctkLabel(self, text=message)
+        self.mensaje_error = ctkLabel(self, text=msg)
 
         self.error_icon_label.grid(row=0, column=0, padx=(15, 5), pady=10, sticky="w")
         self.mensaje_error.grid(row=0, column=1, padx=(5, 15), pady=10, sticky="e")
@@ -109,21 +109,21 @@ class SuccessFrame(ctkFrame):
     Frame personalizado para mostrar mensajes de éxito.
     """
 
-    def __init__(self, parent: Union[ctkFrame, CustomScrollFrame], message: str) -> None:
+    def __init__(self, master: Union[ctkFrame, CustomScrollFrame], msg: str) -> None:
         super().__init__(
-            parent,
+            master,
             corner_radius=8,
             border_width=2,
             border_color="#18c026",
             fg_color="transparent",
         )
 
-        self.parent = parent
+        self.master = master
         self.rowconfigure(0, weight=1)
         self.columnconfigure(0, weight=1)
 
         self.check_icon_label = ctkLabel(self, text="", image=CHECK_ICON)
-        self.mensaje_exito = ctkLabel(self, text=message)
+        self.mensaje_exito = ctkLabel(self, text=msg)
 
         self.check_icon_label.grid(row=0, column=0, padx=(15, 5), pady=10, sticky="w")
         self.mensaje_exito.grid(row=0, column=1, padx=(5, 15), pady=10, sticky="e")
@@ -140,22 +140,22 @@ class ResultadoFrame(ctkFrame):
 
     def __init__(
         self,
-        parent: Union[ctkFrame, CustomScrollFrame],
-        msj: str,
+        master: Union[ctkFrame, CustomScrollFrame],
+        msg: str,
         border_color: str = "#18c026",
     ) -> None:
 
         super().__init__(
-            parent,
+            master,
             corner_radius=8,
             border_width=2,
             border_color=border_color,
             fg_color="transparent",
         )
 
-        self.parent = parent
-        self.msj_label = ctkLabel(self, text=msj)
-        self.msj_label.grid(row=0, column=0, padx=10, pady=10)
+        self.master = master
+        self.msg_label = ctkLabel(self, text=msg)
+        self.msg_label.grid(row=0, column=0, padx=30, pady=30)
 
     def destroy(self) -> None:
         self.forget()

@@ -35,6 +35,8 @@ class Matriz:
                      para añadirle la columna de constantes
         - filas/columnas: dimensiones de la matriz (ints positivos)
         - valores: lista 2D de objetos Fraction() (opcional)
+        
+        * ValueError: si las dimensiones de la matriz no son positivas
         """
 
         if filas < 1 or columnas < 1:

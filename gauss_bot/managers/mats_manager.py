@@ -192,7 +192,7 @@ class MatricesManager:
         nombre_mat_resultado = f"{nombre_mat1} {operador} {nombre_mat2}"
         return (nombre_mat_resultado, mat_resultado)
 
-    def escalar_por_matriz(
+    def escalar_por_mat(
         self,
         escalar: Fraction,
         nombre_mat: str
@@ -223,7 +223,7 @@ class MatricesManager:
         nombre_mat_mult = f"{escalar_str}{nombre_mat}"
         return (nombre_mat_mult, mat_mult)
 
-    def mult_matricial(
+    def mult_mats(
         self,
         nombre_mat1: str,
         nombre_mat2: str
@@ -245,7 +245,7 @@ class MatricesManager:
         nombre_mat_mult = f"{nombre_mat1} • {nombre_mat2}"
         return (nombre_mat_mult, mat_mult)
 
-    def transponer_matriz(self, nombre_mat: str) -> tuple[str, Matriz]:
+    def transponer_mat(self, nombre_mat: str) -> tuple[str, Matriz]:
         """
         Retorna una tupla con el nombre de la
         transposición y el objeto Matriz() transpuesto.
@@ -256,7 +256,7 @@ class MatricesManager:
         mat_transpuesta = mat.transponer()
         return (nombre_mat_transpuesta, mat_transpuesta)
 
-    def invertir_matriz(
+    def invertir_mat(
         self,
         nombre_mat: str
     ) -> tuple[str, "Matriz", "Matriz", Fraction]:

@@ -72,7 +72,7 @@ class OpsManager:
             else vecs_manager
         )
 
-    def matriz_por_vector(self, nombre_mat: str, nombre_vec: str) -> tuple[str, Matriz]:
+    def mat_por_vec(self, nombre_mat: str, nombre_vec: str) -> tuple[str, Matriz]:
         """
         Realiza la multiplicación de una matriz por un vector.
         - ArithmeticError: si la matriz y el vector no son compatibles
