@@ -7,6 +7,7 @@ resolver con la Regla de Cramer y el método Gauss-Jordan.
 from copy import deepcopy
 from fractions import Fraction
 
+from gauss_bot import LOGGER
 from gauss_bot.models import Matriz
 
 
@@ -160,10 +161,10 @@ class SistemaEcuaciones:
         """
 
         if self.matriz.es_matriz_cero():
-            self.solucion += "Sistema tiene soluciones infinitas!\n"
+            self.solucion += "\nSistema tiene soluciones infinitas!\n"
             self.procedimiento += str(self.matriz)
-            self.procedimiento += "Todas las ecuaciones tienen la forma 0 = 0,"
-            self.procedimiento += " lo cual siempre es verdadero.\n"
+            self.procedimiento += "Todas las ecuaciones tienen la forma 0 = 0, "
+            self.procedimiento += "lo cual siempre es verdadero.\n"
             self.procedimiento += "Por lo tanto, el sistema tiene soluciones infinitas."
             return
 
@@ -547,13 +548,13 @@ class SistemaEcuaciones:
 
             for i in range(self.matriz.filas):
                 if all(x == 0 for x in self.matriz[i]):
-                    print("skipping zero row")
+                    LOGGER.warning("Saltando fila cero!")
                     continue
                 self.solucion += (f"X{i+1} = {self.matriz[i, -1]}\n")
             return
 
         ecuaciones = self._despejar_variables(libres)
         self.solucion += "\nSistema no tiene solución única!\n"
-        self.solucion += " Solución general encontrada:\n"
+        self.solucion += "Solución general encontrada:\n"
         for linea in ecuaciones:
             self.solucion += linea

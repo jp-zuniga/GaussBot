@@ -7,7 +7,7 @@ Operaciones implementadas:
 * resta
 * multiplicación por escalar
 * multiplicación matricial
-* transponer
+* transposiciones
 * calcular determinante
 * encontrar inversas
 """

@@ -81,7 +81,14 @@ class ErrorFrame(ctkFrame):
     """
 
     def __init__(self, parent: Union[ctkFrame, CustomScrollFrame], message: str) -> None:
-        super().__init__(parent, corner_radius=8, border_width=2, border_color="#ff3131")
+        super().__init__(
+            parent,
+            corner_radius=8,
+            border_width=2,
+            border_color="#ff3131",
+            fg_color="transparent",
+        )
+
         self.parent = parent
         self.rowconfigure(0, weight=1)
         self.columnconfigure(0, weight=1)
@@ -103,7 +110,14 @@ class SuccessFrame(ctkFrame):
     """
 
     def __init__(self, parent: Union[ctkFrame, CustomScrollFrame], message: str) -> None:
-        super().__init__(parent, corner_radius=8, border_width=2, border_color="#18c026")
+        super().__init__(
+            parent,
+            corner_radius=8,
+            border_width=2,
+            border_color="#18c026",
+            fg_color="transparent",
+        )
+
         self.parent = parent
         self.rowconfigure(0, weight=1)
         self.columnconfigure(0, weight=1)
@@ -127,22 +141,21 @@ class ResultadoFrame(ctkFrame):
     def __init__(
         self,
         parent: Union[ctkFrame, CustomScrollFrame],
-        header: str,
-        resultado: str,
-        solo_header: bool =False,
+        msj: str,
         border_color: str = "#18c026",
     ) -> None:
 
-        super().__init__(parent, corner_radius=8, border_width=2, border_color=border_color)
+        super().__init__(
+            parent,
+            corner_radius=8,
+            border_width=2,
+            border_color=border_color,
+            fg_color="transparent",
+        )
+
         self.parent = parent
-
-        pady_tuple = (10, 10) if solo_header else (10, 3)
-        self.header = ctkLabel(self, text=header)
-        self.header.grid(row=0, column=0, padx=20, pady=pady_tuple, sticky="n")
-
-        if not solo_header:
-            self.resultado = ctkLabel(self, text=resultado)
-            self.resultado.grid(row=1, column=0, padx=20, pady=(3, 10), sticky="n")
+        self.msj_label = ctkLabel(self, text=msj)
+        self.msj_label.grid(row=0, column=0, padx=10, pady=10)
 
     def destroy(self) -> None:
         self.forget()

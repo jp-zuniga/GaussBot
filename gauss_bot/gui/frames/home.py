@@ -83,6 +83,19 @@ class HomeFrame(ctkFrame):
         mostrar_matrices.grid(row=2, column=0, padx=20, pady=(10, 20), sticky="ne")
         mostrar_vectores.grid(row=2, column=1, padx=20, pady=(10, 20), sticky="nw")
 
+    def ir_a_sistemas(self, mostrar: bool):
+        """
+        Mostrar frame 'ManejarSistemas'.
+        * mostrar: si se quiere seleccionar la tab de mostrar o no
+        """
+
+        self.app.nav_frame.seleccionar_frame("inputs")  # type: ignore
+        self.app.inputs_frame.tabview.set("Sistemas de Ecuaciones")  # type: ignore
+        if mostrar:
+            self.app.inputs_frame.instances[0].tabview.set("Mostrar")  # type: ignore
+        else:
+            self.app.inputs_frame.instances[0].tabview.set("Agregar")  # type: ignore
+
     def ir_a_matriz(self, mostrar: bool):
         """
         Mostrar frame 'ManejarMats'.

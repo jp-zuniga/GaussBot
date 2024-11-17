@@ -8,14 +8,13 @@ from logging import (
     DEBUG,
     Formatter,
     FileHandler,
-    Logger,
     getLogger,
 )
 
 from os import (
-    path,
     makedirs,
     walk,
+    path,
 )
 
 from random import choice
@@ -44,6 +43,7 @@ from PIL.Image import (  # pylint: disable=no-name-in-module
     open as open_img,
 )
 
+
 __all__ = [
     "delete_msg_frame",
     "generate_funcs",
@@ -51,6 +51,7 @@ __all__ = [
     "generate_sep",
     "get_dict_key",
     "latex_to_png",
+    "log_setup",
     "resize_image",
     "transparent_invert",
     "ACEPTAR_ICON",
@@ -90,18 +91,32 @@ __all__ = [
     "WARNING_ICON",
 ]
 
+
 # objeto logger global para la aplicacion
 # configurado en la funcion log_setup()
-LOGGER: Logger = getLogger("GaussLogger")
+LOGGER = getLogger()
 
 
 ################################################################################
 ###################   Funciones generales de la aplicación   ###################
 ################################################################################
 
+
+def delete_msg_frame(msg_frame: Optional[ctkFrame]) -> None:
+    """
+    Elimina un frame de mensaje si existe.
+    * msg_frame: frame a eliminar
+    """
+
+    if msg_frame is not None:
+        msg_frame.destroy()
+        msg_frame = None
+
+
 def log_setup(logger=LOGGER) -> None:
     """
-    Configura el logger de la aplicación y crea el archivo 'log.txt' si no existe.
+    Configura el logger de la aplicación y
+    crea el archivo 'log.txt' si no existe.
     """
 
     if not path.exists(LOG_PATH):
@@ -130,21 +145,7 @@ def log_setup(logger=LOGGER) -> None:
 
     logger.addHandler(handler)
     logger.setLevel(DEBUG)
-
     logger.info("Logger configurado...")
-
-
-def delete_msg_frame(msg_frame: Optional[ctkFrame]) -> None:
-    """
-    Elimina un frame de mensaje si existe.
-    Utilizado principalmente para eliminar mensajes
-    de tipo ErrorFrame, SuccessFrame, y ResultadoFrame.
-    * msg_frame: frame a eliminar
-    """
-
-    if msg_frame is not None:
-        msg_frame.destroy()
-        msg_frame = None
 
 
 def get_dict_key(dict_lookup: dict, buscando: Any) -> Union[Any, None]:
@@ -236,18 +237,24 @@ def generate_sep(orientation: bool, size: tuple[int, int]) -> ctkImage:
 def latex_to_png(latex_str: str, output_file: str, font_size: int = 75) -> ctkImage:
     """
     Toma un string en formato LaTeX y lo convierte en una imagen PNG.
-    * latex_str, str: string a convertir en PNG
-    * output_file, str: nombre del archivo de salida
-    * font_size, int: tamaño de la fuente en la imagen PNG
+    * latex_str: string a convertir en PNG
+    * output_file: nombre del archivo de salida
+    * font_size: tamaño de la fuente en la imagen PNG
     """
 
     rc("text", usetex=True)
     rc("font", family="serif")
 
-    fig_length = 12 + (len(latex_str) // 10)
-    fig_height = 2 if r"\\" not in latex_str else 2 + int(latex_str.count(r"\\") * 2)
-    img_length = fig_length * 22
-    img_height = fig_height * 22
+    fig_length = 10 + (len(latex_str) // 12)
+    fig_height = (
+        2
+        if r"\\" not in latex_str
+        else
+        2 + int(latex_str.count(r"\\") * 2)
+    )
+
+    img_length = fig_length * 20
+    img_height = fig_height * 20
 
     fig, _ = subplots(figsize=(fig_length, fig_height))
     axis("off")
@@ -264,16 +271,16 @@ def latex_to_png(latex_str: str, output_file: str, font_size: int = 75) -> ctkIm
         output_file,
         format="png",
         transparent=True,
-        pad_inches=0.5,
+        pad_inches=0.1,
         dpi=200,
     )
 
     close(fig)
 
     img = open_img(output_file)
-    img_inverted = transparent_invert(img)
+    inverted_img = transparent_invert(img)
     return ctkImage(
-        dark_image=img_inverted,
+        dark_image=inverted_img,
         light_image=img,
         size=(img_length, img_height),
     )
@@ -288,10 +295,12 @@ def resize_image(img: ctkImage, divisors: tuple = (4, 8)) -> ctkImage:
     """
 
     div1, div2 = divisors
-    dark = img._dark_image  # pylint: disable=protected-access
-    light = img._light_image  # pylint: disable=protected-access
+    dark: Image = img.cget("dark_image")
+    light: Image = img.cget("light_image")
 
-    width, height = img._size  # pylint: disable=protected-access
+    size: tuple[int, int] = img.cget("size")
+    width, height = size
+
     new_width = int(width // div1)
     new_height = int(height // div1)
 
@@ -325,6 +334,7 @@ def transparent_invert(img: Image) -> Image:
 ################################################################################
 ###################   Paths y directorios de la aplicación   ###################
 ################################################################################
+
 
 ASSET_PATH = path.join(
     path.dirname(path.realpath(__file__)),
@@ -366,6 +376,7 @@ LOG_PATH = path.join(DATA_PATH, "log.txt")
 ################################################################################
 ############################   Íconos de NavFrame   ############################
 ################################################################################
+
 
 LOGO = ctkImage(
     dark_image=open_img(path.join(ASSET_PATH, "light_logo.png")),
@@ -416,6 +427,7 @@ QUIT_ICON = ctkImage(
 ########################   Íconos de CustomMessagebox   ########################
 ################################################################################
 
+
 CHECK_ICON = ctkImage(
     open_img(path.join(ASSET_PATH, "check_icon.png")),
 )
@@ -429,11 +441,13 @@ WARNING_ICON = ctkImage(
 )
 
 INFO_ICON = ctkImage(
-    open_img(path.join(ASSET_PATH, "info_icon.png")),
+    dark_image=open_img(path.join(ASSET_PATH, "dark_info_icon.png")),
+    light_image=open_img(path.join(ASSET_PATH, "light_info_icon.png")),
 )
 
 QUESTION_ICON = ctkImage(
-    open_img(path.join(ASSET_PATH, "question_icon.png")),
+    dark_image=open_img(path.join(ASSET_PATH, "dark_question_icon.png")),
+    light_image=open_img(path.join(ASSET_PATH, "light_question_icon.png")),
 )
 
 MSGBOX_ICONS = {
@@ -448,39 +462,10 @@ MSGBOX_ICONS = {
 ############################   Íconos de botones   #############################
 ################################################################################
 
-ENTER_ICON = ctkImage(
-    dark_image=open_img(path.join(ASSET_PATH, "light_enter_icon.png")),
-    light_image=open_img(path.join(ASSET_PATH, "dark_enter_icon.png")),
-    size=(18, 18),
-)
-
-SHUFFLE_ICON = ctkImage(
-    dark_image=open_img(path.join(ASSET_PATH, "light_shuffle_icon.png")),
-    light_image=open_img(path.join(ASSET_PATH, "dark_shuffle_icon.png")),
-    size=(18, 18),
-)
 
 ACEPTAR_ICON = ctkImage(
     dark_image=open_img(path.join(ASSET_PATH, "light_aceptar_icon.png")),
     light_image=open_img(path.join(ASSET_PATH, "dark_aceptar_icon.png")),
-    size=(18, 18),
-)
-
-LIMPIAR_ICON = ctkImage(
-    dark_image=open_img(path.join(ASSET_PATH, "light_limpiar_icon.png")),
-    light_image=open_img(path.join(ASSET_PATH, "dark_limpiar_icon.png")),
-    size=(25, 18),
-)
-
-MOSTRAR_ICON = ctkImage(
-    dark_image=open_img(path.join(ASSET_PATH, "light_mostrar_icon.png")),
-    light_image=open_img(path.join(ASSET_PATH, "dark_mostrar_icon.png")),
-    size=(18, 18),
-)
-
-ELIMINAR_ICON = ctkImage(
-    dark_image=open_img(path.join(ASSET_PATH, "light_eliminar_icon.png")),
-    light_image=open_img(path.join(ASSET_PATH, "dark_eliminar_icon.png")),
     size=(18, 18),
 )
 
@@ -496,20 +481,52 @@ DROPUP_ICON = ctkImage(
     size=(18, 18),
 )
 
+ELIMINAR_ICON = ctkImage(
+    dark_image=open_img(path.join(ASSET_PATH, "light_eliminar_icon.png")),
+    light_image=open_img(path.join(ASSET_PATH, "dark_eliminar_icon.png")),
+    size=(18, 18),
+)
+
+ENTER_ICON = ctkImage(
+    dark_image=open_img(path.join(ASSET_PATH, "light_enter_icon.png")),
+    light_image=open_img(path.join(ASSET_PATH, "dark_enter_icon.png")),
+    size=(18, 18),
+)
+
+LIMPIAR_ICON = ctkImage(
+    dark_image=open_img(path.join(ASSET_PATH, "light_limpiar_icon.png")),
+    light_image=open_img(path.join(ASSET_PATH, "dark_limpiar_icon.png")),
+    size=(25, 18),
+)
+
+MOSTRAR_ICON = ctkImage(
+    dark_image=open_img(path.join(ASSET_PATH, "light_mostrar_icon.png")),
+    light_image=open_img(path.join(ASSET_PATH, "dark_mostrar_icon.png")),
+    size=(18, 18),
+)
+
+SHUFFLE_ICON = ctkImage(
+    dark_image=open_img(path.join(ASSET_PATH, "light_shuffle_icon.png")),
+    light_image=open_img(path.join(ASSET_PATH, "dark_shuffle_icon.png")),
+    size=(18, 18),
+)
+
+
 ################################################################################
 ##########################   Imagenes de funciones   ###########################
 ################################################################################
+
 
 FUNCTIONS: dict[str, ctkImage] = {
     name[:-4]: ctkImage(
         size=open_img(path.join(FUNC_PATH, f"light_{name}")).size,
         dark_image=open_img(path.join(FUNC_PATH, f"light_{name}")),
         light_image=open_img(path.join(FUNC_PATH, f"dark_{name}"))
-    ) for name in set([
+    ) for name in {
         name.split("_")[1]
         for _, _, files in walk(FUNC_PATH)
         for name in files
-    ])
+    }
 }
 
 FX_ICON = resize_image(FUNCTIONS["f(x)"], (3, 7))

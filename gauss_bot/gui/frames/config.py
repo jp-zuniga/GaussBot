@@ -71,15 +71,18 @@ class ConfigFrame(ctkFrame):
         self.modos = list(self.modos_dict.keys())
         self.temas = list(self.temas_dict.keys())
 
+        # buscar las llaves de la configuracion actual
         escala_actual_key = get_dict_key(self.escalas_dict, self.app.escala_actual)
         modo_actual_key = get_dict_key(self.modos_dict, self.app.modo_actual)
         tema_actual_key = get_dict_key(self.temas_dict, self.app.tema_actual)
 
         try:
+            # inicializar variables de config actual
             first_escala = StringVar(value=escala_actual_key)
             first_modo = StringVar(value=modo_actual_key)
             first_tema = StringVar(value=tema_actual_key)
         except AttributeError:
+            # si get_dict key retorna None, StringVar va a tirar error
             first_escala = StringVar(value="100%")
             first_modo = StringVar(value="Claro")
             first_tema = StringVar(value="Sky")

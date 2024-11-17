@@ -1,7 +1,7 @@
 """
-Implementación de las clases ManejarMats y ManejarVecs,
-los frames que contienen subframes para
-agregar, mostrar, editar y eliminar matrices y vectores.
+Implementación de las clases ManejarSistemas,
+ManejarMats, y ManejarVecs, los frames que contienen
+subframes para agregar, mostrar, y eliminar los datos.
 """
 
 from typing import (

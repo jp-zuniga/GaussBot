@@ -93,20 +93,20 @@ class CustomDropdown(ctkOptionMenu):
         self.icon_label.bind("<Enter>", self._on_enter)
         self.icon_label.bind("<Leave>", self._on_leave)
 
-    def configure(self, **kwargs):
-        super().configure(**kwargs)
+    def configure(self, require_redraw=False, **kwargs):
+        super().configure(require_redraw, **kwargs)
         try:
             color = self._apply_appearance_mode(self._button_color)
             self.icon_label.configure(fg_color=color, bg_color=color)
         except AttributeError:
             pass
 
-    def _on_enter(self, event):
+    def _on_enter(self, event: int = 0):
         super()._on_enter(event)
         color = self._apply_appearance_mode(self._button_hover_color)
         self.icon_label.configure(fg_color=color, bg_color=color)
 
-    def _on_leave(self, event):
+    def _on_leave(self, event: int = 0):
         super()._on_leave(event)
         color = self._apply_appearance_mode(self._button_color)
         self.icon_label.configure(fg_color=color, bg_color=color)
@@ -170,16 +170,20 @@ class FuncDropdown(ScrollableDropdown):
             values=["" for _ in imgs],
             image_values=imgs,
             command=self._on_select,
-            fg_color=self.app.ecuaciones.tabview._segmented_button.cget("unselected_color"),  # type: ignore
-            button_color=self.app.ecuaciones.tabview._segmented_button.cget("unselected_color"),  # type: ignore
-            **kwargs
+            fg_color=self.app.analisis.tabview._segmented_button.cget(
+                "unselected_color"
+            ),  # type: ignore
+            button_color=self.app.analisis.tabview._segmented_button.cget(
+                "unselected_color"
+            ),  # type: ignore
+            **kwargs,
         )
 
         for button in self.widgets.values():
             button.bind(
                 "<Button-1>",
-                command=lambda _, drop=self, img=button._image:
-                self.app.ecuaciones.instances[1].extract_func(drop, img),  # type: ignore
+                command=lambda _, drop=self, img=button.cget("image"):  # type: ignore
+                self.app.analisis.instances[0].extract_func(drop, img),  # type: ignore
             )
             self.frame.configure(width=self.options_button.winfo_width())
 

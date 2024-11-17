@@ -1,3 +1,9 @@
+"""
+Implementaciones de subframes de la aplicación,
+que corresponden a las funcionalidades
+específicas de cada módulo de la aplicación.
+"""
+
 from .input_sis import (
     AgregarSistemas,
     MostrarSistemas,
