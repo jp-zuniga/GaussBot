@@ -113,24 +113,24 @@ class AgregarMats(CustomScrollFrame):
         self.filas_entry.bind("<Return>", lambda _: self.generar_casillas())
         self.filas_entry.bind(
             "<Left>",
-            lambda _: self.key_binder.focus_columnas(self.columnas_entry)
+            lambda _: self.key_binder.focus_columnas(self.columnas_entry),
         )
 
         self.filas_entry.bind(
             "<Right>",
-            lambda _: self.key_binder.focus_columnas(self.columnas_entry)
+            lambda _: self.key_binder.focus_columnas(self.columnas_entry),
         )
 
         self.filas_entry.bind("<Down>", lambda _: self.key_binder.focus_first())
         self.columnas_entry.bind("<Return>", lambda _: self.generar_casillas())
         self.columnas_entry.bind(
             "<Left>",
-            lambda _: self.key_binder.focus_filas(self.filas_entry)
+            lambda _: self.key_binder.focus_filas(self.filas_entry),
         )
 
         self.columnas_entry.bind(
             "<Right>",
-            lambda _: self.key_binder.focus_filas(self.filas_entry)
+            lambda _: self.key_binder.focus_filas(self.filas_entry),
         )
 
         self.columnas_entry.bind("<Down>", lambda _: self.key_binder.focus_first())
@@ -164,26 +164,32 @@ class AgregarMats(CustomScrollFrame):
         for widget in self.matriz_frame.winfo_children():
             widget.destroy()  # type: ignore
         for widget in self.post_mat_frame.winfo_children():
-            widget.destroy()
+            widget.destroy()  # type: ignore
 
         delete_msg_frame(self.mensaje_frame)
-        dimensiones = self.validar_dimensiones()
-        if dimensiones is None:
-            return
-        filas, columnas = dimensiones
+        try:
+            filas, columnas = self.validar_dimensiones()  # type: ignore
+        except TypeError:
+            # hubo input invalido
+            pass
         delete_msg_frame(self.mensaje_frame)
 
+        # crear entries para ingresar la matriz
         self.input_entries.clear()
-        self.input_entries = []
         for i in range(filas):
             fila_entries = []
             for j in range(columnas):
-                input_entry = CustomEntry(self.matriz_frame, width=60)
-                input_entry.insert(0, randint(-15, 15))
+                input_entry = CustomEntry(
+                    self.matriz_frame,
+                    width=60,
+                    placeholder_text=randint(-15, 15)
+                )
+
                 input_entry.grid(row=i, column=j, padx=5, pady=5)
                 fila_entries.append(input_entry)
             self.input_entries.append(fila_entries)
 
+        # crear post_mat_frame widgets
         nombre_label = ctkLabel(self.post_mat_frame, text="Nombre de la matriz:")
         self.nombre_entry = ctkEntry(
             self.post_mat_frame,
@@ -207,6 +213,7 @@ class AgregarMats(CustomScrollFrame):
             command=self.limpiar_casillas,
         )
 
+        # colocar parent frames
         self.matriz_frame.grid(
             row=1, column=0,
             columnspan=2,
@@ -221,15 +228,18 @@ class AgregarMats(CustomScrollFrame):
             sticky="n",
         )
 
+        # colocar widgets
         nombre_label.grid(row=0, column=0, padx=5, pady=5)
         self.nombre_entry.grid(row=0, column=1, padx=5, pady=5)
         agregar_button.grid(row=0, column=2, padx=2, pady=5)
         limpiar_button.grid(row=0, column=3, padx=2, pady=5)
 
+        # configurar atributos de self.key_binder y crear bindings
         self.key_binder.entry_list = self.input_entries  # type: ignore
         self.key_binder.extra_entries = (self.nombre_entry, self.filas_entry)  # type: ignore
         self.key_binder.create_key_bindings()
 
+        # encargarse de los bindings de nombre_entry
         self.nombre_entry.bind("<Up>", lambda _: self.key_binder.focus_last())
         self.nombre_entry.bind("<Return>", lambda _: self.agregar_matriz())
 
@@ -253,9 +263,12 @@ class AgregarMats(CustomScrollFrame):
         try:
             filas, columnas = self.validar_dimensiones()  # type: ignore
         except TypeError:
+            # hubo input invalido
             return
         delete_msg_frame(self.mensaje_frame)
 
+        # si los inputs de filas/columnas
+        # cambiaron despues de generar las casillas
         dimensiones_validas = (
             filas == len(self.input_entries)
             and
@@ -265,14 +278,15 @@ class AgregarMats(CustomScrollFrame):
         if not dimensiones_validas:
             place_msg_frame(
                 parent_frame=self,
-                msj_frame=self.mensaje_frame,
-                msj="Las dimensiones de la matriz ingresada " +
+                msg_frame=self.mensaje_frame,
+                msg="Las dimensiones de la matriz ingresada " +
                     "no coinciden con las dimensiones indicadas!",
                 tipo="error",
                 row=3,
             )
             return
 
+        # recorrer los entries y guardar los valores
         valores = []
         for fila_entries in self.input_entries:
             fila_valores = []
@@ -281,13 +295,13 @@ class AgregarMats(CustomScrollFrame):
                     valor = Fraction(entry.get())
                 except (ValueError, ZeroDivisionError) as e:
                     if isinstance(e, ValueError):
-                        msj = "Todos los valores deben ser números racionales!"
+                        msg = "Todos los valores deben ser números racionales!"
                     else:
-                        msj = "El denominador no puede ser 0!"
+                        msg = "El denominador no puede ser 0!"
                     place_msg_frame(
                         parent_frame=self,
-                        msj_frame=self.mensaje_frame,
-                        msj=msj,
+                        msg_frame=self.mensaje_frame,
+                        msg=msg,
                         tipo="error",
                         row=3,
                     )
@@ -302,6 +316,7 @@ class AgregarMats(CustomScrollFrame):
             columnas=columnas, valores=valores
         )
 
+        # validar nombre de la matriz
         nombre_repetido = nombre_nueva_matriz in self.mats_manager.mats_ingresadas
         nombre_valido = (
             nombre_nueva_matriz.isalpha() and
@@ -310,7 +325,7 @@ class AgregarMats(CustomScrollFrame):
         )
 
         if not nombre_valido or nombre_repetido:
-            msj = (
+            msg = (
                 "El nombre de la matriz debe ser una letra mayúscula!"
                 if not nombre_valido
                 else f"Ya existe una matriz nombrada '{nombre_nueva_matriz}'!"
@@ -318,22 +333,24 @@ class AgregarMats(CustomScrollFrame):
 
             place_msg_frame(
                 parent_frame=self,
-                msj_frame=self.mensaje_frame,
-                msj=msj,
+                msg_frame=self.mensaje_frame,
+                msg=msg,
                 tipo="error",
                 row=3,
             )
             return
+        delete_msg_frame(self.mensaje_frame)
 
         self.mats_manager.mats_ingresadas[nombre_nueva_matriz] = nueva_matriz
         place_msg_frame(
             parent_frame=self,
-            msj_frame=self.mensaje_frame,
-            msj="La matriz se ha agregado exitosamente!",
+            msg_frame=self.mensaje_frame,
+            msg="La matriz se ha agregado exitosamente!",
             tipo="success",
             row=3,
         )
 
+        # mandar a actualizar los datos
         self.app.matrices.update_all()  # type: ignore
         self.app.vectores.update_all()  # type: ignore
         self.master_frame.update_all()
@@ -355,8 +372,8 @@ class AgregarMats(CustomScrollFrame):
         except ValueError:
             place_msg_frame(
                 parent_frame=self,
-                msj_frame=self.mensaje_frame,
-                msj="Debe ingresar números enteros " +
+                msg_frame=self.mensaje_frame,
+                msg="Debe ingresar números enteros " +
                     "positivos como filas y columnas!",
                 tipo="error",
                 row=1,
@@ -442,8 +459,8 @@ class MostrarMats(CustomScrollFrame):
         if "!" in mats_text:  # "!" significa que no hay matrices
             place_msg_frame(
                 parent_frame=self,
-                msj_frame=self.print_frame,
-                msj=mats_text,
+                msg_frame=self.print_frame,
+                msg=mats_text,
                 tipo="error",
                 row=1,
                 columnspan=2,
@@ -451,8 +468,8 @@ class MostrarMats(CustomScrollFrame):
         else:
             place_msg_frame(
                 parent_frame=self,
-                msj_frame=self.print_frame,
-                msj=mats_text,
+                msg_frame=self.print_frame,
+                msg=mats_text,
                 tipo="resultado",
                 row=1,
                 columnspan=2,
@@ -517,13 +534,14 @@ class EliminarMats(CustomScrollFrame):
         if len(self.nombres_matrices) == 0:
             place_msg_frame(
                 parent_frame=self,
-                msj_frame=self.mensaje_frame,
-                msj="No hay matrices guardadas!",
+                msg_frame=self.mensaje_frame,
+                msg="No hay matrices guardadas!",
                 tipo="error",
                 row=1,
             )
             return
 
+        # crear widgets
         instruct_eliminar = ctkLabel(self, text="¿Cuál matriz desea eliminar?")
         self.select_mat = CustomDropdown(
             self,
@@ -543,6 +561,7 @@ class EliminarMats(CustomScrollFrame):
 
         self.mat_seleccionada = self.select_mat.get()
 
+        # colocar widgets
         instruct_eliminar.grid(row=0, column=0, columnspan=2, padx=5, pady=5, sticky="n")
         self.select_mat.grid(row=1, column=0, padx=5, pady=5, sticky="e")
         button.grid(row=1, column=1, padx=5, pady=5, sticky="w")
@@ -558,13 +577,14 @@ class EliminarMats(CustomScrollFrame):
 
         place_msg_frame(
             parent_frame=self,
-            msj_frame=self.mensaje_frame,
-            msj=f"Matriz '{self.mat_seleccionada}' eliminada!",
+            msg_frame=self.mensaje_frame,
+            msg=f"Matriz '{self.mat_seleccionada}' eliminada!",
             tipo="success",
             row=3,
             columnspan=2,
         )
 
+        # mandar a actualizar los datos
         self.app.matrices.update_all()  # type: ignore
         self.app.vectores.update_all()  # type: ignore
         self.master_frame.update_all()
@@ -586,8 +606,8 @@ class EliminarMats(CustomScrollFrame):
                 delete_msg_frame(self.mensaje_frame)
                 place_msg_frame(
                     parent_frame=self,
-                    msj_frame=self.mensaje_frame,
-                    msj="No hay matrices guardadas!",
+                    msg_frame=self.mensaje_frame,
+                    msg="No hay matrices guardadas!",
                     tipo="error",
                 )
 

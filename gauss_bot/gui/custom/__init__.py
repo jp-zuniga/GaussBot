@@ -45,14 +45,14 @@ __all__ = [
 
 def place_msg_frame(
     parent_frame: Union[ctkFrame, CustomScrollFrame],  # noqa
-    msj_frame: Optional[ctkFrame],
-    msj: str,
+    msg_frame: Optional[ctkFrame],
+    msg: str,
     tipo: Literal["error", "success", "resultado"] = "error",
     **grid_kwargs,
 ) -> None:
 
     """
-    Inicializa self.mensaje_frame y lo coloca en la interfaz.
+    Inicializa msj_frame y lo coloca en la interfaz con grid_kwargs.
     * parent_frame: frame que contendrá msj_frame
     * msj_frame: frame a colocar
     * msj: mensaje a mostrar en el frame
@@ -60,12 +60,16 @@ def place_msg_frame(
     * grid_kwargs: kwargs a pasar a msj_frame.grid()
     """
 
+    # esta funcion esta aqui pq el hecho que tiene que inicializar un
+    # ErrorFrame/SuccessFrame/ResultadoFrame causa errores si esta en otro modulo :/
+    # haria mas sentido en el __init__ de gauss_bot, pero ni modo
+
     if tipo == "error":
-        msj_frame = ErrorFrame(parent_frame, msj)  # noqa
+        msg_frame = ErrorFrame(parent_frame, msg)  # noqa
     elif tipo == "success":
-        msj_frame = SuccessFrame(parent_frame, msj)  # noqa
+        msg_frame = SuccessFrame(parent_frame, msg)  # noqa
     elif tipo == "resultado":
-        msj_frame = ResultadoFrame(parent_frame, msj)  # noqa
+        msg_frame = ResultadoFrame(parent_frame, msg)  # noqa
     else:
         raise ValueError("Valor inválido para argumento 'tipo'!")
 
@@ -80,4 +84,4 @@ def place_msg_frame(
     if "sticky" not in grid_kwargs:
         grid_kwargs["sticky"] = "n"
 
-    msj_frame.grid(**grid_kwargs)
+    msg_frame.grid(**grid_kwargs)
