@@ -5,6 +5,7 @@ Implementaciones de frames personalizados.
 from typing import (
     TYPE_CHECKING,
     Any,
+    Optional,
     Union,
 )
 
@@ -141,7 +142,7 @@ class ResultadoFrame(ctkFrame):
     def __init__(
         self,
         master: Union[ctkFrame, CustomScrollFrame],
-        msg: str,
+        msg: Optional[str] = None,
         border_color: str = "#18c026",
     ) -> None:
 
@@ -154,8 +155,9 @@ class ResultadoFrame(ctkFrame):
         )
 
         self.master = master
-        self.msg_label = ctkLabel(self, text=msg)
-        self.msg_label.grid(row=0, column=0, padx=20, pady=20)
+        if msg is not None:
+            self.msg_label = ctkLabel(self, text=msg)
+            self.msg_label.grid(row=0, column=0, padx=20, pady=20)
 
     def destroy(self) -> None:
         self.forget()

@@ -4,6 +4,12 @@ que corresponden a las funcionalidades
 específicas de cada módulo de la aplicación.
 """
 
+from .input_funcs import (
+    AgregarFuncs,
+    MostrarFuncs,
+    EliminarFuncs,
+)
+
 from .input_sis import (
     AgregarSistemas,
     MostrarSistemas,
@@ -38,6 +44,9 @@ from .operaciones_vecs import (
 from .raices import RaicesFrame
 
 __all__ = [
+    "AgregarFuncs",
+    "EditarFuncs",
+    "EliminarFuncs",
     "AgregarSistemas",
     "MostrarSistemas",
     "EliminarSistemas",

@@ -46,7 +46,7 @@ __all__ = [
 def place_msg_frame(
     parent_frame: Union[ctkFrame, CustomScrollFrame],  # noqa
     msg_frame: Optional[ctkFrame],
-    msg: str,
+    msg: Optional[str] = None,
     tipo: Literal["error", "success", "resultado"] = "error",
     **grid_kwargs,
 ) -> ctkFrame:

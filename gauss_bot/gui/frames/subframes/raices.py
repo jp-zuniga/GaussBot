@@ -61,6 +61,7 @@ from gauss_bot.gui.custom import (
     CustomScrollFrame,
     ErrorFrame,
     ResultadoFrame,
+    place_msg_frame,
 )
 
 if TYPE_CHECKING:
@@ -68,12 +69,16 @@ if TYPE_CHECKING:
     from gauss_bot.gui.frames import AnalisisFrame
 
 
-TRANSFORMS = (standard_transformations + (implicit_multiplication_application,))
+TRANSFORMS = standard_transformations + (implicit_multiplication_application,)
 MARGEN_ERROR = Fraction(1, 1000000)
 MAX_ITERACIONES = 500
 
 
 class RaicesFrame(CustomScrollFrame):
+    """
+    Frame que permite encontrar las raíces de una función.
+    """
+
     def __init__(
         self,
         app: "GaussUI",
@@ -128,6 +133,11 @@ class RaicesFrame(CustomScrollFrame):
         ingresar_button.grid(row=0, column=2, ipady=3, pady=5, sticky="nw")
 
     def toggle_terminos_frame(self) -> None:
+        """
+        Cuando el botón de colapsar/expandir se presiona,
+        esconder/mostrar el frame de términos.
+        """
+
         if self.collapsed_terminos:
             self.terminos_frame.grid()
             if self.collapse_button is not None:
@@ -146,9 +156,14 @@ class RaicesFrame(CustomScrollFrame):
         self.update_frame()
 
     def setup_terminos_frame(self) -> None:
+        """
+        Configura e inicializa el frame de ingresar términos.
+        """
+
         self.terminos_frame.grid(row=1, column=0, columnspan=3, sticky="n")
         self.terminos_frame.columnconfigure(0, weight=1)
         self.terminos_frame.columnconfigure(1, weight=1)
+
         for widget in self.terminos_frame.winfo_children():
             widget.destroy()
         for widget in self.func_frame.winfo_children():
@@ -176,7 +191,6 @@ class RaicesFrame(CustomScrollFrame):
             )
             self.msg_frame.grid(row=1, column=0, columnspan=3, padx=5, pady=5, sticky="n")
             return
-
         delete_msg_frame(self.msg_frame)
 
         sep1 = ctkLabel(
@@ -234,10 +248,20 @@ class RaicesFrame(CustomScrollFrame):
         self.collapsed_terminos = False
 
     def extract_func(self, dropdown: FuncDropdown, img: ctkImage) -> None:
+        """
+        Extrae la función seleccionada en el dropdown
+        y crea el CustomEntry para ingresar el término.
+        """
+
         func_key = get_dict_key(dropdown.images, img)
         self.crear_arg_entry(dropdown, func_key)  # type: ignore
 
     def crear_arg_entry(self, dropdown: FuncDropdown, func_key: str) -> None:
+        """
+        Inicializa un CustomEntry para ingresar un
+        término de la función a guardar.
+        """
+
         row, column = dropdown.options_button.grid_info()["row"], 2
         arg_entry = ctkEntry(
             self.terminos_frame,
@@ -246,32 +270,36 @@ class RaicesFrame(CustomScrollFrame):
         )
 
         self.arg_entries.append(arg_entry)
-        self.bind_entry_keys(arg_entry, len(self.arg_entries) - 1)
         dropdown.options_button.grid(columnspan=1, sticky="new")
         arg_entry.grid(row=row, column=column, padx=5, pady=5, sticky="nw")
 
     def leer_arg_entries(self) -> str:
+        """
+        Lee todas las entries de términos y
+        retorna el string completo de la función.
+        """
+
         func = ""
         for sig_entry, arg_entry in zip(self.signos, self.arg_entries):
             signo = sig_entry.get()
             arg = arg_entry.get()
-            print("arg:", arg)
+            print(arg)
             if not arg.startswith(("+", "−")):
                 arg = f"+{arg}"
 
             signos_iguales = (
-                arg[0] == "+" and signo == "+"
+                arg.startswith("+") and signo == "+"
                 or
-                arg[0] == "-" and signo == "−"
+                arg.startswith("-") and signo == "−"
             )
 
             signos_distintos = (
-                arg[0] == "+" and signo == "−"
+                arg.startswith("+") and signo == "−"
                 or
-                arg[0] == "-" and signo == "+"
+                arg.startswith("-") and signo == "+"
             )
 
-            if arg[0] in ("+", "−"):
+            if arg.startswith(("+", "−")):
                 arg = arg[1:]
 
             if signos_iguales:
@@ -282,6 +310,12 @@ class RaicesFrame(CustomScrollFrame):
         return func
 
     def leer_func(self) -> None:
+        """
+        Manda a leer todos los entries de la función
+        y remplaza 'sen' con 'sin' y '^' con '**',
+        para compatibilidad con sympy.
+        """
+
         self.func = self.leer_arg_entries()
         if "sen" in self.func:
             self.func = self.func.replace("sen", "sin")
@@ -289,12 +323,21 @@ class RaicesFrame(CustomScrollFrame):
             self.func = self.func.replace("^", "**")
 
     def mostrar_func(self) -> None:
+        """
+        Inicaliza self.func_frame para
+        mostrar la función ingresada.
+        """
+
         for widget in self.func_frame.winfo_children():
             widget.destroy()
         for widget in self.calc_frame.winfo_children():
             widget.destroy()
         for widget in self.winfo_children():  # type: ignore
-            if isinstance(widget, ctkLabel) and "converge" in widget._text:
+            if (
+                isinstance(widget, ctkLabel)
+                and
+                "converge" in widget.cget("text")  # type: ignore
+            ):
                 widget.destroy()
 
 
@@ -334,10 +377,19 @@ class RaicesFrame(CustomScrollFrame):
         self.setup_calc_frame()
 
     def setup_calc_frame(self) -> None:
+        """
+        Inicializa self.calc_frame para
+        pedir el método de cálculo a utilizar.
+        """
+
         for widget in self.calc_frame.winfo_children():
             widget.destroy()
         for widget in self.winfo_children():  # type: ignore
-            if isinstance(widget, ctkLabel) and "converge" in widget._text:
+            if (
+                isinstance(widget, ctkLabel)
+                and
+                "converge" in widget.cget("text")  # type: ignore
+            ):
                 widget.destroy()
 
         self.calc_frame.grid(row=4, column=0, columnspan=3, padx=5, pady=5, sticky="n")
@@ -353,12 +405,25 @@ class RaicesFrame(CustomScrollFrame):
         select_metodo.grid(row=0, column=0, columnspan=4, padx=5, pady=5, sticky="n")
 
     def setup_metodo(self, metodo: str) -> None:
+        """
+        Recibe el método seleccionado y configura
+        self.calc_frame para aceptar input de acuerdo al método.
+        """
+
         for widget in self.calc_frame.winfo_children():
-            if (not isinstance(widget, CustomDropdown)
-                or isinstance(widget, ResultadoFrame)):
+            if (
+                not isinstance(widget, CustomDropdown)
+                or
+                isinstance(widget, ResultadoFrame)
+            ):
                 widget.destroy()
+
         for widget in self.winfo_children():  # type: ignore
-            if isinstance(widget, ctkLabel) and "aíz" in widget._text:
+            if (
+                isinstance(widget, ctkLabel)
+                and
+                "aíz" in widget.cget("text")  # type: ignore
+            ):
                 widget.destroy()
 
         match metodo:
@@ -370,18 +435,23 @@ class RaicesFrame(CustomScrollFrame):
                 raise ValueError("Método inválido!")
 
     def setup_biseccion(self) -> None:
+        """
+        Configura self.calc_frame para aceptar input
+        de intervalo y margen de error para el método de bisección.
+        """
+
         intervalo_label = ctkLabel(self.calc_frame, text="Intervalo:")
         self.a_entry = CustomEntry(
             self.calc_frame,
             width=40,
-            placeholder_text=randint(-10, -1)
+            placeholder_text=str(randint(-10, -1))
         )
 
         and_label = ctkLabel(self.calc_frame, text=",", font=("Roboto", 18))
         self.b_entry = CustomEntry(
             self.calc_frame,
             width=40,
-            placeholder_text=randint(1, 10)
+            placeholder_text=str(randint(1, 10))
         )
 
         error_label = ctkLabel(self.calc_frame, text="Margen de error:")
@@ -409,11 +479,17 @@ class RaicesFrame(CustomScrollFrame):
         encontrar_button.grid(row=3, column=0, columnspan=4, padx=5, pady=5, sticky="n")
 
     def setup_newton(self) -> None:
+        """
+        Configura self.calc_frame para aceptar input
+        de valor inicial, margen de error y máximo de iteraciones
+        para el método de Newton.
+        """
+
         inicial_label = ctkLabel(self.calc_frame, text="Valor inicial:")
         self.xi_entry = CustomEntry(
             self.calc_frame,
             width=102,
-            placeholder_text=randint(-10, 10)
+            placeholder_text=str(randint(-10, 10))
         )
 
         error_label = ctkLabel(self.calc_frame, text="Margen de error:")
@@ -441,6 +517,11 @@ class RaicesFrame(CustomScrollFrame):
         encontrar_button.grid(row=4, column=0, columnspan=4, padx=5, pady=5, sticky="n")
 
     def raiz_biseccion(self) -> None:
+        """
+        Muestra los resultados de encontrar la
+        raíz de una función con el método de bisección.
+        """
+
         delete_msg_frame(self.msg_frame)
         try:
             a = Fraction(self.a_entry.get())
@@ -461,9 +542,10 @@ class RaicesFrame(CustomScrollFrame):
             )
             self.msg_frame.grid(row=5, column=0, columnspan=3, padx=5, pady=5, sticky="n")
             return
-        elif resultado is True:
+        if resultado is True:
             self.msg_frame = ErrorFrame(
-                self, f"La función no cambia de signo en el intervalo [{float(a):.4f}, {float(b):.4f}]!"
+                self, "La función no cambia de signo en el " +
+                     f"intervalo [{float(a):.4f}, {float(b):.4f}]!"
             )
             self.msg_frame.grid(row=5, column=0, columnspan=3, padx=5, pady=5, sticky="n")
             return
@@ -492,25 +574,25 @@ class RaicesFrame(CustomScrollFrame):
                       "Raíz aproximada encontrada:"
             )
 
-            self.msg_frame = ResultadoFrame(
-                self, solo_header=True,
-                resultado="", header="",
-                border_color="#ff3131",
-            )
-
-            self.msg_frame.columnconfigure(0, weight=1)
-            img_label = ctkLabel(self.msg_frame, text="", image=func_img)
-
-            interpretacion_label.grid(row=5, column=0, columnspan=3, padx=5, pady=5, sticky="n")
-            img_label.grid(row=0, column=0, padx=10, pady=(3, 10), sticky="n")
-            self.msg_frame.grid(
+            self.msg_frame = place_msg_frame(
+                parent_frame=self,
+                msg_frame=self.msg_frame,
+                tipo="resultado",
                 row=6,
-                column=0,
                 columnspan=3,
                 ipadx=10,
                 ipady=10,
-                padx=5,
-                pady=5,
+            )
+
+            self.msg_frame.configure(border_color="#ff3131")
+            self.msg_frame.columnconfigure(0, weight=1)
+            img_label = ctkLabel(self.msg_frame, text="", image=func_img)
+
+            img_label.grid(row=0, column=0, padx=10, pady=(3, 10), sticky="n")
+            interpretacion_label.grid(
+                row=5, column=0,
+                columnspan=3,
+                padx=5, pady=5,
                 sticky="n",
             )
 
@@ -524,25 +606,30 @@ class RaicesFrame(CustomScrollFrame):
                  f"Raíz {tipo_raiz}encontrada: ",
         )
 
-        self.msg_frame = ResultadoFrame(
-            self, header="", resultado="", solo_header=True
+        self.msg_frame = place_msg_frame(
+            parent_frame=self,
+            msg_frame=self.msg_frame,
+            tipo="resultado",
+            row=6,
+            columnspan=3
         )
 
         self.msg_frame.columnconfigure(0, weight=1)
         img_label = ctkLabel(self.msg_frame, text="", image=func_img)
-
-        interpretacion_label.grid(row=5, column=0, columnspan=3, padx=5, pady=5, sticky="n")
         img_label.grid(row=0, column=0, padx=5, pady=5, sticky="n")
-        self.msg_frame.grid(
-            row=6,
-            column=0,
+        interpretacion_label.grid(
+            row=5, column=0,
             columnspan=3,
-            padx=5,
-            pady=5,
+            padx=5, pady=5,
             sticky="n",
         )
 
     def raiz_newton(self) -> None:
+        """
+        Muestra los resultados de encontrar la
+        raíz de una función con el método de Newton.
+        """
+
         delete_msg_frame(self.msg_frame)
         try:
             xi = Fraction(self.xi_entry.get())
@@ -551,12 +638,18 @@ class RaicesFrame(CustomScrollFrame):
         except ValueError as v:
             v_str = str(v)
             if "Fraction" in v_str:
-                msj = "Debe ingresar números reales para el valor inicial y margen de error!"
+                msg = "Debe ingresar números reales para el valor inicial y margen de error!"
             elif "int" in v_str:
-                msj = "Debe ingresar un número entero positivo para el máximo de iteraciones!"
+                msg = "Debe ingresar un número entero positivo para el máximo de iteraciones!"
+            self.msg_frame = place_msg_frame(
+                parent_frame=self,
+                msg_frame=self.msg_frame,
+                msg=msg,  # pylint: disable=E0606
+                tipo="error",
+                row=5,
+                columnspan=3,
+            )
 
-            self.msg_frame = ErrorFrame(self, msj)
-            self.msg_frame.grid(row=5, column=0, columnspan=3, padx=5, pady=5, sticky="n")
             return
         delete_msg_frame(self.msg_frame)
 
@@ -568,15 +661,15 @@ class RaicesFrame(CustomScrollFrame):
         fx_igual = rf"f(x) = {float(fx):6f}"
 
         func_img = latex_to_png(
-            latex_str= rf"{x_igual}" +
-                       r"\\[1em]" +
-                       rf"{fx_igual}",
+            latex_str=rf"{x_igual}" +
+                      r"\\[1em]" +
+                      rf"{fx_igual}",
             output_file=path.join(DATA_PATH, "func.png"),
             font_size=60,
         )
 
         if division_cero or i == iteraciones:
-            msj = (
+            msg = (
                 f"En la iteración {i}, la derivada de la función en el valor inicial es 0!"
                 if division_cero
                 else
@@ -585,76 +678,65 @@ class RaicesFrame(CustomScrollFrame):
             )
 
             interpretacion_label = ctkLabel(
-                self, text=msj + "\nRaíz aproximada encontrada:"
+                self,
+                text=msg + "\nRaíz aproximada encontrada:",
             )
 
-            self.msg_frame = ResultadoFrame(
-                self, solo_header=True,
-                resultado="", header="",
-                border_color="#ff3131",
-            )
-
-            self.msg_frame.columnconfigure(0, weight=1)
-            img_label = ctkLabel(self.msg_frame, text="", image=func_img)
-
-            interpretacion_label.grid(row=5, column=0, columnspan=3, padx=5, pady=5, sticky="n")
-            img_label.grid(row=0, column=0, padx=5, sticky="n")
-            self.msg_frame.grid(
+            self.msg_frame = place_msg_frame(
+                parent_frame=self,
+                msg_frame=self.msg_frame,
+                tipo="resultado",
                 row=6,
-                column=0,
                 columnspan=3,
                 ipadx=10,
                 ipady=10,
-                padx=5,
+            )
+
+            self.msg_frame.configure(border_color="#ff3131")
+            self.msg_frame.columnconfigure(0, weight=1)
+
+            img_label = ctkLabel(self.msg_frame, text="", image=func_img)
+            img_label.grid(row=0, column=0, padx=5, sticky="n")
+            interpretacion_label.grid(
+                row=5, column=0,
+                columnspan=3,
+                padx=5, pady=5,
                 sticky="n",
             )
 
             return
         delete_msg_frame(self.msg_frame)
-
-        self.msg_frame = ResultadoFrame(
-            self, header="", resultado="", solo_header=True
-        )
-
-        self.msg_frame.columnconfigure(0, weight=1)
-        img_label = ctkLabel(self.msg_frame, text="", image=func_img)
         tipo_raiz = "" if fx == 0 else "aproximada "
-
         interpretacion_label = ctkLabel(
             self,
             text=f"El método de Newton converge después de {i} iteraciones!\n" +
                  f"Raíz {tipo_raiz}encontrada: ",
         )
 
-        interpretacion_label.grid(row=5, column=0, columnspan=3, padx=5, pady=5, sticky="n")
-        img_label.grid(row=0, column=0, padx=5, pady=5, sticky="n")
-        self.msg_frame.grid(
+        self.msg_frame = place_msg_frame(
+            parent_frame=self,
+            msg_frame=self.msg_frame,
+            tipo="resultado",
             row=6,
-            column=0,
+            columnspan=3
+        )
+
+        self.msg_frame.columnconfigure(0, weight=1)
+        img_label = ctkLabel(self.msg_frame, text="", image=func_img)
+        img_label.grid(row=0, column=0, padx=5, pady=5, sticky="n")
+        interpretacion_label.grid(
+            row=5, column=0,
             columnspan=3,
-            padx=5,
-            pady=5,
+            padx=5, pady=5,
             sticky="n",
         )
 
-    def bind_entry_keys(self, entry: ctkEntry, i: int) -> None:
-        entry.bind("<Up>", lambda _: self.entry_move_up(i))
-        entry.bind("<Down>", lambda _: self.entry_move_down(i))
-        entry.bind("<Return>", lambda _: self.mostrar_func())
-
-    def entry_move_up(self, i: int) -> None:
-        if i > 0:
-            self.arg_entries[i - 1].focus_set()
-        elif i == 0:
-            self.arg_entries[-1].focus_set()
-
-    def entry_move_down(self, i: int) -> None:
-        if i < len(self.arg_entries) - 1:
-            self.arg_entries[i + 1].focus_set()
-        elif i == len(self.arg_entries) - 1:
-            self.arg_entries[0].focus_set()
-
     def update_frame(self):
+        """
+        Configura todos los backgrounds de los widgets
+        por si hubo un cambio de modo de apariencia.
+        """
+
         for widget in self.winfo_children():
             widget.configure(bg_color="transparent")
             if isinstance(widget, ctkFrame):
@@ -662,7 +744,17 @@ class RaicesFrame(CustomScrollFrame):
                     subwidget.configure(bg_color="transparent")
 
 
-def es_continua(sp_func: Expr, var: Symbol, intervalo: tuple[Fraction, Fraction]) -> bool:
+def es_continua(
+    sp_func: Expr,
+    var: Symbol,
+    intervalo: tuple[Fraction, Fraction],
+) -> bool:
+
+    """
+    Valida si una expresión de sympy es continua
+    en el intervalo indicado, con respecto al símbolo 'var'.
+    """
+
     intervalo_set = Interval(intervalo[0], intervalo[1])
     discontinuities = FiniteSet()
 
@@ -709,6 +801,11 @@ def biseccion(
     error: Fraction = MARGEN_ERROR
 ) -> Union[bool, tuple[Fraction, Fraction, int]]:
 
+    """
+    Implementación del método de bisección,
+    un método cerrado para encontrar raíces de funciones.
+    """
+
     a, b = intervalo
     x = symbols("x")
     parsed_func: Expr = parse_expr(func_str, transformations=TRANSFORMS)
@@ -743,6 +840,11 @@ def newton(
     error: Fraction = MARGEN_ERROR,
     max_its: int = MAX_ITERACIONES
 ) -> Union[tuple[Fraction, Fraction, int, bool]]:
+
+    """
+    Implementación del método de Newton,
+    un método abierto para encontrar raíces de funciones.
+    """
 
     x = symbols("x")
     parsed_func: Expr = parse_expr(func_str, transformations=TRANSFORMS)

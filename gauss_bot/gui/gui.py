@@ -29,7 +29,11 @@ from gauss_bot import (
     LOGGER,
 )
 
-from gauss_bot.managers import OpsManager
+from gauss_bot.managers import (
+    FuncManager,
+    OpsManager,
+)
+
 from gauss_bot.gui.frames import (
     NavFrame,
     HomeFrame,
@@ -67,6 +71,7 @@ class GaussUI(ctk):
         self.grid_columnconfigure(1, weight=1)
 
         # inicializar managers
+        self.func_manager = FuncManager()
         self.ops_manager = OpsManager()
         self.mats_manager = self.ops_manager.mats_manager
         self.vecs_manager = self.ops_manager.vecs_manager
@@ -76,8 +81,11 @@ class GaussUI(ctk):
         self.inputs_frame = InputsFrame(
             app=self,
             master=self,
-            mats_manager=self.mats_manager,
-            vecs_manager=self.vecs_manager,
+            managers=(
+                self.func_manager,
+                self.mats_manager,
+                self.vecs_manager,
+            )
         )
 
         self.matrices = MatricesFrame(
