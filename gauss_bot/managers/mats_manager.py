@@ -33,23 +33,33 @@ class MatricesManager:
 
         if mats_ingresadas is None:
             self.mats_ingresadas: dict[str, Matriz] = {}
+
         elif (
-              isinstance(mats_ingresadas, dict) and
-              all(isinstance(n, str) for n in mats_ingresadas.keys()) and
-              all(isinstance(m, Matriz) for m in mats_ingresadas.values())
+              isinstance(mats_ingresadas, dict)
+              and
+              all(
+                isinstance(k, str) and isinstance(v, Matriz)
+                for k, v in mats_ingresadas.items()
+            )
         ):
             self.mats_ingresadas = mats_ingresadas
+
         else:
             raise TypeError("Argumento inválido para 'mats_ingresadas'!")
 
         if sis_ingresados is None:
             self.sis_ingresados: dict[str, Matriz] = {}
+
         elif (
-              isinstance(sis_ingresados, dict) and
-              all(isinstance(n, str) for n in sis_ingresados.keys()) and
-              all(isinstance(m, Matriz) for m in sis_ingresados.values())
+              isinstance(sis_ingresados, dict)
+              and
+              all(
+                isinstance(k, str) and isinstance(v, str)
+                for k, v in sis_ingresados.items()
+            )
         ):
             self.sis_ingresados = sis_ingresados
+
         else:
             raise TypeError("Argumento inválido para 'sis_ingresados'!")
 

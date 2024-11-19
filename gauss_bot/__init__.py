@@ -69,6 +69,7 @@ __all__ = [
     "ENTER_ICON",
     "ERROR_ICON",
     "FUNC_PATH",
+    "FUNC_ICON_PATH",
     "FUNCTIONS",
     "FX_ICON",
     "HOME_ICON",
@@ -385,6 +386,10 @@ VECTORES_PATH = path.join(
 )
 
 FUNC_PATH = path.join(
+    DATA_PATH, "funcs"
+)
+
+FUNC_ICON_PATH = path.join(
     ASSET_PATH, "functions"
 )
 
@@ -541,12 +546,12 @@ SHUFFLE_ICON = ctkImage(
 
 FUNCTIONS: dict[str, ctkImage] = {
     name[:-4]: ctkImage(
-        size=open_img(path.join(FUNC_PATH, f"light_{name}")).size,
-        dark_image=open_img(path.join(FUNC_PATH, f"light_{name}")),
-        light_image=open_img(path.join(FUNC_PATH, f"dark_{name}"))
+        size=open_img(path.join(FUNC_ICON_PATH, f"light_{name}")).size,
+        dark_image=open_img(path.join(FUNC_ICON_PATH, f"light_{name}")),
+        light_image=open_img(path.join(FUNC_ICON_PATH, f"dark_{name}"))
     ) for name in {
         name.split("_")[1]
-        for _, _, files in walk(FUNC_PATH)
+        for _, _, files in walk(FUNC_ICON_PATH)
         for name in files
     }
 }

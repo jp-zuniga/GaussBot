@@ -27,12 +27,16 @@ class VectoresManager:
 
         if vecs_ingresados is None:
             self.vecs_ingresados: dict[str, Vector] = {}
+
         elif (
               isinstance(vecs_ingresados, dict) and
-              all(isinstance(n, str) for n in vecs_ingresados.keys()) and
-              all(isinstance(v, Vector) for v in vecs_ingresados.values())
+              all(
+                isinstance(k, str) and isinstance(v, Vector)
+                for k, v in vecs_ingresados.items()
+            )
         ):
             self.vecs_ingresados = vecs_ingresados
+
         else:
             raise TypeError("Argumento inválido para 'vecs_ingresados'!")
 

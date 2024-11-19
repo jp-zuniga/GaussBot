@@ -172,7 +172,7 @@ class FuncDropdown(ScrollableDropdown):
 
         imgs = []
         for img in self.images.values():
-            img.configure(light_image=img._dark_image)
+            img.configure(light_image=img.cget("dark_image"))
             imgs.append(img)
 
         self.options_button = ctkButton(

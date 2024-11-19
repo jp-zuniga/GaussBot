@@ -8,6 +8,7 @@ from .fraction_encoding import (
     FractionDecoder,
 )
 
+from .func import Func
 from .matriz import Matriz
 from .sistema_ecuaciones import SistemaEcuaciones
 from .vector import Vector
@@ -15,6 +16,7 @@ from .vector import Vector
 __all__ = [
     "FractionEncoder",
     "FractionDecoder",
+    "Func",
     "Matriz",
     "SistemaEcuaciones",
     "Vector",
