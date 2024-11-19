@@ -15,8 +15,8 @@ from matplotlib.pyplot import (
 
 from PIL.Image import open as open_img
 from sympy import (
-    Reals, Interval,
-    Set, Symbol,
+    Reals,
+    Interval, Symbol,
     latex, parse_expr,
 )
 
@@ -65,19 +65,18 @@ class Func:
     def es_continua(self, intervalo: tuple[Fraction, Fraction]) -> bool:
         """
         Valida si una expresión de sympy es continua
-        en el intervalo indicado, con respecto al símbolo 'var'.
+        en el intervalo indicado, con respecto a self.variable.
         """
 
         a, b = intervalo
-        domain: Set = continuous_domain(self.func_expr, self.variable, Reals)
-        return domain.contains(
-            Interval(
-                a,
-                b,
-                left_open=True,
-                right_open=True,
-            )
-        )
+        domain: Interval = continuous_domain(self.func_expr, self.variable, Reals)
+        return Interval(
+            a,
+            b,
+            left_open=True,
+            right_open=True,
+        ).is_subset(domain)
+
 
     def latex_to_png(self, font_size: int = 75) -> ctkImage:
         """

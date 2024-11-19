@@ -27,14 +27,13 @@ from customtkinter import (
 )
 
 from sympy import (
-    And, Expr, FiniteSet,
-    Interval, log,
-    Set, Symbol, Pow,
+    Reals,
+    Expr, Interval, Symbol,
     diff, lambdify, latex,
-    parse_expr, solve,
-    sqrt, symbols,
+    parse_expr, symbols,
 )
 
+from sympy.calculus.util import continuous_domain
 from sympy.parsing.sympy_parser import (
     standard_transformations,
     implicit_multiplication_application,
@@ -99,12 +98,15 @@ class RaicesFrame(CustomScrollFrame):
 
         self.metodos: list[str] = [
             "Método de Bisección",
+            "Método de Falsa Posición",
             "Método de Newton",
+            "Método de la Secante",
         ]
 
         self.a_entry: CustomEntry
         self.b_entry: CustomEntry
         self.xi_entry: CustomEntry
+        self.xu_entry: CustomEntry
         self.error_entry: CustomEntry
         self.iteraciones_entry: CustomEntry
 
@@ -280,10 +282,17 @@ class RaicesFrame(CustomScrollFrame):
         """
 
         func = ""
+        print("raw entry data")
+        for sig_entry, arg_entry in zip(self.signos, self.arg_entries):
+            print(sig_entry)
+            print(arg_entry)
+            print(sig_entry.get(), arg_entry.get())
+
+        print("processing")
         for sig_entry, arg_entry in zip(self.signos, self.arg_entries):
             signo = sig_entry.get()
             arg = arg_entry.get()
-            print(arg)
+            print("arg get:", arg)
             if not arg.startswith(("+", "−")):
                 arg = f"+{arg}"
 
@@ -429,18 +438,23 @@ class RaicesFrame(CustomScrollFrame):
         match metodo:
             case "Método de Bisección":
                 self.setup_biseccion()
+            case "Método de Falsa Posición":
+                self.setup_biseccion(con_falsa_posicion=True)
             case "Método de Newton":
                 self.setup_newton()
+            case "Método de la Secante":
+                self.setup_newton(con_secante=True)
             case _:
                 raise ValueError("Método inválido!")
 
-    def setup_biseccion(self) -> None:
+    def setup_biseccion(self, con_falsa_posicion: bool = False) -> None:
         """
         Configura self.calc_frame para aceptar input
         de intervalo y margen de error para el método de bisección.
         """
 
-        intervalo_label = ctkLabel(self.calc_frame, text="Intervalo:")
+        txt = "Valores iniciales:" if con_falsa_posicion else "Intervalo:"
+        intervalo_label = ctkLabel(self.calc_frame, text=txt)
         self.a_entry = CustomEntry(
             self.calc_frame,
             width=40,
@@ -467,7 +481,7 @@ class RaicesFrame(CustomScrollFrame):
             self.calc_frame,
             height=30,
             text="Encontrar raíz",
-            command=self.raiz_biseccion
+            command=lambda: self.raiz_biseccion(con_falsa_posicion)
         )
 
         intervalo_label.grid(row=1, column=0, padx=5, pady=(5, 2), sticky="ne")
@@ -478,7 +492,7 @@ class RaicesFrame(CustomScrollFrame):
         self.error_entry.grid(row=2, column=1, columnspan=3, padx=5, pady=(2, 5), sticky="nw")
         encontrar_button.grid(row=3, column=0, columnspan=4, padx=5, pady=5, sticky="n")
 
-    def setup_newton(self) -> None:
+    def setup_newton(self, con_secante: bool = False) -> None:
         """
         Configura self.calc_frame para aceptar input
         de valor inicial, margen de error y máximo de iteraciones
@@ -492,12 +506,22 @@ class RaicesFrame(CustomScrollFrame):
             placeholder_text=str(randint(-10, 10))
         )
 
+        if con_secante:
+            self.xu_entry = CustomEntry(
+                self.calc_frame,
+                width=102,
+                placeholder_text=str(randint(-10, 10))
+            )
+
         error_label = ctkLabel(self.calc_frame, text="Margen de error:")
         self.error_entry = CustomEntry(self.calc_frame, width=102)
         iteraciones_label = ctkLabel(self.calc_frame, text="Máximo de iteraciones:")
         self.iteraciones_entry = CustomEntry(self.calc_frame, width=102)
 
-        self.xi_entry.bind("<Return>", lambda _: self.raiz_newton())
+        self.xi_entry.bind("<Return>", lambda _: self.raiz_newton(con_secante))
+        if con_secante:
+            self.xi_entry.bind("<Return>", lambda _: self.raiz_newton(con_secante))
+
         self.error_entry.insert(0, f"{float(MARGEN_ERROR):.6f}")
         self.iteraciones_entry.insert(0, MAX_ITERACIONES)
 
@@ -505,18 +529,23 @@ class RaicesFrame(CustomScrollFrame):
             self.calc_frame,
             height=30,
             text="Encontrar raíz",
-            command=self.raiz_newton
+            command=lambda: self.raiz_newton(con_secante)
         )
 
         inicial_label.grid(row=1, column=0, padx=5, pady=(5, 2), sticky="ne")
-        self.xi_entry.grid(row=1, column=1, columnspan=3, padx=5, pady=(5, 2), sticky="nw")
+        if not con_secante:
+            self.xi_entry.grid(row=1, column=1, columnspan=3, padx=5, pady=(5, 2), sticky="nw")
+        else:
+            self.xi_entry.grid(row=1, column=1, padx=5, pady=(5, 2), sticky="nw")
+            self.xu_entry.grid(row=1, column=2, columnspan=2, padx=5, pady=(5, 2), sticky="nw")
+
         error_label.grid(row=2, column=0, padx=5, pady=2, sticky="ne")
         self.error_entry.grid(row=2, column=1, columnspan=3, padx=5, pady=2, sticky="nw")
         iteraciones_label.grid(row=3, column=0, padx=5, pady=(2, 5), sticky="ne")
         self.iteraciones_entry.grid(row=3, column=1, columnspan=3, padx=5, pady=(2, 5), sticky="nw")
         encontrar_button.grid(row=4, column=0, columnspan=4, padx=5, pady=5, sticky="n")
 
-    def raiz_biseccion(self) -> None:
+    def raiz_biseccion(self, con_falsa_posicion: bool = False) -> None:
         """
         Muestra los resultados de encontrar la
         raíz de una función con el método de bisección.
@@ -535,17 +564,22 @@ class RaicesFrame(CustomScrollFrame):
             return
         delete_msg_frame(self.msg_frame)
 
-        resultado = biseccion(self.func, (a, b), error)
-        if resultado is False:
+        if not con_falsa_posicion:
+            resultado = biseccion(self.func, (a, b), error)
+        else:
+            resultado = falsa_posicion(self.func, (a, b), error)
+
+        if resultado is False:  # pylint: disable=E0606
             self.msg_frame = ErrorFrame(
-                self, f"La función no es continua en el intervalo [{float(a):.4f}, {float(b):.4f}]!"
+                self,
+                f"La función no es continua en el intervalo [ {float(a):.4f}, {float(b):.4f} ] !"
             )
             self.msg_frame.grid(row=5, column=0, columnspan=3, padx=5, pady=5, sticky="n")
             return
         if resultado is True:
             self.msg_frame = ErrorFrame(
                 self, "La función no cambia de signo en el " +
-                     f"intervalo [{float(a):.4f}, {float(b):.4f}]!"
+                     f"intervalo [ {float(a):.4f}, {float(b):.4f} ] !"
             )
             self.msg_frame.grid(row=5, column=0, columnspan=3, padx=5, pady=5, sticky="n")
             return
@@ -599,10 +633,11 @@ class RaicesFrame(CustomScrollFrame):
             return
         delete_msg_frame(self.msg_frame)
 
+        metodo = "falsa posición" if con_falsa_posicion else "bisección"
         tipo_raiz = "" if fx == 0 else "aproximada "
         interpretacion_label = ctkLabel(
             self,
-            text=f"El método de bisección converge después de {i} iteraciones!\n" +
+            text=f"El método de {metodo} converge después de {i} iteraciones!\n" +
                  f"Raíz {tipo_raiz}encontrada: ",
         )
 
@@ -624,7 +659,7 @@ class RaicesFrame(CustomScrollFrame):
             sticky="n",
         )
 
-    def raiz_newton(self) -> None:
+    def raiz_newton(self, con_secante: bool = False) -> None:
         """
         Muestra los resultados de encontrar la
         raíz de una función con el método de Newton.
@@ -633,8 +668,12 @@ class RaicesFrame(CustomScrollFrame):
         delete_msg_frame(self.msg_frame)
         try:
             xi = Fraction(self.xi_entry.get())
+            if con_secante:
+                xu = Fraction(self.xu_entry.get())
             error = Fraction(self.error_entry.get())
             iteraciones = int(self.iteraciones_entry.get())
+            if iteraciones <= 0:
+                raise ValueError
         except ValueError as v:
             v_str = str(v)
             if "Fraction" in v_str:
@@ -653,9 +692,13 @@ class RaicesFrame(CustomScrollFrame):
             return
         delete_msg_frame(self.msg_frame)
 
-        x, fx, i, division_cero = newton(self.func, xi, error, iteraciones)
-        x = Fraction(x).limit_denominator()
-        fx = Fraction(fx).limit_denominator()
+        if not con_secante:
+            x, fx, i, division_cero = newton(self.func, xi, error, iteraciones)
+        else:
+            x, fx, i, division_cero = secante(self.func, (xi, xu), error, iteraciones)  # pylint: disable=E0606
+
+        x = Fraction(x).limit_denominator()  # pylint: disable=E0606
+        fx = Fraction(fx).limit_denominator()  # pylint: disable=E0606
 
         x_igual = rf"x = {float(x):6f}"
         fx_igual = rf"f(x) = {float(fx):6f}"
@@ -668,7 +711,7 @@ class RaicesFrame(CustomScrollFrame):
             font_size=60,
         )
 
-        if division_cero or i == iteraciones:
+        if division_cero or i == iteraciones:  # pylint: disable=E0606
             msg = (
                 f"En la iteración {i}, la derivada de la función en el valor inicial es 0!"
                 if division_cero
@@ -706,10 +749,12 @@ class RaicesFrame(CustomScrollFrame):
 
             return
         delete_msg_frame(self.msg_frame)
+
+        metodo = "la secante" if con_secante else "Newton"
         tipo_raiz = "" if fx == 0 else "aproximada "
         interpretacion_label = ctkLabel(
             self,
-            text=f"El método de Newton converge después de {i} iteraciones!\n" +
+            text=f"El método de {metodo} converge después de {i} iteraciones!\n" +
                  f"Raíz {tipo_raiz}encontrada: ",
         )
 
@@ -745,7 +790,7 @@ class RaicesFrame(CustomScrollFrame):
 
 
 def es_continua(
-    sp_func: Expr,
+    func: Expr,
     var: Symbol,
     intervalo: tuple[Fraction, Fraction],
 ) -> bool:
@@ -755,45 +800,15 @@ def es_continua(
     en el intervalo indicado, con respecto al símbolo 'var'.
     """
 
-    intervalo_set = Interval(intervalo[0], intervalo[1])
-    discontinuities = FiniteSet()
-
-    for term in sp_func.atoms(Pow):
-        if term.exp.is_negative:
-            solutions = solve(term.base, var)
-            if isinstance(solutions, Set):
-                discontinuities = discontinuities.union(solutions)
-            elif isinstance(solutions, And):
-                for sol in solutions.args:
-                    discontinuities = discontinuities.union(FiniteSet(sol))
-            else:
-                discontinuities = discontinuities.union(FiniteSet(*solutions))
-
-    for term in sp_func.atoms(log):
-        solutions = solve(term.args[0] <= 0, var)
-        if isinstance(solutions, Set):
-            discontinuities = discontinuities.union(solutions)
-        elif isinstance(solutions, And):
-            for sol in solutions.args:
-                discontinuities = discontinuities.union(FiniteSet(sol))
-        else:
-            discontinuities = discontinuities.union(FiniteSet(*solutions))
-
-    for term in sp_func.atoms(sqrt):
-        solutions = solve(term.args[0] < 0, var)
-        if isinstance(solutions, Set):
-            discontinuities = discontinuities.union(solutions)
-        elif isinstance(solutions, And):
-            for sol in solutions.args:
-                discontinuities = discontinuities.union(FiniteSet(sol))
-        else:
-            discontinuities = discontinuities.union(FiniteSet(*solutions))
-
-    for point in discontinuities:
-        if intervalo_set.contains(point):
-            return False
-    return True
-
+    a, b = intervalo
+    domain: Interval = continuous_domain(func, var, Reals)
+    print(f"domain of {func}:", domain)
+    return Interval(
+        a,
+        b,
+        left_open=True,
+        right_open=True,
+    ).is_subset(domain)
 
 def biseccion(
     func_str: str,
@@ -807,7 +822,7 @@ def biseccion(
     """
 
     a, b = intervalo
-    x = symbols("x")
+    x = Symbol("x")
     parsed_func: Expr = parse_expr(func_str, transformations=TRANSFORMS)
     f = lambdify(x, parsed_func)
 
@@ -826,7 +841,46 @@ def biseccion(
         f_c = Fraction(f(float(c)))
         if f_c == 0 or abs(f_c) < error:
             return (c, f_c, i)
-        elif f_a * f_c < 0:
+        if f_a * f_c < 0:
+            b = c
+        elif f_b * f_c < 0:
+            a = c
+        if i == MAX_ITERACIONES:
+            return (c, f_c, -1)
+
+
+def falsa_posicion(
+    func_str: str,
+    intervalo: tuple[Fraction, Fraction],
+    error: Fraction = MARGEN_ERROR
+) -> Union[bool, tuple[Fraction, Fraction, int]]:
+
+    """
+    Implementación del método de bisección,
+    un método cerrado para encontrar raíces de funciones.
+    """
+
+    a, b = intervalo
+    x = Symbol("x")
+    parsed_func: Expr = parse_expr(func_str, transformations=TRANSFORMS)
+    f = lambdify(x, parsed_func)
+
+    if not es_continua(parsed_func, x, intervalo):
+        return False
+
+    f_a = Fraction(f(float(a)))
+    f_b = Fraction(f(float(b)))
+    if f_a * f_b > 0:
+        return True
+
+    i = 0
+    while True:
+        i += 1
+        c = (f(float(a)) * (a - b)) / f(float(a)) - f(float(b))
+        f_c = Fraction(f(float(c)))
+        if f_c == 0 or abs(f_c) < error:
+            return (c, f_c, i)
+        if f_a * f_c < 0:
             b = c
         elif f_b * f_c < 0:
             a = c
@@ -860,7 +914,7 @@ def newton(
         fxi = f(float(xi))
         fxi_prima = f_prima(float(xi))
 
-        if fxi_prima == 0:
+        if abs(fxi) < error:
             return (xi, fxi, i, True)
 
         xi -= fxi / fxi_prima
@@ -868,3 +922,38 @@ def newton(
         if abs(fxi) < error:
             return (xi, fxi, i, False)
     return (xi, fxi, max_its, False)
+
+
+def secante(
+    func_str: str,
+    iniciales: tuple[Fraction, Fraction],
+    error: Fraction = MARGEN_ERROR,
+    max_its: int = MAX_ITERACIONES
+) -> Union[tuple[Fraction, Fraction, int, bool]]:
+
+    """
+    Implementación del método de la secante,
+    un método abierto para encontrar raíces de funciones.
+    """
+
+    xi, xu = iniciales
+    x = symbols("x")
+    parsed_func: Expr = parse_expr(func_str, transformations=TRANSFORMS)
+
+    f = lambdify(x, parsed_func)
+    fxu = f(float(xu))
+    if abs(fxu) < error:
+        return (xu, fxu, 1, False)
+
+    for i in range(2, max_its + 1):
+        fxu = f(float(xu))
+        if abs(fxu) < error:
+            return (xu, fxu, i, True)
+
+        temp = xu
+        xu -= (fxu * (xi - xu)) / (f(float(xi)) - fxu)
+        fxu = f(float(xu))
+        if abs(fxu) < error:
+            return (xu, fxu, i, False)
+        xi = temp
+    return (xu, fxu, max_its, False)

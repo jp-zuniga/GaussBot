@@ -173,8 +173,8 @@ class ConfigFrame(ctkFrame):
         # explicar que se necesita reiniciar la app
         self.msg_frame = SuccessFrame(
             self,
-            message="Tema cambiado exitosamente!\n" +
-                    "El cambio tomará efecto al reiniciar la aplicación."
+            msg="Tema cambiado exitosamente!\n" +
+                "El cambio tomará efecto al reiniciar la aplicación."
         )
 
         self.msg_frame.grid(row=3, column=1, pady=30)
