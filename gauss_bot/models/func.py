@@ -28,7 +28,7 @@ from sympy.parsing.sympy_parser import (
 )
 
 from gauss_bot import (
-    FUNC_PATH,
+    SAVED_FUNC_PATH,
     transparent_invert,
 )
 
@@ -44,6 +44,7 @@ class Func:
         nombre: str,
         expr: str,
         variable: Symbol = Symbol("x"),
+        latexified=False,
     ) -> None:
 
         """
@@ -59,7 +60,7 @@ class Func:
         if str(variable) not in expr:
             raise ValueError("La función no contiene la variable indicada!")
 
-        self.latexified = False
+        self.latexified = latexified
         self.latex_img: Optional[ctkImage] = None
 
         self.nombre = nombre
@@ -107,7 +108,16 @@ class Func:
         * font_size: tamaño de la fuente en la imagen PNG
         """
 
-        output_file = path.join(FUNC_PATH, f"{self.nombre}.png")
+        output_file = path.join(SAVED_FUNC_PATH, f"{self.nombre}.png")
+        if path.exists(output_file):
+            self.latex_img = ctkImage(
+                dark_image=transparent_invert(open_img(output_file)),
+                light_image=open_img(output_file),
+                size=open_img(output_file).size,
+            )
+
+            return self.latex_img
+
         latex_str: str = latex(self.func_expr, ln_notation=True)
         if with_name:
             latex_str = f"{self.nombre} = {latex_str}"

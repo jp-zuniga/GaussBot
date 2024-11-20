@@ -243,6 +243,7 @@ class NavFrame(ctkFrame):
         #     icon="warning",
         # )
 
+        self.app.func_manager.save_funciones()  # type: ignore
         self.app.ops_manager.save_sistemas()  # type: ignore
         self.app.ops_manager.save_matrices()  # type: ignore
         self.app.ops_manager.save_vectores()  # type: ignore

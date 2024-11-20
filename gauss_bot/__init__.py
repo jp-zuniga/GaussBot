@@ -59,8 +59,9 @@ __all__ = [
     "ELIMINAR_ICON",
     "ENTER_ICON",
     "ERROR_ICON",
-    "FUNC_PATH",
+    "SAVED_FUNC_PATH",
     "FUNC_ICON_PATH",
+    "FUNCIONES_PATH",
     "FUNCTIONS",
     "HOME_ICON",
     "INFO_ICON",
@@ -286,6 +287,10 @@ CONFIG_PATH = path.join(
     DATA_PATH, "config.json",
 )
 
+FUNCIONES_PATH = path.join(
+    DATA_PATH, "funciones.json"
+)
+
 SISTEMAS_PATH = path.join(
     DATA_PATH, "sistemas.json"
 )
@@ -300,7 +305,7 @@ VECTORES_PATH = path.join(
 
 LOG_PATH = path.join(DATA_PATH, "log.txt")
 
-FUNC_PATH = path.join(
+SAVED_FUNC_PATH = path.join(
     DATA_PATH, "saved_funcs"
 )
 

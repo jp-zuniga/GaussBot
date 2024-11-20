@@ -166,6 +166,7 @@ class CustomNumpad(ctkTop):
         else just inserts the pressed key into self.attach
         """
 
+        set_from_end = False
         index_adjust: int = 1
         re_pattern = r"\(([^()]*)\)"
         if k == "b^x":
@@ -179,12 +180,17 @@ class CustomNumpad(ctkTop):
         elif "(x)" in k:
             k = k.replace("(x)", "()")
         else:
-            index_adjust = 0
+            set_from_end = True
         self.attach.insert(INSERT, k)
 
         try:
-            last_match = list(comp(re_pattern).finditer(self.attach.get()))[-1]
-            cursor_pos = last_match.start() + index_adjust
+            text = self.attach.get()
+            last_match = list(comp(re_pattern).finditer(text))[-1]
+            if set_from_end:
+                cursor_pos = last_match.end() - 1
+            else:
+                cursor_pos = last_match.start() + index_adjust
+
             self.attach.icursor(cursor_pos)
         except IndexError:
             self.attach.icursor(END)
