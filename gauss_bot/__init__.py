@@ -17,7 +17,6 @@ from os import (
     path,
 )
 
-from random import choice
 from typing import (
     Any,
     Optional,
@@ -41,7 +40,6 @@ from PIL.Image import (  # pylint: disable=no-name-in-module
 __all__ = [
     "delete_msg_frame",
     "delete_msg_if",
-    "generate_funcs",
     "generate_range",
     "generate_sep",
     "get_dict_key",
@@ -178,31 +176,6 @@ def get_dict_key(dict_lookup: dict, buscando: Any) -> Union[Any, None]:
     return None
 
 
-def generate_funcs(func_key: str) -> str:
-    """
-    Genera funciones aleatorias para mostrar ejemplos
-    de como ingresar términos correctamente en RaicesFrame.
-    * func_key: función aleatoria a generar y retornar
-    """
-
-    neg_range = generate_range(-10, 10)
-    pos_range = generate_range(1, 10)
-
-    placeholders: dict[str, str] = {
-        "k": f"{choice(neg_range)}",
-        "x^n": f"x^{choice(neg_range)}",
-        "b^x": f"{choice(neg_range)}^x",
-        "e^x": f"e^{choice(neg_range)}x",
-        "ln(x)": f"ln({choice(pos_range)}x)",
-        "log-b(x)": f"log_{choice(pos_range)}({choice(pos_range)}x)",
-        "sen(x)": f"sen({choice(neg_range)}x)-{choice(pos_range)}",
-        "cos(x)": f"cos({choice(neg_range)}x+{choice(pos_range)})",
-        "tan(x)": f"tan({choice(neg_range)}x-{choice(pos_range)})",
-    }
-
-    return placeholders[func_key]
-
-
 def generate_range(start: int, end: int) -> list[int]:
     """
     Genera una lista de enteros en un rango dado, excluyendo 0 y 1.
@@ -233,12 +206,12 @@ def generate_sep(orientation: bool, size: tuple[int, int]) -> ctkImage:
 
     seps: dict[bool, tuple[Image, Image]] = {
         True: (
-            open_img(path.join(ASSET_PATH, "dark_vseparator.png")),
-            open_img(path.join(ASSET_PATH, "light_vseparator.png")),
+            open_img(path.join(ASSET_PATH, "light_mode", "dark_vseparator.png")),
+            open_img(path.join(ASSET_PATH, "dark_mode", "light_vseparator.png")),
         ),
         False: (
-            open_img(path.join(ASSET_PATH, "dark_hseparator.png")),
-            open_img(path.join(ASSET_PATH, "light_hseparator.png")),
+            open_img(path.join(ASSET_PATH, "light_mode", "dark_hseparator.png")),
+            open_img(path.join(ASSET_PATH, "dark_mode", "light_hseparator.png")),
         ),
     }
 
@@ -325,19 +298,19 @@ VECTORES_PATH = path.join(
     DATA_PATH, "vectores.json"
 )
 
+LOG_PATH = path.join(DATA_PATH, "log.txt")
+
 FUNC_PATH = path.join(
-    DATA_PATH, "funcs"
+    DATA_PATH, "saved_funcs"
 )
 
 FUNC_ICON_PATH = path.join(
-    ASSET_PATH, "functions"
+    ASSET_PATH, "func_icons"
 )
 
 THEMES_PATH = path.join(
     ASSET_PATH, "themes"
 )
-
-LOG_PATH = path.join(DATA_PATH, "log.txt")
 
 
 ################################################################################
@@ -346,48 +319,48 @@ LOG_PATH = path.join(DATA_PATH, "log.txt")
 
 
 LOGO = ctkImage(
-    dark_image=open_img(path.join(ASSET_PATH, "light_logo.png")),
-    light_image=open_img(path.join(ASSET_PATH, "dark_logo.png"))
+    dark_image=open_img(path.join(ASSET_PATH, "dark_mode", "light_logo.png")),
+    light_image=open_img(path.join(ASSET_PATH, "light_mode", "dark_logo.png"))
 )
 
 HOME_ICON = ctkImage(
-    dark_image=open_img(path.join(ASSET_PATH, "light_home_icon.png")),
-    light_image=open_img(path.join(ASSET_PATH, "dark_home_icon.png"))
+    dark_image=open_img(path.join(ASSET_PATH, "dark_mode", "light_home_icon.png")),
+    light_image=open_img(path.join(ASSET_PATH, "light_mode", "dark_home_icon.png"))
 )
 
 INPUTS_ICON = ctkImage(
-    dark_image=open_img(path.join(ASSET_PATH, "light_input_icon.png")),
-    light_image=open_img(path.join(ASSET_PATH, "dark_input_icon.png"))
+    dark_image=open_img(path.join(ASSET_PATH, "dark_mode", "light_input_icon.png")),
+    light_image=open_img(path.join(ASSET_PATH, "light_mode", "dark_input_icon.png"))
 )
 
 MATRIZ_ICON = ctkImage(
-    dark_image=open_img(path.join(ASSET_PATH, "light_matriz_icon.png")),
-    light_image=open_img(path.join(ASSET_PATH, "dark_matriz_icon.png"))
+    dark_image=open_img(path.join(ASSET_PATH, "dark_mode", "light_matriz_icon.png")),
+    light_image=open_img(path.join(ASSET_PATH, "light_mode", "dark_matriz_icon.png"))
 )
 
 VECTOR_ICON = ctkImage(
-    dark_image=open_img(path.join(ASSET_PATH, "light_vector_icon.png")),
-    light_image=open_img(path.join(ASSET_PATH, "dark_vector_icon.png"))
+    dark_image=open_img(path.join(ASSET_PATH, "dark_mode", "light_vector_icon.png")),
+    light_image=open_img(path.join(ASSET_PATH, "light_mode", "dark_vector_icon.png"))
 )
 
 ANALISIS_ICON = ctkImage(
-    dark_image=open_img(path.join(ASSET_PATH, "light_analisis_icon.png")),
-    light_image=open_img(path.join(ASSET_PATH, "dark_analisis_icon.png"))
+    dark_image=open_img(path.join(ASSET_PATH, "dark_mode", "light_analisis_icon.png")),
+    light_image=open_img(path.join(ASSET_PATH, "light_mode", "dark_analisis_icon.png"))
 )
 
 ECUACIONES_ICON = ctkImage(
-    dark_image=open_img(path.join(ASSET_PATH, "light_ecuaciones_icon.png")),
-    light_image=open_img(path.join(ASSET_PATH, "dark_ecuaciones_icon.png"))
+    dark_image=open_img(path.join(ASSET_PATH, "dark_mode", "light_ecuaciones_icon.png")),
+    light_image=open_img(path.join(ASSET_PATH, "light_mode", "dark_ecuaciones_icon.png"))
 )
 
 CONFIG_ICON = ctkImage(
-    dark_image=open_img(path.join(ASSET_PATH, "light_config_icon.png")),
-    light_image=open_img(path.join(ASSET_PATH, "dark_config_icon.png"))
+    dark_image=open_img(path.join(ASSET_PATH, "dark_mode", "light_config_icon.png")),
+    light_image=open_img(path.join(ASSET_PATH, "light_mode", "dark_config_icon.png"))
 )
 
 QUIT_ICON = ctkImage(
-    dark_image=open_img(path.join(ASSET_PATH, "light_quit_icon.png")),
-    light_image=open_img(path.join(ASSET_PATH, "dark_quit_icon.png"))
+    dark_image=open_img(path.join(ASSET_PATH, "dark_mode", "light_quit_icon.png")),
+    light_image=open_img(path.join(ASSET_PATH, "light_mode", "dark_quit_icon.png"))
 )
 
 ################################################################################
@@ -408,13 +381,13 @@ WARNING_ICON = ctkImage(
 )
 
 INFO_ICON = ctkImage(
-    dark_image=open_img(path.join(ASSET_PATH, "light_info_icon.png")),
-    light_image=open_img(path.join(ASSET_PATH, "dark_info_icon.png")),
+    dark_image=open_img(path.join(ASSET_PATH, "dark_mode", "light_info_icon.png")),
+    light_image=open_img(path.join(ASSET_PATH, "light_mode", "dark_info_icon.png")),
 )
 
 QUESTION_ICON = ctkImage(
-    dark_image=open_img(path.join(ASSET_PATH, "light_question_icon.png")),
-    light_image=open_img(path.join(ASSET_PATH, "dark_question_icon.png")),
+    dark_image=open_img(path.join(ASSET_PATH, "dark_mode", "light_question_icon.png")),
+    light_image=open_img(path.join(ASSET_PATH, "light_mode", "dark_question_icon.png")),
 )
 
 MSGBOX_ICONS = {
@@ -431,50 +404,50 @@ MSGBOX_ICONS = {
 
 
 ACEPTAR_ICON = ctkImage(
-    dark_image=open_img(path.join(ASSET_PATH, "light_aceptar_icon.png")),
-    light_image=open_img(path.join(ASSET_PATH, "dark_aceptar_icon.png")),
+    dark_image=open_img(path.join(ASSET_PATH, "dark_mode", "light_aceptar_icon.png")),
+    light_image=open_img(path.join(ASSET_PATH, "light_mode", "dark_aceptar_icon.png")),
     size=(18, 18),
 )
 
 DROPDOWN_ICON = ctkImage(
-    dark_image=open_img(path.join(ASSET_PATH, "light_dropdown_icon.png")),
-    light_image=open_img(path.join(ASSET_PATH, "dark_dropdown_icon.png")),
+    dark_image=open_img(path.join(ASSET_PATH, "dark_mode", "light_dropdown_icon.png")),
+    light_image=open_img(path.join(ASSET_PATH, "light_mode", "dark_dropdown_icon.png")),
     size=(18, 18),
 )
 
 DROPUP_ICON = ctkImage(
-    dark_image=open_img(path.join(ASSET_PATH, "light_dropup_icon.png")),
-    light_image=open_img(path.join(ASSET_PATH, "dark_dropup_icon.png")),
+    dark_image=open_img(path.join(ASSET_PATH, "dark_mode", "light_dropup_icon.png")),
+    light_image=open_img(path.join(ASSET_PATH, "light_mode", "dark_dropup_icon.png")),
     size=(18, 18),
 )
 
 ELIMINAR_ICON = ctkImage(
-    dark_image=open_img(path.join(ASSET_PATH, "light_eliminar_icon.png")),
-    light_image=open_img(path.join(ASSET_PATH, "dark_eliminar_icon.png")),
+    dark_image=open_img(path.join(ASSET_PATH, "dark_mode", "light_eliminar_icon.png")),
+    light_image=open_img(path.join(ASSET_PATH, "light_mode", "dark_eliminar_icon.png")),
     size=(18, 18),
 )
 
 ENTER_ICON = ctkImage(
-    dark_image=open_img(path.join(ASSET_PATH, "light_enter_icon.png")),
-    light_image=open_img(path.join(ASSET_PATH, "dark_enter_icon.png")),
+    dark_image=open_img(path.join(ASSET_PATH, "dark_mode", "light_enter_icon.png")),
+    light_image=open_img(path.join(ASSET_PATH, "light_mode", "dark_enter_icon.png")),
     size=(18, 18),
 )
 
 LIMPIAR_ICON = ctkImage(
-    dark_image=open_img(path.join(ASSET_PATH, "light_limpiar_icon.png")),
-    light_image=open_img(path.join(ASSET_PATH, "dark_limpiar_icon.png")),
+    dark_image=open_img(path.join(ASSET_PATH, "dark_mode", "light_limpiar_icon.png")),
+    light_image=open_img(path.join(ASSET_PATH, "light_mode", "dark_limpiar_icon.png")),
     size=(25, 18),
 )
 
 MOSTRAR_ICON = ctkImage(
-    dark_image=open_img(path.join(ASSET_PATH, "light_mostrar_icon.png")),
-    light_image=open_img(path.join(ASSET_PATH, "dark_mostrar_icon.png")),
+    dark_image=open_img(path.join(ASSET_PATH, "dark_mode", "light_mostrar_icon.png")),
+    light_image=open_img(path.join(ASSET_PATH, "light_mode", "dark_mostrar_icon.png")),
     size=(18, 18),
 )
 
 SHUFFLE_ICON = ctkImage(
-    dark_image=open_img(path.join(ASSET_PATH, "light_shuffle_icon.png")),
-    light_image=open_img(path.join(ASSET_PATH, "dark_shuffle_icon.png")),
+    dark_image=open_img(path.join(ASSET_PATH, "dark_mode", "light_shuffle_icon.png")),
+    light_image=open_img(path.join(ASSET_PATH, "light_mode", "dark_shuffle_icon.png")),
     size=(18, 18),
 )
 
@@ -486,9 +459,9 @@ SHUFFLE_ICON = ctkImage(
 
 FUNCTIONS: dict[str, ctkImage] = {
     name[:-4]: ctkImage(
-        size=open_img(path.join(FUNC_ICON_PATH, f"light_{name}")).size,
-        dark_image=open_img(path.join(FUNC_ICON_PATH, f"light_{name}")),
-        light_image=open_img(path.join(FUNC_ICON_PATH, f"dark_{name}"))
+        size=open_img(path.join(FUNC_ICON_PATH, "dark_mode", f"light_{name}")).size,
+        dark_image=open_img(path.join(FUNC_ICON_PATH, "dark_mode", f"light_{name}")),
+        light_image=open_img(path.join(FUNC_ICON_PATH, "light_mode", f"dark_{name}"))
     ) for name in {
         name.split("_")[1]
         for _, _, files in walk(FUNC_ICON_PATH)
