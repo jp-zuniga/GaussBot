@@ -904,7 +904,7 @@ class DeterminanteTab(CustomScrollFrame):
         self.msg_frame = place_msg_frame(
             parent_frame=self.resultado,
             msg_frame=self.msg_frame,
-            msg=f"| {self,dmat} | = {det}",
+            msg=f"| {self.dmat} | = {det}",
             tipo="resultado",
         )
 
