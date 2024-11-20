@@ -183,7 +183,7 @@ class AgregarSistemas(CustomScrollFrame):
         sep_label = ctkLabel(
             self.sis_frame,
             text="",
-            image=generate_sep(True, (40, 40 * ecuaciones)),
+            image=generate_sep(True, (8, 40 * ecuaciones)),
         )
 
         # crear entries para ingresar elementos
@@ -201,7 +201,7 @@ class AgregarSistemas(CustomScrollFrame):
                     input_entry.grid(row=i, column=j, padx=5, pady=5)
                 else:
                     # si ya es la ultima columna, poner el separador primero
-                    sep_label.grid(row=0, rowspan=ecuaciones, column=j, pady=5)
+                    sep_label.grid(row=0, rowspan=ecuaciones, column=j, padx=3, pady=5)
                     input_entry.grid(row=i, column=j + 1, padx=5, pady=5)
                 fila_entries.append(input_entry)
             self.input_entries.append(fila_entries)

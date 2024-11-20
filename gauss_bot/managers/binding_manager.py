@@ -25,12 +25,19 @@ class KeyBindingManager:
         extra_entries: Optional[tuple[CustomEntry, CustomEntry]] = None,
     ) -> None:
         """
+        Argumentos:
         - es_matriz: True si las entries son para una matriz,
                      False si son para un vector
 
         - entry_list: la lista de entries a la que se le crearán bindings
         - extra_entries: las entries adicionales que se deben tener en cuenta
                          (nombre, filas, columnas, dimensiones)
+
+        Errores:
+        - ValueError:
+            - si 'entry_list' o 'extra_entries' es None a la hora de crear bindings
+            - si 'entry_list' no es una lista 2D y 'es_matriz' == True
+            - si 'es_matriz' == False y 'entry_list' no es una lista 1D.
         """
 
         self.es_matriz = es_matriz

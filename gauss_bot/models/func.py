@@ -89,6 +89,15 @@ class Func:
     def __str__(self) -> str:
         return str(self.func_expr)
 
+    def get_dominio(self) -> Interval:
+        """
+        Wrapper para continuous_domain de sympy().
+        Retorna un objeto Interval que representa el
+        dominio real de self.func_expr.
+        """
+
+        return continuous_domain(self.func_expr, self.variable, Reals)
+
     def es_continua(self, intervalo: tuple[Fraction, Fraction]) -> bool:
         """
         Valida si self.func_expr es continua en el
@@ -96,13 +105,12 @@ class Func:
         """
 
         a, b = intervalo
-        domain: Interval = continuous_domain(self.func_expr, self.variable, Reals)
         return Interval(
             a,
             b,
             left_open=True,
             right_open=True,
-        ).is_subset(domain)
+        ).is_subset(self.get_dominio())
 
     def latex_to_png(self, font_size: int = 75) -> ctkImage:
         """

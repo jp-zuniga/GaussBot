@@ -274,6 +274,7 @@ class MostrarFuncs(CustomScrollFrame):
         self.func_manager = func_manager
         self.columnconfigure(0, weight=1)
 
+        self.funcs_guardadas = self.func_manager.get_funcs()
         self.msg_frame: Optional[ctkFrame] = None
         self.show_frame = ctkFrame(self, fg_color="transparent")
         self.show_frame.columnconfigure(0, weight=1)
@@ -301,8 +302,7 @@ class MostrarFuncs(CustomScrollFrame):
         for widget in self.show_frame.winfo_children():
             widget.destroy()  # type: ignore
 
-        funcs_guardadas = self.func_manager.get_funcs()
-        if not funcs_guardadas:
+        if not self.funcs_guardadas:
             self.msg_frame = place_msg_frame(
                 parent_frame=self.show_frame,
                 msg_frame=self.msg_frame,
@@ -316,26 +316,28 @@ class MostrarFuncs(CustomScrollFrame):
             self.show_frame,
             text="Funciones ingresadas:",
             font=("Roboto", 12, "bold"),
-        ).grid(row=0, column=0, padx=5, sticky="n")
+        ).grid(row=0, column=0, pady=(10, 0), sticky="n")
 
         ctkLabel(
             self.show_frame,
             text="",
-            image=generate_sep(False, (200, 10)),
-        ).grid(row=1, column=0, padx=5, sticky="n")
+            image=generate_sep(False, (300, 5)),
+        ).grid(row=1, column=0, sticky="n")
 
-        for i, func in enumerate(funcs_guardadas):
+        r = 3
+        for func in self.funcs_guardadas:
             ctkLabel(
                 self.show_frame,
                 text="",
                 image=func,
-            ).grid(row=i + 2, column=0, padx=5, pady=5, sticky="n")
+            ).grid(row=r, column=0, sticky="n")
 
             ctkLabel(
                 self.show_frame,
                 text="",
-                image=generate_sep(False, (200, 10)),
-            ).grid(row=i + 3, column=0, padx=5, sticky="n")
+                image=generate_sep(False, (300, 5)),
+            ).grid(row=r + 1, column=0, sticky="n")
+            r += 2
 
     def update_frame(self) -> None:
         """

@@ -76,8 +76,8 @@ class VectoresManager:
             ):
                 continue
             vectores += f"\n{nombre}:\n"
-            vectores += str(vec)
-        vectores += "\n---------------------------------------------"
+            vectores += str(vec) + "\n"
+        vectores += "---------------------------------------------"
 
         if "[" not in vectores:
             if calculado == 1:

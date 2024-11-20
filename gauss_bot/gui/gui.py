@@ -135,7 +135,6 @@ class GaussUI(ctk):
             self.iconbitmap(path.join(ASSET_PATH, "light_logo.ico"))
         else:
             raise ValueError("Valor inválido para argumento 'modo'!")
-        LOGGER.info("Ícono de ventana actualizado!")
 
     def save_config(self) -> None:
         """

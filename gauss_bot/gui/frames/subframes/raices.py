@@ -105,7 +105,6 @@ class RaicesFrame(CustomScrollFrame):
         for widget in self.resultado.winfo_children():  # type: ignore
             widget.destroy()  # type: ignore
 
-
         ctkLabel(
             self.metodo_frame,
             text="",
@@ -126,6 +125,9 @@ class RaicesFrame(CustomScrollFrame):
         """
 
         self.datos_frame.grid(row=2, column=0, pady=5, sticky="n")
+        for widget in self.resultado.winfo_children():  # type: ignore
+            widget.destroy()  # type: ignore
+
         if self.metodo_actual == self.metodos[metodo]:
             return
 
@@ -137,21 +139,18 @@ class RaicesFrame(CustomScrollFrame):
             self.limpiar_inputs()
             return
 
-        for widget in self.datos_frame.winfo_children():
+        for widget in self.datos_frame.winfo_children():  # type: ignore
             widget.destroy()  # type: ignore
 
-        match metodo:
-            case "Método de Bisección":
-                self.metodo_actual = 0
+        self.metodo_actual = self.metodos[metodo]
+        match self.metodo_actual:
+            case 0:
                 self.setup_cerrado()
-            case "Método de Falsa Posición":
-                self.metodo_actual = 1
+            case 1:
                 self.setup_cerrado()
-            case "Método de Newton":
-                self.metodo_actual = 2
+            case 2:
                 self.setup_abierto(newton=True)
-            case "Método de la Secante":
-                self.metodo_actual = 3
+            case 3:
                 self.setup_abierto(newton=False)
             case _:
                 raise ValueError("Argumento inválido para 'metodo'!")
@@ -205,6 +204,7 @@ class RaicesFrame(CustomScrollFrame):
             self.datos_frame,
             height=30,
             text="Encontrar raíz",
+            command=self.leer_datos
         ).grid(row=2, column=0, columnspan=4, padx=5, pady=5, sticky="n")
 
     def setup_abierto(self, newton: bool) -> None:
@@ -288,7 +288,14 @@ class RaicesFrame(CustomScrollFrame):
             self.datos_frame,
             height=30,
             text="Encontrar raíz",
+            command=self.leer_datos
         ).grid(row=4, column=0, columnspan=4, padx=5, pady=5, sticky="n")
+
+    def leer_datos(self) -> None:
+        """
+        Lee y valida los datos ingresados por el usuario
+        en las widgets de self.datos_frame.
+        """
 
     def limpiar_inputs(self) -> None:
         """
@@ -297,7 +304,11 @@ class RaicesFrame(CustomScrollFrame):
         """
 
         for widget in self.datos_frame.winfo_children():
-            if isinstance(widget, CustomEntry):
+            if (
+                isinstance(widget, CustomEntry) and
+                widget.get() != "" and
+                widget.get() != f"{float(MARGEN_ERROR):.6f}"
+            ):
                 widget.delete(0, "end")
 
     def update_frame(self):

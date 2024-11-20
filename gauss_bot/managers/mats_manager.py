@@ -54,7 +54,7 @@ class MatricesManager:
               isinstance(sis_ingresados, dict)
               and
               all(
-                isinstance(k, str) and isinstance(v, str)
+                isinstance(k, str) and isinstance(v, Matriz)
                 for k, v in sis_ingresados.items()
             )
         ):
@@ -99,8 +99,8 @@ class MatricesManager:
             ):
                 continue
             matrices += f"\n{nombre}:\n"
-            matrices += str(mat)
-        matrices += "\n---------------------------------------------"
+            matrices += str(mat) + "\n"
+        matrices += "---------------------------------------------"
 
         if "(" not in matrices:
             if calculada == 1:
@@ -145,8 +145,8 @@ class MatricesManager:
             ):
                 continue
             sistemas += f"\n{nombre}:\n"
-            sistemas += str(sis)
-        sistemas += "\n---------------------------------------------"
+            sistemas += str(sis) + "\n"
+        sistemas += "---------------------------------------------"
 
         if "(" not in sistemas:
             if calculado == 1:
