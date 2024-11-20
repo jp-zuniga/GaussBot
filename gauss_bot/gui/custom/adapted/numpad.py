@@ -8,14 +8,18 @@ Formatted, type-annotated, and simplified.
 Transformed for use as a calculator-like numpad,
 with mathematical functions for use in this project.
 """
+
 from re import (
     compile as comp,
     escape,
 )
 
 from typing import TYPE_CHECKING
+from tkinter import (
+    END,
+    INSERT,
+)
 
-from tkinter import END
 from customtkinter import (
     CTkButton as ctkButton,
     CTkFrame as ctkFrame,
@@ -79,13 +83,13 @@ class CustomNumpad(ctkTop):
             "row1": ["x", "abs(x)", "x^n"],
             "row2": ["b^x", "e^x", "ln(x)"],
             "row3": ["sen(x)", "cos(x)", "tan(x)"],
-            "row4": ["⯇"],
         }
 
         self.attach.unbind("<Alt_L>")
         self.attach.unbind("<Escape>")
         self.attach.bind("<Alt_L>", self.render)
         self.attach.bind("<Escape>", self.hide)
+        self.attach.bind("<Configure>", self.hide)
         self.unbind("<Escape>")
         self.bind("<Escape>", self.hide)
 
@@ -100,21 +104,18 @@ class CustomNumpad(ctkTop):
         self.row1 = ctkFrame(self.show_frame, fg_color=self.fg_color)
         self.row2 = ctkFrame(self.show_frame, fg_color=self.fg_color)
         self.row3 = ctkFrame(self.show_frame, fg_color=self.fg_color)
-        self.row4 = ctkFrame(self.show_frame, fg_color=self.fg_color)
 
         self.show_frame.pack(expand=True, fill="both")
         self.row1.grid(row=1, column=0, pady=(10, 0))
         self.row2.grid(row=2, column=0, padx=10)
-        self.row3.grid(row=3, column=0, padx=10)
-        self.row4.grid(row=4, column=0, pady=(0, 10))
+        self.row3.grid(row=3, column=0, padx=10, pady=(0, 10))
 
         self.init_keys()
         self.render()
 
     def init_keys(self):
         """
-        Initializes self.keypad and creates the
-        buttons for each key on the numpad.
+        Creates the buttons for each key on the numpad.
         """
 
         hover_color = ThemeManager.theme["CTkFrame"]["top_fg_color"]
@@ -167,20 +168,6 @@ class CustomNumpad(ctkTop):
                         command=lambda k=k: self.key_press(k),
                     ).grid(row=0, column=i, sticky="nsew")
 
-            elif row == "row4":
-                ctkButton(
-                    self.row4,
-                    text=self.key_pad["row4"][0],
-                    width=150,
-                    height=50,
-                    border_spacing=0,
-                    border_width=0,
-                    bg_color=self.fg_color,
-                    fg_color=self.fg_color,
-                    hover_color=hover_color,
-                    command=lambda: self.key_press("⯇"),
-                ).grid(row=0, column=i, sticky="nsew")
-
             self.hidden = False
 
     def key_press(self, k: str) -> None:
@@ -190,42 +177,26 @@ class CustomNumpad(ctkTop):
         else just inserts the pressed key into self.attach
         """
 
-        end_pattern = comp(r"(\s*[\+\-]\s*|\s+)$")
-        func_pattern = comp(
-            r"|".join(
-                escape(func)
-                .replace(r"\(x\)", r"\([^)]*\)")
-                .replace(r"\^n", r"\^\([^)]*\)")
-                for func in self.images
-            ) + r"|x"
-        )
-
-        if k == "⯇":
-            text = self.attach.get()
-            matches = list(func_pattern.finditer(text))
-            if matches:
-                last_match = matches[-1]
-                text = text[:last_match.start()]
-            elif end_pattern.search(text):
-                text = end_pattern.sub("", text)
-
-            self.attach.delete(0, END)
-            self.attach.insert(0, text)
-            return
-
-        if "^n" in k:
+        index_adjust: int = 1
+        re_pattern = r"\(([^()]*)\)"
+        if k == "b^x":
+            k = "^()"
+            re_pattern = escape("^()")
+            index_adjust = 0
+        elif "^n" in k:
             k = k.replace("^n", "^()")
         elif "^x" in k:
             k = k.replace("^x", "^()")
         elif "(x)" in k:
             k = k.replace("(x)", "()")
+        self.attach.insert(INSERT, k)
 
-        self.attach.insert(END, k)
-        if not k.endswith("()"):
-            return
-
-        cursor_pos = self.attach.index(END) - 1
-        self.attach.icursor(cursor_pos)
+        try:
+            last_match = list(comp(re_pattern).finditer(self.attach.get()))[-1]
+            cursor_pos = last_match.start() + index_adjust
+            self.attach.icursor(cursor_pos)
+        except IndexError:
+            self.attach.icursor(END)
         self.attach.focus_set()
 
     def destroy(self):

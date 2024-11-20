@@ -54,7 +54,6 @@ class SistemasFrame(CustomScrollFrame):
         self.columnconfigure(1, weight=1)
 
         self.nombres_sistemas = list(self.mats_manager.sis_ingresados.keys())
-        self.dummy_frame: ctkFrame  # para pack mensaje de error inicial
         self.msg_frame: Optional[ctkFrame] = None
 
         # definir atributos, se inicializan en setup_frame
@@ -80,6 +79,7 @@ class SistemasFrame(CustomScrollFrame):
 
         # por si habia un mensaje de error centrado
         self.rowconfigure(0, weight=0)
+        self.rowconfigure(1, weight=0)
         for widget in self.winfo_children():
             widget.destroy()  # type: ignore
 
@@ -254,23 +254,22 @@ class SistemasFrame(CustomScrollFrame):
         """
 
         self.rowconfigure(0, weight=1)
-        self.dummy_frame = ctkFrame(self, fg_color="transparent")
-        self.msg_frame = ErrorFrame(
-            self.dummy_frame,
+        self.rowconfigure(1, weight=1)
+        self.msg_frame = place_msg_frame(
+            parent_frame=self,
+            msg_frame=self.msg_frame,
             msg="No hay sistemas de ecuaciones ingresados!",
+            tipo="error",
+            columnspan=2,
+            sticky="s"
         )
 
-        agregar_button = ctkButton(
-            self.dummy_frame,
-            height=30,
+        ctkButton(
+            self,
             text="Agregar sistemas",
             image=INPUTS_ICON,
-            command=lambda: self.app.home_frame.ir_a_sistemas(mostrar=False),  # type: ignore
-        )
-
-        self.dummy_frame.grid(row=0, column=0, columnspan=2)
-        self.msg_frame.pack(pady=5, anchor="center")
-        agregar_button.pack(pady=5, anchor="center")
+            command=lambda: self.app.home_frame.ir_a_sistemas(mostrar=False),
+        ).grid(row=1, column=0, columnspan=2, padx=5, pady=5, sticky="n")
 
     def toggle_gj(self) -> None:
         """
