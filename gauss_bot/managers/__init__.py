@@ -5,7 +5,12 @@ realizar las operaciones matemáticas.
 """
 
 from .binding_manager import KeyBindingManager
-from .func_manager import FuncManager
+from .func_manager import (
+    MARGEN_ERROR,
+    MAX_ITERACIONES,
+    FuncManager,
+)
+
 from .mats_manager import MatricesManager
 from .vecs_manager import VectoresManager
 from .ops_manager import OpsManager
@@ -16,4 +21,6 @@ __all__ = [
     "MatricesManager",
     "VectoresManager",
     "OpsManager",
+    "MARGEN_ERROR",
+    "MAX_ITERACIONES",
 ]

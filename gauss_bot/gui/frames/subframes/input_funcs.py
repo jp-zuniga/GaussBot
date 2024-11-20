@@ -182,9 +182,7 @@ class AgregarFuncs(CustomScrollFrame):
             self.func_frame,
             app=self.app,
             image=ACEPTAR_ICON,
-            tooltip_text="\nAgregar función\n" +
-                         "(Nota:\nSe agregará la función\n" +
-                         "presentada en la imagen)\n",
+            tooltip_text="Agregar función",
             command=lambda: self.agregar_func(new_func),
         ).grid(row=1, column=0, padx=5, pady=5, sticky="e")
 
@@ -230,6 +228,12 @@ class AgregarFuncs(CustomScrollFrame):
             pady=10,
         )
 
+        self.func_manager.funcs_ingresadas = dict(
+            sorted(
+                self.func_manager.funcs_ingresadas.items()
+            )
+        )
+
         self.master_frame.update_all()
 
     def limpiar_input(self) -> None:
@@ -248,9 +252,6 @@ class AgregarFuncs(CustomScrollFrame):
         Actualiza los backgrounds de todas las widgets.
         """
 
-        delete_msg_frame(self.msg_frame)
-        for widget in self.func_frame.winfo_children():
-            widget.destroy()  # type: ignore
         for widget in self.winfo_children():  # type: ignore
             widget.configure(bg_color="transparent")  # type: ignore
 
@@ -313,28 +314,28 @@ class MostrarFuncs(CustomScrollFrame):
 
         ctkLabel(
             self.show_frame,
-            text="",
-            image=generate_sep(False, (200, 10)),
+            text="Funciones ingresadas:",
+            font=("Roboto", 12, "bold"),
         ).grid(row=0, column=0, padx=5, sticky="n")
 
         ctkLabel(
             self.show_frame,
-            text="Funciones ingresadas:",
-            font=("Roboto", 12, "bold"),
-        ).grid(row=1, column=0, padx=5, sticky="n")
-
-        ctkLabel(
-            self.show_frame,
             text="",
             image=generate_sep(False, (200, 10)),
-        ).grid(row=2, column=0, padx=5, sticky="n")
+        ).grid(row=1, column=0, padx=5, sticky="n")
 
         for i, func in enumerate(funcs_guardadas):
             ctkLabel(
                 self.show_frame,
                 text="",
                 image=func,
-            ).grid(row=i + 3, column=0, padx=5, pady=5, sticky="n")
+            ).grid(row=i + 2, column=0, padx=5, pady=5, sticky="n")
+
+            ctkLabel(
+                self.show_frame,
+                text="",
+                image=generate_sep(False, (200, 10)),
+            ).grid(row=i + 3, column=0, padx=5, sticky="n")
 
     def update_frame(self) -> None:
         """

@@ -102,7 +102,12 @@ class GaussUI(ctk):
             mats_manager=self.mats_manager,
         )
 
-        self.analisis = AnalisisFrame(app=self, master=self)
+        self.analisis = AnalisisFrame(
+            app=self,
+            master=self,
+            func_manager=self.func_manager,
+        )
+
         self.sistemas = SistemasFrame(
             app=self,
             master=self,

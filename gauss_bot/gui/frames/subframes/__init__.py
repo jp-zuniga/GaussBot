@@ -41,7 +41,7 @@ from .operaciones_vecs import (
     VMultiplicacionTab,
 )
 
-# from .raices import RaicesFrame
+from .raices import RaicesFrame
 
 __all__ = [
     "AgregarFuncs",
@@ -63,5 +63,5 @@ __all__ = [
     "InversaTab",
     "VSumaRestaTab",
     "VMultiplicacionTab",
-    # "RaicesFrame",
+    "RaicesFrame",
 ]
