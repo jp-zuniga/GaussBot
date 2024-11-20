@@ -416,7 +416,7 @@ class MostrarVecs(CustomScrollFrame):
 
     def update_frame(self) -> None:
         """
-        Eliminar self.print_frame y configurar los backgrounds.
+        Elimina self.print_frame y configura los backgrounds.
         """
 
         # si print_frame no estaba inicializado,

@@ -3,7 +3,11 @@ Implementación de la clase Func.
 """
 
 from fractions import Fraction
-from os import path
+from os import (
+    makedirs,
+    path,
+)
+
 from re import match
 from typing import Optional
 
@@ -100,7 +104,7 @@ class Func:
             right_open=True,
         ).is_subset(domain)
 
-    def latex_to_png(self, with_name=False, font_size: int = 75) -> ctkImage:
+    def latex_to_png(self, font_size: int = 75) -> ctkImage:
         """
         Convierte self.func_expr en formato LaTeX
         y lo convierte en una imagen PNG.
@@ -108,19 +112,11 @@ class Func:
         * font_size: tamaño de la fuente en la imagen PNG
         """
 
+        makedirs(SAVED_FUNC_PATH, exist_ok=True)
         output_file = path.join(SAVED_FUNC_PATH, f"{self.nombre}.png")
-        if path.exists(output_file):
-            self.latex_img = ctkImage(
-                dark_image=transparent_invert(open_img(output_file)),
-                light_image=open_img(output_file),
-                size=open_img(output_file).size,
-            )
-
-            return self.latex_img
 
         latex_str: str = latex(self.func_expr, ln_notation=True)
-        if with_name:
-            latex_str = f"{self.nombre} = {latex_str}"
+        latex_str = f"{self.nombre} = {latex_str}"
 
         rc("text", usetex=True)
         rc("font", family="serif")
@@ -168,14 +164,14 @@ class Func:
 
         return self.latex_img
 
-    def get_png(self, with_name=False) -> ctkImage:
+    def get_png(self) -> ctkImage:
         """
         Retorna la imagen PNG de la función si ya había sido generada.
         Si no, llama a latex_to_png para generarla, y la retorna.
         """
 
-        if not self.latexified:
-            return self.latex_to_png(with_name=with_name)
+        if not self.latexified or self.latex_img is None:
+            return self.latex_to_png()
         return self.latex_img  # type: ignore
 
     @staticmethod

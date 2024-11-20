@@ -181,8 +181,8 @@ class ManejarFuncs(ctkFrame):
         self.instances = []
         tabs = [
             ("Agregar", AgregarFuncs),
-        #     ("Mostrar", MostrarFuncs),
-        #     ("Eliminar", EliminarFuncs),
+            ("Mostrar", MostrarFuncs),
+            ("Eliminar", EliminarFuncs),
         ]
 
         # crear tabs, inicializar y almacenar instancias

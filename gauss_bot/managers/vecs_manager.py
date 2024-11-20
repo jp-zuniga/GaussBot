@@ -42,7 +42,9 @@ class VectoresManager:
 
     def get_vectores(self, calculado: int) -> str:
         """
-        Obtiene los vectores guardados en self.vecs_ingresados y los retorna como string.
+        Obtiene los vectores guardados en self.vecs_ingresados
+        y los retorna como string.
+
         - calculado: 0 para no mostrar calculados,
                      1 para mostrar solo calculados,
                     -1 para mostrar todos

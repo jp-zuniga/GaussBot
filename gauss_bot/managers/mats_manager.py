@@ -65,7 +65,9 @@ class MatricesManager:
 
     def get_matrices(self, calculada: int) -> str:
         """
-        Obtiene las matrices guardadas en self.mats_ingresadas y las retorna como string.
+        Obtiene las matrices guardadas en self.mats_ingresadas
+        y las retorna como string.
+        
         - calculada: 0 para no mostrar matrices calculadas,
                      1 para mostrar solo matrices calculadas,
                     -1 para mostrar todas las matrices guardadas
@@ -109,7 +111,9 @@ class MatricesManager:
 
     def get_sistemas(self, calculado: int) -> str:
         """
-        Obtiene las sistemas guardados en self.sis_ingresados y las retorna como string.
+        Obtiene las sistemas guardados en self.sis_ingresados
+        y las retorna como string.
+        
         - calculado: 0 para no mostrar sistemas calculados,
                      1 para mostrar solo sistemas calculados,
                     -1 para mostrar todas las sistemas guardados

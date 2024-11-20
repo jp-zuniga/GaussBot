@@ -138,6 +138,11 @@ class IconButton(ctkButton):
         **kwargs
     ) -> None:
 
+        if "border_width" in kwargs:
+            border_width = kwargs.pop("border_width")
+        else:
+            border_width = 0
+
         self.app = app
         super().__init__(
             master,
@@ -145,7 +150,7 @@ class IconButton(ctkButton):
             height=height,
             image=image,
             text="",
-            border_width=0,
+            border_width=border_width,
             border_spacing=0,
             fg_color="transparent",
             bg_color="transparent",
