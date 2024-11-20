@@ -16,16 +16,8 @@ from customtkinter import (
     CTkOptionMenu as ctkOptionMenu,
 )
 
-from gauss_bot.gui.custom import (
-    ScrollableDropdown,
-    Tooltip,
-)
-
-from gauss_bot import (
-    DROPDOWN_ICON,
-    FUNCTIONS,
-    resize_image,
-)
+from gauss_bot import DROPDOWN_ICON
+from gauss_bot.gui.custom import Tooltip
 
 if TYPE_CHECKING:
     from gauss_bot.gui.gui import GaussUI
@@ -36,7 +28,7 @@ class CustomEntry(ctkEntry):
         self,
         master: Any,
         width: int = 140,
-        height: int = 28,
+        height: int = 30,
         placeholder_text: Optional[str] = None,
         justify: str = "center",
         **kwargs
@@ -132,90 +124,6 @@ class CustomDropdown(ctkOptionMenu):
         super()._on_leave(event)
         color = self._apply_appearance_mode(self._button_color)
         self.icon_label.configure(fg_color=color, bg_color=color)
-
-
-class FuncDropdown(ScrollableDropdown):
-    def __init__(
-        self,
-        master: Any,
-        app: "GaussUI",
-        button_text: str,
-        width=80,
-        height=30,
-        **kwargs,
-    ) -> None:
-
-        self.app = app
-
-        resizes = {
-            name: resize_image(
-                img,
-                (4, 8)
-                if name not in ("x^n", "b^x", "e^x")
-                else (3.6, 7.6)
-            )
-            for name, img in FUNCTIONS.items()
-            if name != "k"
-        }
-
-        resizes["k"] = resize_image(FUNCTIONS["k"], (3.5, 7.5))
-        self.images: dict[str, ctkImage] = {
-            "k": resizes["k"],
-            "x^n": resizes["x^n"],
-            "b^x": resizes["b^x"],
-            "e^x": resizes["e^x"],
-            "ln(x)": resizes["ln(x)"],
-            "sen(x)": resizes["sen(x)"],
-            "cos(x)": resizes["cos(x)"],
-            "tan(x)": resizes["tan(x)"],
-        }
-
-        imgs = []
-        for img in self.images.values():
-            img.configure(light_image=img.cget("dark_image"))
-            imgs.append(img)
-
-        self.options_button = ctkButton(
-            master,
-            width=width,
-            height=height,
-            text=button_text,
-            image=DROPDOWN_ICON,
-            compound="right",
-            **kwargs,
-        )
-
-        super().__init__(
-            attach=self.options_button,
-            width=int(width * 2.5),
-            height=height * 250,
-            values=["" for _ in imgs],
-            image_values=imgs,
-            command=self._on_select,
-            fg_color=self.app.analisis.tabview._segmented_button.cget(
-                "unselected_color"
-            ),  # type: ignore
-            button_color=self.app.analisis.tabview._segmented_button.cget(
-                "unselected_color"
-            ),  # type: ignore
-            **kwargs,
-        )
-
-        for button in self.widgets.values():
-            button.bind(
-                "<Button-1>",
-                command=lambda _, drop=self, img=button.cget("image"):  # type: ignore
-                self.app.analisis.instances[0].extract_func(drop, img),  # type: ignore
-            )
-            self.frame.configure(width=self.options_button.winfo_width())
-
-    def _on_select(self, img: ctkImage) -> None:
-        self.options_button.configure(
-            image=img,
-            compound="center",
-            text="",
-        )
-        self.update_idletasks()
 
 
 class IconButton(ctkButton):

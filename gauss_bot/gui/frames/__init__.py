@@ -6,6 +6,7 @@ los módulos de la aplciación.
 from .nav import NavFrame
 from .inputs import (
     InputsFrame,
+    ManejarFuncs,
     ManejarSistemas,
     ManejarMats,
     ManejarVecs,
@@ -21,6 +22,7 @@ from .config import ConfigFrame
 __all__ = [
     "NavFrame",
     "InputsFrame",
+    "ManejarFuncs",
     "ManejarSistemas",
     "ManejarMats",
     "ManejarVecs",

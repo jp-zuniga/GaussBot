@@ -5,6 +5,7 @@ Implementación de la clase Func.
 from fractions import Fraction
 from os import path
 from re import match
+from typing import Optional
 
 from customtkinter import CTkImage as ctkImage
 from matplotlib.pyplot import (
@@ -15,8 +16,8 @@ from matplotlib.pyplot import (
 
 from PIL.Image import open as open_img
 from sympy import (
-    Reals,
-    Interval, Symbol,
+    Reals, oo, zoo, nan,
+    Expr, Interval, Symbol,
     latex, parse_expr,
 )
 
@@ -38,20 +39,38 @@ class Func:
     utilidad para validar su nombre y su continuidad.
     """
 
-    def __init__(self, nombre: str, expr: str, variable: Symbol) -> None:
+    def __init__(
+        self,
+        nombre: str,
+        expr: str,
+        variable: Symbol = Symbol("x"),
+    ) -> None:
+
         """
-        * TypeError: si nombre no es tiene la forma 'f(x)'
+        * ValueError: si nombre no es tiene la forma 'f(x)'
         """
 
         if not self.validar_nombre(nombre):
-            raise ValueError("Nombre inválido! Debe tener la forma 'f(x)'!")
+            if "x" not in nombre:
+                error = "La función debe estar en términos de x!"
+            else:
+                error = "Nombre inválido! Debe tener la forma 'f(x)' !"
+            raise ValueError(error)
         if str(variable) not in expr:
             raise ValueError("La función no contiene la variable indicada!")
 
         self.latexified = False
+        self.latex_img: Optional[ctkImage] = None
+
         self.nombre = nombre
         self.variable = variable
-        self.func_expr = parse_expr(
+
+        if "sen" in expr:
+            expr = expr.replace("sen", "sin")
+        if "^" in expr:
+            expr = expr.replace("^", "**")
+
+        self.func_expr: Expr = parse_expr(
             expr,
             transformations=(
                 standard_transformations +
@@ -59,13 +78,16 @@ class Func:
             ),
         )
 
+        if self.func_expr.has(oo, -oo, zoo, nan):
+            raise ValueError("La función tiene un dominio complejo!")
+
     def __str__(self) -> str:
         return str(self.func_expr)
 
     def es_continua(self, intervalo: tuple[Fraction, Fraction]) -> bool:
         """
-        Valida si una expresión de sympy es continua
-        en el intervalo indicado, con respecto a self.variable.
+        Valida si self.func_expr es continua en el
+        intervalo indicado, con respecto a self.variable.
         """
 
         a, b = intervalo
@@ -77,8 +99,7 @@ class Func:
             right_open=True,
         ).is_subset(domain)
 
-
-    def latex_to_png(self, font_size: int = 75) -> ctkImage:
+    def latex_to_png(self, with_name=False, font_size: int = 75) -> ctkImage:
         """
         Convierte self.func_expr en formato LaTeX
         y lo convierte en una imagen PNG.
@@ -87,17 +108,19 @@ class Func:
         """
 
         output_file = path.join(FUNC_PATH, f"{self.nombre}.png")
-        latex_str = latex(self.func_expr, ln_notation=True)
+        latex_str: str = latex(self.func_expr, ln_notation=True)
+        if with_name:
+            latex_str = f"{self.nombre} = {latex_str}"
 
         rc("text", usetex=True)
         rc("font", family="serif")
 
-        fig_length = 10 + (len(latex_str) // 12)
+        fig_length = 12 + (len(latex_str) // 8)
         fig_height = (
             2
             if r"\\" not in latex_str
             else
-            2 + int(latex_str.count(r"\\") * 2)
+            int(2 + latex_str.count(r"\\") // 2)
         )
 
         img_length = fig_length * 20
@@ -118,7 +141,7 @@ class Func:
             output_file,
             format="png",
             transparent=True,
-            pad_inches=0.1,
+            pad_inches=0.05,
             dpi=200,
         )
 
@@ -127,24 +150,23 @@ class Func:
 
         img = open_img(output_file)
         inverted_img = transparent_invert(img)
-        return ctkImage(
+        self.latex_img = ctkImage(
             dark_image=inverted_img,
             light_image=img,
             size=(img_length, img_height),
         )
 
-    def get_png(self) -> ctkImage:
+        return self.latex_img
+
+    def get_png(self, with_name=False) -> ctkImage:
         """
-        Retorna la imagen PNG de la función si ya habia sido generada.
+        Retorna la imagen PNG de la función si ya había sido generada.
+        Si no, llama a latex_to_png para generarla, y la retorna.
         """
 
         if not self.latexified:
-            return self.latex_to_png()
-
-        return ctkImage(
-            dark_image=open_img(path.join(FUNC_PATH, f"{self.nombre}.png")),
-            light_image=open_img(path.join(FUNC_PATH, f"{self.nombre}.png")),
-        )
+            return self.latex_to_png(with_name=with_name)
+        return self.latex_img  # type: ignore
 
     @staticmethod
     def validar_nombre(nombre: str) -> bool:
@@ -152,5 +174,5 @@ class Func:
         Valida que el nombre de la función sea válido.
         """
 
-        pattern = r"^[a-z]\([a-z]\)$"
+        pattern = r"^[a-z]\([x]\)$"
         return bool(match(pattern, nombre))

@@ -29,12 +29,6 @@ from customtkinter import (
     CTkImage as ctkImage,
 )
 
-from matplotlib.pyplot import (
-    axis, close,
-    rc, savefig,
-    subplots, text,
-)
-
 from PIL.ImageOps import invert
 from PIL.Image import (  # pylint: disable=no-name-in-module
     LANCZOS,  # definido en PIL.Image.pyi (stub file)
@@ -51,7 +45,6 @@ __all__ = [
     "generate_range",
     "generate_sep",
     "get_dict_key",
-    "latex_to_png",
     "log_setup",
     "resize_image",
     "transparent_invert",
@@ -71,7 +64,6 @@ __all__ = [
     "FUNC_PATH",
     "FUNC_ICON_PATH",
     "FUNCTIONS",
-    "FX_ICON",
     "HOME_ICON",
     "INFO_ICON",
     "INPUTS_ICON",
@@ -257,58 +249,6 @@ def generate_sep(orientation: bool, size: tuple[int, int]) -> ctkImage:
     )
 
 
-def latex_to_png(latex_str: str, output_file: str, font_size: int = 75) -> ctkImage:
-    """
-    Toma un string en formato LaTeX y lo convierte en una imagen PNG.
-    * latex_str: string a convertir en PNG
-    * output_file: nombre del archivo de salida
-    * font_size: tamaño de la fuente en la imagen PNG
-    """
-
-    rc("text", usetex=True)
-    rc("font", family="serif")
-
-    fig_length = 10 + (len(latex_str) // 12)
-    fig_height = (
-        2
-        if r"\\" not in latex_str
-        else
-        2 + int(latex_str.count(r"\\") * 2)
-    )
-
-    img_length = fig_length * 20
-    img_height = fig_height * 20
-
-    fig, _ = subplots(figsize=(fig_length, fig_height))
-    axis("off")
-    text(
-        0.5,
-        0.5,
-        f"${latex_str}$",
-        horizontalalignment="center",
-        verticalalignment="center",
-        fontsize=font_size,
-    )
-
-    savefig(
-        output_file,
-        format="png",
-        transparent=True,
-        pad_inches=0.1,
-        dpi=200,
-    )
-
-    close(fig)
-
-    img = open_img(output_file)
-    inverted_img = transparent_invert(img)
-    return ctkImage(
-        dark_image=inverted_img,
-        light_image=img,
-        size=(img_length, img_height),
-    )
-
-
 def resize_image(img: ctkImage, divisors: tuple = (4, 8)) -> ctkImage:
     """
     Recibe una CTkImage y retorna una nueva CTkImage
@@ -468,13 +408,13 @@ WARNING_ICON = ctkImage(
 )
 
 INFO_ICON = ctkImage(
-    dark_image=open_img(path.join(ASSET_PATH, "dark_info_icon.png")),
-    light_image=open_img(path.join(ASSET_PATH, "light_info_icon.png")),
+    dark_image=open_img(path.join(ASSET_PATH, "light_info_icon.png")),
+    light_image=open_img(path.join(ASSET_PATH, "dark_info_icon.png")),
 )
 
 QUESTION_ICON = ctkImage(
-    dark_image=open_img(path.join(ASSET_PATH, "dark_question_icon.png")),
-    light_image=open_img(path.join(ASSET_PATH, "light_question_icon.png")),
+    dark_image=open_img(path.join(ASSET_PATH, "light_question_icon.png")),
+    light_image=open_img(path.join(ASSET_PATH, "dark_question_icon.png")),
 )
 
 MSGBOX_ICONS = {
@@ -555,5 +495,3 @@ FUNCTIONS: dict[str, ctkImage] = {
         for name in files
     }
 }
-
-FX_ICON = resize_image(FUNCTIONS["f(x)"], (3, 7))

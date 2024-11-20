@@ -11,6 +11,7 @@ from typing import (
 
 from customtkinter import (
     CTkFrame as ctkFrame,
+    CTkImage as ctkImage,
     CTkLabel as ctkLabel,
     CTkScrollableFrame as ctkScrollFrame,
 )
@@ -175,6 +176,7 @@ class ResultadoFrame(ctkFrame):
         self,
         master: Union[ctkFrame, CustomScrollFrame],
         msg: Optional[str] = None,
+        img: Optional[ctkImage] = None,
         border_color: str = "#18c026",
     ) -> None:
 
@@ -190,6 +192,9 @@ class ResultadoFrame(ctkFrame):
         if msg is not None:
             self.msg_label = ctkLabel(self, text=msg)
             self.msg_label.grid(row=0, column=0, padx=20, pady=20)
+        elif img is not None:
+            self.img_label = ctkLabel(self, text="", image=img)
+            self.img_label.grid(row=0, column=0, padx=20, pady=20)
 
     def destroy(self) -> None:
         self.forget()

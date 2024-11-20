@@ -184,16 +184,22 @@ class Tooltip(Toplevel):
 
     def configure_tooltip(
         self,
-        message: Optional[str] = None,
+        x_offset: Optional[int] = None,
+        y_offset: Optional[int] = None,
         delay: Optional[float] = None,
+        message: Optional[str] = None,
         bg_color: Optional[str] = None,
         **kwargs,
     ) -> None:
 
+        if x_offset:
+            self.x_offset = x_offset
+        if y_offset:
+            self.y_offset = y_offset
         if delay:
             self.delay = delay
         if bg_color:
             self.frame.configure(fg_color=bg_color)
-
-        self.msg_var.set(message)  # type: ignore
+        if message:
+            self.msg_var.set(message)  # type: ignore
         self.message_label.configure(**kwargs)

@@ -140,13 +140,13 @@ class ManejarFuncs(ctkFrame):
         app: "GaussUI",
         master_tab: ctkFrame,
         master_frame: InputsFrame,
-        mats_manager: FuncManager,
+        func_manager: FuncManager,
     ) -> None:
 
         super().__init__(master_tab, corner_radius=0, fg_color="transparent")
         self.app = app
         self.master_frame = master_frame
-        self.mats_manager = mats_manager
+        self.func_manager = func_manager
 
         self.instances: list[
             Union[
@@ -179,28 +179,30 @@ class ManejarFuncs(ctkFrame):
         self.tabview.pack(expand=True, fill="both")
 
         self.instances = []
-        # tabs = [
-        #     ("Agregar", AgregarFuncs),
+        tabs = [
+            ("Agregar", AgregarFuncs),
         #     ("Mostrar", MostrarFuncs),
-        #     ("Eliminar", EliminarFuncs)
-        # ]
+        #     ("Eliminar", EliminarFuncs),
+        ]
 
-        # crear tab, inicializar y almacenar instancias
-        # for nombre, cls in tabs:
-        #     tab = self.tabview.add(nombre)
-        #     tab_instance = cls()
+        # crear tabs, inicializar y almacenar instancias
+        for nombre, cls in tabs:
+            tab = self.tabview.add(nombre)
+            tab_instance = cls(
+                self.app, tab, self, self.func_manager,
+            )
 
-        #     tab_instance.pack(expand=True, fill="both")
-        #     self.instances.append(tab_instance)   # type: ignore
+            tab_instance.pack(expand=True, fill="both")
+            self.instances.append(tab_instance)   # type: ignore
 
     def update_all(self):
         """
         Manda a actualizar todos los subframes.
         """
 
-    #     for tab in self.instances:
-    #         tab.update_frame()
-    #     self.tabview.configure(fg_color="transparent")
+        for tab in self.instances:
+            tab.update_frame()
+        self.tabview.configure(fg_color="transparent")
 
 
 class ManejarSistemas(ctkFrame):

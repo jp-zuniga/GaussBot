@@ -55,32 +55,20 @@ class CustomNumpad(ctkTop):
         self.disabled = False
         self.hidden = True
 
-        resizes = {
-            name: resize_image(
-                img,
-                (4, 8)
-                if name not in ("x", "abs(x)", "x^n", "b^x", "e^x")
-                else (3, 7)
-            )
-
-            for name, img in FUNCTIONS.items()
-            if name not in ("f(x)", "log-b(x)", "k")
-        }
-
         self.images: dict[str, ctkImage] = {
-            "x": resizes["x"],
-            "abs(x)": resizes["abs(x)"],
-            "x^n": resizes["x^n"],
-            "b^x": resizes["b^x"],
-            "e^x": resizes["e^x"],
-            "ln(x)": resizes["ln(x)"],
-            "sen(x)": resizes["sen(x)"],
-            "cos(x)": resizes["cos(x)"],
-            "tan(x)": resizes["tan(x)"],
+            "pi": resize_image(FUNCTIONS["pi"], (3, 7)),
+            "x": resize_image(FUNCTIONS["x"], (3, 7)),
+            "x^n": resize_image(FUNCTIONS["x^n"], (3, 7)),
+            "b^x": resize_image(FUNCTIONS["b^x"], (3.5, 7.5)),
+            "e^x": resize_image(FUNCTIONS["e^x"], (3.5, 7.5)),
+            "ln(x)": resize_image(FUNCTIONS["ln(x)"]),
+            "sen(x)": resize_image(FUNCTIONS["sen(x)"]),
+            "cos(x)": resize_image(FUNCTIONS["cos(x)"]),
+            "tan(x)": resize_image(FUNCTIONS["tan(x)"]),
         }
 
         self.key_pad = {
-            "row1": ["x", "abs(x)", "x^n"],
+            "row1": ["pi", "x", "x^n"],
             "row2": ["b^x", "e^x", "ln(x)"],
             "row3": ["sen(x)", "cos(x)", "tan(x)"],
         }
@@ -90,6 +78,7 @@ class CustomNumpad(ctkTop):
         self.attach.bind("<Alt_L>", self.render)
         self.attach.bind("<Escape>", self.hide)
         self.attach.bind("<Configure>", self.hide)
+
         self.unbind("<Escape>")
         self.bind("<Escape>", self.hide)
 
@@ -189,6 +178,8 @@ class CustomNumpad(ctkTop):
             k = k.replace("^x", "^()")
         elif "(x)" in k:
             k = k.replace("(x)", "()")
+        else:
+            index_adjust = 0
         self.attach.insert(INSERT, k)
 
         try:
@@ -233,12 +224,14 @@ class CustomNumpad(ctkTop):
             self.deiconify()
             self.focus()
             self.hidden = False
-            x_pos = self.attach.winfo_rootx()
-            y_pos = self.attach.winfo_rooty() + self.attach.winfo_reqheight() + 5
+
+            attach_width = self.attach.winfo_reqwidth()
+            numpad_width = self.show_frame.winfo_reqwidth()
+            x_pos = self.attach.winfo_rootx() + (attach_width - numpad_width) // 2
+            y_pos = self.attach.winfo_rooty() + self.attach.winfo_reqheight() + 10
 
             self.geometry(
-                f"{self.show_frame.winfo_reqwidth()}x" +
-                f"{self.show_frame.winfo_reqheight()}" +
+                f"{numpad_width}x{self.show_frame.winfo_reqheight()}" +
                 f"+{x_pos}+{y_pos}"
             )
 

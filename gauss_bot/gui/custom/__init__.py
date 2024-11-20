@@ -4,13 +4,12 @@ from typing import (
     Union,
 )
 
-from customtkinter import CTkFrame as ctkFrame
+from customtkinter import CTkFrame as ctkFrame, CTkImage as ctkImage
 from .adapted import (
     CustomMessagebox,
-    # CustomScrollFrame,
     CustomNumpad,
+    # CustomScrollFrame,
     Tooltip,
-    ScrollableDropdown,
 )
 
 from .custom_frames import (
@@ -23,7 +22,6 @@ from .custom_frames import (
 from .custom_widgets import (
     CustomEntry,
     CustomDropdown,
-    FuncDropdown,
     IconButton,
 )
 
@@ -32,14 +30,12 @@ __all__ = [
     "CustomDropdown",
     "CustomMessagebox",
     "CustomScrollFrame",
-    "FuncDropdown",
     "IconButton",
     "ErrorFrame",
     "SuccessFrame",
     "ResultadoFrame",
     "CustomNumpad",
     "Tooltip",
-    "ScrollableDropdown",
     "place_msg_frame",
 ]
 
@@ -48,6 +44,7 @@ def place_msg_frame(
     parent_frame: Union[ctkFrame, CustomScrollFrame],  # noqa
     msg_frame: Optional[ctkFrame],
     msg: Optional[str] = None,
+    img: Optional[ctkImage] = None,
     tipo: Literal["error", "success", "resultado"] = "error",
     **grid_kwargs,
 ) -> ctkFrame:
@@ -70,7 +67,7 @@ def place_msg_frame(
     elif tipo == "success":
         msg_frame = SuccessFrame(parent_frame, msg)  # noqa
     elif tipo == "resultado":
-        msg_frame = ResultadoFrame(parent_frame, msg)  # noqa
+        msg_frame = ResultadoFrame(parent_frame, msg, img)  # noqa
     else:
         raise ValueError("Valor inválido para argumento 'tipo'!")
 
