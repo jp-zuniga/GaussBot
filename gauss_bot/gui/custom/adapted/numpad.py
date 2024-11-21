@@ -5,8 +5,8 @@ Adapted from:
 
 Modified by: Joaquín Zúñiga, on 11/18/2024
 Formatted, type-annotated, and simplified.
-Transformed for use as a calculator-like numpad,
-with mathematical functions for use in this project.
+Transformed for use as a calculator-like numpad
+with mathematical functions, for use in this project.
 """
 
 from re import (

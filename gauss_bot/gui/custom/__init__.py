@@ -9,6 +9,7 @@ from .adapted import (
     CustomMessagebox,
     CustomNumpad,
     # CustomScrollFrame,
+    CustomTable,
     Tooltip,
 )
 
@@ -29,12 +30,13 @@ __all__ = [
     "CustomEntry",
     "CustomDropdown",
     "CustomMessagebox",
-    "CustomScrollFrame",
-    "IconButton",
-    "ErrorFrame",
-    "SuccessFrame",
-    "ResultadoFrame",
     "CustomNumpad",
+    "CustomScrollFrame",
+    "CustomTable",
+    "ErrorFrame",
+    "IconButton",
+    "ResultadoFrame",
+    "SuccessFrame",
     "Tooltip",
     "place_msg_frame",
 ]

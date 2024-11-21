@@ -371,6 +371,7 @@ class MostrarFuncs(CustomScrollFrame):
             widget.destroy()  # type: ignore
         for widget in self.winfo_children():  # type: ignore
             widget.configure(bg_color="transparent")  # type: ignore
+        self.funcs_guardadas = self.func_manager.get_funcs()
 
 
 class EliminarFuncs(CustomScrollFrame):
