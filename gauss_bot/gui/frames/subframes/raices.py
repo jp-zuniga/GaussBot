@@ -23,6 +23,11 @@ from customtkinter import (
     CTkLabel as ctkLabel,
 )
 
+from sympy import (
+    I,
+    zoo,
+)
+
 from gauss_bot import generate_sep
 from gauss_bot.models import Func
 from gauss_bot.managers import (
@@ -81,7 +86,7 @@ class RaicesFrame(CustomScrollFrame):
 
         self.msg_frame: Optional[ctkFrame] = None
         self.metodo_actual: int = -1
-        self.func_seleccionada: Func
+        self.selected_func: Func
 
         self.a_entry: CustomEntry
         self.b_entry: CustomEntry
@@ -107,7 +112,7 @@ class RaicesFrame(CustomScrollFrame):
         """
 
         self.metodo_frame.grid(row=1, column=0, pady=5, sticky="n")
-        self.func_seleccionada = self.func_manager.funcs_ingresadas[nombre_func]
+        self.selected_func = self.func_manager.funcs_ingresadas[nombre_func]
 
         for widget in self.metodo_frame.winfo_children():  # type: ignore
             widget.destroy()  # type: ignore
@@ -119,7 +124,7 @@ class RaicesFrame(CustomScrollFrame):
         ctkLabel(
             self.metodo_frame,
             text="",
-            image=self.func_seleccionada.get_png(),
+            image=self.selected_func.get_png(),
         ).grid(row=0, column=0, pady=5, sticky="n")
 
         ctkLabel(
@@ -323,7 +328,7 @@ class RaicesFrame(CustomScrollFrame):
         for widget in self.resultado.winfo_children():  # type: ignore
             widget.destroy()  # type: ignore
 
-        dominio = self.func_seleccionada.get_dominio()
+        dominio = self.selected_func.get_dominio()
         if self.metodo_actual in (0, 1):  # metodos cerrados
             try:
                 a = Decimal(self.a_entry.get())
@@ -337,7 +342,7 @@ class RaicesFrame(CustomScrollFrame):
                 if a not in dominio or b not in dominio:
                     raise ArithmeticError(
                         "Los extremos del intervalo no son parte del " +
-                       f"dominio de {self.func_seleccionada.nombre}!"
+                       f"dominio de {self.selected_func.nombre}!"
                     )
 
                 self.calc_raiz(vals_iniciales=(a, b), error=error)
@@ -366,7 +371,7 @@ class RaicesFrame(CustomScrollFrame):
                     adj = "primer " if self.metodo_actual == 3 else ""
                     raise ArithmeticError(
                         f"El {adj}valor inicial no es parte del " +
-                        f"dominio de {self.func_seleccionada.nombre}!"
+                        f"dominio de {self.selected_func.nombre}!"
                     )
 
                 if self.metodo_actual == 3:
@@ -375,7 +380,7 @@ class RaicesFrame(CustomScrollFrame):
                     if xu not in dominio:
                         raise ArithmeticError(
                             "El segundo valor inicial no es parte del " +
-                            f"dominio de {self.func_seleccionada.nombre}!"
+                            f"dominio de {self.selected_func.nombre}!"
                         )
                 else:
                     vals = xi  # type: ignore
@@ -429,26 +434,26 @@ class RaicesFrame(CustomScrollFrame):
         match self.metodo_actual:
             case 0:
                 resultado = self.func_manager.biseccion(
-                    func=self.func_seleccionada,
+                    func=self.selected_func,
                     intervalo=kwargs.pop("vals_iniciales"),
                     error=kwargs.pop("error"),
                 )
             case 1:
                 resultado = self.func_manager.falsa_posicion(
-                    func=self.func_seleccionada,
+                    func=self.selected_func,
                     intervalo=kwargs.pop("vals_iniciales"),
                     error=kwargs.pop("error"),
                 )
             case 2:
                 resultado = self.func_manager.newton(  # type: ignore
-                    func=self.func_seleccionada,
-                    xi=kwargs.pop("vals_iniciales"),
+                    func=self.selected_func,
+                    inicial=kwargs.pop("vals_iniciales"),
                     error=kwargs.pop("error"),
                     max_its=kwargs.pop("max_its"),
                 )
             case 3:
                 resultado = self.func_manager.secante(  # type: ignore
-                    func=self.func_seleccionada,
+                    func=self.selected_func,
                     iniciales=kwargs.pop("vals_iniciales"),
                     error=kwargs.pop("error"),
                     max_its=kwargs.pop("max_its"),
@@ -482,29 +487,29 @@ class RaicesFrame(CustomScrollFrame):
             return
 
         error = Decimal(self.error_entry.get())
-        x, fx, i = resultado
+        x, fx, its = resultado
 
         x_igual = rf"x = {format(x.normalize(), "f")}"
         fx_igual = rf"f(x) = {format(fx.normalize(), "f")}"
 
         raiz_img = Func.latex_to_png(
-            nombre=f"resultado_cerrado_{self.func_seleccionada.nombre}",
+            nombre=f"resultado_cerrado_{self.selected_func.nombre}",
             misc_str=rf"{x_igual}" + r"\\[1em]" + rf"{fx_igual}",
             font_size=60,
         )
 
-        metodo = "bisección" if self.metodo_actual == 0 else "falsa posición"
-        if i == -1:
-            borde = "#ff3131"
+        tipo_metodo = "bisección" if self.metodo_actual == 0 else "falsa posición"
+        if its == -1:
+            border_color = "#ff3131"
             interpretacion = (
                 f"Después de {MAX_ITERACIONES} iteraciones, no se encontró " +
                 f"una raíz dentro del margen de error {error.normalize()}!\n" +
                  "Raíz aproximada encontrada:"
             )
         else:
-            borde = None
+            border_color = None
             interpretacion = (
-                f"El método de {metodo} converge después de {i} iteraciones!\n" +
+                f"El método de {tipo_metodo} converge después de {its} iteraciones!\n" +
                 f"Raíz{" " if fx == 0 else " aproximada "}encontrada: "
             )
 
@@ -517,20 +522,79 @@ class RaicesFrame(CustomScrollFrame):
             parent_frame=self.resultado,
             msg_frame=self.msg_frame,
             img=raiz_img,
-            border_color=borde,
+            border_color=border_color,
             tipo="resultado",
             row=1,
         )
 
-
     def mostrar_r_abierto(
         self,
-        resultado: Union[bool, tuple[Decimal, Decimal, int, bool]],
+        resultado: tuple[Decimal, Decimal, int, bool],
     ) -> None:
 
         """
         Se encarga de mostrar los resultados de métodos abiertos.
         """
+
+        tipo_metodo = "Newton" if self.metodo_actual == 2 else "la secante"
+        x, fx, its, flag = resultado
+        x_igual = rf"x = {format(x.normalize(), "f")}"
+        fx_igual = rf"f(x) = {format(fx.normalize(), "f")}"
+
+        if flag is not I:
+            raiz_img = None
+            border_color = "#ff3131"
+
+            if flag is -I:
+                interpretacion = (
+                    f"En la iteración {its}:\n" +
+                     "La derivada de la función es igual a 0 en " +
+                    f"{format(x.normalize(), "f")}!"
+                )
+            elif flag == -1:
+                interpretacion = (
+                    f"En la iteración {its}:\n" +
+                    f"{format(x.normalize(), "f")} no es parte del " +
+                    f"dominio de {self.selected_func.nombre}"
+                )
+            elif flag == 1:
+                interpretacion = (
+                    f"En la iteración {its}:\n" +
+                    f"{format(x.normalize(), "f")} no es parte del " +
+                    f"dominio de {self.selected_func.nombre[0]}'(x)!"
+                )
+            elif flag is zoo:
+                interpretacion = (
+                    f"El método de {tipo_metodo} no converge " +
+                    f"después de {its} iteraciones!"
+                )
+        else:
+            border_color = None
+            interpretacion = (
+                f"El método de {tipo_metodo} converge después de {its} iteraciones!\n" +
+                f"Raíz{" " if fx == 0 else " aproximada "}encontrada: "
+            )
+
+            raiz_img = Func.latex_to_png(
+                nombre=f"resultado_abierto_{self.selected_func.nombre}",
+                misc_str=rf"{x_igual}" + r"\\[1em]" + rf"{fx_igual}",
+                font_size=60,
+            )
+
+            ctkLabel(
+                self.resultado,
+                text=interpretacion,  # pylint: disable=E0606
+            ).grid(row=0, column=0, pady=5, sticky="n")
+
+        self.msg_frame = place_msg_frame(
+            parent_frame=self.resultado,
+            msg_frame=self.msg_frame,
+            msg=interpretacion if flag is not I else None,
+            img=raiz_img,
+            border_color=border_color,
+            tipo="resultado",
+            row=1,
+        )
 
     def limpiar_inputs(self) -> None:
         """

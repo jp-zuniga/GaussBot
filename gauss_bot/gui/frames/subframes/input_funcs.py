@@ -2,6 +2,7 @@
 Implementación de los subframes de ManejarFuncs.
 """
 
+from re import match
 from typing import (
     TYPE_CHECKING,
     Optional,
@@ -204,11 +205,24 @@ class AgregarFuncs(CustomScrollFrame):
         if new_func.nombre != latest_nombre:
             new_func.nombre = latest_nombre
 
-        if new_func.nombre in self.func_manager.funcs_ingresadas:
+        if (
+            new_func.nombre in self.func_manager.funcs_ingresadas
+            or
+            not self.validar_nombre(new_func.nombre)
+        ):
+            if not self.validar_nombre(new_func.nombre):
+                error_msg = (
+                    "El nombre de la función debe tener la forma 'f(x)'!"
+                    if "x" in new_func.nombre
+                    else "La función debe estar en términos de 'x'!"
+                )
+            else:
+                error_msg = f"Ya existe una función llamada {new_func.nombre}!"
+
             self.msg_frame = place_msg_frame(
                 parent_frame=self.func_frame,
                 msg_frame=self.msg_frame,
-                msg=f"Ya existe una función llamada {new_func.nombre}!",
+                msg=error_msg,
                 tipo="error",
                 row=2,
                 columnspan=2,
@@ -236,6 +250,14 @@ class AgregarFuncs(CustomScrollFrame):
 
         self.master_frame.update_all()
         self.app.analisis.update_all()  # type: ignore
+
+    def validar_nombre(self, nombre: str) -> bool:
+        """
+        Valida que el nombre de la función sea válido.
+        """
+
+        pattern = r"^[a-z]\([x]\)$"
+        return bool(match(pattern, nombre))
 
     def limpiar_input(self) -> None:
         """

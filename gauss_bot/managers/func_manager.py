@@ -24,6 +24,8 @@ from os import (
 from typing import Union
 from customtkinter import CTkImage as ctkImage
 from sympy import (
+    I,
+    zoo,
     diff,
     lambdify,
 )
@@ -97,11 +99,11 @@ class FuncManager:
         if not func.es_continua(intervalo):
             return False
 
-        a, b = intervalo
+        a, b = a, b = float(intervalo[0]), float(intervalo[1])
         f = lambdify(func.variable, func.func_expr)
 
-        f_a = f(float(a))
-        f_b = f(float(b))
+        f_a = f(a)
+        f_b = f(b)
         if f_a * f_b > 0:
             return True
 
@@ -109,7 +111,7 @@ class FuncManager:
         while i <= MAX_ITERACIONES:
             i += 1
             c = (a + b) / 2
-            f_c = f(float(c))
+            f_c = f(c)
             if abs(f_c) < error:
                 return (Decimal(c), Decimal(f_c), i)
             if f_a * f_c < 0:
@@ -133,22 +135,22 @@ class FuncManager:
         if not func.es_continua(intervalo):
             return False
 
-        a, b = intervalo
+        a, b = float(intervalo[0]), float(intervalo[1])
         f = lambdify(func.variable, func.func_expr)
 
-        f_a = f(float(a))
-        f_b = f(float(b))
+        f_a = f(a)
+        f_b = f(b)
         if f_a * f_b > 0:
             return True
 
         i = 0
         while i <= MAX_ITERACIONES:
             i += 1
-            fa = f(float(a))
-            fb = f(float(b))
+            fa = f(a)
+            fb = f(b)
 
             c = (fa * (a - b)) / fa - fb
-            f_c = f(float(c))
+            f_c = f(c)
             if abs(f_c) < error:
                 return (Decimal(c), Decimal(f_c), i)
 
@@ -161,47 +163,48 @@ class FuncManager:
     def newton(
         self,
         func: Func,
-        xi: Decimal,
+        inicial: Decimal,
         error: Decimal = MARGEN_ERROR,
         max_its: int = MAX_ITERACIONES
-    ) -> Union[bool, tuple[Decimal, Decimal, int, bool]]:
+    ) -> tuple[Decimal, Decimal, int, int]:
 
         """
         Implementación del método de Newton,
         un método abierto para encontrar raíces de funciones.
         """
 
-        derivada = Func("f(x)", str(diff(func.func_expr, func.variable)))
+        derivada = Func(f"{func.nombre[0]}'(x)", str(diff(func.func_expr, func.variable)))
         dominio_derivada = derivada.get_dominio()
         dominio_func = func.get_dominio()
 
+        xi = float(inicial)
         if xi not in dominio_derivada:
-            return False
+            return (Decimal(xi), zoo, 0, 1)
 
         f = lambdify(func.variable, func.func_expr)
         f_prima = lambdify(func.variable, derivada.func_expr)
 
-        fxi = f(float(xi))
+        fxi = f(xi)
         if abs(fxi) < error:
-            return (Decimal(xi), Decimal(fxi), 1, False)
+            return (Decimal(xi), Decimal(fxi), 1, I)
 
         i = 1
         while i <= max_its:
             i += 1
-            fxi = f(float(xi))
-            fxi_prima = f_prima(float(xi))
+            fxi = f(xi)
+            fxi_prima = f_prima(xi)
 
             if abs(fxi) < error:
-                return (Decimal(xi), Decimal(fxi), i, False)
+                return (Decimal(xi), Decimal(fxi), i, I)
             if fxi_prima == 0:
-                return (Decimal(xi), Decimal(fxi), i, True)
+                return (Decimal(xi), Decimal(fxi), i, -I)
 
             xi -= fxi / fxi_prima
             if xi not in dominio_func:
-                return True
+                return (Decimal(xi), Decimal(fxi), i, -1)
             if xi not in dominio_derivada:
-                return False
-        return (Decimal(xi), Decimal(fxi), max_its, False)
+                return (Decimal(xi), Decimal(fxi), i, 1)
+        return (Decimal(xi), Decimal(fxi), max_its, zoo)
 
     def secante(
         self,
@@ -209,34 +212,34 @@ class FuncManager:
         iniciales: tuple[Decimal, Decimal],
         error: Decimal = MARGEN_ERROR,
         max_its: int = MAX_ITERACIONES
-    ) -> Union[bool, tuple[Decimal, Decimal, int, bool]]:
+    ) -> tuple[Decimal, Decimal, int, int]:
 
         """
         Implementación del método de la secante,
         un método abierto para encontrar raíces de funciones.
         """
 
-        xi, xu = iniciales
+        xi, xu = float(iniciales[0]), float(iniciales[1])
         f = lambdify(func.variable, func.func_expr)
         f_dominio = func.get_dominio()
 
-        fxu = f(float(xu))
+        fxu = f(xu)
         if abs(fxu) < error:
-            return (Decimal(xu), Decimal(fxu), 1, False)
+            return (Decimal(xu), Decimal(fxu), 1, I)
 
         i = 1
         while i <= max_its:
             i += 1
-            fxi = f(float(xi))
-            fxu = f(float(xu))
+            fxi = f(xi)
+            fxu = f(xu)
             if abs(fxu) < error:
-                return (Decimal(xu), Decimal(fxu), i, False)
+                return (Decimal(xu), Decimal(fxu), i, I)
 
             xi, xu = xu, xi
             xu = (fxu * (xi - xu)) / (fxi - fxu)
             if xu not in f_dominio:
-                return True
-        return (Decimal(xu), Decimal(fxu), max_its, False)
+                return (Decimal(xu), Decimal(fxu), i, -1)
+        return (Decimal(xu), Decimal(fxu), max_its, zoo)
 
     def save_funciones(self) -> None:
         """

@@ -8,7 +8,6 @@ from os import (
     path,
 )
 
-from re import match
 from typing import Optional
 
 from customtkinter import CTkImage as ctkImage
@@ -54,23 +53,13 @@ class Func:
     ) -> None:
 
         """
-        * ValueError: si nombre no es tiene la forma 'f(x)'
+        * ValueError: si la expresión tiene dominio complejo
         """
-
-        if not self.validar_nombre(nombre):
-            if "x" not in nombre:
-                error = "La función debe estar en términos de x!"
-            else:
-                error = "Nombre inválido! Debe tener la forma 'f(x)' !"
-            raise ValueError(error)
-        if str(variable) not in expr:
-            raise ValueError("La función no contiene la variable indicada!")
-
-        self.latexified = latexified
-        self.latex_img: Optional[ctkImage] = None
 
         self.nombre = nombre
         self.variable = variable
+        self.latexified = latexified
+        self.latex_img: Optional[ctkImage] = None
 
         if "sen" in expr:
             expr = expr.replace("sen", "sin")
@@ -201,12 +190,3 @@ class Func:
             light_image=img,
             size=(img_length, img_height),
         )
-
-    @staticmethod
-    def validar_nombre(nombre: str) -> bool:
-        """
-        Valida que el nombre de la función sea válido.
-        """
-
-        pattern = r"^[a-z]\([x]\)$"
-        return bool(match(pattern, nombre))

@@ -177,8 +177,11 @@ class ResultadoFrame(ctkFrame):
         master: Union[ctkFrame, CustomScrollFrame],
         msg: Optional[str] = None,
         img: Optional[ctkImage] = None,
-        border_color: str = "#18c026",
+        border_color: Optional[str] = None,
     ) -> None:
+
+        if border_color is None:
+            border_color = "#18c026"
 
         super().__init__(
             master,
