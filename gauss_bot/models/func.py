@@ -2,7 +2,7 @@
 Implementación de la clase Func.
 """
 
-from fractions import Fraction
+from decimal import Decimal
 from os import (
     makedirs,
     path,
@@ -35,6 +35,8 @@ from gauss_bot import (
     SAVED_FUNC_PATH,
     transparent_invert,
 )
+
+TRANSFORMS = standard_transformations + (implicit_multiplication_application,)
 
 
 class Func:
@@ -77,10 +79,7 @@ class Func:
 
         self.func_expr: Expr = parse_expr(
             expr,
-            transformations=(
-                standard_transformations +
-                (implicit_multiplication_application,)
-            ),
+            transformations=TRANSFORMS,
         )
 
         if self.func_expr.has(oo, -oo, zoo, nan):
@@ -98,7 +97,7 @@ class Func:
 
         return continuous_domain(self.func_expr, self.variable, Reals)
 
-    def es_continua(self, intervalo: tuple[Fraction, Fraction]) -> bool:
+    def es_continua(self, intervalo: tuple[Decimal, Decimal]) -> bool:
         """
         Valida si self.func_expr es continua en el
         intervalo indicado, con respecto a self.variable.
@@ -112,7 +111,33 @@ class Func:
             right_open=True,
         ).is_subset(self.get_dominio())
 
-    def latex_to_png(self, font_size: int = 75) -> ctkImage:
+    def get_png(self) -> ctkImage:
+        """
+        Retorna la imagen PNG de la función si ya había sido generada.
+        Si no, llama a latex_to_png para generarla, y la retorna.
+        """
+
+        if not self.latexified or self.latex_img is None:
+            self.latex_img  = (
+                self.latex_to_png(
+                    self.nombre,
+                    str(self.func_expr),
+                    con_nombre=True,
+                )
+            )
+
+            self.latexified = True
+        return self.latex_img  # type: ignore
+
+    @staticmethod
+    def latex_to_png(
+        nombre: str,
+        func_expr: Optional[str] = None,
+        misc_str: Optional[str] = None,
+        con_nombre: bool = False,
+        font_size: int = 75
+    ) -> ctkImage:
+
         """
         Convierte self.func_expr en formato LaTeX
         y lo convierte en una imagen PNG.
@@ -121,20 +146,28 @@ class Func:
         """
 
         makedirs(SAVED_FUNC_PATH, exist_ok=True)
-        output_file = path.join(SAVED_FUNC_PATH, f"{self.nombre}.png")
+        output_file = path.join(SAVED_FUNC_PATH, f"{nombre}.png")
 
-        latex_str: str = latex(self.func_expr, ln_notation=True)
-        latex_str = f"{self.nombre} = {latex_str}"
+        if func_expr is not None:
+            parse_str = parse_expr(func_expr, transformations=TRANSFORMS)
+            latex_str: str = latex(parse_str, ln_notation=True)
+        elif misc_str is not None:
+            latex_str = misc_str
+        else:
+            raise ValueError("No se recibió un string a convertir en PNG!")
+
+        if con_nombre:
+            latex_str = f"{nombre} = {latex_str}"
 
         rc("text", usetex=True)
         rc("font", family="serif")
 
-        fig_length = 12 + (len(latex_str) // 8)
+        fig_length = 8 + (len(latex_str) // 8)
         fig_height = (
             2
             if r"\\" not in latex_str
             else
-            int(2 + latex_str.count(r"\\") // 2)
+            int(2 + latex_str.count(r"\\") * 2)
         )
 
         img_length = fig_length * 20
@@ -160,27 +193,14 @@ class Func:
         )
 
         close(fig)
-        self.latexified = True
 
         img = open_img(output_file)
         inverted_img = transparent_invert(img)
-        self.latex_img = ctkImage(
+        return ctkImage(
             dark_image=inverted_img,
             light_image=img,
             size=(img_length, img_height),
         )
-
-        return self.latex_img
-
-    def get_png(self) -> ctkImage:
-        """
-        Retorna la imagen PNG de la función si ya había sido generada.
-        Si no, llama a latex_to_png para generarla, y la retorna.
-        """
-
-        if not self.latexified or self.latex_img is None:
-            return self.latex_to_png()
-        return self.latex_img  # type: ignore
 
     @staticmethod
     def validar_nombre(nombre: str) -> bool:

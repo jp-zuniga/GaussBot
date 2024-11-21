@@ -45,6 +45,7 @@ def place_msg_frame(
     msg_frame: Optional[ctkFrame],
     msg: Optional[str] = None,
     img: Optional[ctkImage] = None,
+    border_color: Optional[str] = None,
     tipo: Literal["error", "success", "resultado"] = "error",
     **grid_kwargs,
 ) -> ctkFrame:
@@ -67,7 +68,7 @@ def place_msg_frame(
     elif tipo == "success":
         msg_frame = SuccessFrame(parent_frame, msg)  # noqa
     elif tipo == "resultado":
-        msg_frame = ResultadoFrame(parent_frame, msg, img)  # noqa
+        msg_frame = ResultadoFrame(parent_frame, msg, img, border_color)  # noqa
     else:
         raise ValueError("Valor inválido para argumento 'tipo'!")
 

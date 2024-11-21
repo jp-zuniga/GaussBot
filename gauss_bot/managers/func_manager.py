@@ -5,7 +5,11 @@ Se encarga de aplicar diferentes métodos para encontrar
 raíces de las funciones ingresadas, y retorna los resultados.
 """
 
-from fractions import Fraction
+from decimal import (
+    Decimal,
+    getcontext,
+)
+
 from json import (
     dump,
     load,
@@ -30,7 +34,9 @@ from gauss_bot import (
     LOGGER,
 )
 
-MARGEN_ERROR = Fraction(1, 1000000)
+getcontext().prec = 20
+
+MARGEN_ERROR = Decimal(1e-6)
 MAX_ITERACIONES = 500
 
 
@@ -79,113 +85,131 @@ class FuncManager:
     def biseccion(
         self,
         func: Func,
-        intervalo: tuple[Fraction, Fraction],
-        error: Fraction = MARGEN_ERROR
-    ) -> Union[bool, tuple[Fraction, Fraction, int]]:
+        intervalo: tuple[Decimal, Decimal],
+        error: Decimal = MARGEN_ERROR
+    ) -> Union[bool, tuple[Decimal, Decimal, int]]:
 
         """
         Implementación del método de bisección,
         un método cerrado para encontrar raíces de funciones.
         """
 
+        if not func.es_continua(intervalo):
+            return False
+
         a, b = intervalo
         f = lambdify(func.variable, func.func_expr)
 
-        f_a = Fraction(f(float(a)))
-        f_b = Fraction(f(float(b)))
+        f_a = f(float(a))
+        f_b = f(float(b))
         if f_a * f_b > 0:
             return True
 
         i = 0
-        while True:
+        while i <= MAX_ITERACIONES:
             i += 1
             c = (a + b) / 2
-            f_c = Fraction(f(float(c)))
-            if f_c == 0 or abs(f_c) < error:
-                return (c, f_c, i)
+            f_c = f(float(c))
+            if abs(f_c) < error:
+                return (Decimal(c), Decimal(f_c), i)
             if f_a * f_c < 0:
                 b = c
             elif f_b * f_c < 0:
                 a = c
-            if i == MAX_ITERACIONES:
-                return (c, f_c, -1)
+        return (Decimal(c), Decimal(f_c), -1)
 
     def falsa_posicion(
         self,
         func: Func,
-        intervalo: tuple[Fraction, Fraction],
-        error: Fraction = MARGEN_ERROR
-    ) -> Union[bool, tuple[Fraction, Fraction, int]]:
+        intervalo: tuple[Decimal, Decimal],
+        error: Decimal = MARGEN_ERROR
+    ) -> Union[bool, tuple[Decimal, Decimal, int]]:
 
         """
         Implementación del método de bisección,
         un método cerrado para encontrar raíces de funciones.
         """
 
+        if not func.es_continua(intervalo):
+            return False
+
         a, b = intervalo
         f = lambdify(func.variable, func.func_expr)
 
-
-        f_a = Fraction(f(float(a)))
-        f_b = Fraction(f(float(b)))
+        f_a = f(float(a))
+        f_b = f(float(b))
         if f_a * f_b > 0:
             return True
 
         i = 0
-        while True:
+        while i <= MAX_ITERACIONES:
             i += 1
-            c = (f(float(a)) * (a - b)) / f(float(a)) - f(float(b))
-            f_c = Fraction(f(float(c)))
-            if f_c == 0 or abs(f_c) < error:
-                return (c, f_c, i)
+            fa = f(float(a))
+            fb = f(float(b))
+
+            c = (fa * (a - b)) / fa - fb
+            f_c = f(float(c))
+            if abs(f_c) < error:
+                return (Decimal(c), Decimal(f_c), i)
+
             if f_a * f_c < 0:
                 b = c
             elif f_b * f_c < 0:
                 a = c
-            if i == MAX_ITERACIONES:
-                return (c, f_c, -1)
+        return (Decimal(c), Decimal(f_c), -1)
 
     def newton(
         self,
         func: Func,
-        xi: Fraction,
-        error: Fraction = MARGEN_ERROR,
+        xi: Decimal,
+        error: Decimal = MARGEN_ERROR,
         max_its: int = MAX_ITERACIONES
-    ) -> Union[tuple[Fraction, Fraction, int, bool]]:
+    ) -> Union[bool, tuple[Decimal, Decimal, int, bool]]:
 
         """
         Implementación del método de Newton,
         un método abierto para encontrar raíces de funciones.
         """
 
+        derivada = Func("f(x)", str(diff(func.func_expr, func.variable)))
+        dominio_derivada = derivada.get_dominio()
+        dominio_func = func.get_dominio()
+
+        if xi not in dominio_derivada:
+            return False
 
         f = lambdify(func.variable, func.func_expr)
-        f_prima = lambdify(func.variable, diff(func.func_expr, func.variable))
+        f_prima = lambdify(func.variable, derivada.func_expr)
 
         fxi = f(float(xi))
         if abs(fxi) < error:
-            return (xi, fxi, 1, False)
+            return (Decimal(xi), Decimal(fxi), 1, False)
 
-        for i in range(2, max_its + 1):
+        i = 1
+        while i <= max_its:
+            i += 1
             fxi = f(float(xi))
             fxi_prima = f_prima(float(xi))
 
             if abs(fxi) < error:
-                return (xi, fxi, i, True)
+                return (Decimal(xi), Decimal(fxi), i, False)
+            if fxi_prima == 0:
+                return (Decimal(xi), Decimal(fxi), i, True)
 
             xi -= fxi / fxi_prima
-            fxi = f(float(xi))
-            if abs(fxi) < error:
-                return (xi, fxi, i, False)
-        return (xi, fxi, max_its, False)
+            if xi not in dominio_func:
+                return True
+            if xi not in dominio_derivada:
+                return False
+        return (Decimal(xi), Decimal(fxi), max_its, False)
 
     def secante(
         self,
         func: Func,
-        iniciales: tuple[Fraction, Fraction],
-        error: Fraction = MARGEN_ERROR,
+        iniciales: tuple[Decimal, Decimal],
+        error: Decimal = MARGEN_ERROR,
         max_its: int = MAX_ITERACIONES
-    ) -> Union[tuple[Fraction, Fraction, int, bool]]:
+    ) -> Union[bool, tuple[Decimal, Decimal, int, bool]]:
 
         """
         Implementación del método de la secante,
@@ -194,28 +218,30 @@ class FuncManager:
 
         xi, xu = iniciales
         f = lambdify(func.variable, func.func_expr)
+        f_dominio = func.get_dominio()
+
         fxu = f(float(xu))
-
         if abs(fxu) < error:
-            return (xu, fxu, 1, False)
+            return (Decimal(xu), Decimal(fxu), 1, False)
 
-        for i in range(2, max_its + 1):
+        i = 1
+        while i <= max_its:
+            i += 1
+            fxi = f(float(xi))
             fxu = f(float(xu))
             if abs(fxu) < error:
-                return (xu, fxu, i, True)
+                return (Decimal(xu), Decimal(fxu), i, False)
 
-            temp = xu
-            xu -= (fxu * (xi - xu)) / (f(float(xi)) - fxu)
-            fxu = f(float(xu))
-            if abs(fxu) < error:
-                return (xu, fxu, i, False)
-            xi = temp
-        return (xu, fxu, max_its, False)
+            xi, xu = xu, xi
+            xu = (fxu * (xi - xu)) / (fxi - fxu)
+            if xu not in f_dominio:
+                return True
+        return (Decimal(xu), Decimal(fxu), max_its, False)
 
     def save_funciones(self) -> None:
         """
         Escribe el diccionario de funciones ingresados al archivo funciones.json,
-        utilizando FractionEncoder() para escribir objetos Fraction().
+        utilizando FractionEncoder() para escribir objetos ).
         """
 
         # descomponer los objetos Func() en self.funcs_ingresadas

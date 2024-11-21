@@ -160,13 +160,6 @@ class SumaRestaTab(CustomScrollFrame):
             sticky="n",
         )
 
-        self.resultado_frame.grid(
-            row=3, column=0,
-            columnspan=3,
-            padx=5, pady=5,
-            sticky="n",
-        )
-
     def ejecutar_operacion(self) -> None:
         """
         Suma o resta las matrices seleccionadas.
@@ -175,6 +168,12 @@ class SumaRestaTab(CustomScrollFrame):
         self.update_operacion(self.select_operacion.get())
         self.update_mat1(self.select_1.get())
         self.update_mat2(self.select_2.get())
+        self.resultado_frame.grid(
+            row=3, column=0,
+            columnspan=3,
+            padx=5, pady=5,
+            sticky="n",
+        )
 
         delete_msg_frame(self.msg_frame)
         try:
@@ -196,7 +195,6 @@ class SumaRestaTab(CustomScrollFrame):
                 msg_frame=self.msg_frame,
                 msg=str(e),
                 tipo="error",
-                columnspan=3,
             )
             return
         delete_msg_frame(self.msg_frame)
@@ -206,7 +204,6 @@ class SumaRestaTab(CustomScrollFrame):
             msg_frame=self.msg_frame,
             msg=f"{header}:\n{str(resultado)}",  # pylint: disable=E0606
             tipo="resultado",
-            columnspan=3,
         )
 
     def update_frame(self) -> None:
@@ -412,13 +409,6 @@ class MultiplicacionTab(CustomScrollFrame):
             sticky="n",
         )
 
-        self.resultado_escalar.grid(
-            row=3, column=0,
-            columnspan=3,
-            padx=5, pady=5,
-            sticky="n",
-        )
-
     def setup_mult_mats_tab(self) -> None:
         """
         Configura la pestaña para multiplicación matricial.
@@ -479,13 +469,6 @@ class MultiplicacionTab(CustomScrollFrame):
             sticky="n",
         )
 
-        self.resultado_mats.grid(
-            row=3, column=0,
-            columnspan=3,
-            padx=5, pady=5,
-            sticky="n",
-        )
-
     def setup_mat_vec_tab(self) -> None:
         """
         Configura la pestaña para producto matriz-vector.
@@ -542,13 +525,6 @@ class MultiplicacionTab(CustomScrollFrame):
             sticky="n",
         )
 
-        self.resultado_mat_vec.grid(
-            row=3, column=0,
-            columnspan=3,
-            padx=5, pady=5,
-            sticky="n",
-        )
-
     def mult_por_escalar(self) -> None:
         """
         Realiza la multiplicación escalar de la
@@ -556,6 +532,13 @@ class MultiplicacionTab(CustomScrollFrame):
         """
 
         self.update_escalar_mat(self.select_escalar_mat.get())
+        self.resultado_escalar.grid(
+            row=3, column=0,
+            columnspan=3,
+            padx=5, pady=5,
+            sticky="n",
+        )
+
         delete_msg_if(self.msg_frame, (self.tab_escalar, self.resultado_escalar))
         try:
             escalar = Fraction(self.escalar_entry.get())  # type: ignore
@@ -571,11 +554,10 @@ class MultiplicacionTab(CustomScrollFrame):
             else:
                 msg = "El denominador no puede ser 0!"
             self.msg_frame = place_msg_frame(
-                parent_frame=self,
+                parent_frame=self.resultado_escalar,
                 msg_frame=self.msg_frame,
                 msg=msg,
                 tipo="error",
-                row=3,
             )
             return
         delete_msg_if(self.msg_frame, (self.tab_escalar, self.resultado_escalar))
@@ -585,7 +567,6 @@ class MultiplicacionTab(CustomScrollFrame):
             msg_frame=self.msg_frame,
             msg=f"{header}:\n{str(resultado)}",  # pylint: disable=E0606
             tipo="resultado",
-            columnspan=3,
         )
 
     def mult_matrices(self) -> None:
@@ -595,17 +576,22 @@ class MultiplicacionTab(CustomScrollFrame):
 
         self.update_mat1(self.select_mat1.get())
         self.update_mat2(self.select_mat2.get())
+        self.resultado_mats.grid(
+            row=3, column=0,
+            columnspan=3,
+            padx=5, pady=5,
+            sticky="n",
+        )
 
         delete_msg_if(self.msg_frame, (self.tab_mats, self.resultado_mats))
         try:
             header, resultado = self.mats_manager.mult_mats(self.mat1, self.mat2)
         except ArithmeticError as e:
             self.msg_frame = place_msg_frame(
-                parent_frame=self,
+                parent_frame=self.resultado_mats,
                 msg_frame=self.msg_frame,
                 msg=str(e),
                 tipo="error",
-                row=3,
             )
             return
         delete_msg_if(self.msg_frame, (self.tab_mats, self.resultado_mats))
@@ -615,7 +601,6 @@ class MultiplicacionTab(CustomScrollFrame):
             msg_frame=self.msg_frame,
             msg=f"{header}:\n{str(resultado)}",  # pylint: disable=E0606
             tipo="resultado",
-            columnspan=3,
         )
 
     def mult_mat_vec(self) -> None:
@@ -625,6 +610,12 @@ class MultiplicacionTab(CustomScrollFrame):
 
         self.update_mvec(self.select_vmat.get())
         self.update_mvec(self.select_mvec.get())
+        self.resultado_mat_vec.grid(
+            row=3, column=0,
+            columnspan=3,
+            padx=5, pady=5,
+            sticky="n",
+        )
 
         delete_msg_if(self.msg_frame, (self.tab_mat_vec, self.resultado_mat_vec))
         try:
@@ -635,11 +626,10 @@ class MultiplicacionTab(CustomScrollFrame):
             )
         except ArithmeticError as e:
             self.msg_frame = place_msg_frame(
-                parent_frame=self,
+                parent_frame=self.resultado_mat_vec,
                 msg_frame=self.msg_frame,
                 msg=str(e),
                 tipo="error",
-                row=3,
             )
             return
         delete_msg_if(self.msg_frame, (self.tab_mat_vec, self.resultado_mat_vec))
@@ -649,7 +639,6 @@ class MultiplicacionTab(CustomScrollFrame):
             msg_frame=self.msg_frame,
             msg=f"{header}:\n{str(resultado)}",  # pylint: disable=E0606
             tipo="resultado",
-            columnspan=3,
         )
 
     def update_frame(self) -> None:
@@ -794,7 +783,7 @@ class TransposicionTab(CustomScrollFrame):
             self.mats_manager.mats_ingresadas[nombre_transpuesta] = transpuesta
             self.after(500, lambda: self.master_frame.update_all())  # pylint: disable=W0108
             self.app.vectores.update_all()  # type: ignore
-            self.app.inputs_frame.instances[1].update_all()  # type: ignore
+            self.app.inputs_frame.instances[2].update_all()  # type: ignore
 
 
     def update_frame(self) -> None:
@@ -806,6 +795,9 @@ class TransposicionTab(CustomScrollFrame):
             variable=Variable(value=self.master_frame.nombres_matrices[0]),
             values=self.master_frame.nombres_matrices,
         )
+
+        for widget in self.winfo_children():  # type: ignore
+            widget.configure(bg_color="transparent")  # type: ignore
 
     def update_tmat(self, valor: str) -> None:
         """
@@ -918,6 +910,9 @@ class DeterminanteTab(CustomScrollFrame):
             values=self.master_frame.nombres_matrices,
         )
 
+        for widget in self.winfo_children():  # type: ignore
+            widget.configure(bg_color="transparent")  # type: ignore
+
     def update_dmat(self, valor: str) -> None:
         """
         Actualiza self.dmat con el valor
@@ -1014,7 +1009,7 @@ class InversaTab(CustomScrollFrame):
             self.mats_manager.mats_ingresadas[nombre_inversa] = inversa
             self.after(500, lambda: self.master_frame.update_all())  # pylint: disable=W0108
             self.app.vectores.update_all()  # type: ignore
-            self.app.inputs_frame.instances[1].update_all()  # type: ignore
+            self.app.inputs_frame.instances[2].update_all()  # type: ignore
 
 
     def update_frame(self) -> None:
@@ -1026,6 +1021,9 @@ class InversaTab(CustomScrollFrame):
             variable=Variable(value=self.master_frame.nombres_matrices[0]),
             values=self.master_frame.nombres_matrices,
         )
+
+        for widget in self.winfo_children():  # type: ignore
+            widget.configure(bg_color="transparent")  # type: ignore
 
     def update_imat(self, valor: str) -> None:
         """

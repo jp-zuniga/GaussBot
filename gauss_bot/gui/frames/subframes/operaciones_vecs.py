@@ -153,13 +153,6 @@ class VSumaRestaTab(CustomScrollFrame):
             sticky="n",
         )
 
-        self.resultado_frame.grid(
-            row=3, column=0,
-            columnspan=3,
-            padx=5, pady=5,
-            sticky="n",
-        )
-
     def ejecutar_operacion(self) -> None:
         """
         Suma o resta las matrices seleccionadas.
@@ -168,13 +161,19 @@ class VSumaRestaTab(CustomScrollFrame):
         self.update_operacion(self.select_operacion.get())
         self.update_vec1(self.select_1.get())
         self.update_vec2(self.select_2.get())
+        self.resultado_frame.grid(
+            row=3, column=0,
+            columnspan=3,
+            padx=5, pady=5,
+            sticky="n",
+        )
 
         delete_msg_frame(self.msg_frame)
         try:
             if self.operacion == "+":
                 header, resultado = (
                     self.vecs_manager.suma_resta_vecs(
-                        False, self.vec1, self.vec2
+                        True, self.vec1, self.vec2
                     )
                 )
             elif self.operacion == "−":
@@ -189,7 +188,6 @@ class VSumaRestaTab(CustomScrollFrame):
                 msg_frame=self.msg_frame,
                 msg=str(e),
                 tipo="error",
-                columnspan=3,
             )
             return
         delete_msg_frame(self.msg_frame)
@@ -199,7 +197,6 @@ class VSumaRestaTab(CustomScrollFrame):
             msg_frame=self.msg_frame,
             msg=f"{header}:\n{str(resultado)}",  # pylint: disable=E0606
             tipo="resultado",
-            columnspan=3,
         )
 
     def update_frame(self) -> None:
@@ -398,13 +395,6 @@ class VMultiplicacionTab(CustomScrollFrame):
             sticky="n",
         )
 
-        self.resultado_escalar.grid(
-            row=3, column=0,
-            columnspan=3,
-            padx=5, pady=5,
-            sticky="n",
-        )
-
     def setup_prod_punto_tab(self) -> None:
         """
         Setup de la tab para multiplicar vectores.
@@ -469,13 +459,6 @@ class VMultiplicacionTab(CustomScrollFrame):
             sticky="n",
         )
 
-        self.resultado_vecs.grid(
-            row=3, column=0,
-            columnspan=3,
-            padx=5, pady=5,
-            sticky="n",
-        )
-
     def setup_mat_vec_tab(self) -> None:
         """
         Setup de la tab para multiplicar matrices y vectores.
@@ -532,19 +515,19 @@ class VMultiplicacionTab(CustomScrollFrame):
             sticky="n",
         )
 
-        self.resultado_mat_vec.grid(
-            row=3, column=0,
-            columnspan=3,
-            padx=5, pady=5,
-            sticky="n",
-        )
-
     def mult_por_escalar(self) -> None:
         """
         Realiza la multiplicación de un vector por un escalar.
         """
 
         self.update_escalar_vec(self.select_escalar_vec.get())
+        self.resultado_escalar.grid(
+            row=3, column=0,
+            columnspan=3,
+            padx=5, pady=5,
+            sticky="n",
+        )
+
         delete_msg_if(self.msg_frame, (self.tab_escalar, self.resultado_escalar))
         try:
             escalar = Fraction(self.escalar_entry.get())  # type: ignore
@@ -560,11 +543,10 @@ class VMultiplicacionTab(CustomScrollFrame):
             else:
                 msg = "El denominador no puede ser 0!"
             self.msg_frame = place_msg_frame(
-                parent_frame=self,
+                parent_frame=self.resultado_escalar,
                 msg_frame=self.msg_frame,
                 msg=msg,
                 tipo="error",
-                row=3,
             )
             return
         delete_msg_if(self.msg_frame, (self.tab_escalar, self.resultado_escalar))
@@ -583,6 +565,12 @@ class VMultiplicacionTab(CustomScrollFrame):
 
         self.update_vec1(self.select_vec1.get())
         self.update_vec2(self.select_vec2.get())
+        self.resultado_vecs.grid(
+            row=3, column=0,
+            columnspan=3,
+            padx=5, pady=5,
+            sticky="n",
+        )
 
         delete_msg_if(self.msg_frame, (self.tab_prod_punto, self.resultado_vecs))
         try:
@@ -594,17 +582,16 @@ class VMultiplicacionTab(CustomScrollFrame):
             )
         except ArithmeticError as e:
             self.msg_frame = place_msg_frame(
-                parent_frame=self,
+                parent_frame=self.resultado_vecs,
                 msg_frame=self.msg_frame,
                 msg=str(e),
                 tipo="error",
-                row=3,
             )
             return
         delete_msg_if(self.msg_frame, (self.tab_prod_punto, self.resultado_vecs))
 
         self.msg_frame = place_msg_frame(
-            parent_frame=self.resultado_escalar,
+            parent_frame=self.resultado_vecs,
             msg_frame=self.msg_frame,
             msg=f"{header}:\n{str(resultado)}",  # pylint: disable=E0606
             tipo="resultado",
@@ -617,6 +604,12 @@ class VMultiplicacionTab(CustomScrollFrame):
 
         self.update_vmat(self.select_vmat.get())
         self.update_mvec(self.select_mvec.get())
+        self.resultado_mat_vec.grid(
+            row=3, column=0,
+            columnspan=3,
+            padx=5, pady=5,
+            sticky="n",
+        )
 
         delete_msg_if(self.msg_frame, (self.tab_mat_vec, self.resultado_mat_vec))
         try:
@@ -628,17 +621,16 @@ class VMultiplicacionTab(CustomScrollFrame):
             )
         except ArithmeticError as e:
             self.msg_frame = place_msg_frame(
-                parent_frame=self,
+                parent_frame=self.resultado_mat_vec,
                 msg_frame=self.msg_frame,
                 msg=str(e),
                 tipo="error",
-                row=3,
             )
             return
         delete_msg_if(self.msg_frame, (self.tab_mat_vec, self.resultado_mat_vec))
 
         self.msg_frame = place_msg_frame(
-            parent_frame=self.resultado_escalar,
+            parent_frame=self.resultado_mat_vec,
             msg_frame=self.msg_frame,
             msg=f"{header}:\n{str(resultado)}",  # pylint: disable=E0606
             tipo="resultado",

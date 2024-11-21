@@ -189,12 +189,13 @@ class ResultadoFrame(ctkFrame):
         )
 
         self.master = master
+        self.columnconfigure(0, weight=1)
         if msg is not None:
             self.msg_label = ctkLabel(self, text=msg)
             self.msg_label.grid(row=0, column=0, padx=20, pady=20)
         elif img is not None:
             self.img_label = ctkLabel(self, text="", image=img)
-            self.img_label.grid(row=0, column=0, padx=20, pady=20)
+            self.img_label.grid(row=0, column=0, padx=10, pady=10)
 
     def destroy(self) -> None:
         self.forget()

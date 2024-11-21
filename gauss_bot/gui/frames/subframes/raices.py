@@ -4,20 +4,27 @@ un frame que permite encontrar
 las raíces de funciones matemáticas.
 """
 
-# from fractions import Fraction
+from decimal import (
+    Decimal,
+    getcontext,
+)
+
 from random import randint
-from typing import TYPE_CHECKING
+from typing import (
+    TYPE_CHECKING,
+    Optional,
+    Union,
+)
 
 from tkinter import Variable
 from customtkinter import (
     CTkButton as ctkButton,
     CTkFrame as ctkFrame,
-    # CTkImage as ctkImage,
     CTkLabel as ctkLabel,
 )
 
-# from gauss_bot import delete_msg_frame
-# from gauss_bot.models import Func
+from gauss_bot import generate_sep
+from gauss_bot.models import Func
 from gauss_bot.managers import (
     MARGEN_ERROR,
     MAX_ITERACIONES,
@@ -28,13 +35,14 @@ from gauss_bot.gui.custom import (
     CustomEntry,
     CustomDropdown,
     CustomScrollFrame,
-    # place_msg_frame,
+    place_msg_frame,
 )
 
 if TYPE_CHECKING:
     from gauss_bot.gui import GaussUI
     from gauss_bot.gui.frames import AnalisisFrame
 
+getcontext().prec = 12  # precision de decimales
 
 class RaicesFrame(CustomScrollFrame):
     """
@@ -71,7 +79,10 @@ class RaicesFrame(CustomScrollFrame):
             "Método de la Secante": 3,
         }
 
+        self.msg_frame: Optional[ctkFrame] = None
         self.metodo_actual: int = -1
+        self.func_seleccionada: Func
+
         self.a_entry: CustomEntry
         self.b_entry: CustomEntry
         self.xi_entry: CustomEntry
@@ -96,7 +107,7 @@ class RaicesFrame(CustomScrollFrame):
         """
 
         self.metodo_frame.grid(row=1, column=0, pady=5, sticky="n")
-        func_seleccionada = self.func_manager.funcs_ingresadas[nombre_func]
+        self.func_seleccionada = self.func_manager.funcs_ingresadas[nombre_func]
 
         for widget in self.metodo_frame.winfo_children():  # type: ignore
             widget.destroy()  # type: ignore
@@ -108,15 +119,21 @@ class RaicesFrame(CustomScrollFrame):
         ctkLabel(
             self.metodo_frame,
             text="",
-            image=func_seleccionada.get_png(),
+            image=self.func_seleccionada.get_png(),
         ).grid(row=0, column=0, pady=5, sticky="n")
+
+        ctkLabel(
+            self.metodo_frame,
+            text="",
+            image=generate_sep(False, (300, 5)),
+        ).grid(row=1, column=0, sticky="n")
 
         CustomDropdown(
             self.metodo_frame,
             variable=Variable(value="Seleccione un método para encontrar las raíces:"),
             values=list(self.metodos.keys()),
             command=self.mostrar_datos,
-        ).grid(row=1, column=0, pady=5, sticky="n")
+        ).grid(row=2, column=0, pady=5, sticky="n")
 
     def mostrar_datos(self, metodo: str) -> None:
         """
@@ -128,7 +145,14 @@ class RaicesFrame(CustomScrollFrame):
         for widget in self.resultado.winfo_children():  # type: ignore
             widget.destroy()  # type: ignore
 
-        if self.metodo_actual == self.metodos[metodo]:
+        if self.metodos.get(metodo, None) is None:
+            raise ValueError("Argumento inválido para 'metodo'!")
+
+        if (
+            self.metodo_actual == self.metodos[metodo]
+            and
+            not self.datos_frame.winfo_children()
+        ):
             return
 
         if (
@@ -152,8 +176,6 @@ class RaicesFrame(CustomScrollFrame):
                 self.setup_abierto(newton=True)
             case 3:
                 self.setup_abierto(newton=False)
-            case _:
-                raise ValueError("Argumento inválido para 'metodo'!")
 
     def setup_cerrado(self) -> None:
         """
@@ -295,6 +317,219 @@ class RaicesFrame(CustomScrollFrame):
         """
         Lee y valida los datos ingresados por el usuario
         en las widgets de self.datos_frame.
+        """
+
+        self.resultado.grid(row=3, column=0, pady=5, sticky="n")
+        for widget in self.resultado.winfo_children():  # type: ignore
+            widget.destroy()  # type: ignore
+
+        dominio = self.func_seleccionada.get_dominio()
+        if self.metodo_actual in (0, 1):  # metodos cerrados
+            try:
+                a = Decimal(self.a_entry.get())
+                b = Decimal(self.b_entry.get())
+                error = Decimal(self.error_entry.get())
+
+                if a > b:
+                    raise ArithmeticError(
+                        "En un intervalo, el número menor debe ir primero!"
+                    )
+                if a not in dominio or b not in dominio:
+                    raise ArithmeticError(
+                        "Los extremos del intervalo no son parte del " +
+                       f"dominio de {self.func_seleccionada.nombre}!"
+                    )
+
+                self.calc_raiz(vals_iniciales=(a, b), error=error)
+            except (ValueError, ZeroDivisionError, ArithmeticError) as e:
+                self.msg_frame = place_msg_frame(
+                    parent_frame=self.resultado,
+                    msg_frame=self.msg_frame,
+                    msg=str(e),
+                    tipo="error",
+                )
+
+                return
+
+        elif self.metodo_actual in (2, 3):  # metodos abiertos
+            try:
+                xi = Decimal(self.xi_entry.get())
+                error = Decimal(self.error_entry.get())
+                max_its = int(self.iteraciones_entry.get())
+                if max_its <= 0:
+                    raise ValueError(
+                        "Debe ingresar un número entero positivo "+
+                        "para el máximo de iteraciones!"
+                    )
+
+                if xi not in dominio:
+                    adj = "primer " if self.metodo_actual == 3 else ""
+                    raise ArithmeticError(
+                        f"El {adj}valor inicial no es parte del " +
+                        f"dominio de {self.func_seleccionada.nombre}!"
+                    )
+
+                if self.metodo_actual == 3:
+                    xu = Decimal(self.xu_entry.get())
+                    vals = (xi, xu)
+                    if xu not in dominio:
+                        raise ArithmeticError(
+                            "El segundo valor inicial no es parte del " +
+                            f"dominio de {self.func_seleccionada.nombre}!"
+                        )
+                else:
+                    vals = xi  # type: ignore
+
+                self.calc_raiz(vals_iniciales=vals, error=error, max_its=max_its)
+            except (ValueError, ZeroDivisionError, ArithmeticError) as e:
+                if isinstance(e, ValueError) and "Decimal" in str(e):
+                    error_substr = (
+                        "el valor inicial"
+                        if self.metodo_actual == 2
+                        else "lost valores iniciales"
+                    )
+
+                    error_msg = (
+                        "Debe ingresar números racionales para "+
+                       f"{error_substr} y margen de error!"
+                    )
+                elif isinstance(e, ValueError) and "int" in str(e):
+                    error_msg = (
+                        "Debe ingresar números enteros positivos " +
+                        "para el máximo de iteraciones!"
+                    )
+                elif isinstance(e, ZeroDivisionError):
+                    error_msg = "El denominador no puede ser 0!"
+                else:
+                    error_msg = str(e)
+
+                self.msg_frame = place_msg_frame(
+                    parent_frame=self.resultado,
+                    msg_frame=self.msg_frame,
+                    msg=error_msg,
+                    tipo="error",
+                )
+
+                return
+
+    def calc_raiz(self, **kwargs) -> None:
+        """
+        Calcula la raíz de self.func_selecccionada
+        utilizando self.metodo_actual.
+
+        Kwargs válidos:
+        - Para métodos cerrados:
+            - vals_iniciales: tuple[Decimal, Decimal]
+        - Para métodos abiertos:
+            - vals_iniciales: Union[Decimal, tuple[Decimal, Decimal]]
+            - max_its: int (<= 0) = 500
+        - error = Decimal(1, 1000000)
+        """
+
+        match self.metodo_actual:
+            case 0:
+                resultado = self.func_manager.biseccion(
+                    func=self.func_seleccionada,
+                    intervalo=kwargs.pop("vals_iniciales"),
+                    error=kwargs.pop("error"),
+                )
+            case 1:
+                resultado = self.func_manager.falsa_posicion(
+                    func=self.func_seleccionada,
+                    intervalo=kwargs.pop("vals_iniciales"),
+                    error=kwargs.pop("error"),
+                )
+            case 2:
+                resultado = self.func_manager.newton(  # type: ignore
+                    func=self.func_seleccionada,
+                    xi=kwargs.pop("vals_iniciales"),
+                    error=kwargs.pop("error"),
+                    max_its=kwargs.pop("max_its"),
+                )
+            case 3:
+                resultado = self.func_manager.secante(  # type: ignore
+                    func=self.func_seleccionada,
+                    iniciales=kwargs.pop("vals_iniciales"),
+                    error=kwargs.pop("error"),
+                    max_its=kwargs.pop("max_its"),
+                )
+        if self.metodo_actual in (0, 1):
+            self.mostrar_r_cerrado(resultado)  # type: ignore
+        elif self.metodo_actual in (2, 3):
+            self.mostrar_r_abierto(resultado)  # type: ignore
+
+    def mostrar_r_cerrado(
+        self,
+        resultado: Union[bool, tuple[Decimal, Decimal, int]],
+    ) -> None:
+
+        """
+        Se encarga de mostrar los resultados de métodos cerrados.
+        """
+
+        if isinstance(resultado, bool):
+            if resultado:
+                error_msg = "La función no cambia de signo en el intervalo indicado!"
+            else:
+                error_msg = "La función no es continua en el intervalo indicado!"
+            self.msg_frame = place_msg_frame(
+                parent_frame=self.resultado,
+                msg_frame=self.msg_frame,
+                msg=error_msg,
+                tipo="error",
+            )
+
+            return
+
+        error = Decimal(self.error_entry.get())
+        x, fx, i = resultado
+
+        x_igual = rf"x = {format(x.normalize(), "f")}"
+        fx_igual = rf"f(x) = {format(fx.normalize(), "f")}"
+
+        raiz_img = Func.latex_to_png(
+            nombre=f"resultado_cerrado_{self.func_seleccionada.nombre}",
+            misc_str=rf"{x_igual}" + r"\\[1em]" + rf"{fx_igual}",
+            font_size=60,
+        )
+
+        metodo = "bisección" if self.metodo_actual == 0 else "falsa posición"
+        if i == -1:
+            borde = "#ff3131"
+            interpretacion = (
+                f"Después de {MAX_ITERACIONES} iteraciones, no se encontró " +
+                f"una raíz dentro del margen de error {error.normalize()}!\n" +
+                 "Raíz aproximada encontrada:"
+            )
+        else:
+            borde = None
+            interpretacion = (
+                f"El método de {metodo} converge después de {i} iteraciones!\n" +
+                f"Raíz{" " if fx == 0 else " aproximada "}encontrada: "
+            )
+
+        ctkLabel(
+            self.resultado,
+            text=interpretacion,
+        ).grid(row=0, column=0, pady=5, sticky="n")
+
+        self.msg_frame = place_msg_frame(
+            parent_frame=self.resultado,
+            msg_frame=self.msg_frame,
+            img=raiz_img,
+            border_color=borde,
+            tipo="resultado",
+            row=1,
+        )
+
+
+    def mostrar_r_abierto(
+        self,
+        resultado: Union[bool, tuple[Decimal, Decimal, int, bool]],
+    ) -> None:
+
+        """
+        Se encarga de mostrar los resultados de métodos abiertos.
         """
 
     def limpiar_inputs(self) -> None:
