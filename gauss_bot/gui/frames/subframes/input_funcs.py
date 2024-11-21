@@ -235,6 +235,7 @@ class AgregarFuncs(CustomScrollFrame):
         )
 
         self.master_frame.update_all()
+        self.app.analisis.update_all()  # type: ignore
 
     def limpiar_input(self) -> None:
         """
