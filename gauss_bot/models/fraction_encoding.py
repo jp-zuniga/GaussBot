@@ -6,10 +6,13 @@ para leer y escribir objetos Fraction() a archivos .json.
 from fractions import Fraction
 from json import (
     JSONEncoder,
-    JSONDecoder
+    JSONDecoder,
 )
 
-from typing import Any, Union
+from typing import (
+    Any,
+    Union,
+)
 
 
 class FractionEncoder(JSONEncoder):
@@ -18,15 +21,21 @@ class FractionEncoder(JSONEncoder):
     a archivos .json en un formato personalizado.
     """
 
-    # override del metodo default() de JSONEncoder
-    def default(self, o: Any) -> Union[dict[str, int], Any]:
+    # override del metodo default() de JSONEncoder:
+    # se utiliza cuando json.load encuentra un objeto
+    # que no puede ser serializado por defecto.
+    def default(self, o: Any) -> Union[dict[str, Union[str, int]], Any]:
         if isinstance(o, Fraction):
+            # si el objeto encontrado es una instancia de Fraction,
+            # se serializa como un diccionario, que incluye
+            # el tipo del objeto, el numerador, y el denominador.
             return {
                 "__type__": "Fraction",
                 "numerator": o.numerator,
                 "denominator": o.denominator
             }
 
+        # si no, llamar al metodo default() de JSONEncoder para tirar el error
         return super().default(o)
 
 
@@ -37,6 +46,7 @@ class FractionDecoder(JSONDecoder):
     """
 
     def __init__(self, *args, **kwargs):
+        # inicializar con fraction_object_hook() como hook por defecto
         super().__init__(object_hook=self.fraction_object_hook, *args, **kwargs)
 
     def fraction_object_hook(self, obj: dict) -> Union[Fraction, dict]:
@@ -44,6 +54,11 @@ class FractionDecoder(JSONDecoder):
         Custom hook para decodificar objetos Fraction().
         """
 
+        # si el diccionario encontrado contiene la llave "__type__",
+        # y su valor == "Fraction", se asume que representa un objeto Fraction(),
+        # y se retorna una instancia de Fraction() con los valores del diccionario.
         if "__type__" in obj and obj["__type__"] == "Fraction":
             return Fraction(obj["numerator"], obj["denominator"])
+
+        # si no, retornar el diccionario a como se encuentra
         return obj

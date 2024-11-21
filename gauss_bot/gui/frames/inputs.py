@@ -1,7 +1,7 @@
 """
-Implementación de las clases ManejarMats y ManejarVecs,
-los frames que contienen subframes para
-agregar, mostrar, editar y eliminar matrices y vectores.
+Implementación de las clases ManejarSistemas,
+ManejarMats, y ManejarVecs, los frames que contienen
+subframes para agregar, mostrar, y eliminar los datos.
 """
 
 from typing import (
@@ -15,21 +15,17 @@ from customtkinter import (
 )
 
 from gauss_bot.managers import (
+    FuncManager,
     MatricesManager,
     VectoresManager,
 )
 
 from gauss_bot.gui.custom import CustomScrollFrame
 from gauss_bot.gui.frames.subframes import (
-    AgregarSistemas,
-    MostrarSistemas,
-    EliminarSistemas,
-    AgregarMats,
-    MostrarMats,
-    EliminarMats,
-    AgregarVecs,
-    MostrarVecs,
-    EliminarVecs,
+    AgregarFuncs, MostrarFuncs, EliminarFuncs,
+    AgregarSistemas, MostrarSistemas, EliminarSistemas,
+    AgregarMats, MostrarMats, EliminarMats,
+    AgregarVecs, MostrarVecs, EliminarVecs,
 )
 
 if TYPE_CHECKING:
@@ -37,21 +33,32 @@ if TYPE_CHECKING:
 
 
 class InputsFrame(ctkFrame):
+    """
+    Frame que contiene a todos los subframes
+    que se encargan de manejar los inputs de la aplicación.
+    """
+
     def __init__(
         self,
         app: "GaussUI",
         master: "GaussUI",
-        mats_manager: MatricesManager,
-        vecs_manager: VectoresManager,
+        managers: tuple[FuncManager, MatricesManager, VectoresManager]
     ) -> None:
 
         super().__init__(master, corner_radius=0, fg_color="transparent")
         self.app = app
-        self.mats_manager = mats_manager
-        self.vecs_manager = vecs_manager
-        self.tabview: ctkTabview
-        self.instances: list[Union[ManejarSistemas, ManejarMats, ManejarVecs]]
+        self.func_manager, self.mats_manager, self.vecs_manager = managers
 
+        self.instances: list[
+            Union[
+                ManejarFuncs,
+                ManejarSistemas,
+                ManejarMats,
+                ManejarVecs,
+            ]
+        ]
+
+        self.tabview: ctkTabview
         self.setup_tabview()
         self.tabview.set("Matrices")
 
@@ -60,28 +67,150 @@ class InputsFrame(ctkFrame):
         Crea un tabview con pestañas para cada frame de inputs.
         """
 
-        self.tabview = ctkTabview(self)
+        self.tabview = ctkTabview(self, fg_color="transparent")
         self.tabview.pack(expand=True, fill="both")
-
         self.instances = []
 
+        # crear tabs en tabview
+        funcs_tab = self.tabview.add("Funciones")
         sistemas_tab = self.tabview.add("Sistemas de Ecuaciones")
         matrices_tab = self.tabview.add("Matrices")
         vectores_tab = self.tabview.add("Vectores")
-        self.instances.append(ManejarSistemas(self.app, sistemas_tab, self, self.mats_manager))
-        self.instances.append(ManejarMats(self.app, matrices_tab, self, self.mats_manager))
-        self.instances.append(ManejarVecs(self.app, vectores_tab, self, self.vecs_manager))
 
+        # inicializar frames y append a lista de instancias:
+        self.instances.append(
+            ManejarFuncs(
+                self.app,
+                funcs_tab,
+                self,
+                self.func_manager
+            )
+        )
+
+        self.instances.append(
+            ManejarSistemas(
+                self.app,
+                sistemas_tab,
+                self,
+                self.mats_manager
+            )
+        )
+
+        self.instances.append(
+            ManejarMats(
+                self.app,
+                matrices_tab,
+                self,
+                self.mats_manager
+            )
+        )
+
+        self.instances.append(
+            ManejarVecs(
+                self.app,
+                vectores_tab,
+                self,
+                self.vecs_manager
+            )
+        )
+
+        # pack frames para mostrarlos
         for tab in self.instances:
             tab.pack(expand=True, fill="both")
 
     def update_all(self):
+        """
+        Llama al método update_all de cada instancia
+        para que se encarguen de actualizar sus subframes.
+        """
+
         for tab in self.instances:
             tab.update_all()
         self.tabview.configure(fg_color="transparent")
 
 
+class ManejarFuncs(ctkFrame):
+    """
+    Frame que permite agregar, mostrar,
+    y eliminar sistemas de ecuaciones.
+    """
+
+    def __init__(
+        self,
+        app: "GaussUI",
+        master_tab: ctkFrame,
+        master_frame: InputsFrame,
+        func_manager: FuncManager,
+    ) -> None:
+
+        super().__init__(master_tab, corner_radius=0, fg_color="transparent")
+        self.app = app
+        self.master_frame = master_frame
+        self.func_manager = func_manager
+
+        self.instances: list[
+            Union[
+                AgregarFuncs,
+                MostrarFuncs,
+                EliminarFuncs,
+            ]
+        ]
+
+        self.tabs: list[
+            tuple[
+                str,
+                Union[
+                    type[AgregarFuncs],
+                    type[MostrarFuncs],
+                    type[EliminarFuncs],
+                ]
+            ]
+        ]
+
+        self.tabview: ctkTabview
+        self.setup_tabview()
+
+    def setup_tabview(self) -> None:
+        """
+        Crea un tabview con pestañas para cada subframe.
+        """
+
+        self.tabview = ctkTabview(self, fg_color="transparent")
+        self.tabview.pack(expand=True, fill="both")
+
+        self.instances = []
+        tabs = [
+            ("Agregar", AgregarFuncs),
+            ("Mostrar", MostrarFuncs),
+            ("Eliminar", EliminarFuncs),
+        ]
+
+        # crear tabs, inicializar y almacenar instancias
+        for nombre, cls in tabs:
+            tab = self.tabview.add(nombre)
+            tab_instance = cls(
+                self.app, tab, self, self.func_manager,
+            )
+
+            tab_instance.pack(expand=True, fill="both")
+            self.instances.append(tab_instance)   # type: ignore
+
+    def update_all(self):
+        """
+        Manda a actualizar todos los subframes.
+        """
+
+        for tab in self.instances:
+            tab.update_frame()
+        self.tabview.configure(fg_color="transparent")
+
+
 class ManejarSistemas(ctkFrame):
+    """
+    Frame que permite agregar, mostrar,
+    y eliminar sistemas de ecuaciones.
+    """
+
     def __init__(
         self,
         app: "GaussUI",
@@ -94,15 +223,14 @@ class ManejarSistemas(ctkFrame):
         self.app = app
         self.master_frame = master_frame
         self.mats_manager = mats_manager
-        self.tabview: ctkTabview
+
         self.instances: list[
             Union[
                 AgregarSistemas,
                 MostrarSistemas,
-                # EditarSistemas,
                 EliminarSistemas,
             ]
-        ] = []
+        ]
 
         self.tabs: list[
             tuple[
@@ -110,26 +238,30 @@ class ManejarSistemas(ctkFrame):
                 Union[
                     type[AgregarSistemas],
                     type[MostrarSistemas],
-                    # type[EditarSistemas],
                     type[EliminarSistemas],
                 ]
             ]
         ]
 
+        self.tabview: ctkTabview
         self.setup_tabview()
 
     def setup_tabview(self) -> None:
-        self.tabview = ctkTabview(self)
+        """
+        Crea un tabview con pestañas para cada subframe.
+        """
+
+        self.tabview = ctkTabview(self, fg_color="transparent")
         self.tabview.pack(expand=True, fill="both")
 
         self.instances = []
         tabs = [
             ("Agregar", AgregarSistemas),
             ("Mostrar", MostrarSistemas),
-            # ("Editar", EditarSistemas),
             ("Eliminar", EliminarSistemas)
         ]
 
+        # crear tab, inicializar y almacenar instancias
         for nombre, cls in tabs:
             tab = self.tabview.add(nombre)
             tab_instance: CustomScrollFrame = (
@@ -140,12 +272,20 @@ class ManejarSistemas(ctkFrame):
             self.instances.append(tab_instance)   # type: ignore
 
     def update_all(self):
+        """
+        Manda a actualizar todos los subframes.
+        """
+
         for tab in self.instances:
             tab.update_frame()
         self.tabview.configure(fg_color="transparent")
 
 
 class ManejarMats(ctkFrame):
+    """
+    Frame que permite agregar, mostrar, y eliminar matrices.
+    """
+
     def __init__(
         self,
         app: "GaussUI",
@@ -158,14 +298,14 @@ class ManejarMats(ctkFrame):
         self.app = app
         self.master_frame = master_frame
         self.mats_manager = mats_manager
+
         self.instances: list[
             Union[
                 AgregarMats,
                 MostrarMats,
-                # EditarMats,
                 EliminarMats,
             ]
-        ] = []
+        ]
 
         self.tabs: list[
             tuple[
@@ -173,26 +313,31 @@ class ManejarMats(ctkFrame):
                 Union[
                     type[AgregarMats],
                     type[MostrarMats],
-                    # type[EditarMats],
                     type[EliminarMats],
                 ]
             ]
         ]
 
+        self.tabview: ctkTabview
         self.setup_tabview()
 
     def setup_tabview(self) -> None:
-        self.tabview = ctkTabview(self)
+        """
+        Crea un tabview para todos los
+        subframes de inputs de matrices.
+        """
+
+        self.tabview = ctkTabview(self, fg_color="transparent")
         self.tabview.pack(expand=True, fill="both")
 
         self.instances = []
         tabs = [
             ("Agregar", AgregarMats),
             ("Mostrar", MostrarMats),
-            # ("Editar", EditarMats),
             ("Eliminar", EliminarMats)
         ]
 
+        # crear tab, inicializar y almacenar instancias
         for nombre, cls in tabs:
             tab = self.tabview.add(nombre)
             tab_instance: CustomScrollFrame = (
@@ -203,12 +348,20 @@ class ManejarMats(ctkFrame):
             self.instances.append(tab_instance)   # type: ignore
 
     def update_all(self):
+        """
+        Mandar a actualizar todos los subframes.
+        """
+
         for tab in self.instances:
             tab.update_frame()
         self.tabview.configure(fg_color="transparent")
 
 
 class ManejarVecs(ctkFrame):
+    """
+    Frame que permite agregar, mostrar, y eliminar vectores.
+    """
+
     def __init__(
         self,
         app: "GaussUI",
@@ -221,14 +374,14 @@ class ManejarVecs(ctkFrame):
         self.app = app
         self.master_frame = master_frame
         self.vecs_manager = vecs_manager
+
         self.instances: list[
             Union[
                 AgregarVecs,
                 MostrarVecs,
-                # EditarVecs,
                 EliminarVecs,
             ]
-        ] = []
+        ]
 
         self.tabs: list[
             tuple[
@@ -236,26 +389,31 @@ class ManejarVecs(ctkFrame):
                 Union[
                     type[AgregarVecs],
                     type[MostrarVecs],
-                    # type[EditarVecs],
                     type[EliminarVecs],
                 ]
             ]
         ]
 
+        self.tabview: ctkTabview
         self.setup_tabview()
 
     def setup_tabview(self) -> None:
-        self.tabview = ctkTabview(self)
+        """
+        Crea un tabview para todos los
+        subframes de inputs de vectores.
+        """
+
+        self.tabview = ctkTabview(self, fg_color="transparent")
         self.tabview.pack(expand=True, fill="both")
 
         self.instances = []
         tabs = [
             ("Agregar", AgregarVecs),
             ("Mostrar", MostrarVecs),
-            # ("Editar", EditarVecs),
             ("Eliminar", EliminarVecs)
         ]
 
+        # crear tabs, inicializar y almacenar instancias
         for nombre, cls in tabs:
             tab = self.tabview.add(nombre)
             tab_instance: CustomScrollFrame = (
@@ -266,6 +424,10 @@ class ManejarVecs(ctkFrame):
             self.instances.append(tab_instance)   # type: ignore
 
     def update_all(self):
+        """
+        Mandar a actualizar todos los subframes.
+        """
+
         for tab in self.instances:
             tab.update_frame()
         self.tabview.configure(fg_color="transparent")

@@ -1,3 +1,15 @@
+"""
+Implementaciones de subframes de la aplicación,
+que corresponden a las funcionalidades
+específicas de cada módulo de la aplicación.
+"""
+
+from .input_funcs import (
+    AgregarFuncs,
+    MostrarFuncs,
+    EliminarFuncs,
+)
+
 from .input_sis import (
     AgregarSistemas,
     MostrarSistemas,
@@ -29,10 +41,12 @@ from .operaciones_vecs import (
     VMultiplicacionTab,
 )
 
-from .sistemas import SistemasFrame
 from .raices import RaicesFrame
 
 __all__ = [
+    "AgregarFuncs",
+    "MostrarFuncs",
+    "EliminarFuncs",
     "AgregarSistemas",
     "MostrarSistemas",
     "EliminarSistemas",
@@ -49,6 +63,5 @@ __all__ = [
     "InversaTab",
     "VSumaRestaTab",
     "VMultiplicacionTab",
-    "SistemasFrame",
     "RaicesFrame",
 ]

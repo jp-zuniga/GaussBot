@@ -57,14 +57,10 @@ class MatricesFrame(ctkFrame):
         self.mats_manager = mats_manager
         self.vecs_manager = vecs_manager
 
-        self.dummy_frame: ctkFrame
-        self.mensaje_frame: Optional[ctkFrame] = None
+        self.dummy_frame: ctkFrame  # para pack mensaje de error inicial
+        self.msg_frame: Optional[ctkFrame] = None
         self.nombres_vectores = list(self.vecs_manager.vecs_ingresados.keys())
-        self.nombres_matrices = [
-            nombre
-            for nombre, mat in self.mats_manager.mats_ingresadas.items()
-            if not mat.aumentada
-        ]
+        self.nombres_matrices = list(self.mats_manager.mats_ingresadas.keys())
 
         self.instances: list[
             Union[
@@ -74,7 +70,7 @@ class MatricesFrame(ctkFrame):
                 DeterminanteTab,
                 InversaTab,
             ]
-        ] = []
+        ]
 
         self.tabs: list[
             tuple[
@@ -95,14 +91,21 @@ class MatricesFrame(ctkFrame):
     def setup_tabview(self) -> None:
         """
         Crea un tabview con pestañas para cada operación con matrices.
+        Se encarga de validar si hay matrices ingresadas para que
+        los setups de los frames individuales no lo tengan que hacer.
         """
 
         for widget in self.winfo_children():
             widget.destroy()
 
         if len(self.nombres_matrices) == 0:
+            # si no hay matrices guardadas, mostrar mensaje de error y
+            # agregar boton para dirigir al usuario adonde se agregan
             self.dummy_frame = ctkFrame(self, fg_color="transparent")
-            self.mensaje_frame = ErrorFrame(self.dummy_frame, message="No hay matrices ingresadas!")
+            self.msg_frame = ErrorFrame(
+                self.dummy_frame, msg="No hay matrices ingresadas!"
+            )
+
             agregar_button = ctkButton(
                 self.dummy_frame,
                 height=30,
@@ -112,16 +115,17 @@ class MatricesFrame(ctkFrame):
             )
 
             self.dummy_frame.pack(expand=True, anchor="center")
-            self.mensaje_frame.pack(pady=5, anchor="center")
+            self.msg_frame.pack(pady=5, anchor="center")
             agregar_button.pack(pady=5, anchor="center")
             return
 
-        if self.mensaje_frame is not None:
+        # cleanup mensaje de error si todavia existe
+        if self.msg_frame is not None:
             for widget in self.winfo_children():
                 widget.destroy()
-            self.mensaje_frame = None
+            self.msg_frame = None
 
-        self.tabview = ctkTabview(self)
+        self.tabview = ctkTabview(self, fg_color="transparent")
         self.tabview.pack(expand=True, fill="both")
 
         self.instances = []
@@ -133,6 +137,10 @@ class MatricesFrame(ctkFrame):
             ("Encontrar Inversa", InversaTab)
         ]
 
+        # iterar sobre self.tabs para:
+        # * agregar tabs al tabview
+        # * inicializar los frames de cada tab
+        # * añadir los frames a self.instances
         for nombre, cls in self.tabs:
             tab = self.tabview.add(nombre)
             tab_instance: CustomScrollFrame = (
@@ -147,26 +155,35 @@ class MatricesFrame(ctkFrame):
         Actualiza todos los frames del tabview.
         """
 
-        self.mats_manager.mats_ingresadas = {
-            nombre: mat
-            for nombre, mat in sorted(self.mats_manager.mats_ingresadas.items())
-        }
+        # sortear los diccionarios de datos para que esten alfabetizados
+        self.mats_manager.mats_ingresadas = dict(
+            sorted(
+                self.mats_manager.mats_ingresadas.items()
+            )
+        )
 
-        self.vecs_manager.vecs_ingresados = {
-            nombre: vec
-            for nombre, vec in sorted(self.vecs_manager.vecs_ingresados.items())
-        }
+        self.vecs_manager.vecs_ingresados = dict(
+            sorted(
+                self.vecs_manager.vecs_ingresados.items()
+            )
+        )
 
+        # actualizar los atributos de nombres despues que cambiaron los dicts
         self.nombres_vectores = list(self.vecs_manager.vecs_ingresados.keys())
         self.nombres_matrices = list(self.mats_manager.mats_ingresadas.keys())
 
-        if (self.mensaje_frame is not None
-            or len(self.nombres_matrices) == 0
-            or self.instances == []):
+        if (
+            self.msg_frame is not None or
+            len(self.nombres_matrices) == 0 or
+            self.instances == []
+        ):
+            # si hay un mensaje de error,
+            # o no hay matrices ingresadas,
+            # o no se han inicializado los frames,
+            # correr el setup
             self.setup_tabview()
             return
 
+        # si no, actualizar todos los subframes
         for tab in self.instances:
-            tab.update_frame()  # type: ignore
-            for widget in tab.winfo_children():
-                widget.configure(bg_color="transparent")  # type: ignore
+            tab.update_frame()

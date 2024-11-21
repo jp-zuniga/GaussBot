@@ -47,8 +47,8 @@ class CustomMessagebox(ctkTop):
         button_text_color: str = "default",
         button_width: Optional[int] = None,
         button_height: Optional[int] = None,
-        cancel_button_color: Optional[str] = None,
-        cancel_button: Optional[Literal["circle", "cross"]] = None,
+        error_button_color: Optional[str] = None,
+        error_button: Optional[Literal["circle", "cross"]] = None,
         button_hover_color: str = "default",
         icon: str = "info",
         corner_radius: int = 15,
@@ -115,15 +115,15 @@ class CustomMessagebox(ctkTop):
         if platform.startswith("win"):
             self.transparent_color = self._apply_appearance_mode(self.cget("fg_color"))
             self.attributes("-transparentcolor", self.transparent_color)
-            default_cancel_button = "cross"
+            default_error_button = "cross"
         elif platform.startswith("darwin"):
             self.transparent_color = "systemTransparent"
             self.attributes("-transparent", True)
-            default_cancel_button = "circle"
+            default_error_button = "circle"
         else:
             self.transparent_color = "#000001"
             corner_radius = 0
-            default_cancel_button = "cross"
+            default_error_button = "cross"
 
         self.lift()
 
@@ -139,7 +139,7 @@ class CustomMessagebox(ctkTop):
         self.font = font
         self.justify = justify
         self.sound = sound
-        self.cancel_button = cancel_button if cancel_button else default_cancel_button
+        self.error_button = error_button if error_button else default_error_button
         self.round_corners = corner_radius if corner_radius <= 30 else 30
         self.button_width = button_width if button_width else self.width // 4
         self.button_height = button_height if button_height else 28
@@ -149,7 +149,7 @@ class CustomMessagebox(ctkTop):
 
         if self.button_height > self.height // 4:
             self.button_height = self.height // 4 - 20
-        self.dot_color = cancel_button_color
+        self.dot_color = error_button_color
 
         self.border_width = border_width if border_width < 6 else 5
 
@@ -278,7 +278,7 @@ class CustomMessagebox(ctkTop):
         self.frame_top.bind("<B1-Motion>", self.move_window)
         self.frame_top.bind("<ButtonPress-1>", self.oldxyset)
 
-        if self.cancel_button == "cross":
+        if self.error_button == "cross":
             self.button_close = ctkButton(
                 self.frame_top,
                 text="✕",
@@ -295,7 +295,7 @@ class CustomMessagebox(ctkTop):
                 padx=5 + self.border_width,
                 pady=5 + self.border_width,
             )
-        elif self.cancel_button == "circle":
+        elif self.error_button == "circle":
             self.button_close = ctkButton(
                 self.frame_top,
                 corner_radius=10,

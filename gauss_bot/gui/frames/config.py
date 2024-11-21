@@ -13,9 +13,9 @@ from tkinter import StringVar
 from customtkinter import (
     CTkFrame as ctkFrame,
     CTkLabel as ctkLabel,
-    set_appearance_mode,
-    set_widget_scaling,
-    set_default_color_theme,
+    set_appearance_mode as set_mode,
+    set_widget_scaling as set_scaling,
+    set_default_color_theme as set_theme,
 )
 
 from gauss_bot import (
@@ -40,7 +40,7 @@ class ConfigFrame(ctkFrame):
     def __init__(self, app: "GaussUI", master: "GaussUI") -> None:
         super().__init__(master, corner_radius=0, fg_color="transparent")
         self.app = app
-        self.mensaje_frame: Optional[SuccessFrame] = None
+        self.msg_frame: Optional[SuccessFrame] = None
 
         self.escalas_dict = {
             "100%": 1.0,
@@ -71,38 +71,53 @@ class ConfigFrame(ctkFrame):
         self.modos = list(self.modos_dict.keys())
         self.temas = list(self.temas_dict.keys())
 
-        self.escala_actual_key = get_dict_key(self.escalas_dict, self.app.escala_actual)
-        self.modo_actual_key = get_dict_key(self.modos_dict, self.app.modo_actual)
-        self.tema_actual_key = get_dict_key(self.temas_dict, self.app.tema_actual)
+        # buscar las llaves de la configuracion actual
+        escala_actual_key = get_dict_key(self.escalas_dict, self.app.escala_actual)
+        modo_actual_key = get_dict_key(self.modos_dict, self.app.modo_actual)
+        tema_actual_key = get_dict_key(self.temas_dict, self.app.tema_actual)
 
         try:
-            self.first_escala = StringVar(value=self.escala_actual_key)
-            self.first_modo = StringVar(value=self.modo_actual_key)
-            self.first_tema = StringVar(value=self.tema_actual_key)
+            # inicializar variables de config actual
+            first_escala = StringVar(value=escala_actual_key)
+            first_modo = StringVar(value=modo_actual_key)
+            first_tema = StringVar(value=tema_actual_key)
         except AttributeError:
-            self.first_escala = StringVar(value="100%")
-            self.first_modo = StringVar(value="Oscuro")
-            self.first_tema = StringVar(value="Metal")
+            # si get_dict key retorna None, StringVar va a tirar error
+            first_escala = StringVar(value="100%")
+            first_modo = StringVar(value="Claro")
+            first_tema = StringVar(value="Sky")
 
+        # crear labels
         self.escala_label = ctkLabel(self, text="Escala:")
         self.modos_label = ctkLabel(self, text="Modo:")
         self.temas_label = ctkLabel(self, text="Tema:")
 
+        # crear dropdowns
         self.desplegar_escalas = CustomDropdown(
-            self, width=105, variable=self.first_escala,
-            values=self.escalas, command=self.cambiar_escala,
+            self,
+            width=105,
+            values=self.escalas,
+            variable=first_escala,
+            command=self.cambiar_escala,
         )
 
         self.desplegar_modos = CustomDropdown(
-            self, width=105, variable=self.first_modo,
-            values=self.modos, command=self.cambiar_modo
+            self,
+            width=105,
+            values=self.modos,
+            variable=first_modo,
+            command=self.cambiar_modo
         )
 
         self.desplegar_temas = CustomDropdown(
-            self, width=105, variable=self.first_tema,
-            values=self.temas, command=self.cambiar_tema
+            self,
+            width=105,
+            values=self.temas,
+            variable=first_tema,
+            command=self.cambiar_tema
         )
 
+        # colocar widgets
         self.escala_label.grid(row=0, column=0, padx=(30, 10), pady=(20, 10), sticky="nw")
         self.desplegar_escalas.grid(row=0, column=1, padx=10, pady=(20, 10), sticky="nw")
         self.modos_label.grid(row=1, column=0, padx=(30, 10), pady=10, sticky="nw")
@@ -116,10 +131,11 @@ class ConfigFrame(ctkFrame):
         """
 
         if self.escalas_dict[escala_seleccionada] == self.app.escala_actual:
+            # si selecciono la misma escala, no cambiar nada
             return
 
         self.app.escala_actual = self.escalas_dict[escala_seleccionada]
-        set_widget_scaling(self.app.escala_actual)
+        set_scaling(self.app.escala_actual)
 
     def cambiar_modo(self, modo_seleccionado: str) -> None:
         """
@@ -127,15 +143,19 @@ class ConfigFrame(ctkFrame):
         """
 
         if self.modos_dict[modo_seleccionado] == self.app.modo_actual:
+            # si se selecciono el mismo, no cambiar nada
             return
 
         self.app.modo_actual = self.modos_dict[modo_seleccionado]
-        set_appearance_mode(self.app.modo_actual)
+        set_mode(self.app.modo_actual)
+
+        # mandar a actualizar todo
         self.app.set_icon(self.app.modo_actual)
         self.app.inputs_frame.update_all()  # type: ignore
-        self.app.ecuaciones.update_all()  # type: ignore
         self.app.matrices.update_all()  # type: ignore
         self.app.vectores.update_all()  # type: ignore
+        self.app.analisis.update_all()  # type: ignore
+        self.app.sistemas.update_frame()  # type: ignore
         self.update_frame()
 
     def cambiar_tema(self, tema_seleccionado: str) -> None:
@@ -144,18 +164,26 @@ class ConfigFrame(ctkFrame):
         """
 
         if self.temas_dict[tema_seleccionado] == self.app.tema_actual:
+            # si se selecciono el mismo tema, no cambiar nada
             return
 
         self.app.tema_actual = self.temas_dict[tema_seleccionado]
-        set_default_color_theme(path.join(THEMES_PATH, self.app.tema_actual))
-        self.mensaje_frame = SuccessFrame(
+        set_theme(path.join(THEMES_PATH, self.app.tema_actual))
+
+        # explicar que se necesita reiniciar la app
+        self.msg_frame = SuccessFrame(
             self,
-            message="Tema cambiado exitosamente!\n" +
-                    "Cambio tomará efecto al reiniciar la aplicación."
+            msg="Tema cambiado exitosamente!\n" +
+                "El cambio tomará efecto al reiniciar la aplicación."
         )
 
-        self.mensaje_frame.grid(row=3, column=1, pady=30)
-    
+        self.msg_frame.grid(row=3, column=1, pady=30)
+
     def update_frame(self) -> None:
+        """
+        Configura los backgrounds de los widgets,
+        por si hubo un cambio de tema.
+        """
+
         for widget in self.winfo_children():
             widget.configure(bg_color="transparent")
