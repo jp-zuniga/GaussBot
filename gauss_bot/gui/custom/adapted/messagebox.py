@@ -23,7 +23,7 @@ from customtkinter import (
     ThemeManager,
 )
 
-from gauss_bot import MSGBOX_ICONS
+from ....icons import MSGBOX_ICONS
 
 class CustomMessagebox(ctkTop):
     def __init__(

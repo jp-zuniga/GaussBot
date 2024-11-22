@@ -12,11 +12,11 @@ from customtkinter import (
     CTkTabview as ctkTabview,
 )
 
-from gauss_bot.managers import FuncManager
-from gauss_bot.gui.frames.subframes import RaicesFrame
+from ...managers import FuncManager
+from .subframes import RaicesFrame
 
 if TYPE_CHECKING:
-    from gauss_bot.gui import GaussUI
+    from .. import GaussUI
 
 
 class AnalisisFrame(ctkFrame):

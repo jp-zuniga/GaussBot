@@ -30,10 +30,8 @@ from sympy.parsing.sympy_parser import (
     standard_transformations,
 )
 
-from gauss_bot import (
-    SAVED_FUNC_PATH,
-    transparent_invert,
-)
+from ..icons import SAVED_FUNCS_PATH
+from ..util_funcs import transparent_invert
 
 TRANSFORMS = standard_transformations + (implicit_multiplication_application,)
 
@@ -134,8 +132,8 @@ class Func:
         * font_size: tamaño de la fuente en la imagen PNG
         """
 
-        makedirs(SAVED_FUNC_PATH, exist_ok=True)
-        output_file = path.join(SAVED_FUNC_PATH, f"{nombre}.png")
+        makedirs(SAVED_FUNCS_PATH, exist_ok=True)
+        output_file = path.join(SAVED_FUNCS_PATH, f"{nombre}.png")
 
         if func_expr is not None:
             parse_str = parse_expr(func_expr, transformations=TRANSFORMS)

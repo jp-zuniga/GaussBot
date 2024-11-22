@@ -8,7 +8,7 @@ from typing import (
     Union,
 )
 
-from gauss_bot.gui.custom import CustomEntry
+from ..gui.custom import CustomEntry
 
 
 class KeyBindingManager:
@@ -24,6 +24,7 @@ class KeyBindingManager:
         entry_list: Optional[Union[list[CustomEntry], list[list[CustomEntry]]]] = None,
         extra_entries: Optional[tuple[CustomEntry, CustomEntry]] = None,
     ) -> None:
+
         """
         Argumentos:
         - es_matriz: True si las entries son para una matriz,

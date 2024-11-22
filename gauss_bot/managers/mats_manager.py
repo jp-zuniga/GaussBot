@@ -14,7 +14,7 @@ Operaciones implementadas:
 
 from fractions import Fraction
 
-from gauss_bot.models import (
+from ..models import (
     Matriz,
     SistemaEcuaciones,
 )

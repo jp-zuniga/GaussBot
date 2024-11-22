@@ -6,10 +6,10 @@ los módulos de la aplciación.
 from .nav import NavFrame
 from .inputs import (
     InputsFrame,
-    ManejarFuncs,
-    ManejarSistemas,
     ManejarMats,
     ManejarVecs,
+    ManejarFuncs,
+    ManejarSistemas,
 )
 
 from .home import HomeFrame
@@ -22,10 +22,10 @@ from .config import ConfigFrame
 __all__ = [
     "NavFrame",
     "InputsFrame",
-    "ManejarFuncs",
-    "ManejarSistemas",
     "ManejarMats",
     "ManejarVecs",
+    "ManejarFuncs",
+    "ManejarSistemas",
     "HomeFrame",
     "MatricesFrame",
     "VectoresFrame",

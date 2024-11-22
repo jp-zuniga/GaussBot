@@ -13,34 +13,40 @@ from customtkinter import (
     CTkLabel as ctkLabel,
 )
 
-from gauss_bot import (
+from ....icons import (
     ACEPTAR_ICON,
     ENTER_ICON,
     INFO_ICON,
     LIMPIAR_ICON,
     MOSTRAR_ICON,
+)
+
+from ....msg_frame_funcs import (
     delete_msg_frame,
+    place_msg_frame,
+)
+
+from ....util_funcs import (
     generate_sep,
     resize_image,
 )
 
-from gauss_bot.models import Func
-from gauss_bot.managers import (
+from ....models import Func
+from ....managers import (
     FuncManager,
     KeyBindingManager,
 )
 
-from gauss_bot.gui.custom import (
+from ...custom import (
     CustomEntry,
     CustomNumpad,
     CustomScrollFrame,
     IconButton,
-    place_msg_frame,
 )
 
 if TYPE_CHECKING:
-    from gauss_bot.gui import GaussUI
-    from gauss_bot.gui.frames import ManejarFuncs
+    from ... import GaussUI
+    from .. import ManejarFuncs
 
 
 class AgregarFuncs(CustomScrollFrame):
@@ -57,7 +63,7 @@ class AgregarFuncs(CustomScrollFrame):
         func_manager: FuncManager,
     ) -> None:
 
-        super().__init__(app, master_tab, corner_radius=0, fg_color="transparent")
+        super().__init__(master_tab, corner_radius=0, fg_color="transparent")
         self.app = app
         self.master_frame = master_frame
         self.func_manager = func_manager
@@ -291,7 +297,7 @@ class MostrarFuncs(CustomScrollFrame):
         func_manager: FuncManager,
     ) -> None:
 
-        super().__init__(app, master_tab, corner_radius=0, fg_color="transparent")
+        super().__init__(master_tab, corner_radius=0, fg_color="transparent")
         self.app = app
         self.master_frame = master_frame
         self.func_manager = func_manager
@@ -387,7 +393,7 @@ class EliminarFuncs(CustomScrollFrame):
         func_manager: FuncManager,
     ) -> None:
 
-        super().__init__(app, master_tab, corner_radius=0, fg_color="transparent")
+        super().__init__(master_tab, corner_radius=0, fg_color="transparent")
         self.app = app
         self.master_frame = master_frame
         self.func_manager = func_manager

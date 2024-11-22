@@ -20,35 +20,38 @@ from customtkinter import (
     CTkLabel as ctkLabel,
 )
 
-from gauss_bot import (
+from ....icons import (
     ENTER_ICON,
     SHUFFLE_ICON,
     ACEPTAR_ICON,
     LIMPIAR_ICON,
     MOSTRAR_ICON,
     ELIMINAR_ICON,
-    delete_msg_frame,
 )
 
-from gauss_bot.models import Vector
-from gauss_bot.managers import (
+from ....msg_frame_funcs import (
+    delete_msg_frame,
+    place_msg_frame,
+)
+
+from ....models import Vector
+from ....managers import (
     KeyBindingManager,
     VectoresManager,
 )
 
-from gauss_bot.gui.custom import (
+from ...custom import (
     CustomEntry,
     CustomDropdown,
     CustomScrollFrame,
     IconButton,
     ErrorFrame,
     SuccessFrame,
-    place_msg_frame,
 )
 
 if TYPE_CHECKING:
-    from gauss_bot.gui import GaussUI
-    from gauss_bot.gui.frames import ManejarVecs
+    from ... import GaussUI
+    from .. import ManejarVecs
 
 
 class AgregarVecs(CustomScrollFrame):
@@ -65,7 +68,7 @@ class AgregarVecs(CustomScrollFrame):
         vecs_manager: VectoresManager
     ) -> None:
 
-        super().__init__(app, master_tab, corner_radius=0, fg_color="transparent")
+        super().__init__(master_tab, corner_radius=0, fg_color="transparent")
         self.master_frame = master_frame
         self.app = app
         self.vecs_manager = vecs_manager
@@ -345,7 +348,7 @@ class MostrarVecs(CustomScrollFrame):
         vecs_manager: VectoresManager
     ) -> None:
 
-        super().__init__(app, master_tab, corner_radius=0, fg_color="transparent")
+        super().__init__(master_tab, corner_radius=0, fg_color="transparent")
         self.app = app
         self.master_frame = master_frame
         self.vecs_manager = vecs_manager
@@ -450,7 +453,7 @@ class EliminarVecs(CustomScrollFrame):
         vecs_manager: VectoresManager
     ) -> None:
 
-        super().__init__(app, master_tab, corner_radius=0, fg_color="transparent")
+        super().__init__(master_tab, corner_radius=0, fg_color="transparent")
         self.app = app
         self.master_frame = master_frame
         self.vecs_manager = vecs_manager

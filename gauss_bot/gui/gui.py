@@ -22,19 +22,19 @@ from customtkinter import (
     set_default_color_theme as set_theme,
 )
 
-from gauss_bot import (
+from .. import (
     ASSET_PATH,
     CONFIG_PATH,
     THEMES_PATH,
-    LOGGER,
 )
 
-from gauss_bot.managers import (
+from ..util_funcs import LOGGER
+from ..managers import (
     FuncManager,
     OpsManager,
 )
 
-from gauss_bot.gui.frames import (
+from .frames import (
     NavFrame,
     HomeFrame,
     InputsFrame,

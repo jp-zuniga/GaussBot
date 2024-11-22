@@ -21,25 +21,28 @@ from customtkinter import (
     CTkTabview as ctkTabview,
 )
 
-from gauss_bot import (
-    INPUTS_ICON,
+from ....icons import INPUTS_ICON
+from ....msg_frame_funcs import (
     delete_msg_frame,
     delete_msg_if,
+    place_msg_frame,
+)
+
+from ....util_funcs import (
     generate_range,
     get_dict_key,
 )
 
-from gauss_bot.managers import MatricesManager
-from gauss_bot.gui.custom import (
+from ....managers import MatricesManager
+from ...custom import (
     CustomEntry,
     CustomDropdown,
     CustomScrollFrame,
-    place_msg_frame,
 )
 
 if TYPE_CHECKING:
-    from gauss_bot.gui import GaussUI
-    from gauss_bot.gui.frames import MatricesFrame
+    from ...gui import GaussUI
+    from ..matrices import MatricesFrame
 
 
 class SumaRestaTab(CustomScrollFrame):
@@ -55,7 +58,7 @@ class SumaRestaTab(CustomScrollFrame):
         mats_manager: MatricesManager
     ) -> None:
 
-        super().__init__(app, master_tab, corner_radius=0, fg_color="transparent")
+        super().__init__(master_tab, corner_radius=0, fg_color="transparent")
         self.app = app
         self.master_frame = master_frame
         self.mats_manager = mats_manager
@@ -278,7 +281,7 @@ class MultiplicacionTab(CustomScrollFrame):
         mats_manager: MatricesManager
     ) -> None:
 
-        super().__init__(app, master_tab, corner_radius=0, fg_color="transparent")
+        super().__init__(master_tab, corner_radius=0, fg_color="transparent")
         self.app = app
         self.master_frame = master_frame
         self.mats_manager = mats_manager
@@ -709,7 +712,7 @@ class TransposicionTab(CustomScrollFrame):
         mats_manager: MatricesManager
     ) -> None:
 
-        super().__init__(app, master_tab, corner_radius=0, fg_color="transparent")
+        super().__init__(master_tab, corner_radius=0, fg_color="transparent")
         self.app = app
         self.master_frame = master_frame
         self.mats_manager = mats_manager
@@ -821,7 +824,7 @@ class DeterminanteTab(CustomScrollFrame):
         mats_manager: MatricesManager
     ) -> None:
 
-        super().__init__(app, master_tab, corner_radius=0, fg_color="transparent")
+        super().__init__(master_tab, corner_radius=0, fg_color="transparent")
         self.app = app
         self.master_frame = master_frame
         self.mats_manager = mats_manager
@@ -935,7 +938,7 @@ class InversaTab(CustomScrollFrame):
         mats_manager: MatricesManager
     ) -> None:
 
-        super().__init__(app, master_tab, corner_radius=0, fg_color="transparent")
+        super().__init__(master_tab, corner_radius=0, fg_color="transparent")
         self.app = app
         self.master_frame = master_frame
         self.mats_manager = mats_manager

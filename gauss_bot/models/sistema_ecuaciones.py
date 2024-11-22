@@ -7,8 +7,8 @@ resolver con la Regla de Cramer y el método Gauss-Jordan.
 from copy import deepcopy
 from fractions import Fraction
 
-from gauss_bot import LOGGER
-from gauss_bot.models import Matriz
+from ..util_funcs import LOGGER
+from .matriz import Matriz
 
 
 class SistemaEcuaciones:

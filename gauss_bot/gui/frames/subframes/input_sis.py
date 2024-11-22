@@ -20,36 +20,39 @@ from customtkinter import (
     CTkLabel as ctkLabel,
 )
 
-from gauss_bot import (
+from ....icons import (
     ENTER_ICON,
     SHUFFLE_ICON,
     ACEPTAR_ICON,
     LIMPIAR_ICON,
     MOSTRAR_ICON,
     ELIMINAR_ICON,
-    delete_msg_frame,
-    generate_sep,
 )
 
-from gauss_bot.models import Matriz
-from gauss_bot.managers import (
+from ....msg_frame_funcs import (
+    delete_msg_frame,
+    place_msg_frame,
+)
+
+from ....util_funcs import generate_sep
+from ....models import Matriz
+from ....managers import (
     KeyBindingManager,
     MatricesManager,
 )
 
-from gauss_bot.gui.custom import (
+from ...custom import (
     IconButton,
     CustomEntry,
     CustomDropdown,
     CustomScrollFrame,
     ErrorFrame,
     SuccessFrame,
-    place_msg_frame,
 )
 
 if TYPE_CHECKING:
-    from gauss_bot.gui import GaussUI
-    from gauss_bot.gui.frames import ManejarSistemas
+    from ... import GaussUI
+    from .. import ManejarSistemas
 
 
 class AgregarSistemas(CustomScrollFrame):
@@ -65,7 +68,7 @@ class AgregarSistemas(CustomScrollFrame):
         mats_manager: MatricesManager
     ) -> None:
 
-        super().__init__(app, master_tab, corner_radius=0, fg_color="transparent")
+        super().__init__(master_tab, corner_radius=0, fg_color="transparent")
         self.app = app
         self.master_frame = master_frame
         self.mats_manager = mats_manager
@@ -426,7 +429,7 @@ class MostrarSistemas(CustomScrollFrame):
         mats_manager: MatricesManager
     ) -> None:
 
-        super().__init__(app, master_tab, corner_radius=0, fg_color="transparent")
+        super().__init__(master_tab, corner_radius=0, fg_color="transparent")
         self.app = app
         self.master_frame = master_frame
         self.mats_manager = mats_manager
@@ -531,7 +534,7 @@ class EliminarSistemas(CustomScrollFrame):
         mats_manager: MatricesManager
     ) -> None:
 
-        super().__init__(app, master_tab, corner_radius=0, fg_color="transparent")
+        super().__init__(master_tab, corner_radius=0, fg_color="transparent")
         self.app = app
         self.master_frame = master_frame
         self.mats_manager = mats_manager

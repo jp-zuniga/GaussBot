@@ -15,22 +15,22 @@ from customtkinter import (
     CTkLabel as ctkLabel,
 )
 
-from gauss_bot import (
-    INPUTS_ICON,
+from ...icons import INPUTS_ICON
+from ...msg_frame_funcs import (
     delete_msg_frame,
-)
-
-from gauss_bot.models import SistemaEcuaciones
-from gauss_bot.managers import MatricesManager
-from gauss_bot.gui.custom import (
-    CustomDropdown,
-    CustomScrollFrame,
-    ErrorFrame,
     place_msg_frame,
 )
 
+from ...models import SistemaEcuaciones
+from ...managers import MatricesManager
+from ..custom import (
+    CustomDropdown,
+    CustomScrollFrame,
+    ErrorFrame,
+)
+
 if TYPE_CHECKING:
-    from gauss_bot.gui import GaussUI
+    from .. import GaussUI
 
 
 class SistemasFrame(CustomScrollFrame):
@@ -47,7 +47,7 @@ class SistemasFrame(CustomScrollFrame):
         mats_manager: MatricesManager
     ) -> None:
 
-        super().__init__(app, master, corner_radius=0, fg_color="transparent")
+        super().__init__(master, corner_radius=0, fg_color="transparent")
         self.app = app
         self.mats_manager = mats_manager
         self.columnconfigure(0, weight=1)

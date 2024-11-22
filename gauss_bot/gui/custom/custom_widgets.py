@@ -16,11 +16,11 @@ from customtkinter import (
     CTkOptionMenu as ctkOptionMenu,
 )
 
-from gauss_bot import DROPDOWN_ICON
-from .adapted.tooltip import Tooltip
+from ...icons import DROPDOWN_ICON
+from .adapted import Tooltip
 
 if TYPE_CHECKING:
-    from gauss_bot.gui.gui import GaussUI
+    from ..gui import GaussUI
 
 
 class CustomEntry(ctkEntry):

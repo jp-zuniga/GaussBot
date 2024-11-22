@@ -20,35 +20,38 @@ from customtkinter import (
     CTkLabel as ctkLabel,
 )
 
-from gauss_bot import (
+from ....icons import (
     ENTER_ICON,
     SHUFFLE_ICON,
     ACEPTAR_ICON,
     LIMPIAR_ICON,
     MOSTRAR_ICON,
     ELIMINAR_ICON,
-    delete_msg_frame,
 )
 
-from gauss_bot.models import Matriz
-from gauss_bot.managers import (
+from ....msg_frame_funcs import (
+    delete_msg_frame,
+    place_msg_frame,
+)
+
+from ....models import Matriz
+from ....managers import (
     KeyBindingManager,
     MatricesManager,
 )
 
-from gauss_bot.gui.custom import (
+from ...custom import (
     IconButton,
     CustomEntry,
     CustomDropdown,
     CustomScrollFrame,
     ErrorFrame,
     SuccessFrame,
-    place_msg_frame,
 )
 
 if TYPE_CHECKING:
-    from gauss_bot.gui import GaussUI
-    from gauss_bot.gui.frames import ManejarMats
+    from ... import GaussUI
+    from .. import ManejarMats
 
 
 class AgregarMats(CustomScrollFrame):
@@ -64,7 +67,7 @@ class AgregarMats(CustomScrollFrame):
         mats_manager: MatricesManager
     ) -> None:
 
-        super().__init__(app, master_tab, corner_radius=0, fg_color="transparent")
+        super().__init__(master_tab, corner_radius=0, fg_color="transparent")
         self.app = app
         self.master_frame = master_frame
         self.mats_manager = mats_manager
@@ -413,7 +416,7 @@ class MostrarMats(CustomScrollFrame):
         mats_manager: MatricesManager
     ) -> None:
 
-        super().__init__(app, master_tab, corner_radius=0, fg_color="transparent")
+        super().__init__(master_tab, corner_radius=0, fg_color="transparent")
         self.app = app
         self.master_frame = master_frame
         self.mats_manager = mats_manager
@@ -518,7 +521,7 @@ class EliminarMats(CustomScrollFrame):
         mats_manager: MatricesManager
     ) -> None:
 
-        super().__init__(app, master_tab, corner_radius=0, fg_color="transparent")
+        super().__init__(master_tab, corner_radius=0, fg_color="transparent")
         self.app = app
         self.master_frame = master_frame
         self.mats_manager = mats_manager

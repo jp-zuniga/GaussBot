@@ -18,25 +18,28 @@ from customtkinter import (
     CTkTabview as ctkTabview,
 )
 
-from gauss_bot import (
-    INPUTS_ICON,
+from ....icons import INPUTS_ICON
+from ....msg_frame_funcs import (
     delete_msg_frame,
     delete_msg_if,
-    generate_range,
-    get_dict_key
-)
-
-from gauss_bot.managers import VectoresManager
-from gauss_bot.gui.custom import (
-    CustomEntry,
-    CustomDropdown,
-    CustomScrollFrame,
     place_msg_frame,
 )
 
+from ....util_funcs import (
+    generate_range,
+    get_dict_key,
+)
+
+from ....managers import VectoresManager
+from ...custom import (
+    CustomEntry,
+    CustomDropdown,
+    CustomScrollFrame,
+)
+
 if TYPE_CHECKING:
-    from gauss_bot.gui import GaussUI
-    from gauss_bot.gui.frames import VectoresFrame
+    from ... import GaussUI
+    from .. import VectoresFrame
 
 
 class VSumaRestaTab(CustomScrollFrame):
@@ -52,7 +55,7 @@ class VSumaRestaTab(CustomScrollFrame):
         vecs_manager: VectoresManager
     ) -> None:
 
-        super().__init__(app, master_tab, corner_radius=0, fg_color="transparent")
+        super().__init__(master_tab, corner_radius=0, fg_color="transparent")
         self.master_frame = master_frame
         self.app = app
         self.vecs_manager = vecs_manager
@@ -269,7 +272,7 @@ class VMultiplicacionTab(CustomScrollFrame):
         vecs_manager: VectoresManager
     ) -> None:
 
-        super().__init__(app, master_tab, corner_radius=0, fg_color="transparent")
+        super().__init__(master_tab, corner_radius=0, fg_color="transparent")
         self.master_frame = master_frame
         self.app = app
         self.vecs_manager = vecs_manager

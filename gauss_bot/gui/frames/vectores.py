@@ -14,20 +14,20 @@ from customtkinter import (
     CTkTabview as ctkTabview,
 )
 
-from gauss_bot import INPUTS_ICON
-from gauss_bot.managers import (
+from ...icons import INPUTS_ICON
+from ...managers import (
     MatricesManager,
     VectoresManager,
 )
 
-from gauss_bot.gui.custom import ErrorFrame
-from gauss_bot.gui.frames.subframes import (
+from ..custom import ErrorFrame
+from .subframes import (
     VSumaRestaTab,
     VMultiplicacionTab,
 )
 
 if TYPE_CHECKING:
-    from gauss_bot.gui import GaussUI
+    from .. import GaussUI
 
 
 class VectoresFrame(ctkFrame):

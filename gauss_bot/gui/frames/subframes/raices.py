@@ -28,24 +28,24 @@ from sympy import (
     zoo,
 )
 
-from gauss_bot import generate_sep
-from gauss_bot.models import Func
-from gauss_bot.managers import (
+from ....msg_frame_funcs import place_msg_frame
+from ....util_funcs import generate_sep
+from ....models import Func
+from ....managers import (
     MARGEN_ERROR,
     MAX_ITERACIONES,
     FuncManager,
 )
 
-from gauss_bot.gui.custom import (
+from ...custom import (
     CustomEntry,
     CustomDropdown,
     CustomScrollFrame,
-    place_msg_frame,
 )
 
 if TYPE_CHECKING:
-    from gauss_bot.gui import GaussUI
-    from gauss_bot.gui.frames import AnalisisFrame
+    from ... import GaussUI
+    from .. import AnalisisFrame
 
 getcontext().prec = 12  # precision de decimales
 
@@ -62,7 +62,7 @@ class RaicesFrame(CustomScrollFrame):
         func_manager: FuncManager,
     ) -> None:
 
-        super().__init__(app, master_tab, corner_radius=0, fg_color="transparent")
+        super().__init__(master_tab, corner_radius=0, fg_color="transparent")
         self.app = app
         self.master_frame = master_frame
         self.func_manager = func_manager

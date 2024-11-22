@@ -3,11 +3,6 @@ Implementación de la clase NavFrame,
 la barra de navegación de la aplicación.
 """
 
-from os import (
-    path,
-    remove,
-)
-
 from typing import TYPE_CHECKING
 
 from customtkinter import (
@@ -17,9 +12,7 @@ from customtkinter import (
     CTkLabel as ctkLabel,
 )
 
-# from gauss_bot.gui.custom import CustomMessagebox
-from gauss_bot import (
-    DATA_PATH,
+from ...icons import (
     LOGO,
     HOME_ICON,
     INPUTS_ICON,
@@ -32,7 +25,7 @@ from gauss_bot import (
 )
 
 if TYPE_CHECKING:
-    from gauss_bot.gui import GaussUI
+    from .. import GaussUI
 
 
 class NavFrame(ctkFrame):
@@ -234,22 +227,9 @@ class NavFrame(ctkFrame):
         Se encarga de llamar los métodos para guardar los datos.
         """
 
-        # confirmar_quit = CustomMessagebox(
-        #     self.app,
-        #     title="Confirmar salida",
-        #     message="¿Estás seguro de que deseas salir?",
-        #     option_1="No",
-        #     option_2="Sí",
-        #     icon="warning",
-        # )
-
         self.app.func_manager.save_funciones()  # type: ignore
         self.app.ops_manager.save_sistemas()  # type: ignore
         self.app.ops_manager.save_matrices()  # type: ignore
         self.app.ops_manager.save_vectores()  # type: ignore
         self.app.save_config()
         self.app.quit()
-        try:
-            remove(path.join(DATA_PATH, "func.png"))
-        except FileNotFoundError:
-            pass

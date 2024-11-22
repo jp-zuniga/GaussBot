@@ -28,13 +28,11 @@ from customtkinter import (
     ThemeManager,
 )
 
-from gauss_bot import (
-    FUNCTIONS,
-    resize_image,
-)
+from ....icons import FUNCTIONS
+from ....util_funcs import resize_image
 
 if TYPE_CHECKING:
-    from gauss_bot.gui.custom import CustomEntry
+    from ..custom_widgets import CustomEntry
 
 
 class CustomNumpad(ctkTop):

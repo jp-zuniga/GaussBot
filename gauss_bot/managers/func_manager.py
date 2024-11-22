@@ -22,6 +22,7 @@ from os import (
 )
 
 from typing import Union
+
 from customtkinter import CTkImage as ctkImage
 from sympy import (
     I,
@@ -30,11 +31,9 @@ from sympy import (
     lambdify,
 )
 
-from gauss_bot.models import Func
-from gauss_bot import (
-    FUNCIONES_PATH,
-    LOGGER,
-)
+from .. import FUNCIONES_PATH
+from ..util_funcs import LOGGER
+from ..models import Func
 
 getcontext().prec = 20
 
