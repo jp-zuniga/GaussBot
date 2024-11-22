@@ -83,8 +83,9 @@ class AgregarFuncs(CustomScrollFrame):
             self.app,
             image=INFO_ICON,
             tooltip_text="\nEl numpad le permite ingresar funciones\n" +
-                         "matemáticas de forma más sencilla.\n\n" +
-                         "Presione ALT para abrirlo, y ESC para cerrarlo.\n\n" +
+                         "matemáticas de una forma más sencilla.\n\n" +
+                         "Mientras el cursor este en la entrada de términos,\n" +
+                         "presione ALT para abrirlo y ESC para cerrarlo.\n\n" +
                          "Para mejores resultados,\nasegúrese que los argumentos " +
                          "de la función\nestén en paréntesis, y operaciones " +
                          "complejas\ncomo multiplicación y división de funciones\n" +
@@ -217,11 +218,9 @@ class AgregarFuncs(CustomScrollFrame):
             not self.validar_nombre(new_func.nombre)
         ):
             if not self.validar_nombre(new_func.nombre):
-                error_msg = (
-                    "El nombre de la función debe tener la forma 'f(x)'!"
-                    if "x" in new_func.nombre
-                    else "La función debe estar en términos de 'x'!"
-                )
+                error_msg = "El nombre de la función debe tener la forma 'f(x)'!"
+            elif new_func.var not in new_func.expr:
+                error_msg = f"La función ingresada no contiene la variable {new_func.var}!"
             else:
                 error_msg = f"Ya existe una función llamada {new_func.nombre}!"
 
@@ -262,7 +261,7 @@ class AgregarFuncs(CustomScrollFrame):
         Valida que el nombre de la función sea válido.
         """
 
-        pattern = r"^[a-z]\([x]\)$"
+        pattern = r"^[a-z]\([a-z]\)$"
         return bool(match(pattern, nombre))
 
     def limpiar_input(self) -> None:

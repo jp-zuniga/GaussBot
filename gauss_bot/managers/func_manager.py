@@ -99,7 +99,7 @@ class FuncManager:
             return False
 
         a, b = a, b = float(intervalo[0]), float(intervalo[1])
-        f = lambdify(func.variable, func.func_expr)
+        f = lambdify(func.var, func.expr)
 
         f_a = f(a)
         f_b = f(b)
@@ -135,7 +135,7 @@ class FuncManager:
             return False
 
         a, b = float(intervalo[0]), float(intervalo[1])
-        f = lambdify(func.variable, func.func_expr)
+        f = lambdify(func.var, func.expr)
 
         f_a = f(a)
         f_b = f(b)
@@ -172,7 +172,7 @@ class FuncManager:
         un método abierto para encontrar raíces de funciones.
         """
 
-        derivada = Func(f"{func.nombre[0]}'(x)", str(diff(func.func_expr, func.variable)))
+        derivada = Func(f"{func.nombre[0]}'(x)", str(diff(func.expr, func.var)))
         dominio_derivada = derivada.get_dominio()
         dominio_func = func.get_dominio()
 
@@ -180,8 +180,8 @@ class FuncManager:
         if xi not in dominio_derivada:
             return (Decimal(xi), zoo, 0, 1)
 
-        f = lambdify(func.variable, func.func_expr)
-        f_prima = lambdify(func.variable, derivada.func_expr)
+        f = lambdify(func.var, func.expr)
+        f_prima = lambdify(func.var, derivada.expr)
 
         fxi = f(xi)
         if abs(fxi) < error:
@@ -219,7 +219,7 @@ class FuncManager:
         """
 
         xi, xu = float(iniciales[0]), float(iniciales[1])
-        f = lambdify(func.variable, func.func_expr)
+        f = lambdify(func.var, func.expr)
         f_dominio = func.get_dominio()
 
         fxu = f(xu)
@@ -252,7 +252,7 @@ class FuncManager:
         funciones_dict = {
             nombre: {
                 "nombre": func.nombre,
-                "expr": str(func.func_expr),
+                "expr": str(func.expr),
                 "latexified": func.latexified,
             } for nombre, func in self.funcs_ingresadas.items()
         }

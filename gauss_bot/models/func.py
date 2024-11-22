@@ -46,7 +46,6 @@ class Func:
         self,
         nombre: str,
         expr: str,
-        variable: Symbol = Symbol("x"),
         latexified=False,
     ) -> None:
 
@@ -55,7 +54,8 @@ class Func:
         """
 
         self.nombre = nombre
-        self.variable = variable
+        self.var = Symbol(self.nombre[-2])
+
         self.latexified = latexified
         self.latex_img: Optional[ctkImage] = None
 
@@ -64,30 +64,30 @@ class Func:
         if "^" in expr:
             expr = expr.replace("^", "**")
 
-        self.func_expr: Expr = parse_expr(
+        self.expr: Expr = parse_expr(
             expr,
             transformations=TRANSFORMS,
         )
 
-        if self.func_expr.has(oo, -oo, zoo, nan):
+        if self.expr.has(oo, -oo, zoo, nan):
             raise ValueError("La función tiene un dominio complejo!")
 
     def __str__(self) -> str:
-        return str(self.func_expr)
+        return str(self.expr)
 
     def get_dominio(self) -> Interval:
         """
         Wrapper para continuous_domain de sympy().
         Retorna un objeto Interval que representa el
-        dominio real de self.func_expr.
+        dominio real de self.expr.
         """
 
-        return continuous_domain(self.func_expr, self.variable, Reals)
+        return continuous_domain(self.expr, self.var, Reals)
 
     def es_continua(self, intervalo: tuple[Decimal, Decimal]) -> bool:
         """
-        Valida si self.func_expr es continua en el
-        intervalo indicado, con respecto a self.variable.
+        Valida si self.expr es continua en el
+        intervalo indicado, con respecto a self.var.
         """
 
         a, b = intervalo
@@ -108,7 +108,7 @@ class Func:
             self.latex_img  = (
                 self.latex_to_png(
                     self.nombre,
-                    str(self.func_expr),
+                    str(self.expr),
                     con_nombre=True,
                 )
             )
@@ -119,14 +119,14 @@ class Func:
     @staticmethod
     def latex_to_png(
         nombre: str,
-        func_expr: Optional[str] = None,
+        expr: Optional[str] = None,
         misc_str: Optional[str] = None,
         con_nombre: bool = False,
         font_size: int = 75
     ) -> ctkImage:
 
         """
-        Convierte self.func_expr en formato LaTeX
+        Convierte self.expr en formato LaTeX
         y lo convierte en una imagen PNG.
         * output_file: nombre del archivo de salida
         * font_size: tamaño de la fuente en la imagen PNG
@@ -135,8 +135,8 @@ class Func:
         makedirs(SAVED_FUNCS_PATH, exist_ok=True)
         output_file = path.join(SAVED_FUNCS_PATH, f"{nombre}.png")
 
-        if func_expr is not None:
-            parse_str = parse_expr(func_expr, transformations=TRANSFORMS)
+        if expr is not None:
+            parse_str = parse_expr(expr, transformations=TRANSFORMS)
             latex_str: str = latex(parse_str, ln_notation=True)
         elif misc_str is not None:
             latex_str = misc_str
