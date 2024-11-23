@@ -35,10 +35,10 @@ from .. import FUNCIONES_PATH
 from ..util_funcs import LOGGER
 from ..models import Func
 
-getcontext().prec = 20
+getcontext().prec = 8  # precision de los decimales
 
-MARGEN_ERROR = Decimal(1e-6)
-MAX_ITERACIONES = 500
+MARGEN_ERROR = Decimal(1e-4)
+MAX_ITERACIONES = 100
 
 
 class FuncManager:
@@ -83,12 +83,12 @@ class FuncManager:
             funcs.append(func.get_png())
         return funcs
 
+    @staticmethod
     def biseccion(
-        self,
         func: Func,
         intervalo: tuple[Decimal, Decimal],
         error: Decimal = MARGEN_ERROR
-    ) -> Union[bool, tuple[Decimal, Decimal, int]]:
+    ) -> Union[bool, tuple[Decimal, Decimal, list, int]]:
 
         """
         Implementación del método de bisección,
@@ -98,147 +98,231 @@ class FuncManager:
         if not func.es_continua(intervalo):
             return False
 
-        a, b = a, b = float(intervalo[0]), float(intervalo[1])
-        f = lambdify(func.var, func.expr)
-
-        f_a = f(a)
-        f_b = f(b)
-        if f_a * f_b > 0:
-            return True
-
-        i = 0
-        while i <= MAX_ITERACIONES:
-            i += 1
-            c = (a + b) / 2
-            f_c = f(c)
-            if abs(f_c) < error:
-                return (Decimal(c), Decimal(f_c), i)
-            if f_a * f_c < 0:
-                b = c
-            elif f_b * f_c < 0:
-                a = c
-        return (Decimal(c), Decimal(f_c), -1)
-
-    def falsa_posicion(
-        self,
-        func: Func,
-        intervalo: tuple[Decimal, Decimal],
-        error: Decimal = MARGEN_ERROR
-    ) -> Union[bool, tuple[Decimal, Decimal, int]]:
-
-        """
-        Implementación del método de bisección,
-        un método cerrado para encontrar raíces de funciones.
-        """
-
-        if not func.es_continua(intervalo):
-            return False
+        registro: list[list[Union[str, int, Decimal]]] = [
+            [
+                "Iteración",
+                "a",
+                "b",
+                "c",
+                f"{func.nombre[0]}(a)",
+                f"{func.nombre[0]}(b)",
+                f"{func.nombre[0]}(c)",
+            ]
+        ]
 
         a, b = float(intervalo[0]), float(intervalo[1])
         f = lambdify(func.var, func.expr)
 
-        f_a = f(a)
-        f_b = f(b)
-        if f_a * f_b > 0:
+        fa: float = f(a)
+        fb: float = f(b)
+        if fa * fb > 0:
             return True
 
         i = 0
-        while i <= MAX_ITERACIONES:
+        while i < MAX_ITERACIONES:
+            i += 1
+
+            c = (a + b) / 2
+            fc: float = f(c)
+            fa = f(a)
+            fb = f(b)
+            registro.append(
+                [
+                    i,
+                    format(Decimal(a).normalize(), "f"),
+                    format(Decimal(b).normalize(), "f"),
+                    format(Decimal(c).normalize(), "f"),
+                    format(Decimal(fa).normalize(), "f"),
+                    format(Decimal(fb).normalize(), "f"),
+                    format(Decimal(fc).normalize(), "f"),
+                ]
+            )
+
+            if abs(fc) < error:
+                return (Decimal(c), Decimal(fc), registro, i)
+            if fa * fc < 0:
+                b = c
+            elif fb * fc < 0:
+                a = c
+        return (Decimal(c), Decimal(fc), registro, -1)
+
+    @staticmethod
+    def falsa_posicion(
+        func: Func,
+        intervalo: tuple[Decimal, Decimal],
+        error: Decimal = MARGEN_ERROR
+    ) -> Union[bool, tuple[Decimal, Decimal, list, int]]:
+
+        """
+        Implementación del método de bisección,
+        un método cerrado para encontrar raíces de funciones.
+        """
+
+        if not func.es_continua(intervalo):
+            return False
+
+        registro: list[list[Union[str, int, Decimal]]] = [
+            [
+                "Iteración",
+                "a",
+                "b",
+                "x_r",
+                f"{func.nombre[0]}(a)",
+                f"{func.nombre[0]}(b)",
+                f"{func.nombre[0]}(x_r)",
+            ]
+        ]
+
+        a, b = float(intervalo[0]), float(intervalo[1])
+        f = lambdify(func.var, func.expr)
+
+        fa: float = f(a)
+        fb: float = f(b)
+        if fa * fb > 0:
+            return True
+
+        i = 0
+        while i < MAX_ITERACIONES:
             i += 1
             fa = f(a)
             fb = f(b)
 
-            c = (fa * (a - b)) / fa - fb
-            f_c = f(c)
-            if abs(f_c) < error:
-                return (Decimal(c), Decimal(f_c), i)
+            xr = b - (fb * (a - b)) / (fa - fb)
+            fxr: float = f(xr)
+            registro.append(
+                [
+                    i,
+                    format(Decimal(a).normalize(), "f"),
+                    format(Decimal(b).normalize(), "f"),
+                    format(Decimal(xr).normalize(), "f"),
+                    format(Decimal(fa).normalize(), "f"),
+                    format(Decimal(fb).normalize(), "f"),
+                    format(Decimal(fxr).normalize(), "f"),
+                ]
+            )
 
-            if f_a * f_c < 0:
-                b = c
-            elif f_b * f_c < 0:
-                a = c
-        return (Decimal(c), Decimal(f_c), -1)
+            if abs(fxr) < error:
+                return (Decimal(xr), Decimal(fxr), registro, i)
+            if fa * fxr < 0:
+                b = xr
+            elif fb * fxr < 0:
+                a = xr
+        return (Decimal(xr), Decimal(fxr), registro, -1)
 
+    @staticmethod
     def newton(
-        self,
         func: Func,
         inicial: Decimal,
         error: Decimal = MARGEN_ERROR,
         max_its: int = MAX_ITERACIONES
-    ) -> tuple[Decimal, Decimal, int, int]:
+    ) -> tuple[Decimal, Decimal, list, int, int]:
 
         """
         Implementación del método de Newton,
         un método abierto para encontrar raíces de funciones.
         """
 
-        derivada = Func(f"{func.nombre[0]}'(x)", str(diff(func.expr, func.var)))
+        derivada = Func(
+            f"{func.nombre[0]}′({func.var})",
+            str(diff(func.expr, func.var)),
+        )
+
+        registro: list[list[Union[str, int, Decimal]]] = [
+            [
+                "Iteración",
+                "x_i",
+                "x_i + 1",
+                f"{func.nombre[0]}(x_i)",
+                f"{func.nombre[0]}′(x_i)",
+            ]
+        ]
+
         dominio_derivada = derivada.get_dominio()
         dominio_func = func.get_dominio()
-
-        xi = float(inicial)
-        if xi not in dominio_derivada:
-            return (Decimal(xi), zoo, 0, 1)
-
         f = lambdify(func.var, func.expr)
         f_prima = lambdify(func.var, derivada.expr)
 
-        fxi = f(xi)
-        if abs(fxi) < error:
-            return (Decimal(xi), Decimal(fxi), 1, I)
+        xi = float(inicial)
+        if xi not in dominio_derivada:
+            return (Decimal(xi), Decimal(float(f(xi))), registro, 0, 1)
 
-        i = 1
-        while i <= max_its:
+        i = 0
+        while i < max_its:
             i += 1
-            fxi = f(xi)
-            fxi_prima = f_prima(xi)
+            fxi: float = f(xi)
+            fxi_prima: float = f_prima(xi)
+
+            temp_xi = xi
+            xi -= fxi / fxi_prima
+            registro.append(
+                [
+                    i,
+                    format(Decimal(temp_xi).normalize(), "f"),
+                    format(Decimal(xi).normalize(), "f"),
+                    format(Decimal(fxi).normalize(), "f"),
+                    format(Decimal(fxi_prima).normalize(), "f"),
+                ]
+            )
 
             if abs(fxi) < error:
-                return (Decimal(xi), Decimal(fxi), i, I)
+                return (Decimal(xi), Decimal(fxi), registro, i, I)
             if fxi_prima == 0:
-                return (Decimal(xi), Decimal(fxi), i, -I)
+                return (Decimal(xi), Decimal(fxi), registro, i, -I)
 
-            xi -= fxi / fxi_prima
             if xi not in dominio_func:
-                return (Decimal(xi), Decimal(fxi), i, -1)
+                return (Decimal(xi), Decimal(fxi), registro, i, -1)
             if xi not in dominio_derivada:
-                return (Decimal(xi), Decimal(fxi), i, 1)
-        return (Decimal(xi), Decimal(fxi), max_its, zoo)
+                return (Decimal(xi), Decimal(fxi), registro, i, 1)
+        return (Decimal(xi), Decimal(fxi), registro, max_its, zoo)
 
+    @staticmethod
     def secante(
-        self,
         func: Func,
         iniciales: tuple[Decimal, Decimal],
         error: Decimal = MARGEN_ERROR,
         max_its: int = MAX_ITERACIONES
-    ) -> tuple[Decimal, Decimal, int, int]:
+    ) -> tuple[Decimal, Decimal, list, int, int]:
 
         """
         Implementación del método de la secante,
         un método abierto para encontrar raíces de funciones.
         """
 
-        xi, xu = float(iniciales[0]), float(iniciales[1])
+        registro: list[list[Union[str, int, Decimal]]] = [
+            [
+                "Iteración",
+                "x_i − 1",
+                "x_i",
+                "x_i + 1",
+            ]
+        ]
+
+        xi, xn = float(iniciales[0]), float(iniciales[1])
         f = lambdify(func.var, func.expr)
         f_dominio = func.get_dominio()
 
-        fxu = f(xu)
-        if abs(fxu) < error:
-            return (Decimal(xu), Decimal(fxu), 1, I)
-
-        i = 1
-        while i <= max_its:
+        i = 0
+        while i < max_its:
             i += 1
-            fxi = f(xi)
-            fxu = f(xu)
-            if abs(fxu) < error:
-                return (Decimal(xu), Decimal(fxu), i, I)
+            fxi, fxn = f(xi), f(xn)
+            new_xn = xn - (fxn * (xi - xn)) / (fxi - fxn)
 
-            xi, xu = xu, xi
-            xu = (fxu * (xi - xu)) / (fxi - fxu)
-            if xu not in f_dominio:
-                return (Decimal(xu), Decimal(fxu), i, -1)
-        return (Decimal(xu), Decimal(fxu), max_its, zoo)
+            registro.append(
+                [
+                    i,
+                    format(Decimal(xi).normalize(), "f"),
+                    format(Decimal(xn).normalize(), "f"),
+                    format(Decimal(new_xn).normalize(), "f"),
+                ]
+            )
+
+            if abs(fxn) < error:
+                return (Decimal(xn), Decimal(fxn), registro, i, I)
+
+            xi, xn = xn, new_xn
+            if xn not in f_dominio:
+                return (Decimal(xn), Decimal(fxn), registro, i, -1)
+        return (Decimal(xn), Decimal(fxn), registro, max_its, zoo)
 
     def save_funciones(self) -> None:
         """

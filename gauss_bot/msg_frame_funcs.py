@@ -20,6 +20,14 @@ from .gui.custom import (
     SuccessFrame,
 )
 
+
+__all__= [
+    "delete_msg_frame",
+    "delete_msg_if",
+    "place_msg_frame",
+]
+
+
 def delete_msg_frame(msg_frame: Optional[ctkFrame]) -> None:
     """
     Elimina un frame de mensaje si existe.

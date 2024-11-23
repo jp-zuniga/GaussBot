@@ -23,11 +23,11 @@ from customtkinter import (
 )
 
 from .. import (
-    ASSET_PATH,
     CONFIG_PATH,
     THEMES_PATH,
 )
 
+from ..icons import APP_ICON
 from ..util_funcs import LOGGER
 from ..managers import (
     FuncManager,
@@ -65,10 +65,10 @@ class GaussUI(ctk):
         self.theme_config = self._load_theme_config()
         self.configure(fg_color=self.theme_config["CTkFrame"]["fg_color"])
 
-        self.title("GaussBot")
         self.geometry("1280x720")
-        self.grid_rowconfigure(0, weight=1)
-        self.grid_columnconfigure(1, weight=1)
+        self.title("GaussBot")
+        self.rowconfigure(0, weight=1)
+        self.columnconfigure(1, weight=1)
 
         # inicializar managers
         self.func_manager = FuncManager()
@@ -130,9 +130,9 @@ class GaussUI(ctk):
         """
 
         if modo == "light":
-            self.iconbitmap(path.join(ASSET_PATH, "dark_logo.ico"))
+            self.iconbitmap(APP_ICON[1])
         elif modo == "dark":
-            self.iconbitmap(path.join(ASSET_PATH, "light_logo.ico"))
+            self.iconbitmap(APP_ICON[0])
         else:
             raise ValueError("Valor inválido para argumento 'modo'!")
 

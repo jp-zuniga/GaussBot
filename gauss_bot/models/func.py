@@ -63,6 +63,7 @@ class Func:
             expr = expr.replace("sen", "sin")
         if "^" in expr:
             expr = expr.replace("^", "**")
+        expr = expr.replace("x", str(self.var))
 
         self.expr: Expr = parse_expr(
             expr,

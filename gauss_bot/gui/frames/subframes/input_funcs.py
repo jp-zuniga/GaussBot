@@ -67,7 +67,7 @@ class AgregarFuncs(CustomScrollFrame):
         self.app = app
         self.master_frame = master_frame
         self.func_manager = func_manager
-        self.columnconfigure(0, weight=3)
+        self.columnconfigure(0, weight=1)
         self.columnconfigure(1, weight=1)
 
         self.func_frame = ctkFrame(self, fg_color="transparent")
@@ -85,14 +85,13 @@ class AgregarFuncs(CustomScrollFrame):
             tooltip_text="\nEl numpad le permite ingresar funciones\n" +
                          "matemáticas de una forma más sencilla.\n\n" +
                          "Mientras el cursor este en la entrada de términos,\n" +
-                         "presione ALT para abrirlo y ESC para cerrarlo.\n\n" +
+                         "presione CTRL+TAB para abrirlo y ESC para cerrarlo.\n\n" +
                          "Para mejores resultados,\nasegúrese que los argumentos " +
                          "de la función\nestén en paréntesis, y operaciones " +
                          "complejas\ncomo multiplicación y división de funciones\n" +
                          "estén encerradas en paréntesis también.\n",
         )
 
-        self.instruct_numpad.tooltip.configure_tooltip(x_offset=30, y_offset=30)
         self.instruct_nombre = ctkLabel(self, text="Nombre de la función:")
         self.nombre_entry = CustomEntry(self, width=40, placeholder_text="f(x)")
 
@@ -103,8 +102,8 @@ class AgregarFuncs(CustomScrollFrame):
 
         self.func_entry = CustomEntry(
             self,
-            width=500,
-            placeholder_text="Presione ALT para abrir el numpad de funciones...",
+            width=300,
+            placeholder_text="Presione CTRL+TAB para abrir el numpad de funciones...",
         )
 
         self.numpad = CustomNumpad(self.func_entry)
@@ -219,7 +218,7 @@ class AgregarFuncs(CustomScrollFrame):
         ):
             if not self.validar_nombre(new_func.nombre):
                 error_msg = "El nombre de la función debe tener la forma 'f(x)'!"
-            elif new_func.var not in new_func.expr:
+            elif str(new_func.var) not in str(new_func.expr):
                 error_msg = f"La función ingresada no contiene la variable {new_func.var}!"
             else:
                 error_msg = f"Ya existe una función llamada {new_func.nombre}!"

@@ -17,8 +17,42 @@ from . import (
 )
 
 
+__all__ = [
+    "ACEPTAR_ICON",
+    "ANALISIS_ICON",
+    "APP_ICON",
+    "CHECK_ICON",
+    "CONFIG_ICON",
+    "DROPDOWN_ICON",
+    "DROPUP_ICON",
+    "ECUACIONES_ICON",
+    "ELIMINAR_ICON",
+    "ENTER_ICON",
+    "ERROR_ICON",
+    "FUNCTIONS",
+    "HOME_ICON",
+    "INFO_ICON",
+    "INPUTS_ICON",
+    "LIMPIAR_ICON",
+    "LOGO",
+    "MATRIZ_ICON",
+    "MOSTRAR_ICON",
+    "MSGBOX_ICONS",
+    "QUESTION_ICON",
+    "QUIT_ICON",
+    "SHUFFLE_ICON",
+    "VECTOR_ICON",
+    "WARNING_ICON",
+]
+
+
 FUNC_ICON_PATH = path.join(ASSET_PATH, "func_icons")
 SAVED_FUNCS_PATH = path.join(DATA_PATH, "saved_funcs")
+
+APP_ICON = (
+    path.join(ASSET_PATH, "light_logo.ico"),
+    path.join(ASSET_PATH, "dark_logo.ico"),
+)
 
 
 ################################################################################
@@ -71,6 +105,7 @@ QUIT_ICON = ctkImage(
     light_image=open_img(path.join(ASSET_PATH, "light_mode", "dark_quit_icon.png"))
 )
 
+
 ################################################################################
 ########################   Íconos de CustomMessagebox   ########################
 ################################################################################
@@ -105,6 +140,7 @@ MSGBOX_ICONS = {
     "question": QUESTION_ICON,
     "warning": WARNING_ICON,
 }
+
 
 ################################################################################
 ############################   Íconos de botones   #############################

@@ -30,47 +30,33 @@ class Tooltip(Toplevel):
         self,
         widget: ctkBase,
         message: str,
-        alpha: float = 1.0,
         delay: float = 0.1,
-        follow: bool = True,
-        x_offset: int = 20,
-        y_offset: int = 20,
+        x_offset: int = 30,
+        y_offset: int = 30,
         padding: tuple[int, int] = (10, 2),
-        corner_radius: int = 10,
-        border_width: int = 2,
-        border_color: Optional[str] = None,
-        bg_color: Optional[str] = None,
         **message_kwargs,
     ) -> None:
 
         super().__init__()
         self.widget = widget
+        self.transient()
         self.withdraw()
         self.overrideredirect(True)  # disable title bar
         self.resizable(width=True, height=True)
-        self.transient()
 
         self.message = message
         self.msg_var = StringVar(value=self.message)
 
         self.delay = delay
-        self.follow = follow
         self.x_offset = x_offset
         self.y_offset = y_offset
-        self.corner_radius = corner_radius
-        self.alpha = alpha
-        self.border_width = border_width
         self.padding = padding
-        self.bg_color = (
-            ThemeManager.theme["CTkFrame"]["fg_color"]
-            if bg_color is None else bg_color
-        )
+        self.bg_color = ThemeManager.theme["CTkFrame"]["fg_color"]
 
-        self.border_color = border_color
-        self.disable = False
 
-        self.status = "outside"
         self.last_moved: float = 0.0
+        self.status = "outside"
+        self.disable = False
 
         self.transparent_frame = Frame(self)
         self.transparent_frame.pack(padx=0, pady=0, fill="both", expand=True)
@@ -78,10 +64,9 @@ class Tooltip(Toplevel):
         self.frame: ctkFrame = ctkFrame(  # type: ignore
             self.transparent_frame,
             bg_color=self.bg_color,
-            corner_radius=self.corner_radius,
-            border_width=self.border_width,
+            corner_radius=10,
+            border_width=2,
             fg_color=self.bg_color,
-            border_color=self.border_color,
         )
 
         self.frame.pack(padx=0, pady=0, fill="both", expand=True)
@@ -95,15 +80,15 @@ class Tooltip(Toplevel):
 
         self.message_label.pack(
             fill="both",
-            padx=self.padding[0] + self.border_width,
-            pady=self.padding[1] + self.border_width,
+            padx=self.padding[0] + 2,
+            pady=self.padding[1] + 2,
             expand=True,
         )
 
-        if (self.widget.winfo_name() != "tk"
+        if (
+            self.widget.winfo_name() != "tk"
             and self.frame.cget("fg_color") == self.widget.cget("bg_color")
-            and not bg_color):
-
+        ):
             self._top_fg_color = self.frame._apply_appearance_mode(
                 ThemeManager.theme["CTkFrame"]["fg_color"]
             )
@@ -128,11 +113,6 @@ class Tooltip(Toplevel):
         # Set the status as inside for the very first time
         if self.status == "outside":
             self.status = "inside"
-
-        # If the follow flag is not set, motion within the widget will make the tooltip disappear
-        if not self.follow:
-            self.status = "inside"
-            self.withdraw()
 
         # Calculate available space on the right side of the widget relative to the screen
         root_width = self.winfo_screenwidth()

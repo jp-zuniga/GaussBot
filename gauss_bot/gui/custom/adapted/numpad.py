@@ -6,7 +6,7 @@ Adapted from:
 Modified by: Joaquín Zúñiga, on 11/18/2024
 Formatted, type-annotated, and simplified.
 Transformed for use as a calculator-like numpad
-with mathematical functions, for use in this project.
+with mathematical functions for use in this project.
 """
 
 from re import (
@@ -71,9 +71,9 @@ class CustomNumpad(ctkTop):
             "row3": ["sen(x)", "cos(x)", "tan(x)"],
         }
 
-        self.attach.unbind("<Alt_L>")
         self.attach.unbind("<Escape>")
-        self.attach.bind("<Alt_L>", self.render)
+        self.attach.unbind("<Control-Tab>")
+        self.attach.bind("<Control-Tab>", self.render)
         self.attach.bind("<Escape>", self.hide)
         self.attach.bind("<Configure>", self.hide)
 
@@ -177,17 +177,18 @@ class CustomNumpad(ctkTop):
             k = k.replace("^x", "^()")
         elif "(x)" in k:
             k = k.replace("(x)", "()")
-        else:
+        elif k in ("x", "pi"):
             set_from_end = True
         self.attach.insert(INSERT, k)
 
         try:
             text = self.attach.get()
             last_match = list(comp(re_pattern).finditer(text))[-1]
+
             if set_from_end:
-                cursor_pos = last_match.end() - 1
+                cursor_pos = INSERT
             else:
-                cursor_pos = last_match.start() + index_adjust
+                cursor_pos = last_match.start() + index_adjust  # type: ignore
 
             self.attach.icursor(cursor_pos)
         except IndexError:
@@ -204,7 +205,7 @@ class CustomNumpad(ctkTop):
 
     def hide(self, event=None) -> str:
         """
-        Reskin of withdraw() to handle custom key-bindings.
+        Wrapper for withdraw() to handle custom key-bindings.
         """
 
         del event
@@ -217,7 +218,7 @@ class CustomNumpad(ctkTop):
 
     def render(self, event=None) -> str:
         """
-        Reskin of iconify() to handle custom key-bindings.
+        Wrapper for iconify() to handle custom key-bindings.
         """
 
         del event
