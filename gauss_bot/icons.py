@@ -31,7 +31,7 @@ __all__ = [
     "ELIMINAR_ICON",
     "ENTER_ICON",
     "ERROR_ICON",
-    "FUNCTIONS",
+    "NUMPAD_KEYS",
     "HOME_ICON",
     "INFO_ICON",
     "INPUTS_ICON",
@@ -40,6 +40,7 @@ __all__ = [
     "MATRIZ_ICON",
     "MOSTRAR_ICON",
     "MSGBOX_ICONS",
+    "NUMPAD_ICON_PATH",
     "QUESTION_ICON",
     "QUIT_ICON",
     "SHUFFLE_ICON",
@@ -48,7 +49,7 @@ __all__ = [
 ]
 
 
-FUNC_ICON_PATH = path.join(ASSET_PATH, "func_icons")
+NUMPAD_ICON_PATH = path.join(ASSET_PATH, "numpad_icons")
 SAVED_FUNCS_PATH = path.join(DATA_PATH, "saved_funcs")
 
 APP_ICON = (
@@ -215,14 +216,14 @@ SHUFFLE_ICON = ctkImage(
 ################################################################################
 
 
-FUNCTIONS: dict[str, ctkImage] = {
+NUMPAD_KEYS: dict[str, ctkImage] = {
     name[:-4]: ctkImage(
-        size=open_img(path.join(FUNC_ICON_PATH, "dark_mode", f"light_{name}")).size,
-        dark_image=open_img(path.join(FUNC_ICON_PATH, "dark_mode", f"light_{name}")),
-        light_image=open_img(path.join(FUNC_ICON_PATH, "light_mode", f"dark_{name}"))
+        size=open_img(path.join(NUMPAD_ICON_PATH, "dark_mode", f"light_{name}")).size,
+        dark_image=open_img(path.join(NUMPAD_ICON_PATH, "dark_mode", f"light_{name}")),
+        light_image=open_img(path.join(NUMPAD_ICON_PATH, "light_mode", f"dark_{name}"))
     ) for name in {
         name.split("_")[1]
-        for _, _, files in walk(FUNC_ICON_PATH)
+        for _, _, files in walk(NUMPAD_ICON_PATH)
         for name in files
     }
 }

@@ -72,8 +72,8 @@ class AgregarFuncs(CustomScrollFrame):
         self.app = app
         self.master_frame = master_frame
         self.func_manager = func_manager
-        self.columnconfigure(0, weight=1)
-        self.columnconfigure(1, weight=1)
+        self.columnconfigure(0, weight=7)
+        self.columnconfigure(1, weight=5)
 
         self.key_binder = KeyBindingManager(es_matriz=False)
 
@@ -156,8 +156,8 @@ class AgregarFuncs(CustomScrollFrame):
             sticky="n",
         )
 
-        self.func_entry.grid(row=4, column=0, padx=(5, ), pady=(1, 3), sticky="n")
-        self.leer_button.grid(row=4, column=1, padx=(0, 5), pady=5, sticky="n")
+        self.func_entry.grid(row=4, column=0, padx=5, pady=(1, 3), sticky="e")
+        self.leer_button.grid(row=4, column=1, padx=5, pady=(1, 3), sticky="w")
         self.func_frame.grid(
             row=5, column=0,
             columnspan=2,
@@ -259,7 +259,7 @@ class AgregarFuncs(CustomScrollFrame):
         self.msg_frame = place_msg_frame(
             parent_frame=self.func_frame,
             msg_frame=self.msg_frame,
-            msg=f"La función {new_func.nombre} ha sido agregada exitosamente!",
+            msg=f"La función '{new_func.nombre}' ha sido agregada exitosamente!",
             tipo="success",
             row=2,
             columnspan=2,

@@ -48,7 +48,7 @@ class NavFrame(ctkFrame):
         self.grid(row=0, column=0, sticky="nsew")
 
         self.rowconfigure(8, weight=1)  # para tener un espacio entre los botones
-        self.columnconfigure(0, weight=1)
+        self.columnconfigure(0, weight=4)
         self.columnconfigure(1, weight=1)
 
         self.hidden = False
@@ -74,6 +74,7 @@ class NavFrame(ctkFrame):
         self.hide_button = IconButton(
             self,
             app=self.app,
+            width=30,
             height=30,
             image=DROPLEFT_ICON,
             command=self.toggle_nav,
@@ -215,8 +216,8 @@ class NavFrame(ctkFrame):
 
         # colocar widgets en la barra de navegacion
         self.logo_label.grid(row=0, column=0, columnspan=2, padx=10, pady=(20, 3))
-        self.app_name.grid(row=1, column=0, padx=10, pady=(3, 10), sticky="e")
-        self.hide_button.grid(row=1, column=1, padx=10, pady=(3, 10), sticky="w")
+        self.app_name.grid(row=1, column=0, padx=0, pady=(3, 10), sticky="nse")
+        self.hide_button.grid(row=1, column=1, padx=10, pady=(3, 10), sticky="e")
 
         i = 2
         for j, widget in enumerate(self.buttons.values()):
@@ -276,7 +277,7 @@ class NavFrame(ctkFrame):
                     )
 
             self.hidden = False
-            self.hide_button.grid_configure(column=1, columnspan=1, sticky="w")
+            self.hide_button.grid_configure(column=1, columnspan=1, sticky="e")
             self.hide_button.configure(image=DROPLEFT_ICON)
 
         else:
@@ -292,7 +293,7 @@ class NavFrame(ctkFrame):
                     )
 
             self.hidden = True
-            self.hide_button.grid_configure(column=0, columnspan=2, sticky="n")
+            self.hide_button.grid_configure(column=0, columnspan=2, sticky="nsew")
             self.hide_button.configure(image=DROPRIGHT_ICON)
 
     def home_button_event(self) -> None:

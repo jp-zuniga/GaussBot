@@ -16,6 +16,7 @@ from os import (
 from typing import Union
 from customtkinter import (
     CTk as ctk,
+    ThemeManager,
     set_appearance_mode as set_mode,
     set_widget_scaling as set_scaling,
     set_default_color_theme as set_theme,
@@ -61,7 +62,7 @@ class GaussUI(ctk):
         self._load_config()
         self.set_icon(self.modo_actual)
 
-        self.theme_config = self._load_theme_config()
+        self.theme_config = ThemeManager.theme
         self.configure(fg_color=self.theme_config["CTkFrame"]["fg_color"])
 
         self.geometry("1280x720")
@@ -186,16 +187,3 @@ class GaussUI(ctk):
         set_scaling(self.escala_actual)
         set_theme(path.join(THEMES_PATH, self.tema_actual))
         LOGGER.info("Configuración aplicada!")
-
-    def _load_theme_config(self) -> dict:
-        """
-        Carga el archivo de configuración del tema actual.
-        """
-
-        with open(
-            path.join(THEMES_PATH, self.tema_actual),
-            mode="r",
-            encoding="utf-8",
-        ) as theme_file:
-            LOGGER.info("Cargando tema '%s'...", self.tema_actual)
-            return load(theme_file)

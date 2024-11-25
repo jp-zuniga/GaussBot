@@ -8,8 +8,6 @@ Formatted file and added type annotations for personal use.
 """
 
 from time import time
-from typing import Optional
-
 from tkinter import (
     Event,
     Frame,
@@ -18,6 +16,7 @@ from tkinter import (
 
 from customtkinter import (
     CTkBaseClass as ctkBase,
+    CTkFont as ctkFont,
     CTkFrame as ctkFrame,
     CTkLabel as ctkLabel,
     StringVar,
@@ -26,6 +25,11 @@ from customtkinter import (
 
 
 class Tooltip(Toplevel):
+    """
+    Tooltip with modern design that appears
+    when the mouse hovers over a widget.
+    """
+
     def __init__(
         self,
         widget: ctkBase,
@@ -33,7 +37,6 @@ class Tooltip(Toplevel):
         delay: float = 0.1,
         x_offset: int = 20,
         y_offset: int = 30,
-        padding: tuple[int, int] = (10, 2),
         **message_kwargs,
     ) -> None:
 
@@ -50,16 +53,14 @@ class Tooltip(Toplevel):
         self.delay = delay
         self.x_offset = x_offset
         self.y_offset = y_offset
-        self.padding = padding
         self.bg_color = ThemeManager.theme["CTkFrame"]["fg_color"]
-
 
         self.last_moved: float = 0.0
         self.status = "outside"
         self.disable = False
 
         self.transparent_frame = Frame(self)
-        self.transparent_frame.pack(padx=0, pady=0, fill="both", expand=True)
+        self.transparent_frame.pack(expand=True, fill="both")
 
         self.frame: ctkFrame = ctkFrame(  # type: ignore
             self.transparent_frame,
@@ -69,25 +70,25 @@ class Tooltip(Toplevel):
             fg_color=self.bg_color,
         )
 
-        self.frame.pack(padx=0, pady=0, fill="both", expand=True)
-
+        self.frame.pack(expand=True, fill="both")
         self.message_label = ctkLabel(
             self.frame,
-            font=("Roboto", 12),
+            font=ctkFont(size=12),
             textvariable=self.msg_var,
             **message_kwargs
         )
 
         self.message_label.pack(
             fill="both",
-            padx=self.padding[0] + 2,
-            pady=self.padding[1] + 2,
+            padx=10,
+            pady=5,
             expand=True,
         )
 
         if (
             self.widget.winfo_name() != "tk"
-            and self.frame.cget("fg_color") == self.widget.cget("bg_color")
+            and
+            self.frame.cget("fg_color") == self.widget.cget("bg_color")
         ):
             self._top_fg_color = self.frame._apply_appearance_mode(
                 ThemeManager.theme["CTkFrame"]["fg_color"]
@@ -102,10 +103,11 @@ class Tooltip(Toplevel):
         self.widget.bind("<B1-Motion>", self.on_enter, add="+")
         self.widget.bind("<Destroy>", lambda _: self.hide(), add="+")
 
-    def show(self) -> None:
-        self.disable = False
-
     def on_enter(self, event: Event) -> None:
+        """
+        Handles tooltip movement.
+        """
+
         if self.disable:
             return
         self.last_moved = time()
@@ -114,12 +116,14 @@ class Tooltip(Toplevel):
         if self.status == "outside":
             self.status = "inside"
 
-        # Calculate available space on the right side of the widget relative to the screen
+        # Calculate available space on the right side
+        # of the widget relative to the screen
         root_width = self.winfo_screenwidth()
         widget_x = event.x_root
         space_on_right = root_width - widget_x
 
-        # Calculate the width of the tooltip's text based on the length of the message string
+        # Calculate the width of the tooltip's text
+        # based on the length of the message string
         text_width = self.message_label.winfo_reqwidth()
 
         # Calculate the offset based on available space and
@@ -136,6 +140,10 @@ class Tooltip(Toplevel):
         self.after(int(self.delay * 1000), self._show)
 
     def on_leave(self) -> None:
+        """
+        Hides the widget when the mouse leaves the widget.
+        """
+
         if self.disable:
             return
         self.status = "outside"
@@ -151,35 +159,29 @@ class Tooltip(Toplevel):
             self.deiconify()
 
     def hide(self) -> None:
+        """
+        Hides the tooltip.
+        """
+
         if not self.winfo_exists():
             return
         self.withdraw()
         self.disable = True
 
-    def is_disabled(self) -> bool:
-        return self.disable
+    def configure_tooltip(self, **kwargs) -> None:
+        """
+        Configures the tooltip with new values.
+        """
 
-    def get(self) -> str:
-        return self.msg_var.get()
+        if "x_offset" in kwargs:
+            self.x_offset = kwargs.pop("x_offset")
+        if "y_offset" in kwargs:
+            self.y_offset = kwargs.pop("y_offset")
+        if "delay" in kwargs:
+            self.delay = kwargs.pop("delay")
+        if "bg_color" in kwargs:
+            self.frame.configure(fg_color=kwargs.pop("bg_color"))
+        if "message" in kwargs:
+            self.msg_var.set(kwargs.pop("message"))
 
-    def configure_tooltip(
-        self,
-        x_offset: Optional[int] = None,
-        y_offset: Optional[int] = None,
-        delay: Optional[float] = None,
-        message: Optional[str] = None,
-        bg_color: Optional[str] = None,
-        **kwargs,
-    ) -> None:
-
-        if x_offset:
-            self.x_offset = x_offset
-        if y_offset:
-            self.y_offset = y_offset
-        if delay:
-            self.delay = delay
-        if bg_color:
-            self.frame.configure(fg_color=bg_color)
-        if message:
-            self.msg_var.set(message)  # type: ignore
         self.message_label.configure(**kwargs)
