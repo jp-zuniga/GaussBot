@@ -41,6 +41,7 @@ from .operaciones_vecs import (
     VMultiplicacionTab,
 )
 
+from .resolver_sis import ResolverSisFrame
 from .raices import RaicesFrame
 
 __all__ = [
@@ -63,5 +64,6 @@ __all__ = [
     "InversaTab",
     "VSumaRestaTab",
     "VMultiplicacionTab",
+    "ResolverSisFrame",
     "RaicesFrame",
 ]

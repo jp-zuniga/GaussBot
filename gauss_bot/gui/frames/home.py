@@ -52,11 +52,10 @@ class HomeFrame(ctkFrame):
 
         ctkLabel(
             self,
-            text="GaussBot es una aplicación para\n" +
-                 "realizar cálculos matemáticos\n" +
-                 "como operaciones con matrices y vectores,\n" +
-                 "resolución de sistemas de ecuaciones,\n" +
-                 "análisis de funciones y más.",
+            text="GaussBot es una aplicación para realizar cálculos matemáticos como:\n" +
+                 "− Operaciones con matrices y vectores\n" +
+                 "− Resolución de sistemas de ecuaciones\n" +
+                 "− Análisis númerico",
         ).grid(row=1, column=0, columnspan=2, padx=20, pady=0, sticky="s")
 
         ctkLabel(
@@ -96,7 +95,7 @@ class HomeFrame(ctkFrame):
             app=self.app,
             height=40,
             image=ANALISIS_ICON,
-            text="Análisis de Númerico",
+            text="Análisis Númerico",
             text_color=self.app.theme_config["CTkLabel"]["text_color"],
             tooltip_text="\nRaíces de funciones, derivadas, integrales.\n",
             command=self.ir_a_funcs,
@@ -110,9 +109,9 @@ class HomeFrame(ctkFrame):
             text="Sistemas de Ecuaciones",
             text_color=self.app.theme_config["CTkLabel"]["text_color"],
             tooltip_text="\nResolver sistemas de ecuaciones por los métodos de:" +
-                         "\n− Gauss - Jordan" +
-                         "\n− Regla de Cramer" +
-                         "\n− Factorización de matrices\n",
+                         "\n− Gauss−Jordan" +
+                         "\n− Regla de Cramer\n",
+                        #  "\n− Factorización de matrices",
             command=self.ir_a_sis,
         ).grid(row=4, column=1, padx=(10, 20), pady=10, sticky="nw")
 

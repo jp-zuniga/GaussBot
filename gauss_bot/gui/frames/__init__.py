@@ -16,7 +16,7 @@ from .home import HomeFrame
 from .matrices import MatricesFrame
 from .vectores import VectoresFrame
 from .analisis import AnalisisFrame
-from .ecuaciones import SistemasFrame
+from .sistemas import SistemasFrame
 from .config import ConfigFrame
 
 __all__ = [

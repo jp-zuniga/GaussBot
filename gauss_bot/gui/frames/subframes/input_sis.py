@@ -375,7 +375,7 @@ class AgregarSistemas(CustomScrollFrame):
 
         # mandar a actualizar los datos
         self.master_frame.update_all()
-        self.app.sistemas.update_frame()  # type: ignore
+        self.app.sistemas.update_all()  # type: ignore
 
     def validar_dimensiones(self) -> Optional[tuple[int, int]]:
         """

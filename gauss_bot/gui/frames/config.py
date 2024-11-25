@@ -150,7 +150,7 @@ class ConfigFrame(ctkFrame):
         self.app.matrices.update_all()  # type: ignore
         self.app.vectores.update_all()  # type: ignore
         self.app.analisis.update_all()  # type: ignore
-        self.app.sistemas.update_frame()  # type: ignore
+        self.app.sistemas.update_all()  # type: ignore
 
     def cambiar_tema(self, tema_seleccionado: str) -> None:
         """

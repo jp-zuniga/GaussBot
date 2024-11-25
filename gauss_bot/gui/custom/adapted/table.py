@@ -44,6 +44,7 @@ class CustomTable(ctkFrame):
 
         self.columnconfigure(0, weight=1)
         self.rowconfigure(0, weight=1)
+        self.rowconfigure(1, weight=1)
         self.rowconfigure(2, weight=1)
 
         self.top_fg = ThemeManager.theme["CTkFrame"]["top_fg_color"]

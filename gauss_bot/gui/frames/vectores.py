@@ -81,7 +81,7 @@ class VectoresFrame(ctkFrame):
             self.dummy_frame = ctkFrame(self, fg_color="transparent")
             self.msg_frame = ErrorFrame(
                 self.dummy_frame,
-                msg="No hay vectores ingresados!"
+                msg="No hay vectores guardados!"
             )
 
             agregar_button = ctkButton(
