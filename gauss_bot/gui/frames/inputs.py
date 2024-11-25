@@ -72,10 +72,10 @@ class InputsFrame(ctkFrame):
         self.instances = []
 
         # crear tabs en tabview
-        funcs_tab = self.tabview.add("Funciones")
-        sistemas_tab = self.tabview.add("Sistemas de Ecuaciones")
         matrices_tab = self.tabview.add("Matrices")
         vectores_tab = self.tabview.add("Vectores")
+        funcs_tab = self.tabview.add("Funciones")
+        sistemas_tab = self.tabview.add("Sistemas de Ecuaciones")
 
         # inicializar frames y append a lista de instancias:
         self.instances.append(
@@ -114,10 +114,61 @@ class InputsFrame(ctkFrame):
             )
         )
 
-
         # pack frames para mostrarlos
         for tab in self.instances:
             tab.pack(expand=True, fill="both")
+
+    def ir_a_input_mats(self, mostrar: bool):
+        """
+        Mostrar frame 'ManejarMats'.
+        * mostrar: si se quiere seleccionar la tab de mostrar o no
+        """
+
+        self.app.nav_frame.seleccionar_frame("inputs")  # type: ignore
+        self.app.inputs_frame.tabview.set("Matrices")  # type: ignore
+        if mostrar:
+            self.instances[0].tabview.set("Mostrar")  # type: ignore
+        else:
+            self.instances[0].tabview.set("Agregar")  # type: ignore
+
+    def ir_a_input_vecs(self, mostrar: bool):
+        """
+        Mostrar frame 'ManejarVecs'.
+        * mostrar: si se quiere seleccionar la tab de mostrar o no
+        """
+
+        self.app.nav_frame.seleccionar_frame("inputs")  # type: ignore
+        self.app.inputs_frame.tabview.set("Vectores")  # type: ignore
+        if mostrar:
+            self.instances[1].tabview.set("Mostrar")  # type: ignore
+        else:
+            self.instances[1].tabview.set("Agregar")  # type: ignore
+
+    def ir_a_input_funcs(self, mostrar: bool):
+        """
+        Mostrar frame 'ManejarFuncs'.
+        * mostrar: si se quiere seleccionar la tab de mostrar o no
+        """
+
+        self.app.nav_frame.seleccionar_frame("inputs")  # type: ignore
+        self.app.inputs_frame.tabview.set("Funciones")  # type: ignore
+        if mostrar:
+            self.instances[2].tabview.set("Mostrar")  # type: ignore
+        else:
+            self.instances[2].tabview.set("Agregar")  # type: ignore
+
+    def ir_a_input_sis(self, mostrar: bool):
+        """
+        Mostrar frame 'ManejarSistemas'.
+        * mostrar: si se quiere seleccionar la tab de mostrar o no
+        """
+
+        self.app.nav_frame.seleccionar_frame("inputs")  # type: ignore
+        self.app.inputs_frame.tabview.set("Sistemas de Ecuaciones")  # type: ignore
+        if mostrar:
+            self.instances[3].tabview.set("Mostrar")  # type: ignore
+        else:
+            self.instances[3].tabview.set("Agregar")  # type: ignore
 
     def update_all(self):
         """

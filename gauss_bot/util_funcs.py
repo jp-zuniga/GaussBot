@@ -84,7 +84,7 @@ def log_setup(logger=LOGGER) -> None:
     handler.setLevel(DEBUG)
     handler.setFormatter(
         Formatter(
-            "%(asctime)s - %(levelname)s:\n%(message)s\n"
+            "\n%(asctime)s - %(levelname)s:\n%(message)s"
         )
     )
 

@@ -11,6 +11,7 @@ from os import (
 from typing import Optional
 
 from customtkinter import CTkImage as ctkImage
+from matplotlib import use
 from matplotlib.pyplot import (
     axis, close,
     rc, savefig,
@@ -34,6 +35,8 @@ from ..icons import SAVED_FUNCS_PATH
 from ..util_funcs import transparent_invert
 
 TRANSFORMS = standard_transformations + (implicit_multiplication_application,)
+
+use("TkAgg")
 
 
 class Func:
@@ -61,8 +64,11 @@ class Func:
 
         if "sen" in expr:
             expr = expr.replace("sen", "sin")
+        if "e^" in expr:
+            expr = expr.replace("e^", "exp")
         if "^" in expr:
             expr = expr.replace("^", "**")
+
         expr = expr.replace("x", str(self.var))
 
         self.expr: Expr = parse_expr(
@@ -138,7 +144,7 @@ class Func:
 
         if expr is not None:
             parse_str = parse_expr(expr, transformations=TRANSFORMS)
-            latex_str: str = latex(parse_str, ln_notation=True)
+            latex_str: str = latex(parse_str, ln_notation=True, inv_trig_style="power")
         elif misc_str is not None:
             latex_str = misc_str
         else:
@@ -150,7 +156,7 @@ class Func:
         rc("text", usetex=True)
         rc("font", family="serif")
 
-        fig_length = 8 + (len(latex_str) // 8)
+        fig_length = 10 + (len(latex_str) // 8)
         fig_height = (
             2
             if r"\\" not in latex_str

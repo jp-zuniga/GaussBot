@@ -268,7 +268,9 @@ class SistemasFrame(CustomScrollFrame):
             self,
             text="Agregar sistemas",
             image=INPUTS_ICON,
-            command=lambda: self.app.home_frame.ir_a_sistemas(mostrar=False),
+            command=lambda: (
+                self.app.inputs_frame.ir_a_input_sis(mostrar=False)  # type: ignore
+            ),
         ).grid(row=1, column=0, columnspan=2, padx=5, pady=5, sticky="n")
 
     def toggle_gj(self) -> None:

@@ -3,13 +3,24 @@ Home frame de la interfaz.
 """
 
 from typing import TYPE_CHECKING
+from webbrowser import open as open_link
 
 from customtkinter import (
-    CTkButton as ctkButton,
     CTkFont as ctkFont,
     CTkFrame as ctkFrame,
     CTkLabel as ctkLabel,
 )
+
+from ...util_funcs import generate_sep
+from ...icons import (
+    ANALISIS_ICON,
+    ECUACIONES_ICON,
+    INFO_ICON,
+    MATRIZ_ICON,
+    VECTOR_ICON,
+)
+
+from ..custom import IconButton
 
 if TYPE_CHECKING:
     from .. import GaussUI
@@ -25,99 +36,120 @@ class HomeFrame(ctkFrame):
         self.app = app
 
         # para centrar widgets
-        self.rowconfigure(0, weight=1)
-        self.rowconfigure(2, weight=1)
         self.columnconfigure(0, weight=1)
         self.columnconfigure(1, weight=1)
+        self.rowconfigure(0, weight=1)
+        self.rowconfigure(5, weight=1)
 
-        # inicializar widgets
-        welcome = ctkLabel(
+        ctkLabel(
             self,
             text="¡Bienvenido a GaussBot!",
             font=ctkFont(
-                size=26,
+                size=20,
                 weight="bold",
-            )
-        )
+            ),
+        ).grid(row=0, column=0, columnspan=2, padx=20, pady=10, sticky="s")
 
-        agregar_matrices = ctkButton(
+        ctkLabel(
             self,
-            width=180,
-            height=40,
-            text="Agregar matrices",
-            font=ctkFont(size=16),
-            command=lambda: self.ir_a_matriz(mostrar=False)
-        )
+            text="GaussBot es una aplicación para\n" +
+                 "realizar cálculos matemáticos\n" +
+                 "como operaciones con matrices y vectores,\n" +
+                 "resolución de sistemas de ecuaciones,\n" +
+                 "análisis de funciones y más.",
+        ).grid(row=1, column=0, columnspan=2, padx=20, pady=0, sticky="s")
 
-        agregar_vectores = ctkButton(
+        ctkLabel(
             self,
-            width=180,
-            height=40,
-            text="Agregar vectores",
-            font=ctkFont(size=16),
-            command=lambda: self.ir_a_vector(mostrar=False)
-        )
+            text="",
+            image=generate_sep(False, (400, 6)),
+        ).grid(row=2, column=0, columnspan=2, padx=20, pady=10, sticky="s")
 
-        mostrar_matrices = ctkButton(
+        IconButton(
             self,
-            width=180,
+            app=self.app,
             height=40,
-            text="Mostrar matrices",
-            font=ctkFont(size=16),
-            command=lambda: self.ir_a_matriz(mostrar=True)
-        )
+            image=MATRIZ_ICON,
+            text="Operaciones de Matrices",
+            text_color=self.app.theme_config["CTkLabel"]["text_color"],
+            tooltip_text="\nSuma, resta, multiplicación," +
+                         "\ntransposición, encontrar inversa," +
+                         "\ny calcular determinante.\n",
+            command=self.ir_a_mats,
+        ).grid(row=3, column=0, padx=(20, 10), pady=10, sticky="se")
 
-        mostrar_vectores = ctkButton(
+        IconButton(
             self,
-            width=180,
+            app=self.app,
             height=40,
-            text="Mostrar vectores",
-            font=ctkFont(size=16),
-            command=lambda: self.ir_a_vector(mostrar=True)
-        )
+            image=VECTOR_ICON,
+            text="Operaciones de Vectores",
+            text_color=self.app.theme_config["CTkLabel"]["text_color"],
+            tooltip_text="\nMagnitud, suma, resta," +
+                         "\nmultiplicación escalar," +
+                         "\nproducto punto, producto cruz.\n",
+            command=self.ir_a_vecs,
+        ).grid(row=3, column=1, padx=(10, 20), pady=10, sticky="sw")
 
-        # colocar en grid para mostrar
-        welcome.grid(row=0, column=0, columnspan=2, padx=20, pady=20, sticky="s")
-        agregar_matrices.grid(row=1, column=0, padx=20, pady=(20, 10), sticky="ne")
-        agregar_vectores.grid(row=1, column=1, padx=20, pady=(20, 10), sticky="nw")
-        mostrar_matrices.grid(row=2, column=0, padx=20, pady=(10, 20), sticky="ne")
-        mostrar_vectores.grid(row=2, column=1, padx=20, pady=(10, 20), sticky="nw")
+        IconButton(
+            self,
+            app=self.app,
+            height=40,
+            image=ANALISIS_ICON,
+            text="Análisis de Númerico",
+            text_color=self.app.theme_config["CTkLabel"]["text_color"],
+            tooltip_text="\nRaíces de funciones, derivadas, integrales.\n",
+            command=self.ir_a_funcs,
+        ).grid(row=4, column=0, padx=(20, 10), pady=10, sticky="ne")
 
-    def ir_a_sistemas(self, mostrar: bool):
+        IconButton(
+            self,
+            app=self.app,
+            height=40,
+            image=ECUACIONES_ICON,
+            text="Sistemas de Ecuaciones",
+            text_color=self.app.theme_config["CTkLabel"]["text_color"],
+            tooltip_text="\nResolver sistemas de ecuaciones por los métodos de:" +
+                         "\n− Gauss - Jordan" +
+                         "\n− Regla de Cramer" +
+                         "\n− Factorización de matrices\n",
+            command=self.ir_a_sis,
+        ).grid(row=4, column=1, padx=(10, 20), pady=10, sticky="nw")
+
+        IconButton(
+            self,
+            app=self.app,
+            height=30,
+            image=INFO_ICON,
+            tooltip_text="\n− Versión: 1.0" +
+                         "\n− Desarrollado por: Joaquín Zúñiga\n",
+            command=lambda: open_link("https://github.com/jp-zuniga/GaussBot"),
+        ).grid(row=5, column=0, columnspan=2, padx=20, pady=10, sticky="n")
+
+    def ir_a_mats(self) -> None:
         """
-        Mostrar frame 'ManejarSistemas'.
-        * mostrar: si se quiere seleccionar la tab de mostrar o no
+        Selecciona el menú de matrices.
         """
 
-        self.app.nav_frame.seleccionar_frame("inputs")  # type: ignore
-        self.app.inputs_frame.tabview.set("Sistemas de Ecuaciones")  # type: ignore
-        if mostrar:
-            self.app.inputs_frame.instances[0].tabview.set("Mostrar")  # type: ignore
-        else:
-            self.app.inputs_frame.instances[0].tabview.set("Agregar")  # type: ignore
+        self.app.nav_frame.seleccionar_frame("matrices")
 
-    def ir_a_matriz(self, mostrar: bool):
+    def ir_a_vecs(self) -> None:
         """
-        Mostrar frame 'ManejarMats'.
-        * mostrar: si se quiere seleccionar la tab de mostrar o no
+        Selecciona el menú de vectores.
         """
 
-        self.app.nav_frame.seleccionar_frame("inputs")  # type: ignore
-        self.app.inputs_frame.tabview.set("Matrices")  # type: ignore
-        if mostrar:
-            self.app.inputs_frame.instances[1].tabview.set("Mostrar")  # type: ignore
-        else:
-            self.app.inputs_frame.instances[1].tabview.set("Agregar")  # type: ignore
+        self.app.nav_frame.seleccionar_frame("vectores")
 
-    def ir_a_vector(self, mostrar: bool):
+    def ir_a_funcs(self) -> None:
         """
-        Mostrar frame 'ManejarVecs'.
-        * mostrar: si se quiere seleccionar la tab de mostrar o no
+        Selecciona el frame de análisis númerico.
         """
 
-        self.app.nav_frame.seleccionar_frame("inputs")  # type: ignore
-        self.app.inputs_frame.tabview.set("Vectores")  # type: ignore
-        if mostrar:
-            self.app.inputs_frame.instances[2].tabview.set("Mostrar")  # type: ignore
-        else:
-            self.app.inputs_frame.instances[2].tabview.set("Agregar")  # type: ignore
+        self.app.nav_frame.seleccionar_frame("analisis")
+
+    def ir_a_sis(self) -> None:
+        """
+        Selecciona el frame de sistemas de ecuaciones.
+        """
+
+        self.app.nav_frame.seleccionar_frame("sistemas")

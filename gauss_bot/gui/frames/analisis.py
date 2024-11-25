@@ -5,14 +5,18 @@ de todos los subframes relacionados con matrices.
 
 from typing import (
     TYPE_CHECKING,
+    Optional,
 )
 
 from customtkinter import (
+    CTkButton as ctkButton,
     CTkFrame as ctkFrame,
     CTkTabview as ctkTabview,
 )
 
+from ...icons import INPUTS_ICON
 from ...managers import FuncManager
+from ..custom import ErrorFrame
 from .subframes import RaicesFrame
 
 if TYPE_CHECKING:
@@ -34,6 +38,10 @@ class AnalisisFrame(ctkFrame):
         super().__init__(master, corner_radius=0, fg_color="transparent")
         self.app = app
         self.func_manager = func_manager
+        self.nombres_funciones = list(func_manager.funcs_ingresadas.keys())
+
+        self.dummy_frame: ctkFrame
+        self.msg_frame: Optional[ctkFrame] = None
 
         self.instances: list[
             RaicesFrame,
@@ -51,8 +59,35 @@ class AnalisisFrame(ctkFrame):
 
     def setup_tabview(self) -> None:
         """
-        Crea un tabview con pestañas para cada módulo de análisis.
+        Crea un tabview con pestañas para cada módulo de análisis númerico.
         """
+
+        for widget in self.winfo_children():  # type: ignore
+            widget.destroy()  # type: ignore
+
+        if len(self.nombres_funciones) == 0:
+            # si no hay funciones guardadas, mostrar mensaje de error y
+            # agregar boton para dirigir al usuario adonde se agregan
+            self.dummy_frame = ctkFrame(self, fg_color="transparent")
+            self.msg_frame = ErrorFrame(
+                self.dummy_frame,
+                msg="No hay funciones ingresadas!",
+            )
+
+            agregar_button = ctkButton(
+                self.dummy_frame,
+                height=30,
+                text="Agregar funciones",
+                image=INPUTS_ICON,
+                command=lambda: (
+                    self.app.inputs_frame.ir_a_input_funcs(mostrar=False)  # type: ignore
+                ),
+            )
+
+            self.dummy_frame.pack(expand=True, anchor="center")
+            self.msg_frame.pack(pady=5, anchor="center")
+            agregar_button.pack(pady=5, anchor="center")
+            return
 
         self.tabview = ctkTabview(self, fg_color="transparent")
         self.tabview.pack(expand=True, fill="both")
@@ -79,6 +114,26 @@ class AnalisisFrame(ctkFrame):
         """
         Actualiza todos los frames del tabview.
         """
+
+        self.func_manager.funcs_ingresadas = dict(
+            sorted(
+                self.func_manager.funcs_ingresadas.items()
+            )
+        )
+
+        self.nombres_funciones = list(self.func_manager.funcs_ingresadas.keys())
+
+        if (
+            self.msg_frame is not None or
+            len(self.nombres_funciones) == 0 or
+            self.instances == []
+        ):
+            # si hay un mensaje de error,
+            # o no hay funciones ingresadas,
+            # o no se han inicializado los frames,
+            # correr el setup
+            self.setup_tabview()
+            return
 
         for tab in self.instances:
             tab.update_frame()

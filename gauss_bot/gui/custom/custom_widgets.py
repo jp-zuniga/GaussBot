@@ -131,10 +131,8 @@ class IconButton(ctkButton):
         self,
         master: Any,
         app: "GaussUI",
-        image: ctkImage,
-        tooltip_text: str,
-        width: int = 20,
-        height: int = 20,
+        image: Optional[ctkImage] = None,
+        tooltip_text: Optional[str] = None,
         **kwargs
     ) -> None:
 
@@ -143,13 +141,28 @@ class IconButton(ctkButton):
         else:
             border_width = 0
 
+        if "text" in kwargs:
+            text = kwargs.pop("text")
+        else:
+            text = ""
+
+        if "width" in kwargs:
+            width = kwargs.pop("width")
+        else:
+            width = 20
+
+        if "height" in kwargs:
+            height = kwargs.pop("height")
+        else:
+            height = 20
+
         self.app = app
         super().__init__(
             master,
             width=width,
             height=height,
             image=image,
-            text="",
+            text=text,
             border_width=border_width,
             border_spacing=0,
             fg_color="transparent",
@@ -158,7 +171,8 @@ class IconButton(ctkButton):
             **kwargs,
         )
 
-        self.tooltip = Tooltip(self, tooltip_text)
+        if tooltip_text is not None:
+            self.tooltip = Tooltip(self, tooltip_text)
 
     def destroy(self):
         self.tooltip.destroy()

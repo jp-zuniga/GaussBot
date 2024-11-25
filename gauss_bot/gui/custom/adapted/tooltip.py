@@ -31,7 +31,7 @@ class Tooltip(Toplevel):
         widget: ctkBase,
         message: str,
         delay: float = 0.1,
-        x_offset: int = 30,
+        x_offset: int = 20,
         y_offset: int = 30,
         padding: tuple[int, int] = (10, 2),
         **message_kwargs,
@@ -63,9 +63,9 @@ class Tooltip(Toplevel):
 
         self.frame: ctkFrame = ctkFrame(  # type: ignore
             self.transparent_frame,
-            bg_color=self.bg_color,
             corner_radius=10,
             border_width=2,
+            bg_color=self.bg_color,
             fg_color=self.bg_color,
         )
 

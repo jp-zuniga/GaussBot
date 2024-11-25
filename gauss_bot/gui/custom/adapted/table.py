@@ -42,6 +42,10 @@ class CustomTable(ctkFrame):
         self.parent = master
         self.values = values
 
+        self.columnconfigure(0, weight=1)
+        self.rowconfigure(0, weight=1)
+        self.rowconfigure(2, weight=1)
+
         self.top_fg = ThemeManager.theme["CTkFrame"]["top_fg_color"]
         self.fg = ThemeManager.theme["CTkFrame"]["fg_color"]
 
@@ -49,12 +53,11 @@ class CustomTable(ctkFrame):
             self,
             text=header,
             font=ctkFont(
-                family="Roboto",
                 size=14,
                 weight="bold",
                 underline=True,
             ),
-        ).pack(expand=True, fill="both", padx=20, pady=20)
+        ).grid(row=0, column=0, padx=20, pady=20, sticky="nsew")
 
         self.header_frame = ctkFrame(
             self,
@@ -74,7 +77,7 @@ class CustomTable(ctkFrame):
                 border_width=2,
                 border_spacing=0,
                 corner_radius=6,
-                font=("Roboto", 12, "bold"),
+                font=ctkFont(size=12, weight="bold"),
                 hover=False,
             )
 
@@ -91,8 +94,12 @@ class CustomTable(ctkFrame):
             fg_color="transparent",
         )
 
-        self.header_frame.pack(expand=True, fill="both", padx=20)
-        self.inside_frame.pack(expand=True, fill="both", padx=20, pady=(0, 20))
+        self.header_frame.grid(row=1, column=0, padx=20, sticky="nsew")
+        self.inside_frame.grid(
+            row=2, column=0,
+            padx=20, pady=(0, 20),
+            sticky="nsew",
+        )
 
         self.cells: list[list[ctkButton]] = [[]]
         self.init_table()

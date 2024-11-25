@@ -111,7 +111,9 @@ class MatricesFrame(ctkFrame):
                 height=30,
                 text="Agregar matrices",
                 image=INPUTS_ICON,
-                command=lambda: self.app.home_frame.ir_a_matriz(mostrar=False),  # type: ignore
+                command=lambda: (
+                    self.app.inputs_frame.ir_a_input_mats(mostrar=False)  # type: ignore
+                ),
             )
 
             self.dummy_frame.pack(expand=True, anchor="center")

@@ -8,11 +8,7 @@ from typing import (
     Union,
 )
 
-from customtkinter import (
-    CTkFrame as ctkFrame,
-    CTkImage as ctkImage,
-)
-
+from customtkinter import CTkFrame as ctkFrame
 from .gui.custom import (
     CustomScrollFrame,
     ErrorFrame,
@@ -64,8 +60,6 @@ def place_msg_frame(
     parent_frame: Union[ctkFrame, CustomScrollFrame],  # noqa
     msg_frame: Optional[ctkFrame],
     msg: Optional[str] = None,
-    img: Optional[ctkImage] = None,
-    border_color: Optional[str] = None,
     tipo: Literal["error", "success", "resultado"] = "error",
     **grid_kwargs,
 ) -> ctkFrame:
@@ -79,16 +73,23 @@ def place_msg_frame(
     * grid_kwargs: kwargs a pasar a msg_frame.grid()
     """
 
-    # esta funcion esta aqui pq el hecho que tiene que inicializar un
-    # ErrorFrame/SuccessFrame/ResultadoFrame causa errores si esta en otro modulo :/
-    # haria mas sentido en el __init__ de gauss_bot, pero ni modo
-
     if tipo == "error":
         msg_frame = ErrorFrame(parent_frame, msg)  # noqa
     elif tipo == "success":
         msg_frame = SuccessFrame(parent_frame, msg)  # noqa
     elif tipo == "resultado":
-        msg_frame = ResultadoFrame(parent_frame, msg, img, border_color)  # noqa
+        if "border_color" in grid_kwargs:
+            bc = grid_kwargs.pop("border_color")
+        else:
+            bc = None
+
+        if "img" in grid_kwargs:
+            img = grid_kwargs.pop("img")
+        else:
+            img = None
+
+        msg_frame = ResultadoFrame(parent_frame, msg, img, bc)  # noqa
+
     else:
         raise ValueError("Valor inválido para argumento 'tipo'!")
 

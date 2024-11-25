@@ -53,72 +53,112 @@ class NavFrame(ctkFrame):
 
         # crear botones de navegacion
         self.home_button = ctkButton(
-            self, corner_radius=0, height=40, border_spacing=10,
-            text="Inicio", fg_color="transparent",
-            text_color=("gray10", "gray90"), hover_color=("gray70", "gray30"),
+            self,
+            height=30,
+            corner_radius=0,
+            border_spacing=10,
+            text="Inicio",
+            fg_color="transparent",
+            text_color=("gray10", "gray90"),
+            hover_color=("gray70", "gray30"),
             image=HOME_ICON, anchor="w",
             command=self.home_button_event,
         )
 
         self.inputs_button = ctkButton(
-            self, corner_radius=0, height=40, border_spacing=10,
-            text="Menú de Datos", fg_color="transparent",
-            text_color=("gray10", "gray90"), hover_color=("gray70", "gray30"),
+            self,
+            height=30,
+            corner_radius=0,
+            border_spacing=10,
+            text="Menú de Datos",
+            fg_color="transparent",
+            text_color=("gray10", "gray90"),
+            hover_color=("gray70", "gray30"),
             image=INPUTS_ICON, anchor="w",
             command=self.inputs_button_event,
         )
 
         self.matrices_button = ctkButton(
-            self, corner_radius=0, height=40, border_spacing=10,
-            text="Menú de Matrices", fg_color="transparent",
-            text_color=("gray10", "gray90"), hover_color=("gray70", "gray30"),
+            self,
+            height=30,
+            corner_radius=0,
+            border_spacing=10,
+            text="Menú de Matrices",
+            fg_color="transparent",
+            text_color=("gray10", "gray90"),
+            hover_color=("gray70", "gray30"),
             image=MATRIZ_ICON, anchor="w",
             command=self.matrices_button_event,
         )
 
         self.vectores_button = ctkButton(
-            self, corner_radius=0, height=40, border_spacing=10,
-            text="Menú de Vectores", fg_color="transparent",
-            text_color=("gray10", "gray90"), hover_color=("gray70", "gray30"),
+            self,
+            height=30,
+            corner_radius=0,
+            border_spacing=10,
+            text="Menú de Vectores",
+            fg_color="transparent",
+            text_color=("gray10", "gray90"),
+            hover_color=("gray70", "gray30"),
             image=VECTOR_ICON, anchor="w",
             command=self.vectores_button_event,
         )
 
         self.analisis_button = ctkButton(
-            self, corner_radius=0, height=40, border_spacing=10,
-            text="Análisis Númerico", fg_color="transparent",
-            text_color=("gray10", "gray90"), hover_color=("gray70", "gray30"),
+            self,
+            height=30,
+            corner_radius=0,
+            border_spacing=10,
+            text="Análisis Númerico",
+            fg_color="transparent",
+            text_color=("gray10", "gray90"),
+            hover_color=("gray70", "gray30"),
             image=ANALISIS_ICON, anchor="w",
             command=self.analisis_button_event,
         )
 
         self.sistemas_button = ctkButton(
-            self, corner_radius=0, height=40, border_spacing=10,
-            text="Sistemas de Ecuaciones", fg_color="transparent",
-            text_color=("gray10", "gray90"), hover_color=("gray70", "gray30"),
+            self,
+            height=30,
+            corner_radius=0,
+            border_spacing=10,
+            text="Sistemas de Ecuaciones",
+            fg_color="transparent",
+            text_color=("gray10", "gray90"),
+            hover_color=("gray70", "gray30"),
             image=ECUACIONES_ICON, anchor="w",
             command=self.sistemas_button_event,
         )
 
         self.config_button = ctkButton(
-            self, corner_radius=0, height=40, border_spacing=10,
-            text="Configuración", fg_color="transparent",
-            text_color=("gray10", "gray90"), hover_color=("gray70", "gray30"),
+            self,
+            height=30,
+            corner_radius=0,
+            border_spacing=10,
+            text="Configuración",
+            fg_color="transparent",
+            text_color=("gray10", "gray90"),
+            hover_color=("gray70", "gray30"),
             image=CONFIG_ICON, anchor="w",
             command=self.config_button_event,
         )
 
         self.quit_button = ctkButton(
-            self, corner_radius=0, height=40, border_spacing=10,
-            text="Cerrar", fg_color="transparent",
-            text_color=("gray10", "gray90"), hover_color=("gray70", "gray30"),
+            self,
+            height=30,
+            corner_radius=0,
+            border_spacing=10,
+            text="Cerrar",
+            fg_color="transparent",
+            text_color=("gray10", "gray90"),
+            hover_color=("gray70", "gray30"),
             image=QUIT_ICON, anchor="w",
             command=self.quit_event,
         )
 
         # colocar widgets en la barra de navegacion
-        self.logo_label.grid(row=0, column=0, padx=5, pady=20, sticky="e")
-        self.logo_text.grid(row=0, column=1, padx=5, pady=20, sticky="w")
+        self.logo_label.grid(row=0, column=0, padx=10, pady=20, sticky="e")
+        self.logo_text.grid(row=0, column=1, padx=10, pady=20, sticky="w")
         self.home_button.grid(row=1, column=0, columnspan=2, padx=10, sticky="ew")
         self.inputs_button.grid(row=2, column=0, columnspan=2, padx=10, sticky="ew")
         self.matrices_button.grid(row=3, column=0, columnspan=2, padx=10, sticky="ew")

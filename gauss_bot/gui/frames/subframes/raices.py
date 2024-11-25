@@ -28,9 +28,14 @@ from customtkinter import (
 from sympy import (
     I,
     zoo,
+    Interval,
 )
 
-from ....icons import APP_ICON
+from ....icons import (
+    APP_ICON,
+    INFO_ICON,
+)
+
 from ....msg_frame_funcs import place_msg_frame
 from ....util_funcs import generate_sep
 from ....models import Func
@@ -45,6 +50,7 @@ from ...custom import (
     CustomDropdown,
     CustomScrollFrame,
     CustomTable,
+    IconButton,
 )
 
 if TYPE_CHECKING:
@@ -93,7 +99,7 @@ class RaicesFrame(CustomScrollFrame):
         self.metodo_actual: int = -1
         self.table_hidden: bool = True
 
-        self.selected_func: Func
+        self.func: Func
 
         self.a_entry: CustomEntry
         self.b_entry: CustomEntry
@@ -121,7 +127,7 @@ class RaicesFrame(CustomScrollFrame):
         """
 
         self.metodo_frame.grid(row=1, column=0, pady=5, sticky="n")
-        self.selected_func = self.func_manager.funcs_ingresadas[nombre_func]
+        self.func = self.func_manager.funcs_ingresadas[nombre_func]
 
         for widget in self.metodo_frame.winfo_children():  # type: ignore
             widget.destroy()  # type: ignore
@@ -133,7 +139,7 @@ class RaicesFrame(CustomScrollFrame):
         ctkLabel(
             self.metodo_frame,
             text="",
-            image=self.selected_func.get_png(),
+            image=self.func.get_png(),
         ).grid(row=0, column=0, pady=5, sticky="n")
 
         ctkLabel(
@@ -160,6 +166,20 @@ class RaicesFrame(CustomScrollFrame):
             widget.destroy()  # type: ignore
         for widget in self.resultado.winfo_children():  # type: ignore
             widget.destroy()  # type: ignore
+
+        if (
+            any(
+                term in str(self.func.expr)
+                for term in ("sen", "cos", "tan")
+            )
+        ):
+            IconButton(
+                self.metodo_frame,
+                app=self.app,
+                image=INFO_ICON,
+                tooltip_text="\nNota: las funciones trigonométricas" +
+                             "\ndeben recibir argumentos en radianes.\n",
+            ).grid(row=3, column=0, pady=(5, 0), sticky="n")
 
         self.metodo_actual = self.metodos[metodo]
         match self.metodo_actual:
@@ -194,7 +214,7 @@ class RaicesFrame(CustomScrollFrame):
             self.datos_frame,
             text=",",
             font=("Roboto", 18),
-        ).grid(row=0, column=2, padx=2, pady=(5, 2), sticky="nw")
+        ).grid(row=0, column=2, padx=3, pady=(5, 2), sticky="nw")
 
         self.b_entry = CustomEntry(
             self.datos_frame,
@@ -222,7 +242,7 @@ class RaicesFrame(CustomScrollFrame):
             height=30,
             text="Encontrar raíz",
             command=self.leer_datos
-        ).grid(row=2, column=0, columnspan=4, padx=5, pady=5, sticky="n")
+        ).grid(row=2, column=0, columnspan=2, padx=5, pady=5, sticky="ne")
 
     def setup_abierto(self, newton: bool) -> None:
         """
@@ -310,110 +330,121 @@ class RaicesFrame(CustomScrollFrame):
 
     def leer_datos(self) -> None:
         """
-        Lee y valida los datos ingresados por el usuario
-        en las widgets de self.datos_frame.
+        Llama los métodos de leer los datos
+        correspondientes al método seleccionado.
         """
 
         self.resultado.grid(row=3, column=0, pady=5, sticky="n")
         for widget in self.resultado.winfo_children():  # type: ignore
             widget.destroy()  # type: ignore
 
-        dominio = self.selected_func.get_dominio()
+        dominio = self.func.get_dominio()
         if self.metodo_actual in (0, 1):  # metodos cerrados
-            try:
-                a = Decimal(float(Fraction(self.a_entry.get())))
-                b = Decimal(float(Fraction(self.b_entry.get())))
-                error = Decimal(float(Fraction(self.error_entry.get())))
-
-                if a > b:
-                    raise ArithmeticError(
-                        "En un intervalo, el número menor debe ir primero!"
-                    )
-                if a == b:
-                    raise ArithmeticError(
-                        "Los extremos del intervalo deben ser distintos!"
-                    )
-                if a not in dominio or b not in dominio:
-                    raise ArithmeticError(
-                        "Los extremos del intervalo no son parte del " +
-                       f"dominio de {self.selected_func.nombre}!"
-                    )
-
-                self.calc_raiz(vals_iniciales=(a, b), error=error)
-            except (ValueError, ArithmeticError) as e:
-                self.msg_frame = place_msg_frame(
-                    parent_frame=self.resultado,
-                    msg_frame=self.msg_frame,
-                    msg=str(e),
-                    tipo="error",
-                )
-
-                return
-
+            self.ld_cerrado(dominio)
         elif self.metodo_actual in (2, 3):  # metodos abiertos
-            try:
-                xi = Decimal(float(Fraction(self.xi_entry.get())))
-                error = Decimal(float(Fraction(self.error_entry.get())))
-                max_its = int(self.iteraciones_entry.get())
-                if max_its <= 0:
-                    raise ValueError(
-                        "Debe ingresar un número entero positivo "+
-                        "para el máximo de iteraciones!"
-                    )
+            self.ld_abierto(dominio)
 
-                if xi not in dominio:
-                    adj = "primer " if self.metodo_actual == 3 else ""
-                    raise ArithmeticError(
-                        f"El {adj}valor inicial no es parte del " +
-                        f"dominio de {self.selected_func.nombre}!"
-                    )
+    def ld_cerrado(self, dominio: Interval) -> None:
+        """
+        Lee y valida los datos para métodos cerrados.
+        en las widgets de self.datos_frame.
+        """
 
-                if self.metodo_actual == 3:
-                    xn = Decimal(float(Fraction(self.xn_entry.get())))
-                    vals = (xi, xn)
-                    if xn not in dominio:
-                        raise ArithmeticError(
-                            "El segundo valor inicial no es parte del " +
-                            f"dominio de {self.selected_func.nombre}!"
-                        )
-                    if xi == xn:
-                        raise ArithmeticError(
-                            "Los valores iniciales deben ser distintos!"
-                        )
-                else:
-                    vals = xi  # type: ignore
+        try:
+            a = Decimal(float(Fraction(self.a_entry.get())))
+            b = Decimal(float(Fraction(self.b_entry.get())))
+            error = Decimal(float(Fraction(self.error_entry.get())))
 
-                self.calc_raiz(vals_iniciales=vals, error=error, max_its=max_its)
-            except (ValueError, ZeroDivisionError, ArithmeticError) as e:
-                if isinstance(e, ValueError) and "Fraction" in str(e):
-                    error_substr = (
-                        "el valor inicial"
-                        if self.metodo_actual == 2
-                        else "lost valores iniciales"
-                    )
-
-                    error_msg = (
-                        "Debe ingresar números racionales para "+
-                       f"{error_substr} y margen de error!"
-                    )
-                elif isinstance(e, ValueError) and "int" in str(e):
-                    error_msg = (
-                        "Debe ingresar números enteros positivos " +
-                        "para el máximo de iteraciones!"
-                    )
-                elif isinstance(e, ZeroDivisionError):
-                    error_msg = "El denominador no puede ser 0!"
-                else:
-                    error_msg = str(e)
-
-                self.msg_frame = place_msg_frame(
-                    parent_frame=self.resultado,
-                    msg_frame=self.msg_frame,
-                    msg=error_msg,
-                    tipo="error",
+            if a > b:
+                raise ArithmeticError(
+                    "En un intervalo, el número menor debe ir primero!"
+                )
+            if a == b:
+                raise ArithmeticError(
+                    "Los extremos del intervalo deben ser distintos!"
+                )
+            if a not in dominio or b not in dominio:
+                raise ArithmeticError(
+                    "Los extremos del intervalo no son parte del " +
+                    f"dominio de {self.func.nombre}!"
                 )
 
-                return
+            self.calc_raiz(vals_iniciales=(a, b), error=error)
+        except (ValueError, ArithmeticError, NotImplementedError) as e:
+            self.msg_frame = place_msg_frame(
+                parent_frame=self.resultado,
+                msg_frame=self.msg_frame,
+                msg=str(e),
+                tipo="error",
+            )
+
+    def ld_abierto(self, dominio: Interval) -> None:
+        """
+        Lee y valida los datos para métodos abiertos.
+        en las widgets de self.datos_frame.
+        """
+
+        try:
+            xi = Decimal(float(Fraction(self.xi_entry.get())))
+            error = Decimal(float(Fraction(self.error_entry.get())))
+            max_its = int(self.iteraciones_entry.get())
+            if max_its <= 0:
+                raise ValueError(
+                    "Debe ingresar un número entero positivo "+
+                    "para el máximo de iteraciones!"
+                )
+
+            if xi not in dominio:
+                adj = "primer " if self.metodo_actual == 3 else ""
+                raise ArithmeticError(
+                    f"El {adj}valor inicial no es parte del " +
+                    f"dominio de {self.func.nombre}!"
+                )
+
+            if self.metodo_actual == 3:
+                xn = Decimal(float(Fraction(self.xn_entry.get())))
+                vals = (xi, xn)
+                if xn not in dominio:
+                    raise ArithmeticError(
+                        "El segundo valor inicial no es parte del " +
+                        f"dominio de {self.func.nombre}!"
+                    )
+                if xi == xn:
+                    raise ArithmeticError(
+                        "Los valores iniciales deben ser distintos!"
+                    )
+            else:
+                vals = xi  # type: ignore
+
+            self.calc_raiz(vals_iniciales=vals, error=error, max_its=max_its)
+        except (ValueError, ZeroDivisionError, ArithmeticError, NotImplementedError) as e:
+            if isinstance(e, ValueError) and "Fraction" in str(e):
+                error_substr = (
+                    "el valor inicial"
+                    if self.metodo_actual == 2
+                    else "lost valores iniciales"
+                )
+
+                error_msg = (
+                    "Debe ingresar números racionales para "+
+                    f"{error_substr} y margen de error!"
+                )
+            elif isinstance(e, ValueError) and "int" in str(e):
+                error_msg = (
+                    "Debe ingresar números enteros positivos " +
+                    "para el máximo de iteraciones!"
+                )
+            elif isinstance(e, ZeroDivisionError):
+                error_msg = "El denominador no puede ser 0!"
+            else:
+                error_msg = str(e)
+
+            self.msg_frame = place_msg_frame(
+                parent_frame=self.resultado,
+                msg_frame=self.msg_frame,
+                msg=error_msg,
+                tipo="error",
+            )
 
     def calc_raiz(self, **kwargs) -> None:
         """
@@ -431,27 +462,27 @@ class RaicesFrame(CustomScrollFrame):
 
         match self.metodo_actual:
             case 0:
-                resultado = self.func_manager.biseccion(
-                    func=self.selected_func,
+                resultado = FuncManager.biseccion(
+                    func=self.func,
                     intervalo=kwargs.pop("vals_iniciales"),
                     error=kwargs.pop("error"),
                 )
             case 1:
-                resultado = self.func_manager.falsa_posicion(
-                    func=self.selected_func,
+                resultado = FuncManager.falsa_posicion(
+                    func=self.func,
                     intervalo=kwargs.pop("vals_iniciales"),
                     error=kwargs.pop("error"),
                 )
             case 2:
-                resultado = self.func_manager.newton(  # type: ignore
-                    func=self.selected_func,
+                resultado = FuncManager.newton(  # type: ignore
+                    func=self.func,
                     inicial=kwargs.pop("vals_iniciales"),
                     error=kwargs.pop("error"),
                     max_its=kwargs.pop("max_its"),
                 )
             case 3:
-                resultado = self.func_manager.secante(  # type: ignore
-                    func=self.selected_func,
+                resultado = FuncManager.secante(  # type: ignore
+                    func=self.func,
                     iniciales=kwargs.pop("vals_iniciales"),
                     error=kwargs.pop("error"),
                     max_its=kwargs.pop("max_its"),
@@ -485,11 +516,11 @@ class RaicesFrame(CustomScrollFrame):
             return
 
         x, fx, registro, its = resultado
-        x_igual = rf"{self.selected_func.var} = {format(x.normalize(), "f")}"
-        fx_igual = rf"{self.selected_func.nombre} = {format(fx.normalize(), "f")}"
+        x_igual = rf"{self.func.var} = {format(x.normalize(), "f")}"
+        fx_igual = rf"{self.func.nombre} = {format(fx.normalize(), "f")}"
 
         raiz_img = Func.latex_to_png(
-            nombre=f"resultado_cerrado_{self.selected_func.nombre}",
+            nombre=f"resultado_cerrado_{self.func.nombre}",
             misc_str=rf"{x_igual}" + r"\\[1em]" + rf"{fx_igual}",
             font_size=60,
         )
@@ -498,9 +529,9 @@ class RaicesFrame(CustomScrollFrame):
         if its == -1:
             border_color = "#ff3131"
             interpretacion = (
-                    f"El método de {tipo_metodo} no converge " +
-                    f"después de {MAX_ITERACIONES} iteraciones!"
-                )
+                f"El método de {tipo_metodo} no converge " +
+                f"después de {MAX_ITERACIONES} iteraciones!"
+            )
         else:
             border_color = None
             interpretacion = (
@@ -542,8 +573,8 @@ class RaicesFrame(CustomScrollFrame):
         tipo_metodo = "Newton" if self.metodo_actual == 2 else "la secante"
         x, fx, registro, its, flag = resultado
 
-        x_igual = rf"{self.selected_func.var} = {format(x.normalize(), "f")}"
-        fx_igual = rf"{self.selected_func.nombre} = {format(fx.normalize(), "f")}"
+        x_igual = rf"{self.func.var} = {format(x.normalize(), "f")}"
+        fx_igual = rf"{self.func.nombre} = {format(fx.normalize(), "f")}"
 
         if flag != I:
             raiz_img = None
@@ -559,13 +590,13 @@ class RaicesFrame(CustomScrollFrame):
                 interpretacion = (
                     f"En la iteración {its}:\n" +
                     f"{format(x.normalize(), "f")} no es parte del " +
-                    f"dominio de {self.selected_func.nombre}"
+                    f"dominio de {self.func.nombre}"
                 )
             elif flag == 1:
                 interpretacion = (
                     f"En la iteración {its}:\n" +
                     f"{format(x.normalize(), "f")} no es parte del " +
-                    f"dominio de {self.selected_func.nombre[0]}′(x)!"
+                    f"dominio de {self.func.nombre[0]}′(x)!"
                 )
             elif flag == zoo:
                 interpretacion = (
@@ -580,7 +611,7 @@ class RaicesFrame(CustomScrollFrame):
             )
 
             raiz_img = Func.latex_to_png(
-                nombre=f"resultado_abierto_{self.selected_func.nombre}",
+                nombre=f"resultado_abierto_{self.func.nombre}",
                 misc_str=rf"{x_igual}" + r"\\[1em]" + rf"{fx_igual}",
                 font_size=60,
             )

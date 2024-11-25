@@ -130,9 +130,9 @@ class GaussUI(ctk):
         """
 
         if modo == "light":
-            self.iconbitmap(APP_ICON[1])
+            self.iconbitmap(bitmap=APP_ICON[1])
         elif modo == "dark":
-            self.iconbitmap(APP_ICON[0])
+            self.iconbitmap(bitmap=APP_ICON[0])
         else:
             raise ValueError("Valor inválido para argumento 'modo'!")
 
