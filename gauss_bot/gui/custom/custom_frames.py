@@ -29,7 +29,7 @@ class CustomScrollFrame(ctkScrollFrame):
 
     def __init__(self, master: Any, **kwargs) -> None:
         super().__init__(master, **kwargs)
-        self._scrollbar.grid_remove()
+        self._scrollbar.grid_forget()
 
 
 class ErrorFrame(ctkFrame):

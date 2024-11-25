@@ -5,7 +5,6 @@ resuelve sistemas de ecuaciones lineales.
 
 from typing import (
     TYPE_CHECKING,
-    Literal,
     Optional,
 )
 
@@ -42,24 +41,28 @@ class ResolverSisFrame(CustomScrollFrame):
     def __init__(
         self,
         app: "GaussUI",
-        master_tab: ctkFrame,
         master_frame: "SistemasFrame",
         mats_manager: MatricesManager,
-        metodo: Literal["gj", "c", "f"],
     ) -> None:
 
-        super().__init__(master_tab, corner_radius=0, fg_color="transparent")
+        super().__init__(master_frame, corner_radius=0, fg_color="transparent")
         self.app = app
         self.master_frame = master_frame
         self.mats_manager = mats_manager
         self.columnconfigure(0, weight=1)
 
         self.msg_frame: Optional[ctkFrame] = None
+        self.metodos: dict[str, str ] = {
+            "Gauss−Jordan": "gj",
+            "Regla de Cramer": "c",
+            # "Factorización LU": "f",
+        }
 
         # definir atributos, se inicializan en setup_frame
         self.select_sis_mat: CustomDropdown
+        self.select_modo: CustomDropdown
         self.sis_mat = ""
-        self.metodo = metodo
+        self.met = ""
 
         self.setup_frame()
 
@@ -82,15 +85,16 @@ class ResolverSisFrame(CustomScrollFrame):
             command=self.update_sis_mat,
         )
 
-        self.sis_mat = self.select_sis_mat.get()
-
-        self.select_sis_mat.grid(row=0, column=0, pady=5, padx=5)
-        ctkButton(
+        self.select_metodo = CustomDropdown(
             self,
-            height=30,
-            text="Resolver",
-            command=self.resolver
-        ).grid(row=1, column=0, pady=5, padx=5)
+            width=40,
+            variable=Variable(value="Seleccione el método a utilizar:"),
+            values=list(self.metodos.keys()),
+            command=self.update_metodo,
+        )
+
+        self.select_sis_mat.grid(row=0, column=0, padx=5, pady=(40, 5), sticky="n")
+        self.select_metodo.grid(row=1, column=0, padx=5, pady=5, sticky="n")
 
     def resolver(self) -> None:
         """
@@ -102,12 +106,12 @@ class ResolverSisFrame(CustomScrollFrame):
         self.update_sis_mat(self.select_sis_mat.get())  # type: ignore
 
         sistema: SistemaEcuaciones
-        metodo = self.metodo
+        met = self.metodos[self.met]
 
         # si es matriz cero, cambiar a gauss_jordan
         # para mostrar la explicacion del resultado
         if self.mats_manager.sis_ingresados[self.sis_mat].es_matriz_cero():
-            metodo = "gj"
+            met = "gj"
 
         if len(self.sis_mat) > 1:
             self.msg_frame = place_msg_frame(
@@ -118,14 +122,14 @@ class ResolverSisFrame(CustomScrollFrame):
                 row=5,
             )
 
-        if metodo == "gj":
+        if met == "gj":
             sistema = (
-                self.mats_manager.resolver_sistema(self.sis_mat, metodo)
+                self.mats_manager.resolver_sistema(self.sis_mat, met)
             )
-        elif metodo == "c":
+        elif met == "c":
             try:
                 sistema = (
-                    self.mats_manager.resolver_sistema(self.sis_mat, metodo)
+                    self.mats_manager.resolver_sistema(self.sis_mat, met)
                 )
             except (ValueError, ArithmeticError, ZeroDivisionError) as e:
                 self.msg_frame = place_msg_frame(
@@ -172,6 +176,12 @@ class ResolverSisFrame(CustomScrollFrame):
             ), values=self.master_frame.nombres_sistemas,
         )
 
+        self.select_sis_mat.configure(
+            variable=Variable(
+                value="Seleccione el método a utilizar:"
+            ), values=list(self.metodos.keys()),
+        )
+
         for widget in self.winfo_children():
             widget.configure(bg_color="transparent")  # type: ignore
 
@@ -182,3 +192,25 @@ class ResolverSisFrame(CustomScrollFrame):
         """
 
         self.sis_mat = valor
+        if len(self.sis_mat) == 1 and len(self.met) > 1:
+            ctkButton(
+                self,
+                height=30,
+                text="Resolver",
+                command=self.resolver
+            ).grid(row=2, column=0, pady=5, padx=5, sticky="n")
+
+    def update_metodo(self, valor: str) -> None:
+        """
+        Actualiza self.met con la opción
+        seleccionada en el dropdown.
+        """
+
+        self.met = valor
+        if len(self.sis_mat) == 1 and len(self.met) > 1:
+            ctkButton(
+                self,
+                height=30,
+                text="Resolver",
+                command=self.resolver
+            ).grid(row=2, column=0, pady=5, padx=5, sticky="n")

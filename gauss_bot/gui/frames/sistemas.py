@@ -12,12 +12,15 @@ from typing import (
 from customtkinter import (
     CTkButton as ctkButton,
     CTkFrame as ctkFrame,
-    CTkTabview as ctkTabview,
 )
 
 from ...icons import INPUTS_ICON
 from ...managers import MatricesManager
-from ..custom import ErrorFrame
+from ..custom import (
+    CustomScrollFrame,
+    ErrorFrame,
+)
+
 from .subframes import ResolverSisFrame
 
 if TYPE_CHECKING:
@@ -41,15 +44,14 @@ class SistemasFrame(ctkFrame):
         self.mats_manager = mats_manager
 
         self.dummy_frame: ctkFrame  # para pack mensaje de error inicial
+
+        self.resolver_frame: Optional[CustomScrollFrame] = None
         self.msg_frame: Optional[ctkFrame] = None
+
         self.nombres_sistemas = list(self.mats_manager.sis_ingresados.keys())
+        self.setup_frame()
 
-        self.instances: list[ResolverSisFrame]
-        self.tabs: dict[str, str]
-
-        self.setup_tabview()
-
-    def setup_tabview(self) -> None:
+    def setup_frame(self) -> None:
         """
         Crea un tabview con pestañas para cada método de resolver sistemas.
         Se encarga de validar si hay sistemas ingresados para que
@@ -65,7 +67,7 @@ class SistemasFrame(ctkFrame):
             self.dummy_frame = ctkFrame(self, fg_color="transparent")
             self.msg_frame = ErrorFrame(
                 self.dummy_frame,
-                msg="No hay sistemas guardados!",
+                msg="No se ha guardado ningún sistema de ecuaciones!",
             )
 
             agregar_button = ctkButton(
@@ -89,24 +91,13 @@ class SistemasFrame(ctkFrame):
                 widget.destroy()
             self.msg_frame = None
 
-        self.tabview = ctkTabview(self)
-        self.tabview.pack(expand=True, fill="both")
+        self.resolver_frame = ResolverSisFrame(
+            app=self.app,
+            master_frame=self,
+            mats_manager=self.mats_manager,
+        )
 
-        self.instances = []
-        self.tabs = {
-            "Método Gauss−Jordan": "gj",
-            "Regla de Cramer": "c",
-            # "Factorización LU": "f",
-        }
-
-        for nombre, codigo in self.tabs.items():
-            tab = self.tabview.add(nombre)
-            tab_instance = ResolverSisFrame(
-                self.app, tab, self, self.mats_manager, codigo  # type: ignore
-            )
-
-            tab_instance.pack(expand=True, fill="both")
-            self.instances.append(tab_instance)
+        self.resolver_frame.pack(expand=True, fill="both", padx=5, pady=5)
 
     def update_all(self):
         """
@@ -125,16 +116,14 @@ class SistemasFrame(ctkFrame):
 
         if (
             self.msg_frame is not None or
-            len(self.nombres_sistemas) == 0 or
-            not self.instances
+            self.resolver_frame is None or
+            len(self.nombres_sistemas) == 0
         ):
             # si hay un mensaje de error,
             # o no hay sistemas ingresados,
             # o no se han inicializado los frames,
             # correr el setup
-            self.setup_tabview()
+            self.setup_frame()
             return
 
-        # si no, actualizar todos los subframes
-        for tab in self.instances:
-            tab.update_frame()
+        self.resolver_frame.update_frame()

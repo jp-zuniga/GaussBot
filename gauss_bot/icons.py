@@ -8,8 +8,8 @@ from os import (
     path,
 )
 
-from PIL.Image import open as open_img
 from customtkinter import CTkImage as ctkImage
+from PIL.Image import open as open_img
 
 from . import (
     ASSET_PATH,
@@ -24,6 +24,8 @@ __all__ = [
     "CHECK_ICON",
     "CONFIG_ICON",
     "DROPDOWN_ICON",
+    "DROPLEFT_ICON",
+    "DROPRIGHT_ICON",
     "DROPUP_ICON",
     "ECUACIONES_ICON",
     "ELIMINAR_ICON",
@@ -156,6 +158,18 @@ ACEPTAR_ICON = ctkImage(
 DROPDOWN_ICON = ctkImage(
     dark_image=open_img(path.join(ASSET_PATH, "dark_mode", "light_dropdown_icon.png")),
     light_image=open_img(path.join(ASSET_PATH, "light_mode", "dark_dropdown_icon.png")),
+    size=(18, 18),
+)
+
+DROPLEFT_ICON = ctkImage(
+    dark_image=open_img(path.join(ASSET_PATH, "dark_mode", "light_dropleft_icon.png")),
+    light_image=open_img(path.join(ASSET_PATH, "light_mode", "dark_dropleft_icon.png")),
+    size=(18, 18),
+)
+
+DROPRIGHT_ICON = ctkImage(
+    dark_image=open_img(path.join(ASSET_PATH, "dark_mode", "light_dropright_icon.png")),
+    light_image=open_img(path.join(ASSET_PATH, "light_mode", "dark_dropright_icon.png")),
     size=(18, 18),
 )
 

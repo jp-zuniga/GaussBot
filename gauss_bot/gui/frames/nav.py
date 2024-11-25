@@ -1,3 +1,5 @@
+# pylint: disable=protected-access
+
 """
 Implementación de la clase NavFrame,
 la barra de navegación de la aplicación.
@@ -6,14 +8,16 @@ la barra de navegación de la aplicación.
 from typing import TYPE_CHECKING
 
 from customtkinter import (
-    CTkButton as ctkButton,
     CTkFont as ctkFont,
     CTkFrame as ctkFrame,
     CTkLabel as ctkLabel,
 )
 
+from ...util_funcs import get_dict_key
 from ...icons import (
     LOGO,
+    DROPLEFT_ICON,
+    DROPRIGHT_ICON,
     HOME_ICON,
     INPUTS_ICON,
     MATRIZ_ICON,
@@ -23,6 +27,8 @@ from ...icons import (
     CONFIG_ICON,
     QUIT_ICON,
 )
+
+from ..custom import IconButton
 
 if TYPE_CHECKING:
     from .. import GaussUI
@@ -38,136 +44,152 @@ class NavFrame(ctkFrame):
         super().__init__(master, corner_radius=0)
         self.app = app
 
+        self.configure(fg_color=self.app.theme_config["CTk"]["fg_color"])
         self.grid(row=0, column=0, sticky="nsew")
-        self.rowconfigure(7, weight=1)  # para tener un espacio entre los botones
+
+        self.rowconfigure(8, weight=1)  # para tener un espacio entre los botones
         self.columnconfigure(0, weight=1)
         self.columnconfigure(1, weight=1)
-        self.configure(fg_color=self.app.theme_config["CTk"]["fg_color"])
+
+        self.hidden = False
+        self.button_texts: dict[str, str] = {
+            "home": "Inicio",
+            "inputs": "Menú de Datos",
+            "matrices": "Menú de Matrices",
+            "vectores": "Menú de Vectores",
+            "analisis": "Análisis Númerico",
+            "sistemas": "Sistemas de Ecuaciones",
+            "config": "Configuración",
+            "quit": "Cerrar",
+        }
 
         # label y logo de la barra de navegacion
         self.logo_label = ctkLabel(self, image=LOGO, text="")
-        self.logo_text = ctkLabel(
-            self, text="GaussBot",
-            font=ctkFont(size=18, weight="bold"),
+        self.app_name = ctkLabel(
+            self,
+            text="GaussBot",
+            font=ctkFont(size=16, weight="bold"),
+        )
+
+        self.hide_button = IconButton(
+            self,
+            app=self.app,
+            height=30,
+            image=DROPLEFT_ICON,
+            command=self.toggle_nav,
         )
 
         # crear botones de navegacion
-        self.home_button = ctkButton(
+        self.home_button = IconButton(
             self,
+            app=self.app,
             height=30,
             corner_radius=0,
+            border_width=0,
             border_spacing=10,
-            text="Inicio",
-            fg_color="transparent",
             text_color=("gray10", "gray90"),
-            hover_color=("gray70", "gray30"),
-            image=HOME_ICON, anchor="w",
+            text="Inicio",
+            image=HOME_ICON,
+            anchor="w",
             command=self.home_button_event,
         )
 
-        self.inputs_button = ctkButton(
+        self.inputs_button = IconButton(
             self,
+            app=self.app,
             height=30,
             corner_radius=0,
+            border_width=0,
             border_spacing=10,
-            text="Menú de Datos",
-            fg_color="transparent",
             text_color=("gray10", "gray90"),
-            hover_color=("gray70", "gray30"),
-            image=INPUTS_ICON, anchor="w",
+            text="Menú de Datos",
+            image=INPUTS_ICON,
+            anchor="w",
             command=self.inputs_button_event,
         )
 
-        self.matrices_button = ctkButton(
+        self.matrices_button = IconButton(
             self,
+            app=self.app,
             height=30,
             corner_radius=0,
+            border_width=0,
             border_spacing=10,
-            text="Menú de Matrices",
-            fg_color="transparent",
             text_color=("gray10", "gray90"),
-            hover_color=("gray70", "gray30"),
-            image=MATRIZ_ICON, anchor="w",
+            text="Menú de Matrices",
+            image=MATRIZ_ICON,
+            anchor="w",
             command=self.matrices_button_event,
         )
 
-        self.vectores_button = ctkButton(
+        self.vectores_button = IconButton(
             self,
+            app=self.app,
             height=30,
             corner_radius=0,
+            border_width=0,
             border_spacing=10,
-            text="Menú de Vectores",
-            fg_color="transparent",
             text_color=("gray10", "gray90"),
-            hover_color=("gray70", "gray30"),
-            image=VECTOR_ICON, anchor="w",
+            text="Menú de Vectores",
+            image=VECTOR_ICON,
+            anchor="w",
             command=self.vectores_button_event,
         )
 
-        self.analisis_button = ctkButton(
+        self.analisis_button = IconButton(
             self,
+            app=self.app,
             height=30,
             corner_radius=0,
+            border_width=0,
             border_spacing=10,
-            text="Análisis Númerico",
-            fg_color="transparent",
             text_color=("gray10", "gray90"),
-            hover_color=("gray70", "gray30"),
-            image=ANALISIS_ICON, anchor="w",
+            text="Análisis Númerico",
+            image=ANALISIS_ICON,
+            anchor="w",
             command=self.analisis_button_event,
         )
 
-        self.sistemas_button = ctkButton(
+        self.sistemas_button = IconButton(
             self,
+            app=self.app,
             height=30,
             corner_radius=0,
+            border_width=0,
             border_spacing=10,
-            text="Sistemas de Ecuaciones",
-            fg_color="transparent",
             text_color=("gray10", "gray90"),
-            hover_color=("gray70", "gray30"),
-            image=ECUACIONES_ICON, anchor="w",
+            text="Sistemas de Ecuaciones",
+            image=ECUACIONES_ICON,
+            anchor="w",
             command=self.sistemas_button_event,
         )
 
-        self.config_button = ctkButton(
+        self.config_button = IconButton(
             self,
+            app=self.app,
             height=30,
             corner_radius=0,
+            border_width=0,
             border_spacing=10,
-            text="Configuración",
-            fg_color="transparent",
             text_color=("gray10", "gray90"),
-            hover_color=("gray70", "gray30"),
-            image=CONFIG_ICON, anchor="w",
+            text="Configuración",
+            image=CONFIG_ICON,
+            anchor="w",
             command=self.config_button_event,
         )
 
-        self.quit_button = ctkButton(
+        self.quit_button = IconButton(
             self,
+            app=self.app,
             height=30,
             corner_radius=0,
+            border_width=0,
             border_spacing=10,
-            text="Cerrar",
-            fg_color="transparent",
             text_color=("gray10", "gray90"),
-            hover_color=("gray70", "gray30"),
-            image=QUIT_ICON, anchor="w",
+            text="Cerrar",
+            image=QUIT_ICON,
+            anchor="w",
             command=self.quit_event,
-        )
-
-        # colocar widgets en la barra de navegacion
-        self.logo_label.grid(row=0, column=0, padx=10, pady=20, sticky="e")
-        self.logo_text.grid(row=0, column=1, padx=10, pady=20, sticky="w")
-        self.home_button.grid(row=1, column=0, columnspan=2, padx=10, sticky="ew")
-        self.inputs_button.grid(row=2, column=0, columnspan=2, padx=10, sticky="ew")
-        self.matrices_button.grid(row=3, column=0, columnspan=2, padx=10, sticky="ew")
-        self.vectores_button.grid(row=4, column=0, columnspan=2, padx=10, sticky="ew")
-        self.analisis_button.grid(row=5, column=0, columnspan=2, padx=10, sticky="ew")
-        self.sistemas_button.grid(row=6, column=0, columnspan=2, padx=10, sticky="ew")
-        self.config_button.grid(row=8, column=0, columnspan=2, padx=10, sticky="ew")
-        self.quit_button.grid(
-            row=9, column=0, columnspan=2, padx=10, pady=(0, 10), sticky="ew"
         )
 
         self.frames: dict[str, ctkFrame] = {
@@ -180,15 +202,34 @@ class NavFrame(ctkFrame):
             "config": self.app.config_frame  # type: ignore
         }
 
-        self.buttons: dict[str, ctkButton] = {
+        self.buttons: dict[str, IconButton] = {
             "home": self.home_button,
             "inputs": self.inputs_button,
             "matrices": self.matrices_button,
             "vectores": self.vectores_button,
             "analisis": self.analisis_button,
             "sistemas": self.sistemas_button,
-            "config": self.config_button
+            "config": self.config_button,
+            "quit": self.quit_button,
         }
+
+        # colocar widgets en la barra de navegacion
+        self.logo_label.grid(row=0, column=0, columnspan=2, padx=10, pady=(20, 3))
+        self.app_name.grid(row=1, column=0, padx=10, pady=(3, 10), sticky="e")
+        self.hide_button.grid(row=1, column=1, padx=10, pady=(3, 10), sticky="w")
+
+        i = 2
+        for j, widget in enumerate(self.buttons.values()):
+            if i == 8:
+                i += 1
+
+            if j == len(self.buttons.values()) - 1:
+                pady = (0, 10)
+            else:
+                pady = 0  # type: ignore
+
+            widget.grid(row=i, column=0, columnspan=3, padx=10, pady=pady, sticky="ew")
+            i += 1
 
     def seleccionar_frame(self, nombre: str) -> None:
         """
@@ -210,6 +251,49 @@ class NavFrame(ctkFrame):
                 frame.grid(row=0, column=1, sticky="nsew")
             else:
                 frame.grid_forget()
+
+    def toggle_nav(self) -> None:
+        """
+        Muestra u oculta la barra de navegación.
+        """
+
+        if self.hidden:
+            for widget in self.winfo_children():
+                if widget in (self.logo_label, self.hide_button):
+                    continue
+                if isinstance(widget, ctkLabel):
+                    widget.grid()
+                elif isinstance(widget, IconButton):
+                    widget.configure(
+                        width=140,
+                        text=self.button_texts[
+                            get_dict_key(self.buttons, widget)  # type: ignore
+                        ],
+                    )
+
+                    widget._image_label.grid_configure(  # type: ignore
+                        columnspan=1, sticky="e",
+                    )
+
+            self.hidden = False
+            self.hide_button.grid_configure(column=1, columnspan=1, sticky="w")
+            self.hide_button.configure(image=DROPLEFT_ICON)
+
+        else:
+            for widget in self.winfo_children():
+                if widget in (self.logo_label, self.hide_button):
+                    continue
+                if widget is self.app_name:
+                    widget.grid_remove()
+                elif isinstance(widget, IconButton):
+                    widget.configure(width=20, text="")
+                    widget._image_label.grid_configure(  # type: ignore
+                        columnspan=3, sticky="nsew",
+                    )
+
+            self.hidden = True
+            self.hide_button.grid_configure(column=0, columnspan=2, sticky="n")
+            self.hide_button.configure(image=DROPRIGHT_ICON)
 
     def home_button_event(self) -> None:
         """

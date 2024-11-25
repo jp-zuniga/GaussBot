@@ -399,8 +399,8 @@ class MultiplicacionTab(CustomScrollFrame):
 
         # colocar widgets
         instruct_e.grid(row=0, column=0, columnspan=3, padx=5, pady=5, sticky="n")
-        self.escalar_entry.grid(row=1, column=0, ipadx=5, padx=5, pady=5, sticky="e")
-        operador_label.grid(row=1, column=1, padx=3, pady=5, sticky="ew")
+        self.escalar_entry.grid(row=1, column=0, padx=5, pady=5, sticky="e")
+        operador_label.grid(row=1, column=1, padx=5, pady=5, sticky="ew")
         self.select_escalar_mat.grid(
             row=1, column=2, padx=5, pady=5, sticky="w"
         )
@@ -972,7 +972,7 @@ class InversaTab(CustomScrollFrame):
         button = ctkButton(
             self,
             height=30,
-            text="Encontrar inversa",
+            text="Invertir",
             command=self.encontrar_inversa,
         )
 

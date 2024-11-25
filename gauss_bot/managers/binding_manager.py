@@ -155,7 +155,6 @@ class KeyBindingManager:
         o al entry de datos iniciales si se llegó al inicio de la lista de entries.
         * row: la fila actual
         * column: la columna actual
-        * entry_list: la lista de entries
 
         Solamente utilizado para los bindings de matrices.
         """
@@ -175,8 +174,6 @@ class KeyBindingManager:
         o al entry de nombre si ya se llegó al final de la lista de entries.
         * row: la fila actual
         * column: la columna actual
-        * nombre_entry: la entry para ingresar el nombre
-        * entry_list: la lista de entries
 
         Solamente utilizado para los bindings de matrices.
         """

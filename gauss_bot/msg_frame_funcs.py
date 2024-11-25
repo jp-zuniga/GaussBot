@@ -1,5 +1,6 @@
 """
-Functions for deleting and placing GaussUI's message frames.
+Funciones para colocar y eliminar los
+frames de mensaje de la aplicación.
 """
 
 from typing import (
@@ -77,17 +78,10 @@ def place_msg_frame(
         msg_frame = ErrorFrame(parent_frame, msg)  # noqa
     elif tipo == "success":
         msg_frame = SuccessFrame(parent_frame, msg)  # noqa
+
     elif tipo == "resultado":
-        if "border_color" in grid_kwargs:
-            bc = grid_kwargs.pop("border_color")
-        else:
-            bc = None
-
-        if "img" in grid_kwargs:
-            img = grid_kwargs.pop("img")
-        else:
-            img = None
-
+        bc = grid_kwargs.pop("border_color", None)
+        img = grid_kwargs.pop("img", None)
         msg_frame = ResultadoFrame(parent_frame, msg, img, bc)  # noqa
 
     else:

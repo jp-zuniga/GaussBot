@@ -128,7 +128,13 @@ class AgregarFuncs(CustomScrollFrame):
         self.func_entry.bind("<Down>", lambda _: self.key_binder.focus_first())
         self.func_entry.bind("<Return>", lambda _: self.leer_func())
 
-        self.instruct_numpad.grid(row=0, column=0, columnspan=2, padx=5, sticky="n")
+        self.instruct_numpad.grid(
+            row=0, column=0,
+            columnspan=2,
+            padx=5, pady=5,
+            sticky="n",
+        )
+
         self.instruct_nombre.grid(
             row=1, column=0,
             columnspan=2,
@@ -150,8 +156,8 @@ class AgregarFuncs(CustomScrollFrame):
             sticky="n",
         )
 
-        self.func_entry.grid(row=4, column=0, padx=5, pady=(1, 3), sticky="e")
-        self.leer_button.grid(row=4, column=1, padx=5, pady=5, sticky="w")
+        self.func_entry.grid(row=4, column=0, padx=(5, ), pady=(1, 3), sticky="n")
+        self.leer_button.grid(row=4, column=1, padx=(0, 5), pady=5, sticky="n")
         self.func_frame.grid(
             row=5, column=0,
             columnspan=2,
@@ -317,14 +323,33 @@ class MostrarFuncs(CustomScrollFrame):
 
         self.funcs_guardadas = self.func_manager.get_funcs()
         self.msg_frame: Optional[ctkFrame] = None
+
         self.show_frame = ctkFrame(self, fg_color="transparent")
         self.show_frame.columnconfigure(0, weight=1)
+
+        self.setup_frame()
+
+    def setup_frame(self) -> None:
+        """
+        Inicializa las widgets del frame.
+        """
+
+        delete_msg_frame(self.msg_frame)
+        if not self.funcs_guardadas:
+            self.msg_frame = place_msg_frame(
+                parent_frame=self,
+                msg_frame=self.msg_frame,
+                msg="No se ha guardado ninguna función!",
+                tipo="error",
+            )
+
+            return
 
         IconButton(
             self,
             self.app,
-            width=30,
-            height=30,
+            width=20,
+            height=40,
             corner_radius=16,
             border_width=3,
             border_color=self.app.theme_config["CTkFrame"]["top_fg_color"],
@@ -332,7 +357,6 @@ class MostrarFuncs(CustomScrollFrame):
             tooltip_text="Mostrar funciones",
             command=self.show_funcs
         ).grid(row=0, column=0, padx=5, pady=5, sticky="n")
-        self.show_frame.grid(row=1, column=0, padx=5, sticky="n")
 
     def show_funcs(self) -> None:
         """
@@ -343,15 +367,7 @@ class MostrarFuncs(CustomScrollFrame):
         for widget in self.show_frame.winfo_children():
             widget.destroy()  # type: ignore
 
-        if not self.funcs_guardadas:
-            self.msg_frame = place_msg_frame(
-                parent_frame=self.show_frame,
-                msg_frame=self.msg_frame,
-                msg="No se ha guardado ninguna función!",
-                tipo="error",
-            )
-
-            return
+        self.show_frame.grid(row=1, column=0, padx=5, sticky="n")
 
         ctkLabel(
             self.show_frame,
@@ -365,7 +381,7 @@ class MostrarFuncs(CustomScrollFrame):
             image=generate_sep(False, (300, 5)),
         ).grid(row=1, column=0, sticky="n")
 
-        r = 3
+        r = 2
         for func in self.funcs_guardadas:
             ctkLabel(
                 self.show_frame,
@@ -389,7 +405,10 @@ class MostrarFuncs(CustomScrollFrame):
             widget.destroy()  # type: ignore
         for widget in self.winfo_children():  # type: ignore
             widget.configure(bg_color="transparent")  # type: ignore
+
         self.funcs_guardadas = self.func_manager.get_funcs()
+        if isinstance(self.msg_frame, ErrorFrame):
+            self.setup_frame()
 
 
 class EliminarFuncs(CustomScrollFrame):
@@ -428,7 +447,7 @@ class EliminarFuncs(CustomScrollFrame):
             self.msg_frame = place_msg_frame(
                 parent_frame=self,
                 msg_frame=self.msg_frame,
-                msg="No hay funciones guardadas!",
+                msg="No se ha guardado ninguna función!",
                 tipo="error",
                 columnspan=2,
             )
@@ -500,7 +519,7 @@ class EliminarFuncs(CustomScrollFrame):
                 self.msg_frame = place_msg_frame(
                     parent_frame=self,
                     msg_frame=self.msg_frame,
-                    msg="No hay funciones guardadas!",
+                    msg="No se ha guardado ninguna función!",
                     tipo="error",
                     columnspan=2,
                 )

@@ -48,7 +48,7 @@ class HomeFrame(ctkFrame):
                 size=20,
                 weight="bold",
             ),
-        ).grid(row=0, column=0, columnspan=2, padx=20, pady=10, sticky="s")
+        ).grid(row=0, column=0, columnspan=2, pady=10, sticky="s")
 
         ctkLabel(
             self,
@@ -56,13 +56,13 @@ class HomeFrame(ctkFrame):
                  "− Operaciones con matrices y vectores\n" +
                  "− Resolución de sistemas de ecuaciones\n" +
                  "− Análisis númerico",
-        ).grid(row=1, column=0, columnspan=2, padx=20, pady=0, sticky="s")
+        ).grid(row=1, column=0, columnspan=2, pady=0, sticky="s")
 
         ctkLabel(
             self,
             text="",
-            image=generate_sep(False, (400, 6)),
-        ).grid(row=2, column=0, columnspan=2, padx=20, pady=10, sticky="s")
+            image=generate_sep(False, (600, 8)),
+        ).grid(row=2, column=0, columnspan=2, pady=10, sticky="s")
 
         IconButton(
             self,
@@ -75,7 +75,7 @@ class HomeFrame(ctkFrame):
                          "\ntransposición, encontrar inversa," +
                          "\ny calcular determinante.\n",
             command=self.ir_a_mats,
-        ).grid(row=3, column=0, padx=(20, 10), pady=10, sticky="se")
+        ).grid(row=3, column=0, padx=(10, 5), pady=(10, 3), sticky="se")
 
         IconButton(
             self,
@@ -88,7 +88,7 @@ class HomeFrame(ctkFrame):
                          "\nmultiplicación escalar," +
                          "\nproducto punto, producto cruz.\n",
             command=self.ir_a_vecs,
-        ).grid(row=3, column=1, padx=(10, 20), pady=10, sticky="sw")
+        ).grid(row=3, column=1, padx=(5, 10), pady=(10, 3), sticky="sw")
 
         IconButton(
             self,
@@ -99,7 +99,7 @@ class HomeFrame(ctkFrame):
             text_color=self.app.theme_config["CTkLabel"]["text_color"],
             tooltip_text="\nRaíces de funciones, derivadas, integrales.\n",
             command=self.ir_a_funcs,
-        ).grid(row=4, column=0, padx=(20, 10), pady=10, sticky="ne")
+        ).grid(row=4, column=0, padx=(10, 5), pady=(3, 10), sticky="ne")
 
         IconButton(
             self,
@@ -111,9 +111,9 @@ class HomeFrame(ctkFrame):
             tooltip_text="\nResolver sistemas de ecuaciones por los métodos de:" +
                          "\n− Gauss−Jordan" +
                          "\n− Regla de Cramer\n",
-                        #  "\n− Factorización de matrices",
+                        #  "\n− Factorización LU",
             command=self.ir_a_sis,
-        ).grid(row=4, column=1, padx=(10, 20), pady=10, sticky="nw")
+        ).grid(row=4, column=1, padx=(5, 10), pady=(3, 10), sticky="nw")
 
         IconButton(
             self,
@@ -123,7 +123,7 @@ class HomeFrame(ctkFrame):
             tooltip_text="\n− Versión: 1.0" +
                          "\n− Desarrollado por: Joaquín Zúñiga\n",
             command=lambda: open_link("https://github.com/jp-zuniga/GaussBot"),
-        ).grid(row=5, column=0, columnspan=2, padx=20, pady=10, sticky="n")
+        ).grid(row=5, column=0, columnspan=2, pady=10, sticky="n")
 
     def ir_a_mats(self) -> None:
         """

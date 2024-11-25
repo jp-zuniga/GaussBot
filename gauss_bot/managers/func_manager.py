@@ -22,7 +22,6 @@ from os import (
 )
 
 from typing import Union
-
 from customtkinter import CTkImage as ctkImage
 from sympy import (
     I,

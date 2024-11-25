@@ -104,7 +104,7 @@ class MatricesFrame(ctkFrame):
             self.dummy_frame = ctkFrame(self, fg_color="transparent")
             self.msg_frame = ErrorFrame(
                 self.dummy_frame,
-                msg="No hay matrices guardadas!",
+                msg="No se ha guardado ninguna matriz!",
             )
 
             agregar_button = ctkButton(

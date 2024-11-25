@@ -9,7 +9,6 @@ from os import (
 )
 
 from typing import Optional
-
 from customtkinter import CTkImage as ctkImage
 from matplotlib import use
 from matplotlib.pyplot import (
@@ -36,6 +35,7 @@ from ..util_funcs import transparent_invert
 
 TRANSFORMS = standard_transformations + (implicit_multiplication_application,)
 
+# para que matplotlib sepa que se esta usando tkinter
 use("TkAgg")
 
 

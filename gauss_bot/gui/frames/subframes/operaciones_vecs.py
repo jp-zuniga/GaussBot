@@ -385,7 +385,7 @@ class VMultiplicacionTab(CustomScrollFrame):
 
         # colocar widgets
         instruct_e.grid(row=0, column=0, columnspan=3, padx=5, pady=5, sticky="n")
-        self.escalar_entry.grid(row=1, column=0, ipadx=5, padx=5, pady=5, sticky="e")
+        self.escalar_entry.grid(row=1, column=0, padx=5, pady=5, sticky="e")
         operador_label.grid(row=1, column=1, padx=5, pady=5, sticky="ew")
         self.select_escalar_vec.grid(
             row=1, column=2, padx=5, pady=5, sticky="w"
@@ -414,7 +414,7 @@ class VMultiplicacionTab(CustomScrollFrame):
         operador_label = ctkLabel(
             self.tab_prod_punto,
             text=".",
-            font=("Roboto", 16),
+            font=("Roboto", 20),
         )
 
         instruct_v = ctkLabel(

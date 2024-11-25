@@ -24,16 +24,20 @@ if TYPE_CHECKING:
 
 
 class CustomEntry(ctkEntry):
+    """
+    Entry personalizado con texto centrado y autocomplete bindings.
+    """
+
     def __init__(
         self,
         master: Any,
-        width: int = 140,
-        height: int = 30,
         placeholder_text: Optional[str] = None,
         justify: str = "center",
         **kwargs
     ) -> None:
 
+        width = kwargs.pop("width", 140)
+        height = kwargs.pop("height", 30)
         super().__init__(
             master,
             width=width,
@@ -65,15 +69,19 @@ class CustomEntry(ctkEntry):
 
 
 class CustomDropdown(ctkOptionMenu):
+    """
+    OptionMenu personalizado con un ícono mejor.
+    """
+
     def __init__(
         self,
         master: Any,
-        width: int = 140,
-        height: int = 30,
         text_anchor = "center",
         **kwargs
     ) -> None:
 
+        width = kwargs.pop("width", 140)
+        height = kwargs.pop("height", 30)
         super().__init__(
             master,
             width,
@@ -89,6 +97,10 @@ class CustomDropdown(ctkOptionMenu):
         self.set_dropdown_icon(light_dropdown)
 
     def set_dropdown_icon(self, image: ctkImage, right_distance: int = 5) -> None:
+        """
+        Cambia el ícono del dropdown
+        """
+
         self.icon_label = ctkLabel(
             self,
             text="",
@@ -127,6 +139,11 @@ class CustomDropdown(ctkOptionMenu):
 
 
 class IconButton(ctkButton):
+    """
+    CTkButton personalizado para tener
+    botones con íconos y tooltips.
+    """
+
     def __init__(
         self,
         master: Any,
@@ -136,27 +153,19 @@ class IconButton(ctkButton):
         **kwargs
     ) -> None:
 
-        if "border_width" in kwargs:
-            border_width = kwargs.pop("border_width")
-        else:
-            border_width = 0
-
-        if "text" in kwargs:
-            text = kwargs.pop("text")
-        else:
-            text = ""
-
-        if "width" in kwargs:
-            width = kwargs.pop("width")
-        else:
-            width = 20
-
-        if "height" in kwargs:
-            height = kwargs.pop("height")
-        else:
-            height = 20
-
         self.app = app
+
+        text = kwargs.pop("text", "")
+        width = kwargs.pop("width", 20)
+        height = kwargs.pop("height", 20)
+        border_width = kwargs.pop("border_width", 0)
+        border_spacing = kwargs.pop("border_spacing", 0)
+        fg_color = kwargs.pop("fg_color", "transparent")
+        hover_color = kwargs.pop(
+            "hover_color",
+            self.app.theme_config["CTkFrame"]["top_fg_color"],
+        )
+
         super().__init__(
             master,
             width=width,
@@ -164,15 +173,16 @@ class IconButton(ctkButton):
             image=image,
             text=text,
             border_width=border_width,
-            border_spacing=0,
-            fg_color="transparent",
-            bg_color="transparent",
-            hover_color=self.app.theme_config["CTkFrame"]["top_fg_color"],
+            border_spacing=border_spacing,
+            fg_color=fg_color,
+            hover_color=hover_color,
             **kwargs,
         )
 
         if tooltip_text is not None:
-            self.tooltip = Tooltip(self, tooltip_text)
+            self.tooltip: Optional[Tooltip] = Tooltip(self, tooltip_text)
+        else:
+            self.tooltip = None
 
     def destroy(self):
         self.tooltip.destroy()
@@ -180,5 +190,13 @@ class IconButton(ctkButton):
 
     def configure(self, require_redraw=False, **kwargs):
         if "tooltip_text" in kwargs:
-            self.tooltip.configure_tooltip(message=kwargs.pop("tooltip_text"))
+            tt_text = kwargs.pop("tooltip_text")
+            if self.tooltip is not None and tt_text is None:
+                self.tooltip.destroy()
+                self.tooltip = None
+            elif self.tooltip is not None:
+                self.tooltip.configure_tooltip(message=tt_text)
+            else:
+                self.tooltip = Tooltip(self, tt_text)
+
         super().configure(require_redraw, **kwargs)

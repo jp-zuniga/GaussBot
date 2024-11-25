@@ -10,7 +10,6 @@ Operaciones implementadas:
 """
 
 from fractions import Fraction
-
 from ..models import Vector
 
 

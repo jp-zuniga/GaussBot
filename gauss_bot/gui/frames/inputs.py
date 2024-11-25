@@ -392,7 +392,7 @@ class ManejarFuncs(ctkFrame):
         # crear tabs, inicializar y almacenar instancias
         for nombre, cls in tabs:
             tab = self.tabview.add(nombre)
-            tab_instance = cls(
+            tab_instance: CustomScrollFrame = cls(
                 self.app, tab, self, self.func_manager,
             )
 

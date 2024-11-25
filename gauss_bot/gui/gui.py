@@ -14,7 +14,6 @@ from os import (
 )
 
 from typing import Union
-
 from customtkinter import (
     CTk as ctk,
     set_appearance_mode as set_mode,
