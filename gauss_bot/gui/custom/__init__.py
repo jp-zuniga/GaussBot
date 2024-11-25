@@ -1,5 +1,9 @@
+"""
+Customized UI elements for customtkinter.
+"""
+
 from .adapted import (
-    CustomMessagebox,
+    CustomMessageBox,
     CustomNumpad,
     # CustomScrollFrame,
     CustomTable,
@@ -22,7 +26,7 @@ from .custom_widgets import (
 __all__ = [
     "CustomEntry",
     "CustomDropdown",
-    "CustomMessagebox",
+    "CustomMessageBox",
     "CustomNumpad",
     "CustomScrollFrame",
     "CustomTable",

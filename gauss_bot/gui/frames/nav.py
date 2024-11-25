@@ -28,7 +28,10 @@ from ...icons import (
     QUIT_ICON,
 )
 
-from ..custom import IconButton
+from ..custom import (
+    CustomMessageBox,
+    IconButton,
+)
 
 if TYPE_CHECKING:
     from .. import GaussUI
@@ -352,9 +355,19 @@ class NavFrame(ctkFrame):
         Se encarga de llamar los métodos para guardar los datos.
         """
 
-        self.app.func_manager.save_funciones()  # type: ignore
-        self.app.ops_manager.save_sistemas()  # type: ignore
-        self.app.ops_manager.save_matrices()  # type: ignore
-        self.app.ops_manager.save_vectores()  # type: ignore
-        self.app.save_config()
-        self.app.quit()
+        quit_box = CustomMessageBox(
+            self.app,
+            name="Cerrar aplicación",
+            msg="¿Está seguro que desea cerrar GaussBot?\n" +
+                "(sus cambios serán guardados)",
+            button_options=("Sí", "No", "Cancelar"),
+            icon="error",
+        )
+
+        if quit_box.get() == "Sí":
+            self.app.func_manager.save_funciones()  # type: ignore
+            self.app.ops_manager.save_sistemas()  # type: ignore
+            self.app.ops_manager.save_matrices()  # type: ignore
+            self.app.ops_manager.save_vectores()  # type: ignore
+            self.app.save_config()
+            self.app.quit()

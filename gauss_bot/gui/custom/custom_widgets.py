@@ -17,7 +17,7 @@ from customtkinter import (
 )
 
 from ...icons import DROPDOWN_ICON
-from .adapted import Tooltip
+from .adapted.tooltip import Tooltip
 
 if TYPE_CHECKING:
     from ..gui import GaussUI
@@ -185,7 +185,8 @@ class IconButton(ctkButton):
             self.tooltip = None
 
     def destroy(self):
-        self.tooltip.destroy()
+        if self.tooltip is not None:
+            self.tooltip.destroy()
         super().destroy()
 
     def configure(self, require_redraw=False, **kwargs):

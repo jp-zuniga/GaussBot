@@ -84,7 +84,7 @@ class HomeFrame(ctkFrame):
             image=VECTOR_ICON,
             text="Operaciones de Vectores",
             text_color=self.app.theme_config["CTkLabel"]["text_color"],
-            tooltip_text="\nMagnitud, suma, resta," +
+            tooltip_text="\nSuma, resta," +  # magnitud
                          "\nmultiplicación escalar," +
                          "\nproducto punto, producto cruz.\n",
             command=self.ir_a_vecs,
