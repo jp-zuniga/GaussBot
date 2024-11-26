@@ -24,8 +24,8 @@ from .custom_widgets import (
 )
 
 __all__ = [
-    "CustomEntry",
     "CustomDropdown",
+    "CustomEntry",
     "CustomMessageBox",
     "CustomNumpad",
     "CustomScrollFrame",

@@ -16,11 +16,11 @@ from .vecs_manager import VectoresManager
 from .ops_manager import OpsManager
 
 __all__ = [
-    "KeyBindingManager",
-    "FuncManager",
-    "MatricesManager",
-    "VectoresManager",
-    "OpsManager",
     "MARGEN_ERROR",
     "MAX_ITERACIONES",
+    "FuncManager",
+    "KeyBindingManager",
+    "MatricesManager",
+    "OpsManager",
+    "VectoresManager",
 ]

@@ -20,16 +20,16 @@ from .sistemas import SistemasFrame
 from .config import ConfigFrame
 
 __all__ = [
-    "NavFrame",
-    "InputsFrame",
-    "ManejarMats",
-    "ManejarVecs",
-    "ManejarFuncs",
-    "ManejarSistemas",
-    "HomeFrame",
-    "MatricesFrame",
-    "VectoresFrame",
     "AnalisisFrame",
-    "SistemasFrame",
     "ConfigFrame",
+    "HomeFrame",
+    "InputsFrame",
+    "ManejarFuncs",
+    "ManejarMats",
+    "ManejarSistemas",
+    "ManejarVecs",
+    "MatricesFrame",
+    "NavFrame",
+    "SistemasFrame",
+    "VectoresFrame",
 ]
