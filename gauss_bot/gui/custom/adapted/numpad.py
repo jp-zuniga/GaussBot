@@ -14,10 +14,15 @@ from re import (
     escape,
 )
 
-from typing import TYPE_CHECKING
+from typing import (
+    TYPE_CHECKING,
+    Optional,
+)
+
 from tkinter import (
     END,
     INSERT,
+    Event,
 )
 
 from customtkinter import (
@@ -46,7 +51,6 @@ class CustomNumpad(ctkTop):
         self.focus()
         self.transient()
         self.overrideredirect(True)
-        self.attributes("-topmost", True)
         self.resizable(width=False, height=False)
 
         self.attach = attach
@@ -78,9 +82,11 @@ class CustomNumpad(ctkTop):
 
         self.attach.unbind("<Escape>")
         self.attach.unbind("<Control-Tab>")
+        self.attach.unbind("<Unmap>")
         self.attach.bind("<Control-Tab>", self.render)
         self.attach.bind("<Escape>", self.hide)
         self.attach.bind("<Configure>", self.hide)
+        self.attach.bind("<Unmap>", self.hide)
 
         self.unbind("<Escape>")
         self.bind("<Escape>", self.hide)
@@ -170,7 +176,6 @@ class CustomNumpad(ctkTop):
             set_from_end = True
 
         self.attach.insert(INSERT, k)
-
         try:
             text = self.attach.get()
             last_match = list(comp(re_pattern).finditer(text))[-1]
@@ -193,7 +198,7 @@ class CustomNumpad(ctkTop):
         self.disabled = True
         super().destroy()
 
-    def hide(self, event=None) -> str:
+    def hide(self, event: Optional[Event] = None) -> str:
         """
         Wrapper for withdraw() to handle custom key-bindings.
         """
@@ -206,7 +211,7 @@ class CustomNumpad(ctkTop):
         super().withdraw()
         return "break"
 
-    def render(self, event=None) -> str:
+    def render(self, event: Optional[Event] = None) -> str:
         """
         Wrapper for iconify() to handle custom key-bindings.
         """
@@ -218,6 +223,7 @@ class CustomNumpad(ctkTop):
         if self.hidden:
             self.deiconify()
             self.focus()
+            self.lift()
             self.hidden = False
 
             attach_width = self.attach.winfo_reqwidth()

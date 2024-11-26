@@ -43,6 +43,8 @@ from .operaciones_vecs import (
 
 from .resolver_sis import ResolverSisFrame
 from .raices import RaicesFrame
+from .derivadas import DerivadasFrame
+from .integrales import IntegralesFrame
 
 __all__ = [
     "AgregarFuncs",
@@ -66,4 +68,6 @@ __all__ = [
     "VMultiplicacionTab",
     "ResolverSisFrame",
     "RaicesFrame",
+    "DerivadasFrame",
+    "IntegralesFrame",
 ]

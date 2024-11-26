@@ -8,6 +8,7 @@ from os import (
     path,
 )
 
+from re import compile as comp
 from typing import Optional
 from customtkinter import CTkImage as ctkImage
 from matplotlib import use
@@ -21,6 +22,7 @@ from PIL.Image import open as open_img
 from sympy import (
     Reals, oo, zoo, nan,
     Expr, Interval, Symbol,
+    diff, integrate,
     latex, parse_expr,
 )
 
@@ -82,6 +84,53 @@ class Func:
     def __str__(self) -> str:
         return str(self.expr)
 
+    def derivar(self) -> "Func":
+        """
+        Retorna un nuevo objeto Func() que representa la derivada de self.
+        """
+
+        if "′" not in self.nombre:
+            d_nombre = f"{self.nombre[0]}′{self.nombre[1:]}"
+
+        else:
+            num_diff = self.nombre.count("′")
+            match num_diff:
+                case 1:
+                    d_nombre = self.nombre.replace("′", "′′")
+                case 2:
+                    d_nombre = self.nombre.replace("′′", "′′′")
+                case _:
+                    d_nombre = self.nombre.replace(
+                        "′" * num_diff,
+                        f"^({num_diff + 1})",
+                    )
+
+        return Func(d_nombre, str(diff(self.expr, self.var)))  # pylint: disable=E0606
+
+    def integrar(self) -> "Func":
+        """
+        Retorna un nuevo objeto Func() que representa el integral indefinido de self.
+        """
+
+        try:
+            match = list(comp(r"\^\(-\d+\)").finditer(self.nombre))[-1]
+        except IndexError:
+            match = None  # type: ignore
+
+        if match is not None:
+            num_ints = int(next(x for x in self.nombre if x.isdigit()))
+            i_nombre = (
+                self.nombre[:match.start()] +
+                f"^(-{num_ints + 1})" +
+                self.nombre[match.end():]
+            )
+        else:
+            num_ints = 0
+
+        notation = f"^(-{num_ints + 1})"
+        i_nombre = f"{self.nombre[0]}{notation}{self.nombre[1:]}"
+        return Func(i_nombre, str(integrate(self.expr, self.var)))
+
     def get_dominio(self) -> Interval:
         """
         Wrapper para continuous_domain de sympy().
@@ -114,8 +163,8 @@ class Func:
         if not self.latexified or self.latex_img is None:
             self.latex_img  = (
                 self.latex_to_png(
-                    self.nombre,
-                    str(self.expr),
+                    nombre_expr=self.nombre,
+                    expr=str(self.expr),
                     con_nombre=True,
                 )
             )
@@ -125,43 +174,51 @@ class Func:
 
     @staticmethod
     def latex_to_png(
-        nombre: str,
+        output_file: Optional[str] = None,
+        nombre_expr: Optional[str] = None,
         expr: Optional[str] = None,
         misc_str: Optional[str] = None,
         con_nombre: bool = False,
-        font_size: int = 75
+        **kwargs,
     ) -> ctkImage:
 
         """
-        Convierte self.expr en formato LaTeX
-        y lo convierte en una imagen PNG.
+        Convierte texto a formato LaTeX para crear una imagen PNG.
         * output_file: nombre del archivo de salida
+        * nombre_expr: nombre de la función a mostrar
+        * expr: string de la expresión a convertir
+        * misc_str: string de texto a convertir
+        * con_nombre: si se debe incluir el nombre de la función en la imagen
         * font_size: tamaño de la fuente en la imagen PNG
         """
 
         makedirs(SAVED_FUNCS_PATH, exist_ok=True)
-        output_file = path.join(SAVED_FUNCS_PATH, f"{nombre}.png")
+        output_file = path.join(SAVED_FUNCS_PATH, f"{output_file or nombre_expr}.png")
 
         if expr is not None:
-            parse_str = parse_expr(expr, transformations=TRANSFORMS)
-            latex_str: str = latex(parse_str, ln_notation=True, inv_trig_style="power")
+            latex_str: str = latex(
+                parse_expr(expr, transformations=TRANSFORMS),
+                ln_notation=kwargs.pop("ln_notation", True),
+                inv_trig_style=kwargs.pop("inv_trig_style", "power"),
+                order=kwargs.pop("order", "lex")
+            )
         elif misc_str is not None:
             latex_str = misc_str
         else:
             raise ValueError("No se recibió un string a convertir en PNG!")
 
-        if con_nombre:
-            latex_str = f"{nombre} = {latex_str}"
+        if con_nombre and nombre_expr is not None:
+            latex_str = f"{nombre_expr} = {latex_str}"
 
         rc("text", usetex=True)
         rc("font", family="serif")
 
-        fig_length = 10 + (len(latex_str) // 8)
+        fig_length = 8 + (len(latex_str) // 12)
         fig_height = (
             2
             if r"\\" not in latex_str
             else
-            int(2 + latex_str.count(r"\\") * 2)
+            2 + latex_str.count(r"\\") * 2
         )
 
         img_length = fig_length * 20
@@ -175,7 +232,7 @@ class Func:
             f"${latex_str}$",
             horizontalalignment="center",
             verticalalignment="center",
-            fontsize=font_size,
+            fontsize=kwargs.pop("font_size", 75),
         )
 
         savefig(

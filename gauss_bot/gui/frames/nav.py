@@ -234,6 +234,7 @@ class NavFrame(ctkFrame):
 
             widget.grid(row=i, column=0, columnspan=3, padx=10, pady=pady, sticky="ew")
             i += 1
+        self.toggle_nav()
 
     def seleccionar_frame(self, nombre: str) -> None:
         """

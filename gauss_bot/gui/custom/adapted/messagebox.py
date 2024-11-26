@@ -165,7 +165,7 @@ class CustomMessageBox(ctkTop):
             sticky="nse",
         )
 
-        ctkButton(
+        msg_button = ctkButton(
             self.frame_top,
             height=self.height // 2,
             corner_radius=0,
@@ -173,7 +173,11 @@ class CustomMessageBox(ctkTop):
             image=self.icon,
             fg_color=self.bg_color,
             hover=False,
-        ).grid(
+        )
+
+        msg_button._image_label.grid_configure(padx=5)  # type: ignore
+        msg_button._text_label.grid_configure(padx=5)  # type: ignore
+        msg_button.grid(
             row=1,
             column=0,
             columnspan=6,

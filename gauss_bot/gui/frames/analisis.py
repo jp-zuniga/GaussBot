@@ -6,6 +6,7 @@ de todos los subframes relacionados con matrices.
 from typing import (
     TYPE_CHECKING,
     Optional,
+    Union
 )
 
 from customtkinter import (
@@ -17,10 +18,15 @@ from customtkinter import (
 from ...icons import INPUTS_ICON
 from ...managers import FuncManager
 from ..custom import ErrorFrame
-from .subframes import RaicesFrame
+from .subframes import (
+    DerivadasFrame,
+    IntegralesFrame,
+    RaicesFrame,
+)
 
 if TYPE_CHECKING:
     from .. import GaussUI
+    from ..custom import CustomScrollFrame
 
 
 class AnalisisFrame(ctkFrame):
@@ -44,13 +50,21 @@ class AnalisisFrame(ctkFrame):
         self.msg_frame: Optional[ctkFrame] = None
 
         self.instances: list[
-            RaicesFrame,
+            Union[
+                RaicesFrame,
+                DerivadasFrame,
+                IntegralesFrame,
+            ],
         ]
 
         self.tabs: list[
             tuple[
                 str,
-                type[RaicesFrame],
+                Union[
+                    type[RaicesFrame],
+                    type[DerivadasFrame],
+                    type[IntegralesFrame],
+                ],
             ]
         ]
 
@@ -95,6 +109,8 @@ class AnalisisFrame(ctkFrame):
         self.instances = []
         self.tabs = [
             ("Raíces de Funciones", RaicesFrame),
+            ("Derivadas", DerivadasFrame),
+            ("Integrales", IntegralesFrame),
         ]
 
         # iterar sobre self.tabs para:
@@ -103,7 +119,7 @@ class AnalisisFrame(ctkFrame):
         # * añadir los frames a self.instances
         for nombre, cls in self.tabs:
             tab = self.tabview.add(nombre)
-            tab_instance: RaicesFrame = (
+            tab_instance: "CustomScrollFrame" = (
                 cls(self.app, tab, self, self.func_manager)
             )
 

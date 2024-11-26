@@ -170,7 +170,7 @@ class RaicesFrame(CustomScrollFrame):
         if (
             any(
                 term in str(self.func.expr)
-                for term in ("sen", "cos", "tan")
+                for term in ("sin", "cos", "tan")
             )
         ):
             IconButton(
@@ -520,7 +520,7 @@ class RaicesFrame(CustomScrollFrame):
         fx_igual = rf"{self.func.nombre} = {format(fx.normalize(), "f")}"
 
         raiz_img = Func.latex_to_png(
-            nombre=f"resultado_cerrado_{self.func.nombre}",
+            output_file=f"resultado_cerrado_{self.func.nombre}",
             misc_str=rf"{x_igual}" + r"\\[1em]" + rf"{fx_igual}",
             font_size=60,
         )
@@ -611,7 +611,7 @@ class RaicesFrame(CustomScrollFrame):
             )
 
             raiz_img = Func.latex_to_png(
-                nombre=f"resultado_abierto_{self.func.nombre}",
+                output_file=f"resultado_abierto_{self.func.nombre}",
                 misc_str=rf"{x_igual}" + r"\\[1em]" + rf"{fx_igual}",
                 font_size=60,
             )
