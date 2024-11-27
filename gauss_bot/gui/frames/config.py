@@ -171,7 +171,7 @@ class ConfigFrame(ctkFrame):
                 "El cambio tomará efecto al reiniciar la aplicación."
         )
 
-        self.msg_frame.grid(row=3, column=1, pady=30)
+        self.msg_frame.grid(row=3, column=1, padx=10, pady=30)
 
     def update_frame(self) -> None:
         """

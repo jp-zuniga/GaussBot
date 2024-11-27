@@ -32,7 +32,6 @@ __all__ = [
     "ENTER_ICON",
     "ERROR_ICON",
     "NUMPAD_KEYS",
-    "HOME_ICON",
     "INFO_ICON",
     "INPUTS_ICON",
     "LIMPIAR_ICON",
@@ -66,11 +65,6 @@ APP_ICON = (
 LOGO = ctkImage(
     dark_image=open_img(path.join(ASSET_PATH, "dark_mode", "light_logo.png")),
     light_image=open_img(path.join(ASSET_PATH, "light_mode", "dark_logo.png"))
-)
-
-HOME_ICON = ctkImage(
-    dark_image=open_img(path.join(ASSET_PATH, "dark_mode", "light_home_icon.png")),
-    light_image=open_img(path.join(ASSET_PATH, "light_mode", "dark_home_icon.png"))
 )
 
 INPUTS_ICON = ctkImage(

@@ -107,7 +107,7 @@ class CustomMessageBox(ctkTop):
         self.icon: ctkImage
         self.load_icon(icon)
 
-        self.option1, self.option2, self.option3 = button_options[::-1]
+        self.option1, self.option2, self.option3 = button_options
 
         self.bg_color = self._apply_appearance_mode(
             ThemeManager.theme["CTkFrame"]["fg_color"]
@@ -214,8 +214,7 @@ class CustomMessageBox(ctkTop):
                 command=lambda: self.button_event(self.option3),  # type: ignore
             )
 
-
-        columns = (4, 2, 0)
+        columns = (0, 2, 4)
         span = 2
 
         if all(button_options):
@@ -246,13 +245,14 @@ class CustomMessageBox(ctkTop):
                 padx=(10, 0),
                 pady=10,
             )
+
         elif self.option2:
-            self.frame_top.columnconfigure((0, 5), weight=1)
-            columns = (2, 3)  # type: ignore
+            self.frame_top.columnconfigure((0, 4), weight=1)
+            columns = (4, 5)  # type: ignore
             self.button_1.grid(
                 row=2,
                 column=columns[0],
-                sticky="nsew",
+                sticky="nse",
                 padx=(0, 5),
                 pady=10,
             )
@@ -260,8 +260,8 @@ class CustomMessageBox(ctkTop):
             self.button_2.grid(
                 row=2,
                 column=columns[1],
-                sticky="nsew",
-                padx=(5, 0),
+                sticky="nse",
+                padx=(5, 10),
                 pady=10,
             )
 
@@ -269,9 +269,9 @@ class CustomMessageBox(ctkTop):
             self.frame_top.columnconfigure((0, 2, 4), weight=2)
             self.button_1.grid(
                 row=2,
-                column=columns[1],
+                column=columns[2],
                 columnspan=span,
-                sticky="news",
+                sticky="nse",
                 padx=(0, 10),
                 pady=10,
             )

@@ -3,6 +3,11 @@ Implementación de todos los frames
 de operaciones con vectores.
 """
 
+from decimal import (
+    Decimal,
+    getcontext,
+)
+
 from fractions import Fraction
 from random import choice
 from typing import (
@@ -48,6 +53,8 @@ from ...custom import (
 if TYPE_CHECKING:
     from ... import GaussUI
     from .. import VectoresFrame
+
+getcontext().prec = 8
 
 
 class MagnitudTab(CustomScrollFrame):
@@ -118,12 +125,12 @@ class MagnitudTab(CustomScrollFrame):
         vec = self.vecs_manager.vecs_ingresados[self.vec]
 
         header = f"|| {self.vec} ||"
-        resultado = vec.magnitud().limit_denominator(10000)
+        resultado = Decimal(float(vec.magnitud())).normalize()
 
         self.msg_frame = place_msg_frame(
             parent_frame=self.resultado_frame,
             msg_frame=self.msg_frame,
-            msg=f"{header} = {resultado}",
+            msg=f"{header}  =  {resultado}",
             tipo="resultado",
         )
 
@@ -519,7 +526,7 @@ class MultiplicacionTab(CustomScrollFrame):
         operador_label = ctkLabel(
             self.tab_prod_punto,
             text=".",
-            font=ctkFont(size=20),
+            font=ctkFont(size=26),
         )
 
         instruct_v = ctkLabel(

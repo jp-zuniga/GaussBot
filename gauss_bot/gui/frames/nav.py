@@ -18,7 +18,6 @@ from ...icons import (
     LOGO,
     DROPLEFT_ICON,
     DROPRIGHT_ICON,
-    HOME_ICON,
     INPUTS_ICON,
     MATRIZ_ICON,
     VECTOR_ICON,
@@ -50,7 +49,7 @@ class NavFrame(ctkFrame):
         self.configure(fg_color=self.app.theme_config["CTk"]["fg_color"])
         self.grid(row=0, column=0, sticky="nsew")
 
-        self.rowconfigure(8, weight=1)  # para tener un espacio entre los botones
+        self.rowconfigure(7, weight=1)  # para tener un espacio entre los botones
         self.columnconfigure(0, weight=4)
         self.columnconfigure(1, weight=1)
 
@@ -67,7 +66,6 @@ class NavFrame(ctkFrame):
         }
 
         # label y logo de la barra de navegacion
-        self.logo_label = ctkLabel(self, image=LOGO, text="")
         self.app_name = ctkLabel(
             self,
             text="GaussBot",
@@ -83,6 +81,10 @@ class NavFrame(ctkFrame):
             command=self.toggle_nav,
         )
 
+        self.hide_button._image_label.grid_configure(  # type: ignore
+            columnspan=3, sticky="nsew",
+        )
+
         # crear botones de navegacion
         self.home_button = IconButton(
             self,
@@ -93,7 +95,7 @@ class NavFrame(ctkFrame):
             border_spacing=10,
             text_color=("gray10", "gray90"),
             text="Inicio",
-            image=HOME_ICON,
+            image=LOGO,
             anchor="w",
             command=self.home_button_event,
         )
@@ -218,13 +220,12 @@ class NavFrame(ctkFrame):
         }
 
         # colocar widgets en la barra de navegacion
-        self.logo_label.grid(row=0, column=0, columnspan=2, padx=10, pady=(20, 3))
-        self.app_name.grid(row=1, column=0, padx=0, pady=(3, 10), sticky="nse")
-        self.hide_button.grid(row=1, column=1, padx=10, pady=(3, 10), sticky="e")
+        self.app_name.grid(row=0, column=0, padx=0, pady=10, sticky="nse")
+        self.hide_button.grid(row=0, column=1, padx=10, pady=10, sticky="e")
 
-        i = 2
+        i = 1
         for j, widget in enumerate(self.buttons.values()):
-            if i == 8:
+            if i == 7:
                 i += 1
 
             if j == len(self.buttons.values()) - 1:
@@ -245,7 +246,7 @@ class NavFrame(ctkFrame):
         # resaltar el boton seleccionado
         for nombre_frame, button in self.buttons.items():
             button.configure(
-                fg_color=("gray75", "gray25")
+                fg_color=self.app.theme_config["CTkFrame"]["top_fg_color"]
                 if nombre == nombre_frame
                 else "transparent"
             )
@@ -264,9 +265,9 @@ class NavFrame(ctkFrame):
 
         if self.hidden:
             for widget in self.winfo_children():
-                if widget in (self.logo_label, self.hide_button):
+                if widget is self.hide_button:
                     continue
-                if isinstance(widget, ctkLabel):
+                if widget is self.app_name:
                     widget.grid()
                 elif isinstance(widget, IconButton):
                     widget.configure(
@@ -286,7 +287,7 @@ class NavFrame(ctkFrame):
 
         else:
             for widget in self.winfo_children():
-                if widget in (self.logo_label, self.hide_button):
+                if widget is self.hide_button:
                     continue
                 if widget is self.app_name:
                     widget.grid_remove()
@@ -297,7 +298,7 @@ class NavFrame(ctkFrame):
                     )
 
             self.hidden = True
-            self.hide_button.grid_configure(column=0, columnspan=2, sticky="nsew")
+            self.hide_button.grid_configure(column=0, columnspan=2, sticky="n")
             self.hide_button.configure(image=DROPRIGHT_ICON)
 
     def home_button_event(self) -> None:
@@ -361,7 +362,7 @@ class NavFrame(ctkFrame):
             name="Cerrar aplicación",
             msg="¿Está seguro que desea cerrar GaussBot?\n" +
                 "(sus cambios serán guardados)",
-            button_options=("Sí", "No", "Cancelar"),
+            button_options=("Sí", "No", None),
             icon="error",
         )
 
