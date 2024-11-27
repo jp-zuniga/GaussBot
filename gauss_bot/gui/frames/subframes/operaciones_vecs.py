@@ -600,6 +600,7 @@ class MultiplicacionTab(CustomScrollFrame):
         ).grid(row=0, column=2, padx=5, pady=5, sticky="w")
 
         def setup_selections(input_dims: str) -> None:
+            delete_msg_frame(self.msg_frame)
             try:
                 dimensiones = int(input_dims)
                 if dimensiones <= 1:
@@ -833,6 +834,7 @@ class MultiplicacionTab(CustomScrollFrame):
         Realiza el producto cruz de dos vectores.
         """
 
+        delete_msg_frame(self.msg_frame)
         vectores = [
             self.vecs_manager.vecs_ingresados[dropdown.get()]
             for dropdown in dropdowns
