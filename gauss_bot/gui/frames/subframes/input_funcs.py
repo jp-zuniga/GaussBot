@@ -10,6 +10,7 @@ from typing import (
 
 from tkinter import Variable
 from customtkinter import (
+    CTkFont as ctkFont,
     CTkFrame as ctkFrame,
     CTkLabel as ctkLabel,
 )
@@ -40,8 +41,8 @@ from ....managers import (
 )
 
 from ...custom import (
-    CustomDropdown,
     CustomEntry,
+    CustomDropdown,
     CustomNumpad,
     CustomScrollFrame,
     ErrorFrame,
@@ -372,7 +373,7 @@ class MostrarFuncs(CustomScrollFrame):
         ctkLabel(
             self.show_frame,
             text="Funciones ingresadas:",
-            font=("Roboto", 12, "bold"),
+            font=ctkFont(size=12, weight="bold", underline=True),
         ).grid(row=0, column=0, pady=(10, 0), sticky="n")
 
         ctkLabel(

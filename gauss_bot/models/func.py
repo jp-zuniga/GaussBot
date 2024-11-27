@@ -162,7 +162,7 @@ class Func:
 
         if not self.latexified or self.latex_img is None:
             self.latex_img  = (
-                self.latex_to_png(
+                Func.latex_to_png(
                     nombre_expr=self.nombre,
                     expr=str(self.expr),
                     con_nombre=True,

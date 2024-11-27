@@ -37,8 +37,9 @@ from .operaciones_mats import (
 )
 
 from .operaciones_vecs import (
-    VSumaRestaTab,
-    VMultiplicacionTab,
+    MagnitudTab,
+    SumaRestaTab as VSRTab,
+    MultiplicacionTab as VMTab,
 )
 
 from .resolver_sis import ResolverSisFrame
@@ -59,6 +60,7 @@ __all__ = [
     "EliminarVecs",
     "InversaTab",
     "IntegralesFrame",
+    "MagnitudTab",
     "MostrarFuncs",
     "MostrarMats",
     "MostrarSistemas",
@@ -68,6 +70,6 @@ __all__ = [
     "ResolverSisFrame",
     "SumaRestaTab",
     "TransposicionTab",
-    "VMultiplicacionTab",
-    "VSumaRestaTab",
+    "VMTab",
+    "VSRTab",
 ]

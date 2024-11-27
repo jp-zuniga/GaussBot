@@ -64,7 +64,7 @@ class CustomMessageBox(ctkTop):
         super().__init__()
         self.master_window = master
         self.overrideredirect(True)
-        self.protocol("WM_DELETE_WINDOW", lambda _: self.button_event(None))  # type: ignore
+        self.protocol("WM_DELETE_WINDOW", lambda _: self.button_event(""))  # type: ignore
 
         self.resizable(width=False, height=False)
         self.grid_columnconfigure(0, weight=1)
@@ -102,6 +102,11 @@ class CustomMessageBox(ctkTop):
 
         self.msgbox_name = name
         self.msg = msg
+        self.clicked_button = ""
+
+        self.icon: ctkImage
+        self.load_icon(icon)
+
         self.option1, self.option2, self.option3 = button_options[::-1]
 
         self.bg_color = self._apply_appearance_mode(
@@ -112,9 +117,6 @@ class CustomMessageBox(ctkTop):
             ThemeManager.theme["CTkFrame"]["top_fg_color"]
         )
 
-        self.clicked_button: str
-        self.icon: ctkImage
-        self.load_icon(icon)
 
         self.frame_top = ctkFrame(
             self,
@@ -154,7 +156,7 @@ class CustomMessageBox(ctkTop):
             app=self.master_window,
             image=QUIT_ICON,
             hover_color=self.bg_color,
-            command=self.button_event,
+            command=lambda: self.button_event(""),
         )
 
         self.button_close.grid(

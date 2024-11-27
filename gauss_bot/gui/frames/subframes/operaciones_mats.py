@@ -1,5 +1,5 @@
 # pylint: disable=too-many-lines
-# mas corto no lo puedo hacer sin perder legibilidad
+# no lo puedo hacer mas corto sin perder legibilidad
 
 """
 Implementación de todos los frames
@@ -16,6 +16,7 @@ from typing import (
 from tkinter import Variable
 from customtkinter import (
     CTkButton as ctkButton,
+    CTkFont as ctkFont,
     CTkFrame as ctkFrame,
     CTkLabel as ctkLabel,
     CTkTabview as ctkTabview,
@@ -112,7 +113,7 @@ class SumaRestaTab(CustomScrollFrame):
         self.select_operacion = CustomDropdown(
             self,
             width=40,
-            font=("Roboto", 16),
+            font=ctkFont(size=16),
             values=list(self.operaciones.values()),
             variable=Variable(value=self.operaciones[default]),
             command=self.update_operacion,
@@ -365,7 +366,7 @@ class MultiplicacionTab(CustomScrollFrame):
         """
 
         # crear widgets
-        operador_label = ctkLabel(self.tab_escalar, text="•", font=("Roboto", 16))
+        operador_label = ctkLabel(self.tab_escalar, text="•", font=ctkFont(size=16))
         instruct_e = ctkLabel(
             self.tab_escalar,
             text="Seleccione la matriz e ingrese el escalar:",
@@ -426,7 +427,7 @@ class MultiplicacionTab(CustomScrollFrame):
             placeholder2 = Variable(value=self.master_frame.nombres_matrices[1])
 
         # crear widgets
-        operador_label = ctkLabel(self.tab_mats, text="•", font=("Roboto", 16))
+        operador_label = ctkLabel(self.tab_mats, text="•", font=ctkFont(size=16))
         instruct_ms = ctkLabel(
             self.tab_mats,
             text="Seleccione las matrices a multiplicar:",
@@ -482,7 +483,7 @@ class MultiplicacionTab(CustomScrollFrame):
         placeholder2 = Variable(value=self.master_frame.nombres_vectores[0])
 
         # crear widgets
-        operador_label = ctkLabel(self.tab_mat_vec, text="•", font=("Roboto", 16))
+        operador_label = ctkLabel(self.tab_mat_vec, text="•", font=ctkFont(size=16))
         instruct_mv = ctkLabel(
             self.tab_mat_vec,
             text="Seleccione la matriz y el vector a multiplicar:",

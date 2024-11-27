@@ -32,16 +32,14 @@ class CustomEntry(ctkEntry):
         self,
         master: Any,
         placeholder_text: Optional[str] = None,
-        justify: str = "center",
         **kwargs
     ) -> None:
 
-        width = kwargs.pop("width", 140)
-        height = kwargs.pop("height", 30)
+        justify = kwargs.pop("justify", "center")
         super().__init__(
             master,
-            width=width,
-            height=height,
+            width=kwargs.pop("width", 140),
+            height=kwargs.pop("height", 30),
             placeholder_text=placeholder_text,
             **kwargs,
         )
@@ -76,21 +74,19 @@ class CustomDropdown(ctkOptionMenu):
     def __init__(
         self,
         master: Any,
-        text_anchor = "center",
         **kwargs
     ) -> None:
 
-        width = kwargs.pop("width", 140)
-        height = kwargs.pop("height", 30)
+        anchor = kwargs.pop("text_anchor", "center")
         super().__init__(
             master,
-            width,
-            height,
+            width=kwargs.pop("width", 140),
+            height=kwargs.pop("height", 30),
             **kwargs
         )
 
         self.icon_label: ctkLabel
-        self._text_label.configure(anchor=text_anchor)
+        self._text_label.configure(anchor=anchor)
 
         light_dropdown = ctkImage(DROPDOWN_ICON._dark_image)
         self.grid_configure(ipadx=5)

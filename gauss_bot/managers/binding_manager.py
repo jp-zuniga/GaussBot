@@ -124,9 +124,9 @@ class KeyBindingManager:
                 self.entry_list[row - 1].focus_set()  # type: ignore
         elif row == 0:
             if self.es_matriz:
-                self.focus_filas(data_entry)
+                KeyBindingManager.focus_filas(data_entry)
             else:
-                self.focus_dimensiones(data_entry)
+                KeyBindingManager.focus_dimensiones(data_entry)
 
     def _entry_move_down(
         self,

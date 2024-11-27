@@ -10,6 +10,8 @@ from typing import (
     Union,
 )
 
+from . import Matriz
+
 
 class Vector:
     """
@@ -36,7 +38,7 @@ class Vector:
 
     def __getitem__(
         self,
-        indice: Union[int, slice]
+        indice: Union[int, slice],
     ) -> Union[Fraction, list[Fraction]]:
 
         """
@@ -46,15 +48,18 @@ class Vector:
         """
 
         if (
-            isinstance(indice, int) and
+            isinstance(indice, int)
+            and
            -len(self) <= indice < len(self)  # para permitir indices negativos
         ):
             return self.componentes[indice]
 
         if isinstance(indice, slice):
             start, stop, step = indice.indices(len(self))
-            if (-len(self) <= start < len(self) and
-               -len(self) <= stop <= len(self)
+            if (
+                -len(self) <= start < len(self)
+                 and
+                -len(self) <= stop <= len(self)
             ):
                 # si se esta recorriendo en reversa, intercambiar start/stop
                 if step < 0:
@@ -72,7 +77,11 @@ class Vector:
             return False
         if len(self) != len(vec2):
             return False
-        return all(a == b for a, b in zip(self.componentes, vec2.componentes))
+
+        return all(
+            a == b
+            for a, b in zip(self.componentes, vec2.componentes)
+        )
 
     def __len__(self) -> int:
         """
@@ -95,8 +104,12 @@ class Vector:
         """
 
         if len(self) != len(vec2):
-            raise ArithmeticError("Vectores deben tener la misma longitud!")
-        return Vector([a + b for a, b in zip(self.componentes, vec2.componentes)])
+            raise ArithmeticError(
+                "Vectores deben tener la misma longitud!"
+            )
+        return Vector(
+            [a + b for a, b in zip(self.componentes, vec2.componentes)]
+        )
 
     def __sub__(self, vec2: "Vector") -> "Vector":
         """
@@ -105,35 +118,39 @@ class Vector:
         """
 
         if len(self) != len(vec2):
-            raise ArithmeticError("Vectores deben tener la misma longitud!")
-        return Vector([a - b for a, b in zip(self.componentes, vec2.componentes)])
+            raise ArithmeticError(
+                "Vectores deben tener la misma longitud!"
+            )
+        return Vector(
+            [a - b for a, b in zip(self.componentes, vec2.componentes)]
+        )
 
     @overload
     def __mul__(self, vec2: "Vector") -> Fraction: ...
 
     @overload
-    def __mul__(self, escalar: Fraction) -> "Vector": ...
+    def __mul__(self, escalar: Union[int, float, Fraction]) -> "Vector": ...
 
     def __mul__(
         self,
-        multiplicador: Union["Vector", Fraction]
+        multiplicador: Union["Vector", int, float, Fraction],
     ) -> Union[Fraction, "Vector"]:
 
         """
         Overloads para realizar producto punto o multiplicación por escalar:
         * Vector() * Vector() -> Fraction()
-        * Vector() * Fraction() -> Vector()
-        * TypeError: si el tipo de dato no es válido
-        * ArithmeticError: si los vectores no tienen la misma longitud
+        * Vector() * Union[int, float, Fraction] -> Vector()
 
-        Nota: Para la multiplicación escalar, ocurre lo mismo que con
-        objetos Matriz(), asi que se debe escribir el escalar antes del vector
-        para que no de error: 2 * Vector() en lugar de Vector() * 2
+        Errores:
+        * TypeError: si el tipo de dato es inválido
+        * ArithmeticError: si los vectores no tienen la misma longitud
         """
 
         if isinstance(multiplicador, Vector):
             if len(self) != len(multiplicador):
-                raise ArithmeticError("Los vectores deben tener la misma longitud!")
+                raise ArithmeticError(
+                    "Los vectores deben tener la misma longitud!"
+                )
             return Fraction(
                 sum(
                     a * b
@@ -141,6 +158,96 @@ class Vector:
                 )
             )
 
-        if isinstance(multiplicador, Fraction):
-            return Vector([c * multiplicador for c in self.componentes])
+        if isinstance(multiplicador, (int, float, Fraction)):
+            return Vector(
+                [Fraction(c * multiplicador) for c in self.componentes]
+            )
         raise TypeError("Tipo de dato inválido!")
+
+    def __rmul__(
+        self,
+        multiplicador: Union[int, float, Fraction],
+    ) -> "Vector":
+
+        """
+        Realiza multiplicación por escalar:
+        * Union[int, float, Fraction] * Vector() -> Vector()
+
+        Errores:
+        * TypeError: si el tipo de dato es inválido
+        """
+
+        if isinstance(multiplicador, (int, float, Fraction)):
+            return Vector(
+                [Fraction(c * multiplicador) for c in self.componentes]
+            )
+        raise TypeError("Tipo de dato inválido!")
+
+    def magnitud(self) -> Fraction:
+        """
+        Calcula la magnitud de la instancia.
+        """
+
+        return Fraction(
+            sum(c ** 2 for c in self.componentes) ** Fraction(1, 2)
+        )
+
+    @staticmethod
+    def prod_cruz(dimensiones: int, vecs: list["Vector"]) -> "Vector":
+        """
+        Calcula el producto cruz de (n - 1) vectores en R^n.
+
+        Args:
+        * dimensiones: valor de n para R^n
+        * vecs: lista de vectores a multiplicar
+
+        Errores:
+        - ArithmethicError:
+            - si no se hay (n - 1) vectores en vecs
+            - si los vectores no están en R^n
+
+        Para n = 2, se retorna un vector unidimensional
+        cuyo componente rerpresenta el área del
+        paralelogramo formado por los dos vectores.
+        """
+
+        if not all(len(x) == dimensiones for x in vecs):
+            raise ArithmeticError(
+                f"Todos los vectores deben estar en R{dimensiones}!"
+            )
+
+        if dimensiones == 2:
+            a1, a2 = vecs[0].componentes
+            b1, b2 = vecs[1].componentes
+            return Vector([(a1 * b2) - (a2 * b1)])
+
+        if len(vecs) != dimensiones - 1:
+            raise ArithmeticError(
+                f"Para encontrar un producto cruz en R{dimensiones}, " +
+                f"se necesitan {dimensiones - 1} vectores!"
+            )
+
+        if dimensiones == 3:
+            a1, a2, a3 = vecs[0].componentes
+            b1, b2, b3 = vecs[1].componentes
+            return Vector(
+                [
+                    (a2 * b3) - (a3 * b2),
+                    (a3 * b1) - (a1 * b3),
+                    (a1 * b2) - (a2 * b1),
+                ]
+            )
+
+        mat_prod_cruz = Matriz(
+            aumentada=False,
+            filas=len(vecs),
+            columnas=dimensiones,
+            valores=[vec.componentes for vec in vecs]
+        ).encontrar_adjunta().transponer()
+
+        return Vector(
+            [
+                mat_prod_cruz[0, i]
+                for i in range(mat_prod_cruz.columnas)
+            ]
+        )

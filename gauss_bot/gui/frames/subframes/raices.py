@@ -20,6 +20,7 @@ from typing import (
 from tkinter import Variable
 from customtkinter import (
     CTkButton as ctkButton,
+    CTkFont as ctkFont,
     CTkFrame as ctkFrame,
     CTkLabel as ctkLabel,
     CTkToplevel as ctkTop,
@@ -213,7 +214,7 @@ class RaicesFrame(CustomScrollFrame):
         ctkLabel(
             self.datos_frame,
             text=",",
-            font=("Roboto", 18),
+            font=ctkFont(size=18),
         ).grid(row=0, column=2, padx=3, pady=(5, 2), sticky="nw")
 
         self.b_entry = CustomEntry(
@@ -277,7 +278,7 @@ class RaicesFrame(CustomScrollFrame):
             ctkLabel(
                 self.datos_frame,
                 text=",",
-                font=("Roboto", 18),
+                font=ctkFont(size=18),
             ).grid(row=0, column=2, padx=2, pady=(5, 2), sticky="nw")
 
             self.xn_entry.grid(

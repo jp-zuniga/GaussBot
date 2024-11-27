@@ -96,6 +96,7 @@ class IntegralesFrame(CustomScrollFrame):
 
         ctkButton(
             self,
+            height=30,
             text=f"Integrar {self.func.nombre}",
             command=self.encontrar_derivada,
         ).grid(row=3, column=0, ipadx=10, pady=5, sticky="n")

@@ -124,7 +124,7 @@ class CustomTable(ctkFrame):
                     border_width=1,
                     border_spacing=0,
                     corner_radius=6,
-                    font=("Roboto", 8),
+                    font=ctkFont(size=10),
                     hover=False,
                 )
 
