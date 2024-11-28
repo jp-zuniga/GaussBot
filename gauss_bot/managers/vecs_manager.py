@@ -10,8 +10,7 @@ Operaciones implementadas:
 """
 
 from fractions import Fraction
-
-from gauss_bot.models import Vector
+from ..models import Vector
 
 
 class VectoresManager:

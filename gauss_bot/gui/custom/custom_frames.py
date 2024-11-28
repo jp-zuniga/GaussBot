@@ -3,7 +3,6 @@ Implementaciones de frames personalizados.
 """
 
 from typing import (
-    TYPE_CHECKING,
     Any,
     Optional,
     Union,
@@ -16,65 +15,21 @@ from customtkinter import (
     CTkScrollableFrame as ctkScrollFrame,
 )
 
-from gauss_bot import (
+from ...icons import (
     CHECK_ICON,
     ERROR_ICON,
 )
 
-if TYPE_CHECKING:
-    from gauss_bot.gui import GaussUI
-
 
 class CustomScrollFrame(ctkScrollFrame):
-    def __init__(
-        self,
-        app: "GaussUI",
-        master: Any,
-        **kwargs
-    ) -> None:
+    """
+    Subclass de CTkScrollableFrame
+    con la scrollbar escondida.
+    """
 
-        super().__init__(
-            master,
-            **kwargs
-        )
-
-        self.app = app
-        self.bind("<Configure>", self._on_frame_configure)
-
-    def update_scrollbar_visibility(self) -> None:
-        self.update_idletasks()
-        content_height, frame_height = self._calculate_heights()
-        if content_height > frame_height:
-            self._scrollbar.grid()
-        else:
-            self._scrollbar.grid_remove()
-
-    def _on_frame_configure(self, event) -> None:
-        self.update_idletasks()
-        self._fit_frame_dimensions_to_canvas(event)
-        self._parent_canvas.configure(scrollregion=self._parent_canvas.bbox("all"))
-        self.update_scrollbar_visibility()
-
-    def _calculate_heights(self) -> tuple[int, int]:
-        total_padding = 0
-        for widget in self.winfo_children():
-            total_padding += 10
-            if isinstance(widget, ctkFrame):
-                for _ in widget.winfo_children():
-                    total_padding += 10
-
-        frame_height = self.app._current_height
-        content_height = 0
-
-        for widget in self.winfo_children():
-            content_height += widget.winfo_reqheight()
-            if isinstance(widget, ctkFrame):
-                content_height += sum(
-                    subwidget.winfo_reqheight()
-                    for subwidget in widget.winfo_children()
-                )
-        content_height -= total_padding
-        return (content_height, frame_height)
+    def __init__(self, master: Any, **kwargs) -> None:
+        super().__init__(master, **kwargs)
+        self._scrollbar.grid_forget()
 
 
 class ErrorFrame(ctkFrame):

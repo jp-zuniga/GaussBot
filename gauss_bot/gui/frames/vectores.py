@@ -14,20 +14,22 @@ from customtkinter import (
     CTkTabview as ctkTabview,
 )
 
-from gauss_bot import INPUTS_ICON
-from gauss_bot.managers import (
+from ...icons import INPUTS_ICON
+from ...managers import (
     MatricesManager,
     VectoresManager,
 )
 
-from gauss_bot.gui.custom import ErrorFrame
-from gauss_bot.gui.frames.subframes import (
-    VSumaRestaTab,
-    VMultiplicacionTab,
+from ..custom import ErrorFrame
+from .subframes import (
+    MagnitudTab,
+    VSRTab,
+    VMTab,
 )
 
 if TYPE_CHECKING:
-    from gauss_bot.gui import GaussUI
+    from .. import GaussUI
+    from ..custom import CustomScrollFrame
 
 
 class VectoresFrame(ctkFrame):
@@ -57,8 +59,20 @@ class VectoresFrame(ctkFrame):
 
         self.instances: list[
             Union[
-                VSumaRestaTab,
-                VMultiplicacionTab,
+                MagnitudTab,
+                VSRTab,
+                VMTab,
+            ]
+        ]
+
+        self.tabs: list[
+            tuple[
+                str,
+                Union[
+                    type[MagnitudTab],
+                    type[VSRTab],
+                    type[VMTab],
+                ]
             ]
         ]
 
@@ -81,7 +95,7 @@ class VectoresFrame(ctkFrame):
             self.dummy_frame = ctkFrame(self, fg_color="transparent")
             self.msg_frame = ErrorFrame(
                 self.dummy_frame,
-                msg="No hay vectores ingresados!"
+                msg="No se ha guardado ningún vector!"
             )
 
             agregar_button = ctkButton(
@@ -89,7 +103,9 @@ class VectoresFrame(ctkFrame):
                 height=30,
                 text="Agregar vectores",
                 image=INPUTS_ICON,
-                command=lambda: self.app.home_frame.ir_a_vector(mostrar=False),  # type: ignore
+                command=lambda: (
+                    self.app.inputs_frame.ir_a_input_vecs(mostrar=False)  # type: ignore
+                ),
             )
 
             self.dummy_frame.pack(expand=True, anchor="center")
@@ -103,19 +119,28 @@ class VectoresFrame(ctkFrame):
                 widget.destroy()
             self.msg_frame = None
 
-        # inicializar tabview, crear tabs y frames
         self.tabview = ctkTabview(self, fg_color="transparent")
         self.tabview.pack(expand=True, fill="both")
 
-        tab_sr = self.tabview.add("Suma y Resta")
-        tab_m = self.tabview.add("Multiplicación")
+        self.instances = []
+        self.tabs = [
+            ("Magnitud", MagnitudTab),
+            ("Suma y Resta", VSRTab),
+            ("Multiplicación", VMTab),
+        ]
 
-        frame_sr = VSumaRestaTab(self.app, tab_sr, self, self.vecs_manager)
-        frame_m = VMultiplicacionTab(self.app, tab_m, self, self.vecs_manager)
+        # iterar sobre self.tabs para:
+        # * agregar tabs al tabview
+        # * inicializar los frames de cada tab
+        # * añadir los frames a self.instances
+        for nombre, cls in self.tabs:
+            tab = self.tabview.add(nombre)
+            tab_instance: "CustomScrollFrame" = (
+                cls(self.app, tab, self, self.vecs_manager)
+            )
 
-        frame_sr.pack(expand=True, fill="both")
-        frame_m.pack(expand=True, fill="both")
-        self.instances = [frame_sr, frame_m]
+            tab_instance.pack(expand=True, fill="both")
+            self.instances.append(tab_instance)  # type: ignore
 
     def update_all(self) -> None:
         """

@@ -15,18 +15,18 @@ from customtkinter import (
     CTkTabview as ctkTabview,
 )
 
-from gauss_bot import INPUTS_ICON
-from gauss_bot.managers import (
+from ...icons import INPUTS_ICON
+from ...managers import (
     MatricesManager,
     VectoresManager,
 )
 
-from gauss_bot.gui.custom import (
+from ..custom import (
     CustomScrollFrame,
     ErrorFrame,
 )
 
-from gauss_bot.gui.frames.subframes import (
+from .subframes import (
     SumaRestaTab,
     MultiplicacionTab,
     TransposicionTab,
@@ -35,7 +35,7 @@ from gauss_bot.gui.frames.subframes import (
 )
 
 if TYPE_CHECKING:
-    from gauss_bot.gui import GaussUI
+    from .. import GaussUI
 
 
 class MatricesFrame(ctkFrame):
@@ -103,7 +103,8 @@ class MatricesFrame(ctkFrame):
             # agregar boton para dirigir al usuario adonde se agregan
             self.dummy_frame = ctkFrame(self, fg_color="transparent")
             self.msg_frame = ErrorFrame(
-                self.dummy_frame, msg="No hay matrices ingresadas!"
+                self.dummy_frame,
+                msg="No se ha guardado ninguna matriz!",
             )
 
             agregar_button = ctkButton(
@@ -111,7 +112,9 @@ class MatricesFrame(ctkFrame):
                 height=30,
                 text="Agregar matrices",
                 image=INPUTS_ICON,
-                command=lambda: self.app.home_frame.ir_a_matriz(mostrar=False),  # type: ignore
+                command=lambda: (
+                    self.app.inputs_frame.ir_a_input_mats(mostrar=False)  # type: ignore
+                ),
             )
 
             self.dummy_frame.pack(expand=True, anchor="center")

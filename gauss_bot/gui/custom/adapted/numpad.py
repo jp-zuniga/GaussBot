@@ -5,7 +5,7 @@ Adapted from:
 
 Modified by: Joaquín Zúñiga, on 11/18/2024
 Formatted, type-annotated, and simplified.
-Transformed for use as a calculator-like numpad,
+Transformed for use as a calculator-like numpad
 with mathematical functions for use in this project.
 """
 
@@ -14,10 +14,15 @@ from re import (
     escape,
 )
 
-from typing import TYPE_CHECKING
+from typing import (
+    TYPE_CHECKING,
+    Optional,
+)
+
 from tkinter import (
     END,
     INSERT,
+    Event,
 )
 
 from customtkinter import (
@@ -28,13 +33,11 @@ from customtkinter import (
     ThemeManager,
 )
 
-from gauss_bot import (
-    FUNCTIONS,
-    resize_image,
-)
+from ....icons import NUMPAD_KEYS
+from ....util_funcs import resize_image
 
 if TYPE_CHECKING:
-    from gauss_bot.gui.custom import CustomEntry
+    from ..custom_widgets import CustomEntry
 
 
 class CustomNumpad(ctkTop):
@@ -48,7 +51,6 @@ class CustomNumpad(ctkTop):
         self.focus()
         self.transient()
         self.overrideredirect(True)
-        self.attributes("-topmost", True)
         self.resizable(width=False, height=False)
 
         self.attach = attach
@@ -56,28 +58,35 @@ class CustomNumpad(ctkTop):
         self.hidden = True
 
         self.images: dict[str, ctkImage] = {
-            "pi": resize_image(FUNCTIONS["pi"], (3, 7)),
-            "x": resize_image(FUNCTIONS["x"], (3, 7)),
-            "x^n": resize_image(FUNCTIONS["x^n"], (3, 7)),
-            "b^x": resize_image(FUNCTIONS["b^x"], (3.5, 7.5)),
-            "e^x": resize_image(FUNCTIONS["e^x"], (3.5, 7.5)),
-            "ln(x)": resize_image(FUNCTIONS["ln(x)"]),
-            "sen(x)": resize_image(FUNCTIONS["sen(x)"]),
-            "cos(x)": resize_image(FUNCTIONS["cos(x)"]),
-            "tan(x)": resize_image(FUNCTIONS["tan(x)"]),
+            "pi": resize_image(NUMPAD_KEYS["pi"], (3, 6.4)),
+            "x": resize_image(NUMPAD_KEYS["x"], (3, 6.4)),
+            "x^n": resize_image(NUMPAD_KEYS["x^n"], (3, 7.2)),
+            "b^x": resize_image(NUMPAD_KEYS["b^x"], (3.5, 7.5)),
+            "e^x": resize_image(NUMPAD_KEYS["e^x"], (3.5, 7.5)),
+            "ln(x)": resize_image(NUMPAD_KEYS["ln(x)"]),
+            "sin(x)": resize_image(NUMPAD_KEYS["sin(x)"], (3.8, 7.8)),
+            "cos(x)": resize_image(NUMPAD_KEYS["cos(x)"]),
+            "tan(x)": resize_image(NUMPAD_KEYS["tan(x)"]),
+            "+": resize_image(NUMPAD_KEYS["plus"], (3, 7)),
+            "-": resize_image(NUMPAD_KEYS["minus"], (3, 7)),
+            "*": resize_image(NUMPAD_KEYS["times"], (3, 7)),
+            "/": resize_image(NUMPAD_KEYS["divide"], (3, 7)),
         }
 
         self.key_pad = {
             "row1": ["pi", "x", "x^n"],
             "row2": ["b^x", "e^x", "ln(x)"],
-            "row3": ["sen(x)", "cos(x)", "tan(x)"],
+            "row3": ["sin(x)", "cos(x)", "tan(x)"],
+            "row4": ["+", "-", "*", "/"],
         }
 
-        self.attach.unbind("<Alt_L>")
         self.attach.unbind("<Escape>")
-        self.attach.bind("<Alt_L>", self.render)
+        self.attach.unbind("<Control-Tab>")
+        self.attach.unbind("<Unmap>")
+        self.attach.bind("<Control-Tab>", self.render)
         self.attach.bind("<Escape>", self.hide)
         self.attach.bind("<Configure>", self.hide)
+        self.attach.bind("<Unmap>", self.hide)
 
         self.unbind("<Escape>")
         self.bind("<Escape>", self.hide)
@@ -90,14 +99,17 @@ class CustomNumpad(ctkTop):
             border_width=3,
         )
 
+        self.show_frame.columnconfigure(0, weight=1)
         self.row1 = ctkFrame(self.show_frame, fg_color=self.fg_color)
         self.row2 = ctkFrame(self.show_frame, fg_color=self.fg_color)
         self.row3 = ctkFrame(self.show_frame, fg_color=self.fg_color)
+        self.row4 = ctkFrame(self.show_frame, fg_color=self.fg_color)
 
         self.show_frame.pack(expand=True, fill="both")
-        self.row1.grid(row=1, column=0, pady=(10, 0))
-        self.row2.grid(row=2, column=0, padx=10)
-        self.row3.grid(row=3, column=0, padx=10, pady=(0, 10))
+        self.row1.grid(row=0, column=0, padx=10, pady=(10, 0), sticky="ns")
+        self.row2.grid(row=1, column=0, padx=10, sticky="ns")
+        self.row3.grid(row=2, column=0, padx=10, sticky="ns")
+        self.row4.grid(row=3, column=0, padx=10, pady=(0, 10), sticky="ns")
 
         self.init_keys()
         self.render()
@@ -109,53 +121,30 @@ class CustomNumpad(ctkTop):
 
         hover_color = ThemeManager.theme["CTkFrame"]["top_fg_color"]
         for row, keys in self.key_pad.items():
-            if row == "row1":
-                for i, k in enumerate(keys):
-                    ctkButton(
-                        self.row1,
-                        text="",
-                        image=self.images[k],
-                        width=50,
-                        height=50,
-                        border_spacing=0,
-                        border_width=0,
-                        bg_color=self.fg_color,
-                        fg_color=self.fg_color,
-                        hover_color=hover_color,
-                        command=lambda k=k: self.key_press(k),
-                    ).grid(row=0, column=i, sticky="nsew")
+            match row:
+                case "row1":
+                    master = self.row1
+                case "row2":
+                    master = self.row2
+                case "row3":
+                    master = self.row3
+                case "row4":
+                    master = self.row4
 
-            elif row == "row2":
-                for i, k in enumerate(keys):
-                    ctkButton(
-                        self.row2,
-                        text="",
-                        image=self.images[k],
-                        width=50,
-                        height=50,
-                        border_spacing=0,
-                        border_width=0,
-                        bg_color=self.fg_color,
-                        fg_color=self.fg_color,
-                        hover_color=hover_color,
-                        command=lambda k=k: self.key_press(k),
-                    ).grid(row=0, column=i, sticky="nsew")
-
-            elif row == "row3":
-                for i, k in enumerate(keys):
-                    ctkButton(
-                        self.row3,
-                        text="",
-                        image=self.images[k],
-                        width=50,
-                        height=50,
-                        border_spacing=0,
-                        border_width=0,
-                        bg_color=self.fg_color,
-                        fg_color=self.fg_color,
-                        hover_color=hover_color,
-                        command=lambda k=k: self.key_press(k),
-                    ).grid(row=0, column=i, sticky="nsew")
+            for i, k in enumerate(keys):
+                ctkButton(
+                    master,
+                    text="",
+                    image=self.images[k],
+                    width=50,
+                    height=50,
+                    border_spacing=0,
+                    border_width=0,
+                    bg_color=self.fg_color,
+                    fg_color=self.fg_color,
+                    hover_color=hover_color,
+                    command=lambda k=k: self.key_press(k),
+                ).grid(row=0, column=i, sticky="nsew")
 
             self.hidden = False
 
@@ -169,6 +158,7 @@ class CustomNumpad(ctkTop):
         set_from_end = False
         index_adjust: int = 1
         re_pattern = r"\(([^()]*)\)"
+
         if k == "b^x":
             k = "^()"
             re_pattern = escape("^()")
@@ -179,17 +169,21 @@ class CustomNumpad(ctkTop):
             k = k.replace("^x", "^()")
         elif "(x)" in k:
             k = k.replace("(x)", "()")
+        elif k in ("+", "-", "/"):
+            k = f" {k} "
+            set_from_end = True
         else:
             set_from_end = True
-        self.attach.insert(INSERT, k)
 
+        self.attach.insert(INSERT, k)
         try:
             text = self.attach.get()
             last_match = list(comp(re_pattern).finditer(text))[-1]
+
             if set_from_end:
-                cursor_pos = last_match.end() - 1
+                cursor_pos = INSERT
             else:
-                cursor_pos = last_match.start() + index_adjust
+                cursor_pos = last_match.start() + index_adjust  # type: ignore
 
             self.attach.icursor(cursor_pos)
         except IndexError:
@@ -204,9 +198,9 @@ class CustomNumpad(ctkTop):
         self.disabled = True
         super().destroy()
 
-    def hide(self, event=None) -> str:
+    def hide(self, event: Optional[Event] = None) -> str:
         """
-        Reskin of withdraw() to handle custom key-bindings.
+        Wrapper for withdraw() to handle custom key-bindings.
         """
 
         del event
@@ -217,9 +211,9 @@ class CustomNumpad(ctkTop):
         super().withdraw()
         return "break"
 
-    def render(self, event=None) -> str:
+    def render(self, event: Optional[Event] = None) -> str:
         """
-        Reskin of iconify() to handle custom key-bindings.
+        Wrapper for iconify() to handle custom key-bindings.
         """
 
         del event
@@ -229,6 +223,7 @@ class CustomNumpad(ctkTop):
         if self.hidden:
             self.deiconify()
             self.focus()
+            self.lift()
             self.hidden = False
 
             attach_width = self.attach.winfo_reqwidth()

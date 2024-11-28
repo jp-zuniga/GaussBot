@@ -8,39 +8,51 @@ from typing import (
     Optional,
 )
 
+from tkinter import Variable
 from customtkinter import (
+    CTkFont as ctkFont,
     CTkFrame as ctkFrame,
     CTkLabel as ctkLabel,
 )
 
-from gauss_bot import (
+from ....icons import (
     ACEPTAR_ICON,
+    ELIMINAR_ICON,
     ENTER_ICON,
     INFO_ICON,
     LIMPIAR_ICON,
     MOSTRAR_ICON,
+)
+
+from ....msg_frame_funcs import (
     delete_msg_frame,
+    place_msg_frame,
+)
+
+from ....util_funcs import (
     generate_sep,
     resize_image,
 )
 
-from gauss_bot.models import Func
-from gauss_bot.managers import (
+from ....models import Func
+from ....managers import (
     FuncManager,
     KeyBindingManager,
 )
 
-from gauss_bot.gui.custom import (
+from ...custom import (
     CustomEntry,
+    CustomDropdown,
     CustomNumpad,
     CustomScrollFrame,
+    ErrorFrame,
     IconButton,
-    place_msg_frame,
+    SuccessFrame,
 )
 
 if TYPE_CHECKING:
-    from gauss_bot.gui import GaussUI
-    from gauss_bot.gui.frames import ManejarFuncs
+    from ... import GaussUI
+    from .. import ManejarFuncs
 
 
 class AgregarFuncs(CustomScrollFrame):
@@ -57,18 +69,19 @@ class AgregarFuncs(CustomScrollFrame):
         func_manager: FuncManager,
     ) -> None:
 
-        super().__init__(app, master_tab, corner_radius=0, fg_color="transparent")
+        super().__init__(master_tab, corner_radius=0, fg_color="transparent")
         self.app = app
         self.master_frame = master_frame
         self.func_manager = func_manager
-        self.columnconfigure(0, weight=3)
-        self.columnconfigure(1, weight=1)
+        self.columnconfigure(0, weight=7)
+        self.columnconfigure(1, weight=5)
+
+        self.key_binder = KeyBindingManager(es_matriz=False)
 
         self.func_frame = ctkFrame(self, fg_color="transparent")
         self.func_frame.columnconfigure(0, weight=1)
         self.func_frame.columnconfigure(1, weight=1)
 
-        self.key_binder = KeyBindingManager(es_matriz=False)
         self.msg_frame: Optional[ctkFrame] = None
         self.input_func: Optional[ctkFrame] = None
 
@@ -76,16 +89,16 @@ class AgregarFuncs(CustomScrollFrame):
             self,
             self.app,
             image=INFO_ICON,
-            tooltip_text="\nEl numpad le permite ingresar funciones\n" +
-                         "matemáticas de forma más sencilla.\n\n" +
-                         "Presione ALT para abrirlo, y ESC para cerrarlo.\n\n" +
-                         "Para mejores resultados,\nasegúrese que los argumentos " +
+            tooltip_text="\nEl numpad le permite ingresar funciones" +
+                         "\nmatemáticas de una forma más sencilla.\n" +
+                         "\nMientras el cursor este en la entrada de términos," +
+                         "\npresione CTRL+TAB para abrirlo y ESC para cerrarlo.\n" +
+                         "\nPara mejores resultados,\nasegúrese que los argumentos " +
                          "de la función\nestén en paréntesis, y operaciones " +
-                         "complejas\ncomo multiplicación y división de funciones\n" +
-                         "estén encerradas en paréntesis también.\n",
+                         "complejas\ncomo multiplicación y división de funciones" +
+                         "\nestén encerradas en paréntesis también.\n",
         )
 
-        self.instruct_numpad.tooltip.configure_tooltip(x_offset=30, y_offset=30)
         self.instruct_nombre = ctkLabel(self, text="Nombre de la función:")
         self.nombre_entry = CustomEntry(self, width=40, placeholder_text="f(x)")
 
@@ -96,8 +109,8 @@ class AgregarFuncs(CustomScrollFrame):
 
         self.func_entry = CustomEntry(
             self,
-            width=500,
-            placeholder_text="Presione ALT para abrir el numpad de funciones...",
+            width=400,
+            placeholder_text="Presione CTRL+TAB para abrir el numpad de funciones...",
         )
 
         self.numpad = CustomNumpad(self.func_entry)
@@ -116,7 +129,13 @@ class AgregarFuncs(CustomScrollFrame):
         self.func_entry.bind("<Down>", lambda _: self.key_binder.focus_first())
         self.func_entry.bind("<Return>", lambda _: self.leer_func())
 
-        self.instruct_numpad.grid(row=0, column=0, columnspan=2, padx=5, sticky="n")
+        self.instruct_numpad.grid(
+            row=0, column=0,
+            columnspan=2,
+            padx=5, pady=5,
+            sticky="n",
+        )
+
         self.instruct_nombre.grid(
             row=1, column=0,
             columnspan=2,
@@ -139,7 +158,7 @@ class AgregarFuncs(CustomScrollFrame):
         )
 
         self.func_entry.grid(row=4, column=0, padx=5, pady=(1, 3), sticky="e")
-        self.leer_button.grid(row=4, column=1, padx=5, pady=5, sticky="w")
+        self.leer_button.grid(row=4, column=1, padx=5, pady=(1, 3), sticky="w")
         self.func_frame.grid(
             row=5, column=0,
             columnspan=2,
@@ -159,7 +178,15 @@ class AgregarFuncs(CustomScrollFrame):
             widget.destroy()  # type: ignore
 
         try:
-            new_func = Func(self.nombre_entry.get(), self.func_entry.get())
+            input_nombre = self.nombre_entry.get()
+            input_terms = self.func_entry.get()
+
+            if input_nombre == "":
+                raise ValueError("Debe ingresar el nombre de la función!")
+            if input_terms == "":
+                raise ValueError("Debe ingresar los términos de la función!")
+
+            new_func = Func(input_nombre, input_terms)
         except ValueError as v:
             self.msg_frame = place_msg_frame(
                 parent_frame=self.func_frame,
@@ -211,11 +238,9 @@ class AgregarFuncs(CustomScrollFrame):
             not self.validar_nombre(new_func.nombre)
         ):
             if not self.validar_nombre(new_func.nombre):
-                error_msg = (
-                    "El nombre de la función debe tener la forma 'f(x)'!"
-                    if "x" in new_func.nombre
-                    else "La función debe estar en términos de 'x'!"
-                )
+                error_msg = "El nombre de la función debe tener la forma 'f(x)'!"
+            elif str(new_func.var) not in str(new_func.expr):
+                error_msg = f"La función ingresada no contiene la variable {new_func.var}!"
             else:
                 error_msg = f"Ya existe una función llamada {new_func.nombre}!"
 
@@ -235,7 +260,7 @@ class AgregarFuncs(CustomScrollFrame):
         self.msg_frame = place_msg_frame(
             parent_frame=self.func_frame,
             msg_frame=self.msg_frame,
-            msg=f"La función {new_func.nombre} ha sido agregada exitosamente!",
+            msg=f"La función '{new_func.nombre}' ha sido agregada exitosamente!",
             tipo="success",
             row=2,
             columnspan=2,
@@ -256,7 +281,7 @@ class AgregarFuncs(CustomScrollFrame):
         Valida que el nombre de la función sea válido.
         """
 
-        pattern = r"^[a-z]\([x]\)$"
+        pattern = r"^[a-z]\([a-z]\)$"
         return bool(match(pattern, nombre))
 
     def limpiar_input(self) -> None:
@@ -291,7 +316,7 @@ class MostrarFuncs(CustomScrollFrame):
         func_manager: FuncManager,
     ) -> None:
 
-        super().__init__(app, master_tab, corner_radius=0, fg_color="transparent")
+        super().__init__(master_tab, corner_radius=0, fg_color="transparent")
         self.app = app
         self.master_frame = master_frame
         self.func_manager = func_manager
@@ -299,22 +324,40 @@ class MostrarFuncs(CustomScrollFrame):
 
         self.funcs_guardadas = self.func_manager.get_funcs()
         self.msg_frame: Optional[ctkFrame] = None
+
         self.show_frame = ctkFrame(self, fg_color="transparent")
         self.show_frame.columnconfigure(0, weight=1)
+
+        self.setup_frame()
+
+    def setup_frame(self) -> None:
+        """
+        Inicializa las widgets del frame.
+        """
+
+        delete_msg_frame(self.msg_frame)
+        if not self.funcs_guardadas:
+            self.msg_frame = place_msg_frame(
+                parent_frame=self,
+                msg_frame=self.msg_frame,
+                msg="No se ha guardado ninguna función!",
+                tipo="error",
+            )
+
+            return
 
         IconButton(
             self,
             self.app,
-            width=30,
-            height=30,
+            width=20,
+            height=40,
             corner_radius=16,
             border_width=3,
             border_color=self.app.theme_config["CTkFrame"]["top_fg_color"],
             image=resize_image(MOSTRAR_ICON, (0.75, 1)),
             tooltip_text="Mostrar funciones",
             command=self.show_funcs
-        ).grid(row=0, column=0, padx=5, pady=(5, 0), sticky="n")
-        self.show_frame.grid(row=1, column=0, padx=5, sticky="n")
+        ).grid(row=0, column=0, padx=5, pady=5, sticky="n")
 
     def show_funcs(self) -> None:
         """
@@ -325,20 +368,12 @@ class MostrarFuncs(CustomScrollFrame):
         for widget in self.show_frame.winfo_children():
             widget.destroy()  # type: ignore
 
-        if not self.funcs_guardadas:
-            self.msg_frame = place_msg_frame(
-                parent_frame=self.show_frame,
-                msg_frame=self.msg_frame,
-                msg="No se ha guardado ninguna función!",
-                tipo="error",
-            )
-
-            return
+        self.show_frame.grid(row=1, column=0, padx=5, sticky="n")
 
         ctkLabel(
             self.show_frame,
             text="Funciones ingresadas:",
-            font=("Roboto", 12, "bold"),
+            font=ctkFont(size=12, weight="bold", underline=True),
         ).grid(row=0, column=0, pady=(10, 0), sticky="n")
 
         ctkLabel(
@@ -347,7 +382,7 @@ class MostrarFuncs(CustomScrollFrame):
             image=generate_sep(False, (300, 5)),
         ).grid(row=1, column=0, sticky="n")
 
-        r = 3
+        r = 2
         for func in self.funcs_guardadas:
             ctkLabel(
                 self.show_frame,
@@ -372,6 +407,10 @@ class MostrarFuncs(CustomScrollFrame):
         for widget in self.winfo_children():  # type: ignore
             widget.configure(bg_color="transparent")  # type: ignore
 
+        self.funcs_guardadas = self.func_manager.get_funcs()
+        if isinstance(self.msg_frame, ErrorFrame):
+            self.setup_frame()
+
 
 class EliminarFuncs(CustomScrollFrame):
     """
@@ -386,13 +425,126 @@ class EliminarFuncs(CustomScrollFrame):
         func_manager: FuncManager,
     ) -> None:
 
-        super().__init__(app, master_tab, corner_radius=0, fg_color="transparent")
+        super().__init__(master_tab, corner_radius=0, fg_color="transparent")
         self.app = app
         self.master_frame = master_frame
         self.func_manager = func_manager
+        self.columnconfigure(0, weight=1)
+        self.columnconfigure(1, weight=1)
+
+        self.nombres_funcs = list(self.func_manager.funcs_ingresadas.keys())
+        self.msg_frame: Optional[ctkFrame] = None
+        self.select_func: CustomDropdown
+        self.func_seleccionada = ""
+        self.setup_frame()
+
+    def setup_frame(self) -> None:
+        """
+        Crear y colocar las widgets del frame.
+        """
+
+        delete_msg_frame(self.msg_frame)
+        if len(self.nombres_funcs) == 0:
+            self.msg_frame = place_msg_frame(
+                parent_frame=self,
+                msg_frame=self.msg_frame,
+                msg="No se ha guardado ninguna función!",
+                tipo="error",
+                columnspan=2,
+            )
+
+            return
+
+        # crear widgets
+        instruct_eliminar = ctkLabel(self, text="¿Cuál función desea eliminar?")
+        self.select_func = CustomDropdown(
+            self,
+            height=30,
+            width=60,
+            values=self.nombres_funcs,
+            command=self.update_func,
+        )
+
+        button = IconButton(
+            self,
+            self.app,
+            image=ELIMINAR_ICON,
+            tooltip_text="Eliminar función",
+            command=self.eliminar_func,
+        )
+
+        self.func_seleccionada = self.select_func.get()
+
+        # colocar widgets
+        instruct_eliminar.grid(row=0, column=0, columnspan=2, padx=5, pady=5, sticky="n")
+        self.select_func.grid(row=1, column=0, padx=5, pady=5, sticky="e")
+        button.grid(row=1, column=1, padx=5, pady=5, sticky="w")
+
+    def eliminar_func(self) -> None:
+        """
+        Elimina la función seleccionada.
+        """
+
+        delete_msg_frame(self.msg_frame)
+        self.update_func(self.select_func.get())
+        self.func_manager.funcs_ingresadas.pop(self.func_seleccionada)
+
+        self.msg_frame = place_msg_frame(
+            parent_frame=self,
+            msg_frame=self.msg_frame,
+            msg=f"Función '{self.func_seleccionada}' eliminada!",
+            tipo="success",
+            row=2,
+            columnspan=2,
+        )
+
+        # mandar a actualizar los datos
+        self.app.analisis.update_all()  # type: ignore
+        self.master_frame.update_all()
 
     def update_frame(self) -> None:
         """
-        Actualiza los datos del dropdown y
-        los backgrounds de todas las widgets.
+        Actualiza el frame y sus datos.
         """
+
+        self.nombres_funcs = list(self.func_manager.funcs_ingresadas.keys())
+
+        if (
+            len(self.nombres_funcs) == 0
+            and
+            isinstance(self.msg_frame, SuccessFrame)
+        ):
+
+            def clear_after_wait() -> None:
+                delete_msg_frame(self.msg_frame)
+                self.msg_frame = place_msg_frame(
+                    parent_frame=self,
+                    msg_frame=self.msg_frame,
+                    msg="No se ha guardado ninguna función!",
+                    tipo="error",
+                    columnspan=2,
+                )
+
+                for widget in self.winfo_children():
+                    if not isinstance(widget, ctkFrame):
+                        widget.destroy()
+            self.after(2000, clear_after_wait)
+
+        elif isinstance(self.msg_frame, ErrorFrame):
+            self.setup_frame()
+        else:
+            for widget in self.winfo_children():
+                widget.configure(bg_color="transparent")  # type: ignore
+            self.select_func.configure(
+                variable=Variable(value=self.nombres_funcs[0]),
+                values=self.nombres_funcs,
+            )
+
+            self.after(2000, lambda: delete_msg_frame(self.msg_frame))
+
+    def update_func(self, valor: str) -> None:
+        """
+        Actualiza func_seleccionada con el valor seleccionado en el dropdown.
+        """
+
+        self.func_seleccionada = valor

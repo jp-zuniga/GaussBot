@@ -37,31 +37,39 @@ from .operaciones_mats import (
 )
 
 from .operaciones_vecs import (
-    VSumaRestaTab,
-    VMultiplicacionTab,
+    MagnitudTab,
+    SumaRestaTab as VSRTab,
+    MultiplicacionTab as VMTab,
 )
 
+from .resolver_sis import ResolverSisFrame
 from .raices import RaicesFrame
+from .derivadas import DerivadasFrame
+from .integrales import IntegralesFrame
 
 __all__ = [
     "AgregarFuncs",
-    "MostrarFuncs",
-    "EliminarFuncs",
-    "AgregarSistemas",
-    "MostrarSistemas",
-    "EliminarSistemas",
     "AgregarMats",
-    "MostrarMats",
-    "EliminarMats",
+    "AgregarSistemas",
     "AgregarVecs",
-    "MostrarVecs",
-    "EliminarVecs",
-    "SumaRestaTab",
-    "MultiplicacionTab",
-    "TransposicionTab",
+    "DerivadasFrame",
     "DeterminanteTab",
+    "EliminarFuncs",
+    "EliminarMats",
+    "EliminarSistemas",
+    "EliminarVecs",
     "InversaTab",
-    "VSumaRestaTab",
-    "VMultiplicacionTab",
+    "IntegralesFrame",
+    "MagnitudTab",
+    "MostrarFuncs",
+    "MostrarMats",
+    "MostrarSistemas",
+    "MostrarVecs",
+    "MultiplicacionTab",
     "RaicesFrame",
+    "ResolverSisFrame",
+    "SumaRestaTab",
+    "TransposicionTab",
+    "VMTab",
+    "VSRTab",
 ]

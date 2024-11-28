@@ -20,36 +20,39 @@ from customtkinter import (
     CTkLabel as ctkLabel,
 )
 
-from gauss_bot import (
+from ....icons import (
     ENTER_ICON,
     SHUFFLE_ICON,
     ACEPTAR_ICON,
     LIMPIAR_ICON,
     MOSTRAR_ICON,
     ELIMINAR_ICON,
-    delete_msg_frame,
-    generate_sep,
 )
 
-from gauss_bot.models import Matriz
-from gauss_bot.managers import (
+from ....msg_frame_funcs import (
+    delete_msg_frame,
+    place_msg_frame,
+)
+
+from ....util_funcs import generate_sep
+from ....models import Matriz
+from ....managers import (
     KeyBindingManager,
     MatricesManager,
 )
 
-from gauss_bot.gui.custom import (
+from ...custom import (
     IconButton,
     CustomEntry,
     CustomDropdown,
     CustomScrollFrame,
     ErrorFrame,
     SuccessFrame,
-    place_msg_frame,
 )
 
 if TYPE_CHECKING:
-    from gauss_bot.gui import GaussUI
-    from gauss_bot.gui.frames import ManejarSistemas
+    from ... import GaussUI
+    from .. import ManejarSistemas
 
 
 class AgregarSistemas(CustomScrollFrame):
@@ -65,7 +68,7 @@ class AgregarSistemas(CustomScrollFrame):
         mats_manager: MatricesManager
     ) -> None:
 
-        super().__init__(app, master_tab, corner_radius=0, fg_color="transparent")
+        super().__init__(master_tab, corner_radius=0, fg_color="transparent")
         self.app = app
         self.master_frame = master_frame
         self.mats_manager = mats_manager
@@ -365,14 +368,14 @@ class AgregarSistemas(CustomScrollFrame):
         self.msg_frame = place_msg_frame(
             parent_frame=self,
             msg_frame=self.msg_frame,
-            msg="El sistema se ha agregado exitosamente!",
+            msg=f"El sistema '{nombre_nuevo_sis}' se ha agregado exitosamente!",
             tipo="success",
             row=3,
         )
 
         # mandar a actualizar los datos
         self.master_frame.update_all()
-        self.app.sistemas.update_frame()  # type: ignore
+        self.app.sistemas.update_all()  # type: ignore
 
     def validar_dimensiones(self) -> Optional[tuple[int, int]]:
         """
@@ -426,14 +429,14 @@ class MostrarSistemas(CustomScrollFrame):
         mats_manager: MatricesManager
     ) -> None:
 
-        super().__init__(app, master_tab, corner_radius=0, fg_color="transparent")
+        super().__init__(master_tab, corner_radius=0, fg_color="transparent")
         self.app = app
         self.master_frame = master_frame
         self.mats_manager = mats_manager
         self.columnconfigure(0, weight=1)
         self.columnconfigure(1, weight=1)
 
-        self.print_frame: Optional[ctkFrame] = None
+        self.show_frame: Optional[ctkFrame] = None
 
         # definir los filtros que se mandaran
         # a self.mats_manager.get_sistemas()
@@ -443,71 +446,91 @@ class MostrarSistemas(CustomScrollFrame):
             "Sistemas calculados": 1,
         }
 
-        # crear widgets
-        select_label = ctkLabel(self, text="Seleccione un filtro:")
+        self.select_opcion: CustomDropdown
+        self.opcion_seleccionada: Optional[int] = None
+
+        self.setup_frame()
+
+    def setup_frame(self) -> None:
+        """
+        Inicializa las widgets del frame.
+        """
+
+        delete_msg_frame(self.show_frame)
+        if len(self.mats_manager.sis_ingresados.keys()) == 0:
+            self.show_frame = place_msg_frame(
+                parent_frame=self,
+                msg_frame=self.show_frame,
+                msg="No se ha guardado ningún sistema de ecuaciones!",
+                tipo="error",
+                columnspan=2,
+            )
+
+            return
+
         self.select_opcion = CustomDropdown(
             self,
             height=30,
+            variable=Variable(value="Seleccione un filtro:"),
             values=list(self.opciones.keys()),
             command=self.update_opcion,
         )
 
-        self.opcion_seleccionada = self.opciones[self.select_opcion.get()]
-        mostrar_button = IconButton(
+        self.select_opcion.grid(row=0, column=0, ipadx=10, padx=5, pady=5, sticky="e")
+        IconButton(
             self,
             self.app,
             image=MOSTRAR_ICON,
             tooltip_text="Mostrar",
             command=self.mostrar_sis
-        )
-
-        # colocar widgets
-        select_label.grid(row=0, column=0, columnspan=2, padx=5, pady=5, sticky="n")
-        self.select_opcion.grid(row=1, column=0, ipadx=10, padx=5, pady=5, sticky="e")
-        mostrar_button.grid(row=1, column=1, padx=5, pady=5, sticky="w")
+        ).grid(row=0, column=1, padx=5, pady=5, sticky="w")
 
     def mostrar_sis(self) -> None:
         """
         Muestra los sistemas guardados, usando el filtro seleccionado.
         """
 
-        delete_msg_frame(self.print_frame)
-        self.update_opcion(self.select_opcion.get())
-
-        sis_text = self.mats_manager.get_sistemas(self.opcion_seleccionada)
-        if "!" in sis_text:
-            self.print_frame = place_msg_frame(
+        delete_msg_frame(self.show_frame)
+        if "filtro" in self.select_opcion.get():
+            self.show_frame = place_msg_frame(
                 parent_frame=self,
-                msg_frame=self.print_frame,
-                msg=sis_text,
+                msg_frame=self.show_frame,
+                msg="Debe seleccionar un filtro!",
                 tipo="error",
-                row=2,
+                row=1,
                 columnspan=2,
             )
-        else:
-            self.print_frame = place_msg_frame(
-                parent_frame=self,
-                msg_frame=self.print_frame,
-                msg=sis_text,
-                tipo="resultado",
-                row=2,
-                columnspan=2,
-            )
-        self.print_frame.columnconfigure(0, weight=1)  # type: ignore
+
+            return
+
+        self.update_opcion(self.select_opcion.get())
+        sis_text = self.mats_manager.get_sistemas(self.opcion_seleccionada)  # type: ignore
+        self.show_frame = place_msg_frame(
+            parent_frame=self,
+            msg_frame=self.show_frame,
+            msg=sis_text,
+            tipo="resultado",
+            row=1,
+            columnspan=2,
+        )
+
+        self.show_frame.columnconfigure(0, weight=1)  # type: ignore
 
     def update_frame(self) -> None:
         """
-        Elimina self.print_frame y configura los backgrounds.
+        Elimina self.show_frame y configura los backgrounds.
         """
 
-        # si print_frame no estaba inicializado,
-        # .destroy() tira error, pero no pasa nada
-        try:
-            self.print_frame.destroy()  # type: ignore
-        except AttributeError:
-            pass
+        delete_msg_frame(self.show_frame)
         for widget in self.winfo_children():
             widget.configure(bg_color="transparent")  # type: ignore
+
+        if isinstance(self.show_frame, ErrorFrame):
+            self.setup_frame()
+        else:
+            self.select_opcion.configure(
+                variable=Variable(value="Seleccione un filtro:"),
+            )
 
     def update_opcion(self, valor: str) -> None:
         """
@@ -531,7 +554,7 @@ class EliminarSistemas(CustomScrollFrame):
         mats_manager: MatricesManager
     ) -> None:
 
-        super().__init__(app, master_tab, corner_radius=0, fg_color="transparent")
+        super().__init__(master_tab, corner_radius=0, fg_color="transparent")
         self.app = app
         self.master_frame = master_frame
         self.mats_manager = mats_manager
@@ -540,8 +563,10 @@ class EliminarSistemas(CustomScrollFrame):
 
         self.nombres_sistemas = list(self.mats_manager.sis_ingresados.keys())
         self.msg_frame: Optional[ctkFrame] = None
+
         self.select_sis: CustomDropdown
         self.sis_seleccionado = ""
+
         self.setup_frame()
 
     def setup_frame(self) -> None:
@@ -554,10 +579,11 @@ class EliminarSistemas(CustomScrollFrame):
             self.msg_frame = place_msg_frame(
                 parent_frame=self,
                 msg_frame=self.msg_frame,
-                msg="No hay sistemas de ecuaciones guardados!",
+                msg="No se ha guardado ningún sistema de ecuaciones!",
                 tipo="error",
                 columnspan=2,
             )
+
             return
 
         # crear widgets
@@ -604,7 +630,7 @@ class EliminarSistemas(CustomScrollFrame):
         )
 
         self.master_frame.update_all()
-        self.app.sistemas.update_frame()  # type: ignore
+        self.app.sistemas.update_all()  # type: ignore
 
     def update_frame(self) -> None:
         """
@@ -624,7 +650,7 @@ class EliminarSistemas(CustomScrollFrame):
                 self.msg_frame = place_msg_frame(
                     parent_frame=self,
                     msg_frame=self.msg_frame,
-                    msg="No hay sistemas guardados!",
+                    msg="No se ha guardado ningún sistema de ecuaciones!",
                     tipo="error",
                     columnspan=2,
                 )

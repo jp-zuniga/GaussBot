@@ -20,35 +20,38 @@ from customtkinter import (
     CTkLabel as ctkLabel,
 )
 
-from gauss_bot import (
+from ....icons import (
     ENTER_ICON,
     SHUFFLE_ICON,
     ACEPTAR_ICON,
     LIMPIAR_ICON,
     MOSTRAR_ICON,
     ELIMINAR_ICON,
-    delete_msg_frame,
 )
 
-from gauss_bot.models import Matriz
-from gauss_bot.managers import (
+from ....msg_frame_funcs import (
+    delete_msg_frame,
+    place_msg_frame,
+)
+
+from ....models import Matriz
+from ....managers import (
     KeyBindingManager,
     MatricesManager,
 )
 
-from gauss_bot.gui.custom import (
+from ...custom import (
     IconButton,
     CustomEntry,
     CustomDropdown,
     CustomScrollFrame,
     ErrorFrame,
     SuccessFrame,
-    place_msg_frame,
 )
 
 if TYPE_CHECKING:
-    from gauss_bot.gui import GaussUI
-    from gauss_bot.gui.frames import ManejarMats
+    from ... import GaussUI
+    from .. import ManejarMats
 
 
 class AgregarMats(CustomScrollFrame):
@@ -64,7 +67,7 @@ class AgregarMats(CustomScrollFrame):
         mats_manager: MatricesManager
     ) -> None:
 
-        super().__init__(app, master_tab, corner_radius=0, fg_color="transparent")
+        super().__init__(master_tab, corner_radius=0, fg_color="transparent")
         self.app = app
         self.master_frame = master_frame
         self.mats_manager = mats_manager
@@ -351,7 +354,7 @@ class AgregarMats(CustomScrollFrame):
         self.msg_frame = place_msg_frame(
             parent_frame=self,
             msg_frame=self.msg_frame,
-            msg="La matriz se ha agregado exitosamente!",
+            msg=f"La matriz '{nombre_nueva_matriz}' se ha agregado exitosamente!",
             tipo="success",
             row=3,
         )
@@ -413,14 +416,14 @@ class MostrarMats(CustomScrollFrame):
         mats_manager: MatricesManager
     ) -> None:
 
-        super().__init__(app, master_tab, corner_radius=0, fg_color="transparent")
+        super().__init__(master_tab, corner_radius=0, fg_color="transparent")
         self.app = app
         self.master_frame = master_frame
         self.mats_manager = mats_manager
         self.columnconfigure(0, weight=1)
         self.columnconfigure(1, weight=1)
 
-        self.print_frame: Optional[ctkFrame] = None
+        self.show_frame: Optional[ctkFrame] = None
 
         # definir los filtros que se mandaran
         # a self.mats_manager.get_matrices()
@@ -430,71 +433,96 @@ class MostrarMats(CustomScrollFrame):
             "Matrices calculadas": 1,
         }
 
-        # crear widgets
-        select_label = ctkLabel(self, text="Seleccione un filtro:")
+        self.select_opcion: CustomDropdown
+        self.opcion_seleccionada: Optional[int] = None
+
+        self.setup_frame()
+
+    def setup_frame(self) -> None:
+        """
+        Inicializa las widgets del frame.
+        """
+
+        if len(self.mats_manager.mats_ingresadas.keys()) == 0:
+            self.show_frame = place_msg_frame(
+                parent_frame=self,
+                msg_frame=self.show_frame,
+                msg="No se ha guardado ninguna matriz!",
+                tipo="error",
+                columnspan=2,
+            )
+
+            return
+
         self.select_opcion = CustomDropdown(
             self,
             height=30,
+            variable=Variable(value="Seleccione un filtro:"),
             values=list(self.opciones.keys()),
             command=self.update_opcion,
         )
 
-        self.opcion_seleccionada = self.opciones[self.select_opcion.get()]
-        mostrar_button = IconButton(
+        self.select_opcion.grid(row=0, column=0, ipadx=10, padx=5, pady=5, sticky="e")
+        IconButton(
             self,
             self.app,
             image=MOSTRAR_ICON,
             tooltip_text="Mostrar",
             command=self.show_mats
-        )
+        ).grid(row=0, column=1, padx=5, pady=5, sticky="w")
 
-        # colocar widgets
-        select_label.grid(row=0, column=0, columnspan=2, padx=5, pady=5, sticky="n")
-        self.select_opcion.grid(row=1, column=0, ipadx=10, padx=5, pady=5, sticky="e")
-        mostrar_button.grid(row=1, column=1, padx=5, pady=5, sticky="w")
 
     def show_mats(self) -> None:
         """
         Muestra las matrices guardadas, usando el filtro seleccionado.
         """
 
-        delete_msg_frame(self.print_frame)
-        self.update_opcion(self.select_opcion.get())
-
-        mats_text = self.mats_manager.get_matrices(self.opcion_seleccionada)
-        if "!" in mats_text:  # "!" significa que no hay matrices
-            self.print_frame = place_msg_frame(
+        delete_msg_frame(self.show_frame)
+        if "filtro" in self.select_opcion.get():
+            self.show_frame = place_msg_frame(
                 parent_frame=self,
-                msg_frame=self.print_frame,
-                msg=mats_text,
+                msg_frame=self.show_frame,
+                msg="Debe seleccionar un filtro!",
                 tipo="error",
-                row=2,
+                row=1,
                 columnspan=2,
             )
+
+            return
+
+        self.update_opcion(self.select_opcion.get())
+        mats_text = self.mats_manager.get_matrices(self.opcion_seleccionada)  # type: ignore
+
+        if "!" in mats_text:
+            tipo = "error"
         else:
-            self.print_frame = place_msg_frame(
-                parent_frame=self,
-                msg_frame=self.print_frame,
-                msg=mats_text,
-                tipo="resultado",
-                row=2,
-                columnspan=2,
-            )
-        self.print_frame.columnconfigure(0, weight=1)  # type: ignore
+            tipo = "resultado"
+
+        self.show_frame = place_msg_frame(
+            parent_frame=self,
+            msg_frame=self.show_frame,
+            msg=mats_text,
+            tipo=tipo,  # type: ignore
+            row=1,
+            columnspan=2,
+        )
+
+        self.show_frame.columnconfigure(0, weight=1)  # type: ignore
 
     def update_frame(self) -> None:
         """
-        Elimina self.print_frame y configura los backgrounds.
+        Elimina self.show_frame y configura los backgrounds.
         """
 
-        # si print_frame no estaba inicializado,
-        # .destroy() tira error, pero no pasa nada
-        try:
-            self.print_frame.destroy()  # type: ignore
-        except AttributeError:
-            pass
         for widget in self.winfo_children():
             widget.configure(bg_color="transparent")  # type: ignore
+
+        if isinstance(self.show_frame, ErrorFrame):
+            self.setup_frame()
+        else:
+            self.select_opcion.configure(
+                variable=Variable(value="Seleccione un filtro:"),
+            )
 
     def update_opcion(self, valor: str) -> None:
         """
@@ -518,7 +546,7 @@ class EliminarMats(CustomScrollFrame):
         mats_manager: MatricesManager
     ) -> None:
 
-        super().__init__(app, master_tab, corner_radius=0, fg_color="transparent")
+        super().__init__(master_tab, corner_radius=0, fg_color="transparent")
         self.app = app
         self.master_frame = master_frame
         self.mats_manager = mats_manager
@@ -527,8 +555,10 @@ class EliminarMats(CustomScrollFrame):
 
         self.nombres_matrices = list(self.mats_manager.mats_ingresadas.keys())
         self.msg_frame: Optional[ctkFrame] = None
+
         self.select_mat: CustomDropdown
         self.mat_seleccionada = ""
+
         self.setup_frame()
 
     def setup_frame(self) -> None:
@@ -541,10 +571,11 @@ class EliminarMats(CustomScrollFrame):
             self.msg_frame = place_msg_frame(
                 parent_frame=self,
                 msg_frame=self.msg_frame,
-                msg="No hay matrices guardadas!",
+                msg="No se ha guardado ninguna matriz!",
                 tipo="error",
                 columnspan=2,
             )
+
             return
 
         # crear widgets
@@ -613,7 +644,7 @@ class EliminarMats(CustomScrollFrame):
                 self.msg_frame = place_msg_frame(
                     parent_frame=self,
                     msg_frame=self.msg_frame,
-                    msg="No hay matrices guardadas!",
+                    msg="No se ha guardado ninguna matriz!",
                     tipo="error",
                     columnspan=2,
                 )

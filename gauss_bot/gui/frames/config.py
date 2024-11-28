@@ -18,18 +18,15 @@ from customtkinter import (
     set_default_color_theme as set_theme,
 )
 
-from gauss_bot import (
-    THEMES_PATH,
-    get_dict_key,
-)
-
-from gauss_bot.gui.custom import (
+from ... import THEMES_PATH
+from ...util_funcs import get_dict_key
+from ..custom import (
     CustomDropdown,
     SuccessFrame,
 )
 
 if TYPE_CHECKING:
-    from gauss_bot.gui import GaussUI
+    from .. import GaussUI
 
 
 class ConfigFrame(ctkFrame):
@@ -49,9 +46,6 @@ class ConfigFrame(ctkFrame):
             "130%": 1.3,
             "140%": 1.4,
             "150%": 1.5,
-            "160%": 1.6,
-            "170%": 1.7,
-            "180%": 1.8,
         }
 
         self.modos_dict = {
@@ -151,12 +145,12 @@ class ConfigFrame(ctkFrame):
 
         # mandar a actualizar todo
         self.app.set_icon(self.app.modo_actual)
+        self.update_frame()
         self.app.inputs_frame.update_all()  # type: ignore
         self.app.matrices.update_all()  # type: ignore
         self.app.vectores.update_all()  # type: ignore
         self.app.analisis.update_all()  # type: ignore
-        self.app.sistemas.update_frame()  # type: ignore
-        self.update_frame()
+        self.app.sistemas.update_all()  # type: ignore
 
     def cambiar_tema(self, tema_seleccionado: str) -> None:
         """
@@ -177,7 +171,7 @@ class ConfigFrame(ctkFrame):
                 "El cambio tomará efecto al reiniciar la aplicación."
         )
 
-        self.msg_frame.grid(row=3, column=1, pady=30)
+        self.msg_frame.grid(row=3, column=1, padx=10, pady=30)
 
     def update_frame(self) -> None:
         """

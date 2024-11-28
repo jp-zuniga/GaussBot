@@ -7,10 +7,7 @@ Modified by: Joaquín Zúñiga, on 11/8/2024.
 Formatted file and added type annotations for personal use.
 """
 
-from typing import (
-    TYPE_CHECKING,
-    Optional,
-)
+from typing import Optional
 
 from tkinter import Canvas
 from customtkinter import (
@@ -19,14 +16,10 @@ from customtkinter import (
     CTkScrollbar as ctkScrollbar,
 )
 
-if TYPE_CHECKING:
-    from gauss_bot.gui import GaussUI
-
 
 class CustomScrollFrame(ctkFrame):
     def __init__(
         self,
-        app: "GaussUI",
         master: ctkFrame,
         width: int = 800,
         height: int = 400,
@@ -37,7 +30,6 @@ class CustomScrollFrame(ctkFrame):
         **kwargs,
     ):
 
-        self.app = app
         self.parent_frame = ctkFrame(master=master, **kwargs)
         self.bg_color = self.parent_frame.cget("bg_color")
 

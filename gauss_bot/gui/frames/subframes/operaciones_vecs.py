@@ -3,6 +3,11 @@ Implementación de todos los frames
 de operaciones con vectores.
 """
 
+from decimal import (
+    Decimal,
+    getcontext,
+)
+
 from fractions import Fraction
 from random import choice
 from typing import (
@@ -13,33 +18,139 @@ from typing import (
 from tkinter import Variable
 from customtkinter import (
     CTkButton as ctkButton,
+    CTkFont as ctkFont,
     CTkFrame as ctkFrame,
     CTkLabel as ctkLabel,
     CTkTabview as ctkTabview,
 )
 
-from gauss_bot import (
+from ....icons import (
+    ENTER_ICON,
+    INFO_ICON,
     INPUTS_ICON,
-    delete_msg_frame,
-    delete_msg_if,
-    generate_range,
-    get_dict_key
 )
 
-from gauss_bot.managers import VectoresManager
-from gauss_bot.gui.custom import (
-    CustomEntry,
-    CustomDropdown,
-    CustomScrollFrame,
+from ....msg_frame_funcs import (
+    delete_msg_frame,
+    delete_msg_if,
     place_msg_frame,
 )
 
+from ....util_funcs import (
+    generate_range,
+    get_dict_key,
+)
+
+from ....models import Vector
+from ....managers import VectoresManager
+from ...custom import (
+    CustomEntry,
+    CustomDropdown,
+    CustomScrollFrame,
+    IconButton,
+)
+
 if TYPE_CHECKING:
-    from gauss_bot.gui import GaussUI
-    from gauss_bot.gui.frames import VectoresFrame
+    from ... import GaussUI
+    from .. import VectoresFrame
+
+getcontext().prec = 8
 
 
-class VSumaRestaTab(CustomScrollFrame):
+class MagnitudTab(CustomScrollFrame):
+    """
+    Frame para calcular la magnitud de un vector ingresado por el usuario.
+    """
+
+    def __init__(
+        self,
+        app: "GaussUI",
+        master_tab: ctkFrame,
+        master_frame: "VectoresFrame",
+        vecs_manager: VectoresManager
+    ) -> None:
+
+        super().__init__(master_tab, corner_radius=0, fg_color="transparent")
+        self.master_frame = master_frame
+        self.app = app
+        self.vecs_manager = vecs_manager
+        self.columnconfigure(0, weight=1)
+        self.columnconfigure(2, weight=1)
+
+        self.msg_frame: Optional[ctkFrame] = None
+
+        # crear widgets
+        instruct_m = ctkLabel(
+            self,
+            text="Seleccione un vector del para calcular su magnitud:",
+        )
+
+        self.select_vec = CustomDropdown(
+            self,
+            width=60,
+            values=self.master_frame.nombres_vectores,
+            variable=Variable(value=self.master_frame.nombres_vectores[0]),
+            command=self.update_vec,
+        )
+
+        self.vec = self.select_vec.get()
+        calcular_button = ctkButton(
+            self,
+            height=30,
+            text="Calcular",
+            command=self.calcular_magnitud,
+        )
+
+        self.resultado_frame = ctkFrame(self, fg_color="transparent")
+
+        # colocar widgets
+        instruct_m.grid(row=0, column=0, columnspan=3, padx=5, pady=5, sticky="n")
+        self.select_vec.grid(row=1, column=0, padx=5, pady=5, sticky="e")
+        calcular_button.grid(row=1, column=1, padx=5, pady=5, sticky="ew")
+
+    def calcular_magnitud(self) -> None:
+        """
+        Calcula la magnitud del vector seleccionado.
+        """
+
+        self.resultado_frame.grid(
+            row=2, column=0,
+            columnspan=3,
+            padx=5, pady=5,
+            sticky="n",
+        )
+
+        delete_msg_frame(self.msg_frame)
+        self.update_vec(self.select_vec.get())
+        vec = self.vecs_manager.vecs_ingresados[self.vec]
+
+        header = f"|| {self.vec} ||"
+        resultado = Decimal(float(vec.magnitud())).normalize()
+
+        self.msg_frame = place_msg_frame(
+            parent_frame=self.resultado_frame,
+            msg_frame=self.msg_frame,
+            msg=f"{header}  =  {resultado}",
+            tipo="resultado",
+        )
+
+    def update_frame(self) -> None:
+        """
+        Actualiza los backgrounds y los datos del frame.
+        """
+
+        for widget in self.winfo_children():  # type: ignore
+            widget.configure(bg_color="transparent")  # type: ignore
+
+    def update_vec(self, valor: str) -> None:
+        """
+        Actualiza el valor de self.vec con el valor seleccionado en el dropdown.
+        """
+
+        self.vec = valor
+
+
+class SumaRestaTab(CustomScrollFrame):
     """
     Frame para sumar y restar vectores ingresados por el usuario.
     """
@@ -52,7 +163,7 @@ class VSumaRestaTab(CustomScrollFrame):
         vecs_manager: VectoresManager
     ) -> None:
 
-        super().__init__(app, master_tab, corner_radius=0, fg_color="transparent")
+        super().__init__(master_tab, corner_radius=0, fg_color="transparent")
         self.master_frame = master_frame
         self.app = app
         self.vecs_manager = vecs_manager
@@ -101,7 +212,7 @@ class VSumaRestaTab(CustomScrollFrame):
         self.select_operacion = CustomDropdown(
             self,
             width=40,
-            font=("Roboto", 16),
+            font=ctkFont(size=16),
             values=list(self.operaciones.values()),
             variable=Variable(value=self.operaciones[default]),
             command=self.update_operacion,
@@ -255,7 +366,7 @@ class VSumaRestaTab(CustomScrollFrame):
         self.vec2 = valor
 
 
-class VMultiplicacionTab(CustomScrollFrame):
+class MultiplicacionTab(CustomScrollFrame):
     """
     Frame para realizar multiplicaciones de vectores por escalares,
     producto punto y producto matriz-vector.
@@ -269,7 +380,7 @@ class VMultiplicacionTab(CustomScrollFrame):
         vecs_manager: VectoresManager
     ) -> None:
 
-        super().__init__(app, master_tab, corner_radius=0, fg_color="transparent")
+        super().__init__(master_tab, corner_radius=0, fg_color="transparent")
         self.master_frame = master_frame
         self.app = app
         self.vecs_manager = vecs_manager
@@ -279,6 +390,7 @@ class VMultiplicacionTab(CustomScrollFrame):
         self.msg_frame: Optional[ctkFrame] = None
         self.select_escalar_vec: CustomDropdown
         self.escalar_entry: CustomEntry
+        self.dimensiones_entry: CustomEntry
         self.select_vec1: CustomDropdown
         self.select_vec2: CustomDropdown
         self.select_vmat: CustomDropdown
@@ -296,6 +408,7 @@ class VMultiplicacionTab(CustomScrollFrame):
         # crear tabs
         self.tab_escalar = self.tabview.add("Escalar por Vector")
         self.tab_prod_punto = self.tabview.add("Producto Punto")
+        self.tab_prod_cruz = self.tabview.add("Producto Cruz")
         self.tab_mat_vec = self.tabview.add("Producto Matriz-Vector")
         self.setup_tabs()
 
@@ -312,13 +425,15 @@ class VMultiplicacionTab(CustomScrollFrame):
 
         # crear frames de resultado
         self.resultado_escalar = ctkFrame(self.tab_escalar, fg_color="transparent")
-        self.resultado_vecs = ctkFrame(self.tab_prod_punto, fg_color="transparent")
+        self.resultado_punto = ctkFrame(self.tab_prod_punto, fg_color="transparent")
+        self.resultado_cruz = ctkFrame(self.tab_prod_cruz, fg_color="transparent")
         self.resultado_mat_vec = ctkFrame(
             self.tab_mat_vec, fg_color="transparent"
         )
 
         self.setup_escalar_tab()
         self.setup_prod_punto_tab()
+        self.setup_prod_cruz_tab()
 
         if len(self.master_frame.nombres_matrices) >= 1:
             self.setup_mat_vec_tab()
@@ -347,7 +462,7 @@ class VMultiplicacionTab(CustomScrollFrame):
         delete_msg_frame(self.msg_frame)
 
         # crear widgets
-        operador_label = ctkLabel(self.tab_escalar, text="•", font=("Roboto", 16))
+        operador_label = ctkLabel(self.tab_escalar, text="•", font=ctkFont(size=16))
         instruct_e = ctkLabel(
             self.tab_escalar,
             text="Seleccione el vector e ingrese el escalar:",
@@ -382,7 +497,7 @@ class VMultiplicacionTab(CustomScrollFrame):
 
         # colocar widgets
         instruct_e.grid(row=0, column=0, columnspan=3, padx=5, pady=5, sticky="n")
-        self.escalar_entry.grid(row=1, column=0, ipadx=5, padx=5, pady=5, sticky="e")
+        self.escalar_entry.grid(row=1, column=0, padx=5, pady=5, sticky="e")
         operador_label.grid(row=1, column=1, padx=5, pady=5, sticky="ew")
         self.select_escalar_vec.grid(
             row=1, column=2, padx=5, pady=5, sticky="w"
@@ -397,7 +512,7 @@ class VMultiplicacionTab(CustomScrollFrame):
 
     def setup_prod_punto_tab(self) -> None:
         """
-        Setup de la tab para multiplicar vectores.
+        Setup de la tab para calcular el producto punto de dos vectores.
         """
 
         delete_msg_frame(self.msg_frame)
@@ -411,7 +526,7 @@ class VMultiplicacionTab(CustomScrollFrame):
         operador_label = ctkLabel(
             self.tab_prod_punto,
             text=".",
-            font=("Roboto", 16),
+            font=ctkFont(size=26),
         )
 
         instruct_v = ctkLabel(
@@ -459,6 +574,130 @@ class VMultiplicacionTab(CustomScrollFrame):
             sticky="n",
         )
 
+    def setup_prod_cruz_tab(self) -> None:
+        """
+        Setup de la tab para multiplicar vectores.
+        """
+
+        delete_msg_frame(self.msg_frame)
+
+        ctkLabel(
+            self.tab_prod_cruz,
+            text="Ingrese las dimensiones:",
+        ).grid(row=0, column=0, padx=5, pady=5, sticky="e")
+
+        self.dimensiones_entry = CustomEntry(
+            self.tab_prod_cruz,
+            placeholder_text="3",
+            width=40,
+        )
+
+        self.dimensiones_entry.grid(
+            row=0, column=1,
+            padx=5, pady=5,
+            sticky="n",
+        )
+
+        IconButton(
+            self.tab_prod_cruz,
+            app=self.app,
+            image=ENTER_ICON,
+            tooltip_text="Ingresar dimensiones",
+            command=lambda: setup_selections(self.dimensiones_entry.get()),
+        ).grid(row=0, column=2, padx=5, pady=5, sticky="w")
+
+        def setup_selections(input_dims: str) -> None:
+            delete_msg_frame(self.msg_frame)
+            try:
+                dimensiones = int(input_dims)
+                if dimensiones <= 1:
+                    raise ValueError
+                if dimensiones - 1 > len(self.master_frame.nombres_vectores):
+                    raise ValueError(
+                        f"No hay suficientes vectores en R{dimensiones} " +
+                         "para calcular un producto cruz!"
+                    )
+            except ValueError as e:
+                str_e = str(e)
+                if "!" not in str_e:
+                    msg = "Debe ingresar un número entero mayor a 1!"
+                else:
+                    msg = str_e
+
+                self.msg_frame = place_msg_frame(
+                    parent_frame=self.tab_prod_cruz,
+                    msg_frame=self.msg_frame,
+                    msg=msg,
+                    tipo="error",
+                    row=1,
+                    columnspan=3,
+                )
+
+                return
+
+            dropdowns: list[CustomDropdown] = []
+            vecs_validos = [
+                get_dict_key(self.vecs_manager.vecs_ingresados, vec)
+                for vec in self.vecs_manager.vecs_ingresados.values()
+                if len(vec) == dimensiones
+            ]
+
+            if not vecs_validos:
+                self.msg_frame = place_msg_frame(
+                    parent_frame=self.tab_prod_cruz,
+                    msg_frame=self.msg_frame,
+                    msg=f"No hay vectores en R{dimensiones} guardados!",
+                    tipo="error",
+                    row=1,
+                    columnspan=3,
+                )
+
+                return
+
+            IconButton(
+                self.tab_prod_cruz,
+                app=self.app,
+                image=INFO_ICON,
+                tooltip_text="Solamente se están mostrando " +
+                            f"los vectores guardados en R{dimensiones}.",
+            ).grid(row=1, column=0, columnspan=3, padx=5, pady=(10, 3), sticky="n")
+
+            ctkLabel(
+                self.tab_prod_cruz,
+                text="Seleccione los vectores a multiplicar:",
+            ).grid(row=2, column=0, columnspan=3, padx=5, pady=3, sticky="n")
+
+            for i in range(dimensiones - 1):
+                dropdowns.append(
+                    CustomDropdown(
+                        self.tab_prod_cruz,
+                        width=60,
+                        values=vecs_validos,
+                        variable=Variable(value=vecs_validos[i])
+                    )
+                )
+
+                dropdowns[i].grid(
+                    row=i + 3,
+                    column=0,
+                    columnspan=3,
+                    padx=5, pady=5,
+                    sticky="n",
+                )
+
+            ctkButton(
+                self.tab_prod_cruz,
+                height=30,
+                text="Multiplicar",
+                command=lambda: self.prod_cruz(dropdowns),
+            ).grid(
+                row=dimensiones + 3,
+                column=0,
+                columnspan=3,
+                padx=5, pady=10,
+                sticky="n",
+            )
+
     def setup_mat_vec_tab(self) -> None:
         """
         Setup de la tab para multiplicar matrices y vectores.
@@ -469,7 +708,7 @@ class VMultiplicacionTab(CustomScrollFrame):
         placeholder2 = Variable(value=self.master_frame.nombres_vectores[0])
 
         # crear widgets
-        operador_label = ctkLabel(self.tab_mat_vec, text="•", font=("Roboto", 16))
+        operador_label = ctkLabel(self.tab_mat_vec, text="•", font=ctkFont(size=16))
         instruct_mv = ctkLabel(
             self.tab_mat_vec,
             text="Seleccione la matriz y el vector a multiplicar:",
@@ -565,14 +804,14 @@ class VMultiplicacionTab(CustomScrollFrame):
 
         self.update_vec1(self.select_vec1.get())
         self.update_vec2(self.select_vec2.get())
-        self.resultado_vecs.grid(
+        self.resultado_punto.grid(
             row=3, column=0,
             columnspan=3,
             padx=5, pady=5,
             sticky="n",
         )
 
-        delete_msg_if(self.msg_frame, (self.tab_prod_punto, self.resultado_vecs))
+        delete_msg_if(self.msg_frame, (self.tab_prod_punto, self.resultado_punto))
         try:
             header, resultado = (
                 self.vecs_manager.producto_punto(
@@ -582,18 +821,47 @@ class VMultiplicacionTab(CustomScrollFrame):
             )
         except ArithmeticError as e:
             self.msg_frame = place_msg_frame(
-                parent_frame=self.resultado_vecs,
+                parent_frame=self.resultado_punto,
                 msg_frame=self.msg_frame,
                 msg=str(e),
                 tipo="error",
             )
             return
-        delete_msg_if(self.msg_frame, (self.tab_prod_punto, self.resultado_vecs))
+        delete_msg_if(self.msg_frame, (self.tab_prod_punto, self.resultado_punto))
 
         self.msg_frame = place_msg_frame(
-            parent_frame=self.resultado_vecs,
+            parent_frame=self.resultado_punto,
             msg_frame=self.msg_frame,
             msg=f"{header}:\n{str(resultado)}",  # pylint: disable=E0606
+            tipo="resultado",
+        )
+
+    def prod_cruz(self, dropdowns: list[CustomDropdown]) -> None:
+        """
+        Realiza el producto cruz de dos vectores.
+        """
+
+        delete_msg_frame(self.msg_frame)
+        vectores = [
+            self.vecs_manager.vecs_ingresados[dropdown.get()]
+            for dropdown in dropdowns
+        ]
+
+        self.resultado_cruz.grid(
+            row=len(vectores) + 5,
+            column=0,
+            columnspan=3,
+            padx=5, pady=5,
+            sticky="n",
+        )
+
+        header = " × ".join([dropdown.get() for dropdown in dropdowns])
+        resultado = Vector.prod_cruz(len(vectores) + 1, vectores)
+
+        self.msg_frame = place_msg_frame(
+            parent_frame=self.resultado_cruz,
+            msg_frame=self.msg_frame,
+            msg=f"{header}:\n{str(resultado)}",
             tipo="resultado",
         )
 

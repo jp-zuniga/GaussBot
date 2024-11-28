@@ -16,28 +16,30 @@ from customtkinter import (
     CTkOptionMenu as ctkOptionMenu,
 )
 
-from gauss_bot import DROPDOWN_ICON
-from gauss_bot.gui.custom import Tooltip
+from ...icons import DROPDOWN_ICON
+from .adapted.tooltip import Tooltip
 
 if TYPE_CHECKING:
-    from gauss_bot.gui.gui import GaussUI
+    from ..gui import GaussUI
 
 
 class CustomEntry(ctkEntry):
+    """
+    Entry personalizado con texto centrado y autocomplete bindings.
+    """
+
     def __init__(
         self,
         master: Any,
-        width: int = 140,
-        height: int = 30,
         placeholder_text: Optional[str] = None,
-        justify: str = "center",
         **kwargs
     ) -> None:
 
+        justify = kwargs.pop("justify", "center")
         super().__init__(
             master,
-            width=width,
-            height=height,
+            width=kwargs.pop("width", 140),
+            height=kwargs.pop("height", 30),
             placeholder_text=placeholder_text,
             **kwargs,
         )
@@ -65,30 +67,36 @@ class CustomEntry(ctkEntry):
 
 
 class CustomDropdown(ctkOptionMenu):
+    """
+    OptionMenu personalizado con un ícono mejor.
+    """
+
     def __init__(
         self,
         master: Any,
-        width: int = 140,
-        height: int = 30,
-        text_anchor = "center",
         **kwargs
     ) -> None:
 
+        anchor = kwargs.pop("text_anchor", "center")
         super().__init__(
             master,
-            width,
-            height,
+            width=kwargs.pop("width", 140),
+            height=kwargs.pop("height", 30),
             **kwargs
         )
 
         self.icon_label: ctkLabel
-        self._text_label.configure(anchor=text_anchor)
+        self._text_label.configure(anchor=anchor)
 
         light_dropdown = ctkImage(DROPDOWN_ICON._dark_image)
         self.grid_configure(ipadx=5)
         self.set_dropdown_icon(light_dropdown)
 
     def set_dropdown_icon(self, image: ctkImage, right_distance: int = 5) -> None:
+        """
+        Cambia el ícono del dropdown
+        """
+
         self.icon_label = ctkLabel(
             self,
             text="",
@@ -127,44 +135,65 @@ class CustomDropdown(ctkOptionMenu):
 
 
 class IconButton(ctkButton):
+    """
+    CTkButton personalizado para tener
+    botones con íconos y tooltips.
+    """
+
     def __init__(
         self,
         master: Any,
         app: "GaussUI",
-        image: ctkImage,
-        tooltip_text: str,
-        width: int = 20,
-        height: int = 20,
+        image: Optional[ctkImage] = None,
+        tooltip_text: Optional[str] = None,
         **kwargs
     ) -> None:
 
-        if "border_width" in kwargs:
-            border_width = kwargs.pop("border_width")
-        else:
-            border_width = 0
-
         self.app = app
+
+        text = kwargs.pop("text", "")
+        width = kwargs.pop("width", 20)
+        height = kwargs.pop("height", 20)
+        border_width = kwargs.pop("border_width", 0)
+        border_spacing = kwargs.pop("border_spacing", 0)
+        fg_color = kwargs.pop("fg_color", "transparent")
+        hover_color = kwargs.pop(
+            "hover_color",
+            self.app.theme_config["CTkFrame"]["top_fg_color"],
+        )
+
         super().__init__(
             master,
             width=width,
             height=height,
             image=image,
-            text="",
+            text=text,
             border_width=border_width,
-            border_spacing=0,
-            fg_color="transparent",
-            bg_color="transparent",
-            hover_color=self.app.theme_config["CTkFrame"]["top_fg_color"],
+            border_spacing=border_spacing,
+            fg_color=fg_color,
+            hover_color=hover_color,
             **kwargs,
         )
 
-        self.tooltip = Tooltip(self, tooltip_text)
+        if tooltip_text is not None:
+            self.tooltip: Optional[Tooltip] = Tooltip(self, tooltip_text)
+        else:
+            self.tooltip = None
 
     def destroy(self):
-        self.tooltip.destroy()
+        if self.tooltip is not None:
+            self.tooltip.destroy()
         super().destroy()
 
     def configure(self, require_redraw=False, **kwargs):
         if "tooltip_text" in kwargs:
-            self.tooltip.configure_tooltip(message=kwargs.pop("tooltip_text"))
+            tt_text = kwargs.pop("tooltip_text")
+            if self.tooltip is not None and tt_text is None:
+                self.tooltip.destroy()
+                self.tooltip = None
+            elif self.tooltip is not None:
+                self.tooltip.configure_tooltip(message=tt_text)
+            else:
+                self.tooltip = Tooltip(self, tt_text)
+
         super().configure(require_redraw, **kwargs)

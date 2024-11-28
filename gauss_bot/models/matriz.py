@@ -31,11 +31,13 @@ class Matriz:
     ) -> None:
 
         """
+        Args:
         - aumentada: indica si la matriz representa un sistema de ecuaciones,
                      para añadirle la columna de constantes
         - filas/columnas: dimensiones de la matriz (ints positivos)
         - valores: lista 2D de objetos Fraction() (opcional)
-        
+
+        Errores:
         * ValueError: si las dimensiones de la matriz no son positivas
         """
 
@@ -303,22 +305,21 @@ class Matriz:
     def __mul__(self, mat2: "Matriz") -> "Matriz": ...
 
     @overload
-    def __mul__(self, escalar: Fraction) -> "Matriz": ...
+    def __mul__(self, escalar: Union[int, float, Fraction]) -> "Matriz": ...
 
-    def __mul__(self, multiplicador: Union["Matriz", Fraction]) -> "Matriz":
+    def __mul__(
+        self,
+        multiplicador: Union["Matriz", int, float, Fraction],
+    ) -> "Matriz":
+
         """
         Overloads para multiplicar matrices o multiplicar matrices por escalares:
         * Matriz() * Matriz() -> Matriz()
         * Matriz() * Fraction() -> Matriz()
+
+        Errores:
         * TypeError: si el tipo de dato es inválido
         * ArithmeticError: si las dimensiones de las matrices son inválidas
-
-        Nota: A la hora de multiplicar una matriz por un escalar,
-        no se puede multiplicar de la forma Fraction() * Matriz(),
-        ya que sintácticamente, lo que estaría ocurriendo es la
-        multiplicación de una fracción por una matriz, y los
-        objetos Fraction() no tienen overloads para soportar esto.
-        Siempre se debe escribir la matriz primero: Matriz() * Fraction().
         """
 
         if isinstance(multiplicador, Matriz):
@@ -347,13 +348,13 @@ class Matriz:
                 self.aumentada,
                 self.filas,
                 multiplicador.columnas,
-                mat_multiplicada
+                mat_multiplicada,
             )
 
-        if isinstance(multiplicador, Fraction):
+        if isinstance(multiplicador, (int, float, Fraction)):
             # multiplicar todos los valores por el escalar
             mat_multiplicada = [
-                [multiplicador * valor for valor in fila]
+                [Fraction(multiplicador * valor) for valor in fila]
                 for fila in self.valores
             ]
 
@@ -361,9 +362,32 @@ class Matriz:
                 self.aumentada,
                 self.filas,
                 self.columnas,
-                mat_multiplicada
+                mat_multiplicada,
             )
 
+        raise TypeError("Tipo de dato inválido!")
+
+    def __rmul__(self, multiplicador: Union[int, float, Fraction]) -> "Matriz":
+        """
+        Realiza multiplicación por escalar:
+        * Union[int, float, Fraction] * Matriz() -> Matriz()
+
+        Errores:
+        * TypeError: si el tipo de dato es inválido
+        """
+
+        if isinstance(multiplicador, (int, float, Fraction)):
+            mat_multiplicada = [
+                [Fraction(multiplicador * valor) for valor in fila]
+                for fila in self.valores
+            ]
+
+            return Matriz(
+                self.aumentada,
+                self.filas,
+                self.columnas,
+                mat_multiplicada,
+            )
         raise TypeError("Tipo de dato inválido!")
 
     def es_matriz_cero(self) -> bool:
@@ -448,7 +472,12 @@ class Matriz:
                     mat_triangular[j][k] -= factor * mat_triangular[i][k]
 
         return (
-            Matriz(self.aumentada, self.filas, self.columnas, mat_triangular),
+            Matriz(
+                self.aumentada,
+                self.filas,
+                self.columnas,
+                mat_triangular,
+            ),
             intercambio,
         )
 
@@ -472,7 +501,7 @@ class Matriz:
 
         Para matrices 1x1 y 2x2, solo retorna el determinante.
         Para matrices de nxn (n > 2), retorna:
-        * Fraction: determinante
+        * Fraction(): determinante
         * Matriz(): matriz triangular superior
         * bool:     bandera de intercambio de filas
 
@@ -515,11 +544,6 @@ class Matriz:
         La adjunta es la transposición de la matriz de cofactores de una matriz.
         * ArithmeticError: si la matriz no es cuadrada
         """
-
-        if not self.es_cuadrada():
-            raise ArithmeticError(
-                "La matriz no es cuadrada; su determinante es indefinido!"
-            )
 
         # construir matriz de cofactores
         mat_cofactores = []

@@ -8,7 +8,7 @@ from typing import (
     Union,
 )
 
-from gauss_bot.gui.custom import CustomEntry
+from ..gui.custom import CustomEntry
 
 
 class KeyBindingManager:
@@ -24,6 +24,7 @@ class KeyBindingManager:
         entry_list: Optional[Union[list[CustomEntry], list[list[CustomEntry]]]] = None,
         extra_entries: Optional[tuple[CustomEntry, CustomEntry]] = None,
     ) -> None:
+
         """
         Argumentos:
         - es_matriz: True si las entries son para una matriz,
@@ -123,9 +124,9 @@ class KeyBindingManager:
                 self.entry_list[row - 1].focus_set()  # type: ignore
         elif row == 0:
             if self.es_matriz:
-                self.focus_filas(data_entry)
+                KeyBindingManager.focus_filas(data_entry)
             else:
-                self.focus_dimensiones(data_entry)
+                KeyBindingManager.focus_dimensiones(data_entry)
 
     def _entry_move_down(
         self,
@@ -154,7 +155,6 @@ class KeyBindingManager:
         o al entry de datos iniciales si se llegó al inicio de la lista de entries.
         * row: la fila actual
         * column: la columna actual
-        * entry_list: la lista de entries
 
         Solamente utilizado para los bindings de matrices.
         """
@@ -174,8 +174,6 @@ class KeyBindingManager:
         o al entry de nombre si ya se llegó al final de la lista de entries.
         * row: la fila actual
         * column: la columna actual
-        * nombre_entry: la entry para ingresar el nombre
-        * entry_list: la lista de entries
 
         Solamente utilizado para los bindings de matrices.
         """

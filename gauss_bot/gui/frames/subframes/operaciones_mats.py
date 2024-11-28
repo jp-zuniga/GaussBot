@@ -1,5 +1,5 @@
 # pylint: disable=too-many-lines
-# mas corto no lo puedo hacer sin perder legibilidad
+# no lo puedo hacer mas corto sin perder legibilidad
 
 """
 Implementación de todos los frames
@@ -16,30 +16,34 @@ from typing import (
 from tkinter import Variable
 from customtkinter import (
     CTkButton as ctkButton,
+    CTkFont as ctkFont,
     CTkFrame as ctkFrame,
     CTkLabel as ctkLabel,
     CTkTabview as ctkTabview,
 )
 
-from gauss_bot import (
-    INPUTS_ICON,
+from ....icons import INPUTS_ICON
+from ....msg_frame_funcs import (
     delete_msg_frame,
     delete_msg_if,
+    place_msg_frame,
+)
+
+from ....util_funcs import (
     generate_range,
     get_dict_key,
 )
 
-from gauss_bot.managers import MatricesManager
-from gauss_bot.gui.custom import (
+from ....managers import MatricesManager
+from ...custom import (
     CustomEntry,
     CustomDropdown,
     CustomScrollFrame,
-    place_msg_frame,
 )
 
 if TYPE_CHECKING:
-    from gauss_bot.gui import GaussUI
-    from gauss_bot.gui.frames import MatricesFrame
+    from ...gui import GaussUI
+    from ..matrices import MatricesFrame
 
 
 class SumaRestaTab(CustomScrollFrame):
@@ -55,7 +59,7 @@ class SumaRestaTab(CustomScrollFrame):
         mats_manager: MatricesManager
     ) -> None:
 
-        super().__init__(app, master_tab, corner_radius=0, fg_color="transparent")
+        super().__init__(master_tab, corner_radius=0, fg_color="transparent")
         self.app = app
         self.master_frame = master_frame
         self.mats_manager = mats_manager
@@ -109,7 +113,7 @@ class SumaRestaTab(CustomScrollFrame):
         self.select_operacion = CustomDropdown(
             self,
             width=40,
-            font=("Roboto", 16),
+            font=ctkFont(size=16),
             values=list(self.operaciones.values()),
             variable=Variable(value=self.operaciones[default]),
             command=self.update_operacion,
@@ -278,7 +282,7 @@ class MultiplicacionTab(CustomScrollFrame):
         mats_manager: MatricesManager
     ) -> None:
 
-        super().__init__(app, master_tab, corner_radius=0, fg_color="transparent")
+        super().__init__(master_tab, corner_radius=0, fg_color="transparent")
         self.app = app
         self.master_frame = master_frame
         self.mats_manager = mats_manager
@@ -362,7 +366,7 @@ class MultiplicacionTab(CustomScrollFrame):
         """
 
         # crear widgets
-        operador_label = ctkLabel(self.tab_escalar, text="•", font=("Roboto", 16))
+        operador_label = ctkLabel(self.tab_escalar, text="•", font=ctkFont(size=16))
         instruct_e = ctkLabel(
             self.tab_escalar,
             text="Seleccione la matriz e ingrese el escalar:",
@@ -396,8 +400,8 @@ class MultiplicacionTab(CustomScrollFrame):
 
         # colocar widgets
         instruct_e.grid(row=0, column=0, columnspan=3, padx=5, pady=5, sticky="n")
-        self.escalar_entry.grid(row=1, column=0, ipadx=5, padx=5, pady=5, sticky="e")
-        operador_label.grid(row=1, column=1, padx=3, pady=5, sticky="ew")
+        self.escalar_entry.grid(row=1, column=0, padx=5, pady=5, sticky="e")
+        operador_label.grid(row=1, column=1, padx=5, pady=5, sticky="ew")
         self.select_escalar_mat.grid(
             row=1, column=2, padx=5, pady=5, sticky="w"
         )
@@ -423,7 +427,7 @@ class MultiplicacionTab(CustomScrollFrame):
             placeholder2 = Variable(value=self.master_frame.nombres_matrices[1])
 
         # crear widgets
-        operador_label = ctkLabel(self.tab_mats, text="•", font=("Roboto", 16))
+        operador_label = ctkLabel(self.tab_mats, text="•", font=ctkFont(size=16))
         instruct_ms = ctkLabel(
             self.tab_mats,
             text="Seleccione las matrices a multiplicar:",
@@ -479,7 +483,7 @@ class MultiplicacionTab(CustomScrollFrame):
         placeholder2 = Variable(value=self.master_frame.nombres_vectores[0])
 
         # crear widgets
-        operador_label = ctkLabel(self.tab_mat_vec, text="•", font=("Roboto", 16))
+        operador_label = ctkLabel(self.tab_mat_vec, text="•", font=ctkFont(size=16))
         instruct_mv = ctkLabel(
             self.tab_mat_vec,
             text="Seleccione la matriz y el vector a multiplicar:",
@@ -709,7 +713,7 @@ class TransposicionTab(CustomScrollFrame):
         mats_manager: MatricesManager
     ) -> None:
 
-        super().__init__(app, master_tab, corner_radius=0, fg_color="transparent")
+        super().__init__(master_tab, corner_radius=0, fg_color="transparent")
         self.app = app
         self.master_frame = master_frame
         self.mats_manager = mats_manager
@@ -821,7 +825,7 @@ class DeterminanteTab(CustomScrollFrame):
         mats_manager: MatricesManager
     ) -> None:
 
-        super().__init__(app, master_tab, corner_radius=0, fg_color="transparent")
+        super().__init__(master_tab, corner_radius=0, fg_color="transparent")
         self.app = app
         self.master_frame = master_frame
         self.mats_manager = mats_manager
@@ -935,7 +939,7 @@ class InversaTab(CustomScrollFrame):
         mats_manager: MatricesManager
     ) -> None:
 
-        super().__init__(app, master_tab, corner_radius=0, fg_color="transparent")
+        super().__init__(master_tab, corner_radius=0, fg_color="transparent")
         self.app = app
         self.master_frame = master_frame
         self.mats_manager = mats_manager
@@ -969,7 +973,7 @@ class InversaTab(CustomScrollFrame):
         button = ctkButton(
             self,
             height=30,
-            text="Encontrar inversa",
+            text="Invertir",
             command=self.encontrar_inversa,
         )
 

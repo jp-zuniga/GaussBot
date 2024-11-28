@@ -14,27 +14,27 @@ from os import (
 )
 
 from typing import Union
-
 from customtkinter import (
     CTk as ctk,
+    ThemeManager,
     set_appearance_mode as set_mode,
     set_widget_scaling as set_scaling,
     set_default_color_theme as set_theme,
 )
 
-from gauss_bot import (
-    ASSET_PATH,
+from .. import (
     CONFIG_PATH,
     THEMES_PATH,
-    LOGGER,
 )
 
-from gauss_bot.managers import (
+from ..icons import APP_ICON
+from ..util_funcs import LOGGER
+from ..managers import (
     FuncManager,
     OpsManager,
 )
 
-from gauss_bot.gui.frames import (
+from .frames import (
     NavFrame,
     HomeFrame,
     InputsFrame,
@@ -62,13 +62,13 @@ class GaussUI(ctk):
         self._load_config()
         self.set_icon(self.modo_actual)
 
-        self.theme_config = self._load_theme_config()
+        self.theme_config = ThemeManager.theme
         self.configure(fg_color=self.theme_config["CTkFrame"]["fg_color"])
 
-        self.title("GaussBot")
         self.geometry("1280x720")
-        self.grid_rowconfigure(0, weight=1)
-        self.grid_columnconfigure(1, weight=1)
+        self.title("GaussBot")
+        self.rowconfigure(0, weight=1)
+        self.columnconfigure(1, weight=1)
 
         # inicializar managers
         self.func_manager = FuncManager()
@@ -130,9 +130,9 @@ class GaussUI(ctk):
         """
 
         if modo == "light":
-            self.iconbitmap(path.join(ASSET_PATH, "dark_logo.ico"))
+            self.iconbitmap(bitmap=APP_ICON[1])
         elif modo == "dark":
-            self.iconbitmap(path.join(ASSET_PATH, "light_logo.ico"))
+            self.iconbitmap(bitmap=APP_ICON[0])
         else:
             raise ValueError("Valor inválido para argumento 'modo'!")
 
@@ -187,16 +187,3 @@ class GaussUI(ctk):
         set_scaling(self.escala_actual)
         set_theme(path.join(THEMES_PATH, self.tema_actual))
         LOGGER.info("Configuración aplicada!")
-
-    def _load_theme_config(self) -> dict:
-        """
-        Carga el archivo de configuración del tema actual.
-        """
-
-        with open(
-            path.join(THEMES_PATH, self.tema_actual),
-            mode="r",
-            encoding="utf-8",
-        ) as theme_file:
-            LOGGER.info("Cargando tema '%s'...", self.tema_actual)
-            return load(theme_file)

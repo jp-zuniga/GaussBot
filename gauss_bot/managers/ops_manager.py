@@ -16,21 +16,22 @@ from os import (
     path,
 )
 
-from gauss_bot import (
-    SISTEMAS_PATH,
+from .. import (
     MATRICES_PATH,
+    SISTEMAS_PATH,
     VECTORES_PATH,
-    LOGGER,
 )
 
-from gauss_bot.managers.mats_manager import MatricesManager
-from gauss_bot.managers.vecs_manager import VectoresManager
-from gauss_bot.models import (
+from ..util_funcs import LOGGER
+from ..models import (
     FractionEncoder,
     FractionDecoder,
     Matriz,
     Vector,
 )
+
+from . import MatricesManager
+from . import VectoresManager
 
 
 class OpsManager:
