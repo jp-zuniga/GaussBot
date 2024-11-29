@@ -15,6 +15,7 @@ from customtkinter import (
     CTkLabel as ctkLabel,
 )
 
+from sympy import SympifyError
 from ....icons import (
     ACEPTAR_ICON,
     ELIMINAR_ICON,
@@ -187,11 +188,16 @@ class AgregarFuncs(CustomScrollFrame):
                 raise ValueError("Debe ingresar los términos de la función!")
 
             new_func = Func(input_nombre, input_terms)
-        except ValueError as v:
+        except (SyntaxError, SympifyError, ValueError) as v:
+            if isinstance(v, ValueError):
+                msg_error = str(v)
+            else:
+                msg_error = "Debe ingresar una expresión matemática válida!"
+
             self.msg_frame = place_msg_frame(
                 parent_frame=self.func_frame,
                 msg_frame=self.msg_frame,
-                msg=str(v),
+                msg=msg_error,
                 tipo="error",
                 columnspan=2,
             )

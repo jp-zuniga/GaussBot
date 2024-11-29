@@ -3,6 +3,11 @@ Implementación de la clase Func.
 """
 
 from decimal import Decimal
+from logging import (
+    WARNING,
+    getLogger,
+)
+
 from os import (
     makedirs,
     path,
@@ -40,6 +45,8 @@ TRANSFORMS = standard_transformations + (implicit_multiplication_application,)
 # para que matplotlib sepa que se esta usando tkinter
 use("TkAgg")
 
+# para que matplotlib no mande mil mensajes al log
+getLogger("matplotlib").setLevel(WARNING)
 
 class Func:
     """
@@ -161,12 +168,23 @@ class Func:
         """
 
         if not self.latexified or self.latex_img is None:
-            self.latex_img  = (
-                Func.latex_to_png(
-                    nombre_expr=self.nombre,
-                    expr=str(self.expr),
-                    con_nombre=True,
-                )
+            self.latex_img = Func.latex_to_png(
+                nombre_expr=(
+                    self.nombre
+                    if self.nombre.count("′") == 0
+                    else None
+                ),
+                expr=(
+                    str(self.expr)
+                    if self.nombre.count("′") == 0
+                    else None
+                ),
+                misc_str=(
+                    Func.get_derivada_nombre(self) + " = " + str(self.expr)
+                    if self.nombre.count("′") > 0
+                    else None
+                ),
+                con_nombre=self.nombre.count("′") == 0,
             )
 
             self.latexified = True
@@ -193,17 +211,15 @@ class Func:
         """
 
         makedirs(SAVED_FUNCS_PATH, exist_ok=True)
-        output_file = path.join(SAVED_FUNCS_PATH, f"{output_file or nombre_expr}.png")
+        output_file = path.join(SAVED_FUNCS_PATH, rf"{output_file or nombre_expr}.png")
 
         if expr is not None:
             latex_str: str = latex(
                 parse_expr(expr, transformations=TRANSFORMS),
                 ln_notation=kwargs.pop("ln_notation", True),
-                inv_trig_style=kwargs.pop("inv_trig_style", "power"),
-                order=kwargs.pop("order", "lex")
             )
         elif misc_str is not None:
-            latex_str = misc_str
+            latex_str = misc_str.replace("log", "ln")
         else:
             raise ValueError("No se recibió un string a convertir en PNG!")
 
@@ -251,4 +267,17 @@ class Func:
             dark_image=inverted_img,
             light_image=img,
             size=(img_length, img_height),
+        )
+
+    @staticmethod
+    def get_derivada_nombre(derivada: "Func") -> str:
+        """
+        Formate el nombre de la derivada en la
+        notación dy/dx, con respecto a la variable.
+        """
+
+        num_diff = derivada.nombre.count("′")
+        return (
+            f"\\frac{{d{f"^{{{num_diff}}}" if num_diff > 1 else ""}{derivada.nombre[0]}}}" +
+            f"{{d{str(derivada.var)}{f"^{{{num_diff}}}" if num_diff > 1 else ""}}}"
         )

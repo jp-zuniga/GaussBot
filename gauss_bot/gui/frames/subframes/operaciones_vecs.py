@@ -592,6 +592,11 @@ class MultiplicacionTab(CustomScrollFrame):
             width=40,
         )
 
+        self.dimensiones_entry.bind(
+            "<Return>",
+            lambda _: setup_selections(self.dimensiones_entry.get()),
+        )
+
         self.dimensiones_entry.grid(
             row=0, column=1,
             padx=5, pady=5,

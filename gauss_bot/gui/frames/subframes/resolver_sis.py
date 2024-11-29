@@ -79,9 +79,10 @@ class ResolverSisFrame(CustomScrollFrame):
         self.select_sis_mat = CustomDropdown(
             self,
             width=40,
+            values=self.master_frame.nombres_sistemas,
             variable=Variable(
                 value="Seleccione el sistema de ecuaciones a resolver:"
-            ), values=self.master_frame.nombres_sistemas,
+            ),
             command=self.update_sis_mat,
         )
 
@@ -93,7 +94,7 @@ class ResolverSisFrame(CustomScrollFrame):
             command=self.update_metodo,
         )
 
-        self.select_sis_mat.grid(row=0, column=0, padx=5, pady=(40, 5), sticky="n")
+        self.select_sis_mat.grid(row=0, column=0, padx=5, pady=(30, 5), sticky="n")
         self.select_metodo.grid(row=1, column=0, padx=5, pady=5, sticky="n")
 
     def resolver(self) -> None:
@@ -145,13 +146,12 @@ class ResolverSisFrame(CustomScrollFrame):
         delete_msg_frame(self.msg_frame)
         if "!=" in sistema.solucion:  # type: ignore
             # si el sistema es inconsistente, habria un != en la solucion
-            # entonces se muestra el resultado con un borde rojo
+            # entonces se muestra un mensaje de error
             self.msg_frame = place_msg_frame(
                 parent_frame=self,
                 msg_frame=self.msg_frame,
                 msg=sistema.solucion,  # type: ignore
-                tipo="resultado",
-                border_color="#ff3131",
+                tipo="error",
                 row=5,
             )
 

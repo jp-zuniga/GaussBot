@@ -48,7 +48,7 @@ __all__ = [
 
 # objeto logger global para la aplicacion
 # configurado en la funcion log_setup()
-LOGGER = getLogger()
+LOGGER = getLogger("GaussBot")
 
 LOG_PATH = path.join(DATA_PATH, "log.txt")
 

@@ -13,6 +13,7 @@ from customtkinter import (
 
 from ...util_funcs import generate_sep
 from ...icons import (
+    ABOUT_US_ICON,
     ANALISIS_ICON,
     ECUACIONES_ICON,
     INFO_ICON,
@@ -72,8 +73,8 @@ class HomeFrame(ctkFrame):
             text="Operaciones de Matrices",
             text_color=self.app.theme_config["CTkLabel"]["text_color"],
             tooltip_text="\nSuma, resta, multiplicación," +
-                         "\ntransposición, encontrar inversa," +
-                         "\ny calcular determinante.\n",
+                         "\ntransposición, calcular determinante," +
+                         "\nencontrar inversa.\n",
             command=self.ir_a_mats,
         ).grid(row=3, column=0, padx=(10, 5), pady=(10, 3), sticky="se")
 
@@ -99,7 +100,7 @@ class HomeFrame(ctkFrame):
             text_color=self.app.theme_config["CTkLabel"]["text_color"],
             tooltip_text="\nRaíces de funciones, derivadas, integrales.\n",
             command=self.ir_a_funcs,
-        ).grid(row=4, column=0, padx=(10, 5), pady=(3, 10), sticky="ne")
+        ).grid(row=4, column=0, padx=(10, 5), pady=3, sticky="ne")
 
         IconButton(
             self,
@@ -113,17 +114,29 @@ class HomeFrame(ctkFrame):
                          "\n− Regla de Cramer\n",
                         #  "\n− Factorización LU",
             command=self.ir_a_sis,
-        ).grid(row=4, column=1, padx=(5, 10), pady=(3, 10), sticky="nw")
+        ).grid(row=4, column=1, padx=(5, 10), pady=3, sticky="nw")
+
+        IconButton(
+            self,
+            app=self.app,
+            height=30,
+            image=ABOUT_US_ICON,
+            tooltip_text="\n− Desarrollado por: Joaquín Zúñiga" +
+                         "\n− Versión: 1.0" +
+                         "\n− Licencia: MIT License" +
+                         "\n(haga click para ir al repositorio de Github)\n",
+            command=lambda: open_link("https://github.com/jp-zuniga/GaussBot"),
+        ).grid(row=5, column=0, padx=(10, 5), pady=(3, 10), sticky="ne")
 
         IconButton(
             self,
             app=self.app,
             height=30,
             image=INFO_ICON,
-            tooltip_text="\n− Versión: 1.0" +
-                         "\n− Desarrollado por: Joaquín Zúñiga\n",
-            command=lambda: open_link("https://github.com/jp-zuniga/GaussBot"),
-        ).grid(row=5, column=0, columnspan=2, pady=10, sticky="n")
+            tooltip_text="\nTodos los datos ingresados y los resultados calculados" +
+                         "\n(excepto raíces de funciones, magnitudes de vectores y determinantes)" +
+                         "\npueden ser guardados para uso futuro.\n",
+        ).grid(row=5, column=1, padx=(5, 10), pady=(3, 10), sticky="nw")
 
     def ir_a_mats(self) -> None:
         """
@@ -152,3 +165,16 @@ class HomeFrame(ctkFrame):
         """
 
         self.app.nav_frame.seleccionar_frame("sistemas")
+
+    def update_frame(self) -> None:
+        """
+        Configura los backgrounds de los widgets,
+        por si hubo un cambio de tema.
+        """
+
+        for widget in self.winfo_children():
+            widget.configure(bg_color="transparent")
+            if isinstance(widget, IconButton) and widget.tooltip is not None:
+                widget.tooltip.configure_tooltip(
+                    bg_color=self.app.theme_config["CTkFrame"]["fg_color"]
+                )

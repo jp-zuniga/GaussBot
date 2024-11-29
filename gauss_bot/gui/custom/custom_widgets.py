@@ -91,6 +91,7 @@ class CustomDropdown(ctkOptionMenu):
         light_dropdown = ctkImage(DROPDOWN_ICON._dark_image)
         self.grid_configure(ipadx=5)
         self.set_dropdown_icon(light_dropdown)
+        self.update_idletasks()
 
     def set_dropdown_icon(self, image: ctkImage, right_distance: int = 5) -> None:
         """
@@ -108,7 +109,7 @@ class CustomDropdown(ctkOptionMenu):
         self.icon_label.configure(fg_color=color)
 
         grid_info = self._text_label.grid_info()
-        grid_info["padx"], grid_info["sticky"] = right_distance, "e"
+        grid_info["padx"], grid_info["sticky"] = right_distance, "nse"
         self.icon_label.grid(**grid_info)
 
         self.icon_label.bind("<Button-1>", self._clicked)

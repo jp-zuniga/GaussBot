@@ -174,6 +174,7 @@ class CustomMessageBox(ctkTop):
             text=self.msg,
             image=self.icon,
             fg_color=self.bg_color,
+            text_color=ThemeManager.theme["CTkLabel"]["text_color"],
             hover=False,
         )
 

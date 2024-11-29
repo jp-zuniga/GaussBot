@@ -18,6 +18,7 @@ from . import (
 
 
 __all__ = [
+    "ABOUT_US_ICON",
     "ACEPTAR_ICON",
     "ANALISIS_ICON",
     "APP_ICON",
@@ -42,6 +43,7 @@ __all__ = [
     "NUMPAD_ICON_PATH",
     "QUESTION_ICON",
     "QUIT_ICON",
+    "SAVE_ICON",
     "SHUFFLE_ICON",
     "VECTOR_ICON",
     "WARNING_ICON",
@@ -144,64 +146,64 @@ MSGBOX_ICONS = {
 ################################################################################
 
 
+ABOUT_US_ICON = ctkImage(
+    dark_image=open_img(path.join(ASSET_PATH, "dark_mode", "light_about_us_icon.png")),
+    light_image=open_img(path.join(ASSET_PATH, "light_mode", "dark_about_us_icon.png")),
+)
+
 ACEPTAR_ICON = ctkImage(
     dark_image=open_img(path.join(ASSET_PATH, "dark_mode", "light_aceptar_icon.png")),
     light_image=open_img(path.join(ASSET_PATH, "light_mode", "dark_aceptar_icon.png")),
-    size=(18, 18),
 )
 
 DROPDOWN_ICON = ctkImage(
     dark_image=open_img(path.join(ASSET_PATH, "dark_mode", "light_dropdown_icon.png")),
     light_image=open_img(path.join(ASSET_PATH, "light_mode", "dark_dropdown_icon.png")),
-    size=(18, 18),
 )
 
 DROPLEFT_ICON = ctkImage(
     dark_image=open_img(path.join(ASSET_PATH, "dark_mode", "light_dropleft_icon.png")),
     light_image=open_img(path.join(ASSET_PATH, "light_mode", "dark_dropleft_icon.png")),
-    size=(18, 18),
 )
 
 DROPRIGHT_ICON = ctkImage(
     dark_image=open_img(path.join(ASSET_PATH, "dark_mode", "light_dropright_icon.png")),
     light_image=open_img(path.join(ASSET_PATH, "light_mode", "dark_dropright_icon.png")),
-    size=(18, 18),
 )
 
 DROPUP_ICON = ctkImage(
     dark_image=open_img(path.join(ASSET_PATH, "dark_mode", "light_dropup_icon.png")),
     light_image=open_img(path.join(ASSET_PATH, "light_mode", "dark_dropup_icon.png")),
-    size=(18, 18),
 )
 
 ELIMINAR_ICON = ctkImage(
     dark_image=open_img(path.join(ASSET_PATH, "dark_mode", "light_eliminar_icon.png")),
     light_image=open_img(path.join(ASSET_PATH, "light_mode", "dark_eliminar_icon.png")),
-    size=(18, 18),
 )
 
 ENTER_ICON = ctkImage(
     dark_image=open_img(path.join(ASSET_PATH, "dark_mode", "light_enter_icon.png")),
     light_image=open_img(path.join(ASSET_PATH, "light_mode", "dark_enter_icon.png")),
-    size=(18, 18),
 )
 
 LIMPIAR_ICON = ctkImage(
     dark_image=open_img(path.join(ASSET_PATH, "dark_mode", "light_limpiar_icon.png")),
     light_image=open_img(path.join(ASSET_PATH, "light_mode", "dark_limpiar_icon.png")),
-    size=(25, 18),
 )
 
 MOSTRAR_ICON = ctkImage(
     dark_image=open_img(path.join(ASSET_PATH, "dark_mode", "light_mostrar_icon.png")),
     light_image=open_img(path.join(ASSET_PATH, "light_mode", "dark_mostrar_icon.png")),
-    size=(18, 18),
+)
+
+SAVE_ICON = ctkImage(
+    dark_image=open_img(path.join(ASSET_PATH, "dark_mode", "light_save_icon.png")),
+    light_image=open_img(path.join(ASSET_PATH, "light_mode", "dark_save_icon.png")),
 )
 
 SHUFFLE_ICON = ctkImage(
     dark_image=open_img(path.join(ASSET_PATH, "dark_mode", "light_shuffle_icon.png")),
     light_image=open_img(path.join(ASSET_PATH, "light_mode", "dark_shuffle_icon.png")),
-    size=(18, 18),
 )
 
 

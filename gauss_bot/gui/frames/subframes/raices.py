@@ -243,7 +243,7 @@ class RaicesFrame(CustomScrollFrame):
             height=30,
             text="Encontrar raíz",
             command=self.leer_datos
-        ).grid(row=2, column=0, columnspan=2, padx=5, pady=5, sticky="ne")
+        ).grid(row=2, column=0, columnspan=4, padx=5, pady=5, sticky="n")
 
     def setup_abierto(self, newton: bool) -> None:
         """

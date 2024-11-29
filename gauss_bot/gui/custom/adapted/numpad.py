@@ -51,6 +51,7 @@ class CustomNumpad(ctkTop):
         self.focus()
         self.transient()
         self.overrideredirect(True)
+        self.attributes("-topmost", True)
         self.resizable(width=False, height=False)
 
         self.attach = attach

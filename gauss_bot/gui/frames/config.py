@@ -3,7 +3,6 @@ Implementación de ConfigFrame, encargado de mostrar
 y editar las configuraciones de la aplicación.
 """
 
-from os import path
 from typing import (
     TYPE_CHECKING,
     Optional,
@@ -15,10 +14,8 @@ from customtkinter import (
     CTkLabel as ctkLabel,
     set_appearance_mode as set_mode,
     set_widget_scaling as set_scaling,
-    set_default_color_theme as set_theme,
 )
 
-from ... import THEMES_PATH
 from ...util_funcs import get_dict_key
 from ..custom import (
     CustomDropdown,
@@ -64,6 +61,8 @@ class ConfigFrame(ctkFrame):
         self.escalas = list(self.escalas_dict.keys())
         self.modos = list(self.modos_dict.keys())
         self.temas = list(self.temas_dict.keys())
+
+        self.tema_anterior: Optional[str] = None
 
         # buscar las llaves de la configuracion actual
         escala_actual_key = get_dict_key(self.escalas_dict, self.app.escala_actual)
@@ -145,12 +144,13 @@ class ConfigFrame(ctkFrame):
 
         # mandar a actualizar todo
         self.app.set_icon(self.app.modo_actual)
-        self.update_frame()
+        self.app.home_frame.update_frame()  # type: ignore
         self.app.inputs_frame.update_all()  # type: ignore
         self.app.matrices.update_all()  # type: ignore
         self.app.vectores.update_all()  # type: ignore
         self.app.analisis.update_all()  # type: ignore
         self.app.sistemas.update_all()  # type: ignore
+        self.update_frame()
 
     def cambiar_tema(self, tema_seleccionado: str) -> None:
         """
@@ -161,8 +161,10 @@ class ConfigFrame(ctkFrame):
             # si se selecciono el mismo tema, no cambiar nada
             return
 
-        self.app.tema_actual = self.temas_dict[tema_seleccionado]
-        set_theme(path.join(THEMES_PATH, self.app.tema_actual))
+        self.tema_anterior, self.app.tema_actual = (
+            self.app.tema_actual,
+            self.temas_dict[tema_seleccionado],
+        )
 
         # explicar que se necesita reiniciar la app
         self.msg_frame = SuccessFrame(

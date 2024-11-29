@@ -778,18 +778,6 @@ class TransposicionTab(CustomScrollFrame):
             columnspan=3,
         )
 
-        # si la transposicion no esta guardada,
-        # agregarla y mandar a actualizar los datos
-        if not any(
-            transpuesta == mat
-            for mat in self.mats_manager.mats_ingresadas.values()
-        ):
-            self.mats_manager.mats_ingresadas[nombre_transpuesta] = transpuesta
-            self.after(500, lambda: self.master_frame.update_all())  # pylint: disable=W0108
-            self.app.vectores.update_all()  # type: ignore
-            self.app.inputs_frame.instances[2].update_all()  # type: ignore
-
-
     def update_frame(self) -> None:
         """
         Actualiza los valores del dropdown.
@@ -1003,18 +991,6 @@ class InversaTab(CustomScrollFrame):
             tipo="resultado",
             columnspan=3,
         )
-
-        # si la inversa no esta guardada,
-        # agregarla y mandar a actualizar los datos
-        if not any(
-            inversa == mat
-            for mat in self.mats_manager.mats_ingresadas.values()
-        ):
-            self.mats_manager.mats_ingresadas[nombre_inversa] = inversa
-            self.after(500, lambda: self.master_frame.update_all())  # pylint: disable=W0108
-            self.app.vectores.update_all()  # type: ignore
-            self.app.inputs_frame.instances[2].update_all()  # type: ignore
-
 
     def update_frame(self) -> None:
         """

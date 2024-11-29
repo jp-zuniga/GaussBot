@@ -220,8 +220,8 @@ class NavFrame(ctkFrame):
         }
 
         # colocar widgets en la barra de navegacion
-        self.app_name.grid(row=0, column=0, padx=0, pady=10, sticky="nse")
-        self.hide_button.grid(row=0, column=1, padx=10, pady=10, sticky="e")
+        self.app_name.grid(row=0, column=0, padx=0, pady=(20, 10), sticky="nse")
+        self.hide_button.grid(row=0, column=1, padx=10, pady=(20, 10), sticky="nse")
 
         i = 1
         for j, widget in enumerate(self.buttons.values()):
