@@ -74,8 +74,8 @@ class AgregarFuncs(CustomScrollFrame):
         self.app = app
         self.master_frame = master_frame
         self.func_manager = func_manager
-        self.columnconfigure(0, weight=7)
-        self.columnconfigure(1, weight=5)
+        self.columnconfigure(0, weight=1)
+        self.columnconfigure(1, weight=1)
 
         self.key_binder = KeyBindingManager(es_matriz=False)
 
@@ -375,7 +375,6 @@ class MostrarFuncs(CustomScrollFrame):
             widget.destroy()  # type: ignore
 
         self.show_frame.grid(row=1, column=0, padx=5, sticky="n")
-
         ctkLabel(
             self.show_frame,
             text="Funciones ingresadas:",
@@ -385,7 +384,7 @@ class MostrarFuncs(CustomScrollFrame):
         ctkLabel(
             self.show_frame,
             text="",
-            image=generate_sep(False, (300, 5)),
+            image=generate_sep(False, (400, 3)),
         ).grid(row=1, column=0, sticky="n")
 
         r = 2
@@ -399,7 +398,7 @@ class MostrarFuncs(CustomScrollFrame):
             ctkLabel(
                 self.show_frame,
                 text="",
-                image=generate_sep(False, (300, 5)),
+                image=generate_sep(False, (400, 3)),
             ).grid(row=r + 1, column=0, sticky="n")
             r += 2
 
@@ -461,6 +460,9 @@ class EliminarFuncs(CustomScrollFrame):
 
             return
 
+        for widget in self.winfo_children():  # type: ignore
+            widget.destroy()  # type: ignore
+
         # crear widgets
         instruct_eliminar = ctkLabel(self, text="¿Cuál función desea eliminar?")
         self.select_func = CustomDropdown(
@@ -520,7 +522,6 @@ class EliminarFuncs(CustomScrollFrame):
             and
             isinstance(self.msg_frame, SuccessFrame)
         ):
-
             def clear_after_wait() -> None:
                 delete_msg_frame(self.msg_frame)
                 self.msg_frame = place_msg_frame(
@@ -534,19 +535,20 @@ class EliminarFuncs(CustomScrollFrame):
                 for widget in self.winfo_children():
                     if not isinstance(widget, ctkFrame):
                         widget.destroy()
-            self.after(2000, clear_after_wait)
+            self.after(1000, clear_after_wait)
 
         elif isinstance(self.msg_frame, ErrorFrame):
             self.setup_frame()
+
         else:
             for widget in self.winfo_children():
                 widget.configure(bg_color="transparent")  # type: ignore
             self.select_func.configure(
-                variable=Variable(value=self.nombres_funcs[0]),
                 values=self.nombres_funcs,
+                variable=Variable(value=self.nombres_funcs[0]),
             )
 
-            self.after(2000, lambda: delete_msg_frame(self.msg_frame))
+            self.after(1000, lambda: delete_msg_frame(self.msg_frame))
 
     def update_func(self, valor: str) -> None:
         """

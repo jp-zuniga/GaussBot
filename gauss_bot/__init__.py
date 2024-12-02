@@ -4,7 +4,10 @@ de álgebra lineal, como resolver sistemas de ecuaciones,
 operaciones con matrices y vectores, y análisis númerico.
 """
 
-from os import path
+from os import (
+    getenv,
+    path,
+)
 
 __all__ = [
     "ASSET_PATH",
@@ -29,8 +32,9 @@ ASSET_PATH = path.join(
 )
 
 DATA_PATH = path.join(
-    path.dirname(path.realpath(__file__)),
-    "data"
+    getenv("APPDATA"),  # type: ignore
+    "GaussBot",
+    "data",
 )
 
 CONFIG_PATH = path.join(DATA_PATH, "config.json")

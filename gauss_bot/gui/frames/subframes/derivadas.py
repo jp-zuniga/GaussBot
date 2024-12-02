@@ -107,27 +107,18 @@ class DerivadasFrame(CustomScrollFrame):
         """
 
         derivada = self.func.derivar()
-        num_diff = derivada.nombre.count("′")
-
-        # this is disgusting and i hate it
-        print_nombre = (
-            f"\\frac{{d{f"^{{{num_diff}}}" if num_diff > 1 else ''}{self.func.nombre[0]}}}" +
-            f"{{d{str(self.func.var)}{f"^{{{num_diff}}}" if num_diff > 1 else ''}}}"
-        )
-
         self.msg_frame = place_msg_frame(
             parent_frame=self,
             msg_frame=self.msg_frame,
             img=Func.latex_to_png(
                 output_file=derivada.nombre,
-                nombre_expr=print_nombre,
+                nombre_expr=derivada.get_di_nombre(diffr=True),
                 expr=str(derivada.expr),
                 con_nombre=True,
             ),
             tipo="resultado",
             row=4,
             pady=10,
-            sticky="n",
         )
 
     def update_frame(self):
@@ -138,10 +129,12 @@ class DerivadasFrame(CustomScrollFrame):
 
         delete_msg_frame(self.msg_frame)
         self.nombres_funcs = list(self.func_manager.funcs_ingresadas.keys())
-        self.func_select.configure(values=self.nombres_funcs)
+        self.func_select.configure(
+            values=self.nombres_funcs,
+            variable=Variable(value="Seleccione una función para derivar:"),
+        )
 
         for widget in self.winfo_children():  # type: ignore
             widget.configure(bg_color="transparent")  # type: ignore
-            if isinstance(widget, ctkFrame):
-                for subwidget in widget.winfo_children():  # type: ignore
-                    subwidget.configure(bg_color="transparent")  # type: ignore
+            if dict(widget.grid_info()).get("row", -1) > 0:
+                widget.destroy()

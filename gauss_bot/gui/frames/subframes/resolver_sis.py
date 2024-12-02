@@ -12,8 +12,13 @@ from tkinter import Variable
 from customtkinter import (
     CTkButton as ctkButton,
     CTkFrame as ctkFrame,
+    CTkFont as ctkFont,
+    CTkLabel as ctkLabel,
+    CTkToplevel as ctkTop,
 )
 
+from ....icons import APP_ICON
+from ....util_funcs import generate_sep
 from ....msg_frame_funcs import (
     delete_msg_frame,
     place_msg_frame,
@@ -55,7 +60,6 @@ class ResolverSisFrame(CustomScrollFrame):
         self.metodos: dict[str, str ] = {
             "Gauss−Jordan": "gj",
             "Regla de Cramer": "c",
-            # "Factorización LU": "f",
         }
 
         # definir atributos, se inicializan en setup_frame
@@ -63,6 +67,9 @@ class ResolverSisFrame(CustomScrollFrame):
         self.select_modo: CustomDropdown
         self.sis_mat = ""
         self.met = ""
+
+        self.proc_label: ctkLabel
+        self.proc_hidden = True
 
         self.setup_frame()
 
@@ -94,8 +101,8 @@ class ResolverSisFrame(CustomScrollFrame):
             command=self.update_metodo,
         )
 
-        self.select_sis_mat.grid(row=0, column=0, padx=5, pady=(30, 5), sticky="n")
-        self.select_metodo.grid(row=1, column=0, padx=5, pady=5, sticky="n")
+        self.select_sis_mat.grid(row=0, column=0, pady=(20, 10), sticky="n")
+        self.select_metodo.grid(row=1, column=0, pady=10, sticky="n")
 
     def resolver(self) -> None:
         """
@@ -114,15 +121,6 @@ class ResolverSisFrame(CustomScrollFrame):
         if self.mats_manager.sis_ingresados[self.sis_mat].es_matriz_cero():
             met = "gj"
 
-        if len(self.sis_mat) > 1:
-            self.msg_frame = place_msg_frame(
-                parent_frame=self,
-                msg_frame=self.msg_frame,
-                msg="Debe seleccionar un sistema de ecuaciones!",
-                tipo="error",
-                row=5,
-            )
-
         if met == "gj":
             sistema = (
                 self.mats_manager.resolver_sistema(self.sis_mat, met)
@@ -139,31 +137,92 @@ class ResolverSisFrame(CustomScrollFrame):
                     msg=str(e),  # type: ignore
                     tipo="error",
                     row=5,
+                    pady=10,
                 )
 
                 return
 
         delete_msg_frame(self.msg_frame)
-        if "!=" in sistema.solucion:  # type: ignore
-            # si el sistema es inconsistente, habria un != en la solucion
-            # entonces se muestra un mensaje de error
-            self.msg_frame = place_msg_frame(
-                parent_frame=self,
-                msg_frame=self.msg_frame,
-                msg=sistema.solucion,  # type: ignore
-                tipo="error",
-                row=5,
-            )
-
-            return
-
         self.msg_frame = place_msg_frame(
             parent_frame=self,
             msg_frame=self.msg_frame,
             msg=sistema.solucion,  # type: ignore
-            tipo="resultado",
+            tipo="error" if "!=" in sistema.solucion else "resultado",
             row=5,
+            pady=10,
         )
+
+        lambda_proc = (
+            sistema.procedimiento
+            if met == "gj"
+            else sistema.procedimiento + sistema.solucion
+        )
+
+        ctkButton(
+            self,
+            text="Mostrar procedimiento",
+            command=lambda: self.toggle_proc(lambda_proc),
+        ).grid(row=6, column=0, pady=5, sticky="n")
+
+    def toggle_proc(self, procedimiento: str) -> None:
+        """
+        Muestra o esconde la ventana de procedimiento.
+        """
+
+        if not self.proc_hidden:
+            return
+
+        new_window = ctkTop(self.app)
+        new_window.title(
+            "GaussBot: Procedimiento para resolver " +
+           f"el sistema de ecuaciones '{self.sis_mat}' mediante " +
+           f"{"el método" if "−" in self.met else "la"} {self.met}"
+        )
+
+        new_window.geometry("400x800")
+        self.after(100, new_window.focus)  # type: ignore
+
+        if self.app.modo_actual == "dark":
+            i = 0
+        elif self.app.modo_actual == "light":
+            i = 1
+
+        self.after(
+            250,
+            lambda: new_window.iconbitmap(APP_ICON[i]),  # pylint: disable=E0606
+        )
+
+        new_window.protocol(
+            "WM_DELETE_WINDOW",
+            lambda: delete_window(new_window),
+        )
+
+        dummy_frame = ctkFrame(
+            new_window,
+            fg_color="transparent",
+            corner_radius=20,
+            border_width=3,
+        )
+
+        dummy_frame.pack(expand=True, fill="both", padx=20, pady=20)
+        proc_frame = CustomScrollFrame(
+            dummy_frame,
+            fg_color="transparent",
+        )
+
+        proc_frame.pack(expand=True, fill="both", padx=10, pady=10)
+        self.proc_label = ctkLabel(
+            proc_frame,
+            text=procedimiento.strip(),
+            font=ctkFont(size=14),
+        )
+
+        self.proc_label.pack(expand=True, fill="both", padx=10, pady=10)
+        self.proc_hidden = False
+
+        def delete_window(new_window: ctkTop) -> None:
+            self.proc_hidden = True
+            new_window.destroy()
 
     def update_frame(self) -> None:
         """
@@ -171,19 +230,35 @@ class ResolverSisFrame(CustomScrollFrame):
         """
 
         self.select_sis_mat.configure(
+            values=self.master_frame.nombres_sistemas,
             variable=Variable(
                 value="Seleccione el sistema de ecuaciones a resolver:"
-            ), values=self.master_frame.nombres_sistemas,
+            ),
         )
 
-        self.select_sis_mat.configure(
+        self.select_metodo.configure(
+            values=list(self.metodos.keys()),
             variable=Variable(
                 value="Seleccione el método a utilizar:"
-            ), values=list(self.metodos.keys()),
+            ),
         )
 
-        for widget in self.winfo_children():
+        if not self.proc_hidden:
+            if self.app.modo_actual == "dark":
+                self.after(
+                    250,
+                    lambda: self.proc_label.master.master.iconbitmap(APP_ICON[1]),  # type: ignore
+                )
+            elif self.app.modo_actual == "light":
+                self.after(
+                    250,
+                    lambda: self.proc_label.master.master.iconbitmap(APP_ICON[0]),  # type: ignore
+                )
+
+        for widget in self.winfo_children():  # type: ignore
             widget.configure(bg_color="transparent")  # type: ignore
+            if widget not in (self.select_metodo, self.select_sis_mat):
+                widget.destroy()  # type: ignore
 
     def update_sis_mat(self, valor: str) -> None:
         """
@@ -192,13 +267,35 @@ class ResolverSisFrame(CustomScrollFrame):
         """
 
         self.sis_mat = valor
-        if len(self.sis_mat) == 1 and len(self.met) > 1:
+        delete_msg_frame(self.msg_frame)
+
+        for widget in self.winfo_children():  # type: ignore
+            if (
+                widget.grid_info()["row"] > 0
+                and
+                widget not in (self.select_sis_mat, self.select_metodo)
+            ):
+                widget.destroy()  # type: ignore
+
+        ctkLabel(
+            self,
+            text=str(self.mats_manager.sis_ingresados[self.sis_mat]),
+        ).grid(row=1, column=0, pady=10, sticky="n")
+
+        ctkLabel(
+            self,
+            text="",
+            image=generate_sep(False, (300, 3)),
+        ).grid(row=2, column=0, sticky="n")
+
+        self.select_metodo.grid_configure(row=3)
+        if "" not in (self.sis_mat, self.met):
             ctkButton(
                 self,
                 height=30,
                 text="Resolver",
-                command=self.resolver
-            ).grid(row=2, column=0, pady=5, padx=5, sticky="n")
+                command=self.resolver,
+            ).grid(row=4, column=0, pady=5, sticky="n")
 
     def update_metodo(self, valor: str) -> None:
         """
@@ -207,10 +304,14 @@ class ResolverSisFrame(CustomScrollFrame):
         """
 
         self.met = valor
-        if len(self.sis_mat) == 1 and len(self.met) > 1:
+        for widget in self.winfo_children():  # type: ignore
+            if widget.grid_info()["row"] > 4:
+                widget.destroy()  # type: ignore
+
+        if "" not in (self.sis_mat, self.met):
             ctkButton(
                 self,
                 height=30,
                 text="Resolver",
-                command=self.resolver
-            ).grid(row=2, column=0, pady=5, padx=5, sticky="n")
+                command=self.resolver,
+            ).grid(row=4, column=0, pady=5, sticky="n")

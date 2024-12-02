@@ -23,6 +23,8 @@ from os import (
 
 from typing import Union
 from customtkinter import CTkImage as ctkImage
+
+from sympy.sets import Contains
 from sympy import (
     I,
     zoo,
@@ -70,8 +72,8 @@ class FuncManager:
 
     def get_funcs(self) -> list[ctkImage]:
         """
-        Obtiene las funciones guardadas en self.funcs_ingresadas
-        y las retorna como string.
+        Obtiene las funciones guardadas en
+        self.funcs_ingresadas y retorna sus imagenes.
         """
 
         if not self._validar_funcs_ingresadas():
@@ -103,6 +105,7 @@ class FuncManager:
                 "a",
                 "b",
                 "c",
+                "E",
                 f"{func.nombre[0]}(a)",
                 f"{func.nombre[0]}(b)",
                 f"{func.nombre[0]}(c)",
@@ -131,6 +134,7 @@ class FuncManager:
                     format(Decimal(a).normalize(), "f"),
                     format(Decimal(b).normalize(), "f"),
                     format(Decimal(c).normalize(), "f"),
+                    format(Decimal(fc).normalize(), "f"),
                     format(Decimal(fa).normalize(), "f"),
                     format(Decimal(fb).normalize(), "f"),
                     format(Decimal(fc).normalize(), "f"),
@@ -166,6 +170,7 @@ class FuncManager:
                 "a",
                 "b",
                 "x_r",
+                "E",
                 f"{func.nombre[0]}(a)",
                 f"{func.nombre[0]}(b)",
                 f"{func.nombre[0]}(x_r)",
@@ -194,6 +199,7 @@ class FuncManager:
                     format(Decimal(a).normalize(), "f"),
                     format(Decimal(b).normalize(), "f"),
                     format(Decimal(xr).normalize(), "f"),
+                    format(Decimal(fxr).normalize(), "f"),
                     format(Decimal(fa).normalize(), "f"),
                     format(Decimal(fb).normalize(), "f"),
                     format(Decimal(fxr).normalize(), "f"),
@@ -231,6 +237,7 @@ class FuncManager:
                 "Iteración",
                 "x_i",
                 "x_i + 1",
+                "E",
                 f"{func.nombre[0]}(x_i)",
                 f"{func.nombre[0]}′(x_i)",
             ]
@@ -242,8 +249,12 @@ class FuncManager:
         f_prima = lambdify(func.var, derivada.expr)
 
         xi = float(inicial)
-        if xi not in dominio_derivada:
-            return (Decimal(xi), Decimal(float(f(xi))), registro, 0, 1)
+        try:
+            if xi not in dominio_derivada:
+                return (Decimal(xi), Decimal(float(f(xi))), registro, 0, 1)
+        except TypeError:
+            if not Contains(xi, dominio_derivada).simplify():
+                return (Decimal(xi), Decimal(float(f(xi))), registro, 0, 1)
 
         i = 0
         while i < max_its:
@@ -252,12 +263,24 @@ class FuncManager:
             fxi_prima: float = f_prima(xi)
 
             temp_xi = xi
+            try:
+                if temp_xi not in dominio_func:
+                    return (Decimal(temp_xi), Decimal(fxi), registro, i, -1)
+                if temp_xi not in dominio_derivada:
+                    return (Decimal(temp_xi), Decimal(fxi), registro, i, 1)
+            except TypeError:
+                if not Contains(temp_xi, dominio_func).simplify():
+                    return (Decimal(temp_xi), Decimal(fxi), registro, i, 1)
+                if not Contains(temp_xi, dominio_derivada).simplify():
+                    return (Decimal(temp_xi), Decimal(fxi), registro, i, 1)
+
             xi -= fxi / fxi_prima
             registro.append(
                 [
                     i,
                     format(Decimal(temp_xi).normalize(), "f"),
                     format(Decimal(xi).normalize(), "f"),
+                    format(Decimal(fxi).normalize(), "f"),
                     format(Decimal(fxi).normalize(), "f"),
                     format(Decimal(fxi_prima).normalize(), "f"),
                 ]
@@ -268,10 +291,6 @@ class FuncManager:
             if fxi_prima == 0:
                 return (Decimal(xi), Decimal(fxi), registro, i, -I)
 
-            if xi not in dominio_func:
-                return (Decimal(xi), Decimal(fxi), registro, i, -1)
-            if xi not in dominio_derivada:
-                return (Decimal(xi), Decimal(fxi), registro, i, 1)
         return (Decimal(xi), Decimal(fxi), registro, max_its, zoo)
 
     @staticmethod
@@ -362,9 +381,9 @@ class FuncManager:
                 sort_keys=True,
             )
 
-            LOGGER.info(
-                "Funciones guardadas en 'funciones.json'!"
-            )
+        LOGGER.info(
+            "Funciones guardadas en 'funciones.json'!"
+        )
 
     def _load_funcs(self) -> dict[str, Func]:
         """

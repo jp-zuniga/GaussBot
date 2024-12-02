@@ -443,6 +443,9 @@ class MostrarMats(CustomScrollFrame):
         Inicializa las widgets del frame.
         """
 
+        for widget in self.winfo_children():  # type: ignore
+            widget.destroy()  # type: ignore
+
         if len(self.mats_manager.mats_ingresadas.keys()) == 0:
             self.show_frame = place_msg_frame(
                 parent_frame=self,
@@ -578,6 +581,9 @@ class EliminarMats(CustomScrollFrame):
 
             return
 
+        for widget in self.winfo_children():  # type: ignore
+            widget.destroy()  # type: ignore
+
         # crear widgets
         instruct_eliminar = ctkLabel(self, text="¿Cuál matriz desea eliminar?")
         self.select_mat = CustomDropdown(
@@ -638,7 +644,6 @@ class EliminarMats(CustomScrollFrame):
             and
             isinstance(self.msg_frame, SuccessFrame)
         ):
-
             def clear_after_wait() -> None:
                 delete_msg_frame(self.msg_frame)
                 self.msg_frame = place_msg_frame(
@@ -651,20 +656,21 @@ class EliminarMats(CustomScrollFrame):
 
                 for widget in self.winfo_children():
                     if not isinstance(widget, ctkFrame):
-                        widget.destroy()
-            self.after(2000, clear_after_wait)
+                        widget.grid_remove()
+            self.after(1000, clear_after_wait)
 
         elif isinstance(self.msg_frame, ErrorFrame):
             self.setup_frame()
+
         else:
             for widget in self.winfo_children():
                 widget.configure(bg_color="transparent")  # type: ignore
             self.select_mat.configure(
-                variable=Variable(value=self.nombres_matrices[0]),
                 values=self.nombres_matrices,
+                variable=Variable(value=self.nombres_matrices[0]),
             )
 
-            self.after(2000, lambda: delete_msg_frame(self.msg_frame))
+            self.after(1000, lambda: delete_msg_frame(self.msg_frame))
 
     def update_mat(self, valor: str) -> None:
         """

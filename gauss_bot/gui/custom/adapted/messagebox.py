@@ -80,14 +80,12 @@ class CustomMessageBox(ctkTop):
             self.master_window.winfo_width() * 0.5
             + self.master_window.winfo_x()
             - 0.5 * self.width
-            + 7
         )
 
         self.spawn_y = int(
             self.master_window.winfo_height() * 0.5
             + self.master_window.winfo_y()
             - 0.5 * self.height
-            + 20
         )
 
         self.after(

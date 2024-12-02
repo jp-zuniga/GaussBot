@@ -13,10 +13,16 @@ from os import (
     path,
 )
 
-from re import compile as comp
+from re import (
+    compile as comp,
+    sub,
+)
+
 from typing import Optional
 from customtkinter import CTkImage as ctkImage
+
 from matplotlib import use
+from matplotlib.backends.backend_agg import FigureCanvasAgg
 from matplotlib.pyplot import (
     axis, close,
     rc, savefig,
@@ -66,19 +72,39 @@ class Func:
         """
 
         self.nombre = nombre
-        self.var = Symbol(self.nombre[-2])
+
+        var_pattern = r"\(([a-z])\)"
+        self.var = Symbol(
+            comp(var_pattern).findall(nombre)[0]
+        )
 
         self.latexified = latexified
         self.latex_img: Optional[ctkImage] = None
 
+        def replace_var(expr: str) -> str:
+            var_str = str(self.var)
+            patt = r"\bx\b"
+
+            replaced_expr = expr
+            for _ in list(comp(patt).finditer(expr)):
+                replaced_expr = sub(
+                    patt,
+                    var_str,
+                    expr,
+                )
+            return replaced_expr
+
         if "sen" in expr:
             expr = expr.replace("sen", "sin")
-        if "e^" in expr:
-            expr = expr.replace("e^", "exp")
         if "^" in expr:
             expr = expr.replace("^", "**")
 
-        expr = expr.replace("x", str(self.var))
+        expr = replace_var(
+            str(parse_expr(expr, transformations=TRANSFORMS))
+        )
+
+        if "e**" in expr:
+            expr = expr.replace("e**", "exp")
 
         self.expr: Expr = parse_expr(
             expr,
@@ -101,22 +127,17 @@ class Func:
 
         else:
             num_diff = self.nombre.count("′")
-            match num_diff:
-                case 1:
-                    d_nombre = self.nombre.replace("′", "′′")
-                case 2:
-                    d_nombre = self.nombre.replace("′′", "′′′")
-                case _:
-                    d_nombre = self.nombre.replace(
-                        "′" * num_diff,
-                        f"^({num_diff + 1})",
-                    )
+            d_nombre = self.nombre.replace(
+                "".join("′" for _ in range(num_diff)),
+                "".join("′" for _ in range(num_diff + 1)),
+            )
 
         return Func(d_nombre, str(diff(self.expr, self.var)))  # pylint: disable=E0606
 
     def integrar(self) -> "Func":
         """
-        Retorna un nuevo objeto Func() que representa el integral indefinido de self.
+        Retorna un nuevo objeto Func() que
+        representa el integral indefinido de self.
         """
 
         try:
@@ -132,10 +153,8 @@ class Func:
                 self.nombre[match.end():]
             )
         else:
-            num_ints = 0
+            i_nombre = rf"{self.nombre[0]}^{"(-1)"}{self.nombre[1:]}"
 
-        notation = f"^(-{num_ints + 1})"
-        i_nombre = f"{self.nombre[0]}{notation}{self.nombre[1:]}"
         return Func(i_nombre, str(integrate(self.expr, self.var)))
 
     def get_dominio(self) -> Interval:
@@ -164,27 +183,22 @@ class Func:
     def get_png(self) -> ctkImage:
         """
         Retorna la imagen PNG de la función si ya había sido generada.
-        Si no, llama a latex_to_png para generarla, y la retorna.
+        Si no, llama a latex_to_png() para generarla, y la retorna.
         """
 
         if not self.latexified or self.latex_img is None:
             self.latex_img = Func.latex_to_png(
                 nombre_expr=(
                     self.nombre
-                    if self.nombre.count("′") == 0
-                    else None
+                    if (
+                        self.nombre.count("′") == 0
+                        and
+                        self.nombre.count("∫") == 0
+                    )
+                    else self.get_di_nombre()
                 ),
-                expr=(
-                    str(self.expr)
-                    if self.nombre.count("′") == 0
-                    else None
-                ),
-                misc_str=(
-                    Func.get_derivada_nombre(self) + " = " + str(self.expr)
-                    if self.nombre.count("′") > 0
-                    else None
-                ),
-                con_nombre=self.nombre.count("′") == 0,
+                expr=str(self.expr),
+                con_nombre=True,
             )
 
             self.latexified = True
@@ -207,11 +221,17 @@ class Func:
         * expr: string de la expresión a convertir
         * misc_str: string de texto a convertir
         * con_nombre: si se debe incluir el nombre de la función en la imagen
-        * font_size: tamaño de la fuente en la imagen PNG
+
+        - kwargs:
+            - ln_notation: si se debe usar ln en lugar de log
+            - font_size: tamaño de la fuente en la imagen
         """
 
         makedirs(SAVED_FUNCS_PATH, exist_ok=True)
-        output_file = path.join(SAVED_FUNCS_PATH, rf"{output_file or nombre_expr}.png")
+        output_file = path.join(
+            SAVED_FUNCS_PATH,
+            rf"{output_file or nombre_expr}.png",
+        )
 
         if expr is not None:
             latex_str: str = latex(
@@ -229,18 +249,25 @@ class Func:
         rc("text", usetex=True)
         rc("font", family="serif")
 
-        fig_length = 8 + (len(latex_str) // 12)
-        fig_height = (
-            2
-            if r"\\" not in latex_str
-            else
-            2 + latex_str.count(r"\\") * 2
+        temp_fig, temp_ax = subplots()
+        temp_text = temp_ax.text(
+            0.5,
+            0.5,
+            f"${latex_str}$",
+            horizontalalignment="center",
+            verticalalignment="center",
+            fontsize=kwargs.pop("font_size", 75),
+            transform=temp_ax.transAxes
         )
 
-        img_length = fig_length * 20
-        img_height = fig_height * 20
+        temp_canvas = FigureCanvasAgg(temp_fig)
+        temp_canvas.draw()
 
-        fig, _ = subplots(figsize=(fig_length, fig_height))
+        bbox = temp_text.get_window_extent(renderer=temp_canvas.get_renderer())
+        width, height = (bbox.width / temp_fig.dpi) + 2, (bbox.height / temp_fig.dpi) + 2
+        close(temp_fig)
+
+        fig, _ = subplots(figsize=(width, height))
         axis("off")
         text(
             0.5,
@@ -255,7 +282,6 @@ class Func:
             output_file,
             format="png",
             transparent=True,
-            pad_inches=0.05,
             dpi=200,
         )
 
@@ -266,18 +292,46 @@ class Func:
         return ctkImage(
             dark_image=inverted_img,
             light_image=img,
-            size=(img_length, img_height),
+            size=(int(width * 20), int(height * 20)),
         )
 
-    @staticmethod
-    def get_derivada_nombre(derivada: "Func") -> str:
+    def get_di_nombre(self, diffr: bool = False, integ: bool = False) -> str:
+        """
+        Llama las funciones get_derivada_nombre() o get_integral_nombre().
+        """
+
+        num_diff = self.nombre.count("′")
+        num_integ = int(
+            next(
+                (x for x in self.nombre if x.isdigit()),
+                0,
+            )
+        )
+
+        if num_diff != 0 or diffr:
+            return self.get_derivada_nombre(num_diff)
+        if num_integ != 0 or integ:
+            return self.get_integral_nombre(num_integ)
+        raise NameError("No se pudo determinar el tipo de función!")
+
+    def get_derivada_nombre(self, num_diff: int) -> str:
         """
         Formate el nombre de la derivada en la
         notación dy/dx, con respecto a la variable.
         """
 
-        num_diff = derivada.nombre.count("′")
         return (
-            f"\\frac{{d{f"^{{{num_diff}}}" if num_diff > 1 else ""}{derivada.nombre[0]}}}" +
-            f"{{d{str(derivada.var)}{f"^{{{num_diff}}}" if num_diff > 1 else ""}}}"
+            f"\\frac{{d{f"^{{{num_diff}}}" if num_diff > 1 else ""}{self.nombre[0]}}}" +
+            f"{{d{str(self.var)}{f"^{{{num_diff}}}" if num_diff > 1 else ""}}}"
+        )
+
+    def get_integral_nombre(self, num_integ: int) -> str:
+        """
+        Formate el nombre de la integral con la
+        notación ∫ f(x) dx, con respecto a la variable.
+        """
+
+        return (
+            rf"{r"".join(r"\int" for _ in range(num_integ))} " +
+            rf"{self.nombre[0] + rf"({self.var})"} \ d{str(self.var)}"
         )

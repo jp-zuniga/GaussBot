@@ -203,7 +203,7 @@ class Vector:
 
         Errores:
         - ArithmethicError:
-            - si no se hay (n - 1) vectores en vecs
+            - si no hay (n - 1) vectores en vecs
             - si los vectores no están en R^n
 
         Para n = 2, se retorna un vector unidimensional

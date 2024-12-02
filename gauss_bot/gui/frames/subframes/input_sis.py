@@ -468,6 +468,9 @@ class MostrarSistemas(CustomScrollFrame):
 
             return
 
+        for widget in self.winfo_children():  # type: ignore
+            widget.destroy()  # type: ignore
+
         self.select_opcion = CustomDropdown(
             self,
             height=30,
@@ -586,6 +589,9 @@ class EliminarSistemas(CustomScrollFrame):
 
             return
 
+        for widget in self.winfo_children():  # type: ignore
+            widget.destroy()  # type: ignore
+
         # crear widgets
         instruct_eliminar = ctkLabel(self, text="¿Cuál sistema desea eliminar?")
         self.select_sis = CustomDropdown(
@@ -644,7 +650,6 @@ class EliminarSistemas(CustomScrollFrame):
             and
             isinstance(self.msg_frame, SuccessFrame)
         ):
-
             def clear_after_wait() -> None:
                 delete_msg_frame(self.msg_frame)
                 self.msg_frame = place_msg_frame(
@@ -658,19 +663,20 @@ class EliminarSistemas(CustomScrollFrame):
                 for widget in self.winfo_children():
                     if not isinstance(widget, ctkFrame):
                         widget.destroy()
-            self.after(2000, clear_after_wait)
+            self.after(1000, clear_after_wait)
 
         elif isinstance(self.msg_frame, ErrorFrame):
             self.setup_frame()
+
         else:
             for widget in self.winfo_children():
                 widget.configure(bg_color="transparent")  # type: ignore
             self.select_sis.configure(
+                values=self.nombres_sistemas,
                 variable=Variable(value=self.nombres_sistemas[0]),
-                values=self.nombres_sistemas
             )
 
-            self.after(2000, lambda: delete_msg_frame(self.msg_frame))
+            self.after(1000, lambda: delete_msg_frame(self.msg_frame))
 
     def update_sis(self, valor: str) -> None:
         """

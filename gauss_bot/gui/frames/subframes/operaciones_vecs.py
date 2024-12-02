@@ -139,6 +139,11 @@ class MagnitudTab(CustomScrollFrame):
         Actualiza los backgrounds y los datos del frame.
         """
 
+        self.select_vec.configure(
+            values=self.master_frame.nombres_vectores,
+            variable=Variable(value=self.master_frame.nombres_vectores[0]),
+        )
+
         for widget in self.winfo_children():  # type: ignore
             widget.configure(bg_color="transparent")  # type: ignore
 
@@ -306,7 +311,7 @@ class SumaRestaTab(CustomScrollFrame):
         self.msg_frame = place_msg_frame(
             parent_frame=self.resultado_frame,
             msg_frame=self.msg_frame,
-            msg=f"{header}:\n{str(resultado)}",  # pylint: disable=E0606
+            msg=f"\n{header}:\n{str(resultado)}\n",  # pylint: disable=E0606
             tipo="resultado",
         )
 
@@ -613,6 +618,14 @@ class MultiplicacionTab(CustomScrollFrame):
 
         def setup_selections(input_dims: str) -> None:
             delete_msg_frame(self.msg_frame)
+            for widget in self.tab_prod_cruz.winfo_children():  # type: ignore
+                if (
+                    widget is not self.resultado_cruz
+                    and
+                    dict(widget.grid_info()).get("row", -1) > 0  # type: ignore
+                ):
+                    widget.destroy()  # type: ignore
+
             try:
                 dimensiones = int(input_dims)
                 if dimensiones <= 1:
@@ -665,14 +678,15 @@ class MultiplicacionTab(CustomScrollFrame):
                 image=INFO_ICON,
                 tooltip_text="Solamente se están mostrando " +
                             f"los vectores guardados en R{dimensiones}.",
-            ).grid(row=1, column=0, columnspan=3, padx=5, pady=(10, 3), sticky="n")
+            ).grid(row=1, column=0, columnspan=3, padx=5, pady=(15, 3), sticky="n")
 
             ctkLabel(
                 self.tab_prod_cruz,
                 text="Seleccione los vectores a multiplicar:",
             ).grid(row=2, column=0, columnspan=3, padx=5, pady=3, sticky="n")
 
-            for i in range(dimensiones - 1):
+            range_dims = dimensiones if dimensiones == 2 else dimensiones - 1
+            for i in range(range_dims):
                 dropdowns.append(
                     CustomDropdown(
                         self.tab_prod_cruz,
@@ -798,7 +812,7 @@ class MultiplicacionTab(CustomScrollFrame):
         self.msg_frame = place_msg_frame(
             parent_frame=self.resultado_escalar,
             msg_frame=self.msg_frame,
-            msg=f"{header}:\n{str(resultado)}",  # pylint: disable=E0606
+            msg=f"\n{header}:\n{str(resultado)}\n",  # pylint: disable=E0606
             tipo="resultado",
         )
 
@@ -837,7 +851,7 @@ class MultiplicacionTab(CustomScrollFrame):
         self.msg_frame = place_msg_frame(
             parent_frame=self.resultado_punto,
             msg_frame=self.msg_frame,
-            msg=f"{header}:\n{str(resultado)}",  # pylint: disable=E0606
+            msg=f"\n{header}:\n{str(resultado)}\n",  # pylint: disable=E0606
             tipo="resultado",
         )
 
@@ -861,12 +875,12 @@ class MultiplicacionTab(CustomScrollFrame):
         )
 
         header = " × ".join([dropdown.get() for dropdown in dropdowns])
-        resultado = Vector.prod_cruz(len(vectores) + 1, vectores)
+        resultado = Vector.prod_cruz(len(vectores[0]), vectores)
 
         self.msg_frame = place_msg_frame(
             parent_frame=self.resultado_cruz,
             msg_frame=self.msg_frame,
-            msg=f"{header}:\n{str(resultado)}",
+            msg=f"\n{header}:\n{str(resultado)}\n",
             tipo="resultado",
         )
 
@@ -905,7 +919,7 @@ class MultiplicacionTab(CustomScrollFrame):
         self.msg_frame = place_msg_frame(
             parent_frame=self.resultado_mat_vec,
             msg_frame=self.msg_frame,
-            msg=f"{header}:\n{str(resultado)}",  # pylint: disable=E0606
+            msg=f"\n{header}:\n{str(resultado)}\n",  # pylint: disable=E0606
             tipo="resultado",
         )
 

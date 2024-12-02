@@ -41,6 +41,9 @@ class SistemaEcuaciones:
         self.solucion = ""
         self.procedimiento = ""
 
+    def __str__(self) -> str:
+        return str(self.matriz)
+
     def cramer(self, nombre: str) -> None:
         """
         Resuelve un sistema de ecuaciones ocupando la Regla de Cramer.
@@ -124,16 +127,15 @@ class SistemaEcuaciones:
             tipo_sol = "no trivial"
 
         # almacenar el procedimiento
-        self.procedimiento += "\n---------------------------------------------"
-        self.procedimiento += f"Variables de matriz {nombre}:"
-        self.procedimiento += str(mat_variables)
-        self.procedimiento += "Vector b:"
-        self.procedimiento += str(col_aumentada)
-        self.procedimiento += "---------------------------------------------\n"
-        self.procedimiento += f"Determinante de la matriz de variables = {det}"
+        self.procedimiento +=  "---------------------------------------------\n"
+        self.procedimiento += f"{nombre}_var:\n" + str(mat_variables)
+        self.procedimiento +=  "\n\nb:\n" + str(col_aumentada)
+        self.procedimiento +=  "\n---------------------------------------------\n"
+
+        self.procedimiento += f"|  {nombre}_var  |  =  {det}\n\n"
         for i, subdet in enumerate(sub_dets):
-            self.procedimiento += f"Determinante de {nombre}_{i+1}(b) = {subdet}"
-        self.procedimiento += "\n---------------------------------------------\n"
+            self.procedimiento += f"|  {nombre}_{i+1} (b)  |  =  {subdet}\n"
+        self.procedimiento += "---------------------------------------------\n"
 
         # almacenar la solucion
         self.solucion += f"\nSolución {tipo_sol} encontrada:\n"
@@ -160,22 +162,26 @@ class SistemaEcuaciones:
           y el procedimiento en .procedimiento
         """
 
+        self.procedimiento += "\nMatriz original:\n"
+        self.procedimiento += str(self.matriz) + "\n"
+
         if self.matriz.es_matriz_cero():
             self.solucion += "\nSistema tiene soluciones infinitas!\n"
-            self.procedimiento += str(self.matriz)
-            self.procedimiento += "Todas las ecuaciones tienen la forma 0 = 0, "
-            self.procedimiento += "lo cual siempre es verdadero.\n"
-            self.procedimiento += "Por lo tanto, el sistema tiene soluciones infinitas."
+            self.procedimiento += "\nTodas las ecuaciones tienen la forma 0 = 0, "
+            self.procedimiento += "  lo cual siempre es verdadero.".strip()
+            self.procedimiento += "\nPor lo tanto, el sistema tiene soluciones infinitas.\n"
             return
 
         test_inicial = self._validar_consistencia()
         if not test_inicial[0]:
             if self._validar_escalonada_reducida():
                 self.procedimiento += "\nMatriz ya esta en su forma escalonada reducida!\n\n"
+
             self.procedimiento += str(self.matriz)
             self._obtener_soluciones_gj(
                 unica=False, libres=[], validacion=test_inicial
             )
+
             return
 
         if self._validar_escalonada_reducida():
@@ -188,14 +194,22 @@ class SistemaEcuaciones:
             self._obtener_soluciones_gj(
                 unica=False, libres=[], validacion=test_final
             )
+
             return
 
         libres = self._encontrar_variables_libres()
         solucion_unica = self._validar_escalonada_reducida() and libres == []
-        if solucion_unica:
-            self._obtener_soluciones_gj(unica=True, libres=[], validacion=(True, -1))
-        else:
-            self._obtener_soluciones_gj(unica=False, libres=libres, validacion=(True, -1))
+
+        self._obtener_soluciones_gj(
+            unica=solucion_unica,
+            libres=(
+                []
+                if solucion_unica
+                else
+                libres
+            ),
+            validacion=(True, -1),
+        )
 
     def _reducir_matriz(self) -> None:
         """
@@ -246,11 +260,12 @@ class SistemaEcuaciones:
 
             # intercambiar filas si es necesario
             if fila_pivote != fila_actual:
-                temp = self.matriz.valores[fila_actual]
-                self.matriz.valores[fila_actual] = self.matriz.valores[fila_pivote]
-                self.matriz.valores[fila_pivote] = temp
-                del temp
-                self.procedimiento += f"\nF{fila_actual+1} <==> F{fila_pivote+1}\n"
+                self.matriz.valores[fila_actual], self.matriz.valores[fila_pivote] = (
+                    self.matriz[fila_pivote],
+                    self.matriz[fila_actual],
+                )
+
+                self.procedimiento += f"\n\nF{fila_actual+1}  <=>  F{fila_pivote+1}:\n"
                 self.procedimiento += str(self.matriz)
 
             # normalizar fila pivote (convertir elemento pivote en 1)
@@ -260,10 +275,10 @@ class SistemaEcuaciones:
                     self.matriz.valores[fila_actual][k] /= pivote
 
                 if pivote == -1:
-                    self.procedimiento += f"\nF{fila_actual+1} => -F{fila_actual+1}\n"
+                    self.procedimiento += f"\n\nF{fila_actual+1}  =>  -F{fila_actual+1}:\n"
                 else:
-                    self.procedimiento += f"\nF{fila_actual+1} => "
-                    self.procedimiento += f"F{fila_actual+1} / {pivote}\n"
+                    self.procedimiento += f"\n\nF{fila_actual+1}  =>  "
+                    self.procedimiento += f"F{fila_actual+1} / {_format_factor(pivote, False)}:\n"
                 self.procedimiento += str(self.matriz)
 
             # eliminar elementos debajo del pivote
@@ -274,8 +289,8 @@ class SistemaEcuaciones:
                 for k in range(self.matriz.columnas):
                     self.matriz.valores[f][k] -= factor * self.matriz[fila_actual, k]
 
-                self.procedimiento += f"\nF{fila_actual+1} => F{fila_actual+1} − "
-                self.procedimiento += f"({factor} * F{fila_pivote+1})\n"
+                self.procedimiento += f"\n\nF{fila_actual+1}  =>  F{fila_actual+1} − "
+                self.procedimiento += f"[ {_format_factor(factor)}F{fila_pivote+1} ]:\n"
                 self.procedimiento += str(self.matriz)
             fila_actual += 1
 
@@ -304,8 +319,8 @@ class SistemaEcuaciones:
                 for k in range(self.matriz.columnas):
                     self.matriz.valores[f][k] -= factor * self.matriz[i, k]
 
-                self.procedimiento += f"\nF{f+1} => F{f+1} − "
-                self.procedimiento += f"({factor} * F{i+1})\n"
+                self.procedimiento += f"\n\nF{f+1}  =>  F{f+1} − "
+                self.procedimiento += f"[ {_format_factor(factor)}F{i+1} ]:\n"
                 self.procedimiento += str(self.matriz)
 
     def _encontrar_variables_libres(self) -> list[int]:
@@ -389,16 +404,18 @@ class SistemaEcuaciones:
                 continue
 
             signo = " + " if coeficiente > 0 else " − "
-            variable = (
-                f"{abs(coeficiente)}*X{j+1}"
-                if abs(coeficiente) not in (1, -1)
-                else f"X{j+1}"
-            )
+
+            if coeficiente in (1, -1):
+                variable = f"X{j + 1}"
+            elif coeficiente.is_integer():
+                variable = f"{abs(coeficiente)}X{j + 1}"
+            else:
+                variable = f"[ ({abs(coeficiente).limit_denominator(1000)}) • X{j + 1} ]"
 
             expresion += (
                 f"{signo}{variable}"
                 if expresion != ""
-                else f"{"-" if coeficiente < 0 else ""}{variable}"
+                else f"{"−" if coeficiente < 0 else ""}{variable}"
             )
 
         return expresion
@@ -532,9 +549,9 @@ class SistemaEcuaciones:
         solucion, fila_inconsistente = validacion
 
         if not solucion and fila_inconsistente != -1:
-            self.solucion += f"\nEn F{fila_inconsistente+1}: 0 != "
-            self.solucion += f"{self.matriz[fila_inconsistente, -1]}\n"
-            self.solucion += "Sistema es inconsistente!\n"
+            self.solucion +=  "\nSistema es inconsistente!"
+            self.solucion += f"\nEn la ecuación #{fila_inconsistente+1}:"
+            self.solucion += f"\n0 != {self.matriz[fila_inconsistente, -1]}\n"
             return
 
         if unica:
@@ -555,6 +572,25 @@ class SistemaEcuaciones:
 
         ecuaciones = self._despejar_variables(libres)
         self.solucion += "\nSistema no tiene solución única!\n"
-        self.solucion += "Solución general encontrada:\n"
+        self.solucion += "\nSolución general encontrada:\n"
         for linea in ecuaciones:
             self.solucion += linea
+
+
+def _format_factor(factor: Fraction, mult: bool = True) -> str:
+    """
+    Formatea un factor para mostrarlo en el procedimiento.
+    * factor: fracción a formatear
+    """
+
+    if factor == 1:
+        return ""
+    if factor == -1:
+        return "−"
+    if factor.is_integer():
+        return str(factor)
+
+    frac_factor = f"( {factor} )"
+    if mult:
+        return frac_factor + " • "
+    return frac_factor

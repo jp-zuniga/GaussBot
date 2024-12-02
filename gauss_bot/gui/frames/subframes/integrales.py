@@ -4,13 +4,12 @@ un frame que permite encontrar
 las raíces de funciones matemáticas.
 """
 
-from re import compile as comp
+from tkinter import Variable
 from typing import (
     TYPE_CHECKING,
     Optional,
 )
 
-from tkinter import Variable
 from customtkinter import (
     CTkButton as ctkButton,
     CTkFrame as ctkFrame,
@@ -62,9 +61,10 @@ class IntegralesFrame(CustomScrollFrame):
         self.func_select = CustomDropdown(
             self,
             width=40,
+            values=self.nombres_funcs,
             variable=Variable(
                 value="Seleccione una función para integrar:",
-            ), values=self.nombres_funcs,
+            ),
             command=self.mostrar_func,
         )
 
@@ -98,42 +98,36 @@ class IntegralesFrame(CustomScrollFrame):
             self,
             height=30,
             text=f"Integrar {self.func.nombre}",
-            command=self.encontrar_derivada,
+            command=self.encontrar_integral,
         ).grid(row=3, column=0, ipadx=10, pady=5, sticky="n")
 
-    def encontrar_derivada(self) -> None:
+    def encontrar_integral(self) -> None:
         """
         Encuentra y muestra la integral de la función seleccionada.
         """
 
         integral = self.func.integrar()
-        try:
-            match = list(comp(r"\^\(-\d+\)").finditer(self.func.nombre))[-1]
-            num_ints = int(next(x for x in self.func.nombre if x.isdigit()))
-            i_nombre = (
-                self.func.nombre[:match.start()] +
-                rf"^{{-{num_ints}}}" +
-                self.func.nombre[match.end():]
-            )
-        except IndexError:
-            i_nombre = self.func.nombre[0] + r"^{(-1)}" + self.func.nombre[1:]
 
-        int_img = Func.latex_to_png(
-            output_file=integral.nombre,
-            nombre_expr=i_nombre,
-            expr=str(integral.expr) + " + c",
-            con_nombre=True,
-            order=None,
-        )
+        try:
+            msg = None
+            integ_img = Func.latex_to_png(
+                output_file=integral.nombre,
+                nombre_expr=integral.get_di_nombre(integ=True),
+                expr=str(integral.expr),
+                con_nombre=True,
+            )
+        except RuntimeError:
+            integ_img = None
+            msg = "No se pudo generar la imagen del integral!"
 
         self.msg_frame = place_msg_frame(
             parent_frame=self,
             msg_frame=self.msg_frame,
-            img=int_img,
-            tipo="resultado",
+            msg=msg,
+            img=integ_img,
+            tipo="resultado" if msg is None else "error",
             row=4,
             pady=10,
-            sticky="n",
         )
 
     def update_frame(self):
@@ -144,10 +138,12 @@ class IntegralesFrame(CustomScrollFrame):
 
         delete_msg_frame(self.msg_frame)
         self.nombres_funcs = list(self.func_manager.funcs_ingresadas.keys())
-        self.func_select.configure(values=self.nombres_funcs)
+        self.func_select.configure(
+            values=self.nombres_funcs,
+            variable=Variable(value="Seleccione una función para integrar:"),
+        )
 
         for widget in self.winfo_children():  # type: ignore
             widget.configure(bg_color="transparent")  # type: ignore
-            if isinstance(widget, ctkFrame):
-                for subwidget in widget.winfo_children():  # type: ignore
-                    subwidget.configure(bg_color="transparent")  # type: ignore
+            if dict(widget.grid_info()).get("row", -1) > 0:
+                widget.destroy()

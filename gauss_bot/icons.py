@@ -1,6 +1,6 @@
 """
-Definiciones de todos los íconos e
-imagenes de la aplicación.
+Definiciones de todos los íconos
+e imagenes de la aplicación.
 """
 
 from os import (
@@ -189,6 +189,7 @@ ENTER_ICON = ctkImage(
 LIMPIAR_ICON = ctkImage(
     dark_image=open_img(path.join(ASSET_PATH, "dark_mode", "light_limpiar_icon.png")),
     light_image=open_img(path.join(ASSET_PATH, "light_mode", "dark_limpiar_icon.png")),
+    size=(27, 20),
 )
 
 MOSTRAR_ICON = ctkImage(

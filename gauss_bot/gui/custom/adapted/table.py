@@ -41,10 +41,7 @@ class CustomTable(ctkFrame):
 
         self.parent = master
         self.values = values
-
         self.columnconfigure(0, weight=1)
-        self.rowconfigure(0, weight=1)
-        self.rowconfigure(1, weight=1)
         self.rowconfigure(2, weight=1)
 
         self.top_fg = ThemeManager.theme["CTkFrame"]["top_fg_color"]
@@ -58,7 +55,7 @@ class CustomTable(ctkFrame):
                 weight="bold",
                 underline=True,
             ),
-        ).grid(row=0, column=0, padx=20, pady=20, sticky="nsew")
+        ).grid(row=0, column=0, padx=20, pady=20, sticky="new")
 
         self.header_frame = ctkFrame(
             self,
@@ -85,18 +82,18 @@ class CustomTable(ctkFrame):
             cell._text_label.configure(justify="center")  # type: ignore
             cell.grid(
                 row=0, column=j,
-                padx=0 if j == 0 else (1, 0),
+                padx=6 if j == 0 else (1, 0),
                 sticky="nsew",
             )
 
-        self.inside_frame = CustomScrollFrame(
+        self.cells_frame = CustomScrollFrame(
             self,
             border_width=0,
             fg_color="transparent",
         )
 
         self.header_frame.grid(row=1, column=0, padx=20, sticky="nsew")
-        self.inside_frame.grid(
+        self.cells_frame.grid(
             row=2, column=0,
             padx=20, pady=(0, 20),
             sticky="nsew",
@@ -112,19 +109,40 @@ class CustomTable(ctkFrame):
 
         for i, row in enumerate(self.values[1:]):
             for j, value in enumerate(row):
-                self.inside_frame.rowconfigure(i, weight=1)
-                self.inside_frame.columnconfigure(j, weight=1)
+                self.cells_frame.rowconfigure(i, weight=1)
+                self.cells_frame.columnconfigure(j, weight=1)
 
                 cell = ctkButton(
-                    self.inside_frame,
+                    self.cells_frame,
                     text=value,
-                    fg_color=self.top_fg if i % 2 == 0 else self.fg,
+                    fg_color=(
+                        ThemeManager.theme["CTkButton"]["fg_color"]
+                        if i == len(self.values) - 2
+                        else
+                        self.top_fg
+                        if i % 2 == 0
+                        else
+                        self.fg
+                    ),
                     text_color=ThemeManager.theme["CTkEntry"]["text_color"],
                     border_color=ThemeManager.theme["CTkFrame"]["border_color"],
-                    border_width=1,
+                    border_width=3 if i == len(self.values) - 2 else 1,
                     border_spacing=0,
                     corner_radius=6,
-                    font=ctkFont(size=10),
+                    font=ctkFont(
+                        size=(
+                            12
+                            if j == 0 or i == len(self.values) - 2
+                            else
+                            10
+                        ),
+                        weight=(
+                            "bold"
+                            if j == 0 or i == len(self.values) - 2
+                            else
+                            "normal"
+                        ),
+                    ),
                     hover=False,
                 )
 
@@ -132,7 +150,7 @@ class CustomTable(ctkFrame):
                 cell.grid(
                     row=i,
                     column=j,
-                    padx=0 if j == 0 else (1, 0),
-                    pady=(0, 1),
+                    padx=(0, 6) if j == 0 else (1, 0),
+                    pady=3 if i == len(self.values) - 2 else (0, 1),
                     sticky="nsew",
                 )

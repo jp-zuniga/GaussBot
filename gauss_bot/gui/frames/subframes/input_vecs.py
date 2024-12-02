@@ -387,6 +387,9 @@ class MostrarVecs(CustomScrollFrame):
 
             return
 
+        for widget in self.winfo_children():  # type: ignore
+            widget.destroy()  # type: ignore
+
         self.select_opcion = CustomDropdown(
             self,
             height=30,
@@ -505,6 +508,9 @@ class EliminarVecs(CustomScrollFrame):
 
             return
 
+        for widget in self.winfo_children():  # type: ignore
+            widget.destroy()  # type: ignore
+
         # crear widgets
         instruct_eliminar = ctkLabel(self, text="¿Cuál vector desea eliminar?")
         self.select_vec = CustomDropdown(
@@ -579,19 +585,20 @@ class EliminarVecs(CustomScrollFrame):
                 for widget in self.winfo_children():
                     if not isinstance(widget, ctkFrame):
                         widget.destroy()
-            self.after(2000, clear_after_wait)
+            self.after(1000, clear_after_wait)
 
         elif isinstance(self.msg_frame, ErrorFrame):
             self.setup_frame()
+
         else:
             for widget in self.winfo_children():
                 widget.configure(bg_color="transparent")  # type: ignore
             self.select_vec.configure(
+                values=self.nombres_vectores,
                 variable=Variable(value=self.nombres_vectores[0]),
-                values=self.nombres_vectores
             )
 
-            self.after(2000, lambda: delete_msg_frame(self.msg_frame))
+            self.after(1000, lambda: delete_msg_frame(self.msg_frame))
 
     def update_vec(self, valor: str) -> None:
         """

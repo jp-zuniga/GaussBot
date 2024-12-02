@@ -81,10 +81,6 @@ class NavFrame(ctkFrame):
             command=self.toggle_nav,
         )
 
-        self.hide_button._image_label.grid_configure(  # type: ignore
-            columnspan=3, sticky="nsew",
-        )
-
         # crear botones de navegacion
         self.home_button = IconButton(
             self,
@@ -93,9 +89,9 @@ class NavFrame(ctkFrame):
             corner_radius=0,
             border_width=0,
             border_spacing=10,
-            text_color=("gray10", "gray90"),
-            text="Inicio",
             image=LOGO,
+            text="Inicio",
+            text_color=self.app.theme_config["CTkLabel"]["text_color"],
             anchor="w",
             command=self.home_button_event,
         )
@@ -107,9 +103,9 @@ class NavFrame(ctkFrame):
             corner_radius=0,
             border_width=0,
             border_spacing=10,
-            text_color=("gray10", "gray90"),
-            text="Menú de Datos",
             image=INPUTS_ICON,
+            text="Datos",
+            text_color=self.app.theme_config["CTkLabel"]["text_color"],
             anchor="w",
             command=self.inputs_button_event,
         )
@@ -121,9 +117,9 @@ class NavFrame(ctkFrame):
             corner_radius=0,
             border_width=0,
             border_spacing=10,
-            text_color=("gray10", "gray90"),
-            text="Menú de Matrices",
             image=MATRIZ_ICON,
+            text="Matrices",
+            text_color=self.app.theme_config["CTkLabel"]["text_color"],
             anchor="w",
             command=self.matrices_button_event,
         )
@@ -135,9 +131,9 @@ class NavFrame(ctkFrame):
             corner_radius=0,
             border_width=0,
             border_spacing=10,
-            text_color=("gray10", "gray90"),
-            text="Menú de Vectores",
             image=VECTOR_ICON,
+            text="Vectores",
+            text_color=self.app.theme_config["CTkLabel"]["text_color"],
             anchor="w",
             command=self.vectores_button_event,
         )
@@ -149,9 +145,9 @@ class NavFrame(ctkFrame):
             corner_radius=0,
             border_width=0,
             border_spacing=10,
-            text_color=("gray10", "gray90"),
-            text="Análisis Númerico",
             image=ANALISIS_ICON,
+            text="Análisis Númerico",
+            text_color=self.app.theme_config["CTkLabel"]["text_color"],
             anchor="w",
             command=self.analisis_button_event,
         )
@@ -163,9 +159,9 @@ class NavFrame(ctkFrame):
             corner_radius=0,
             border_width=0,
             border_spacing=10,
-            text_color=("gray10", "gray90"),
-            text="Sistemas de Ecuaciones",
             image=ECUACIONES_ICON,
+            text="Sistemas de Ecuaciones",
+            text_color=self.app.theme_config["CTkLabel"]["text_color"],
             anchor="w",
             command=self.sistemas_button_event,
         )
@@ -177,9 +173,9 @@ class NavFrame(ctkFrame):
             corner_radius=0,
             border_width=0,
             border_spacing=10,
-            text_color=("gray10", "gray90"),
-            text="Configuración",
             image=CONFIG_ICON,
+            text="Configuración",
+            text_color=self.app.theme_config["CTkLabel"]["text_color"],
             anchor="w",
             command=self.config_button_event,
         )
@@ -191,9 +187,9 @@ class NavFrame(ctkFrame):
             corner_radius=0,
             border_width=0,
             border_spacing=10,
-            text_color=("gray10", "gray90"),
-            text="Cerrar",
             image=QUIT_ICON,
+            text="Cerrar",
+            text_color=self.app.theme_config["CTkLabel"]["text_color"],
             anchor="w",
             command=self.quit_event,
         )
@@ -282,8 +278,8 @@ class NavFrame(ctkFrame):
                     )
 
             self.hidden = False
-            self.hide_button.grid_configure(column=1, columnspan=1, sticky="e")
             self.hide_button.configure(image=DROPLEFT_ICON)
+            self.hide_button.grid_configure(column=1, columnspan=1, sticky="e")
 
         else:
             for widget in self.winfo_children():
@@ -298,8 +294,8 @@ class NavFrame(ctkFrame):
                     )
 
             self.hidden = True
-            self.hide_button.grid_configure(column=0, columnspan=2, sticky="n")
             self.hide_button.configure(image=DROPRIGHT_ICON)
+            self.hide_button.grid_configure(column=0, columnspan=2, sticky="n")
 
     def home_button_event(self) -> None:
         """

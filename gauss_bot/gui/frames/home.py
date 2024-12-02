@@ -112,7 +112,6 @@ class HomeFrame(ctkFrame):
             tooltip_text="\nResolver sistemas de ecuaciones por los métodos de:" +
                          "\n− Gauss−Jordan" +
                          "\n− Regla de Cramer\n",
-                        #  "\n− Factorización LU",
             command=self.ir_a_sis,
         ).grid(row=4, column=1, padx=(5, 10), pady=3, sticky="nw")
 
@@ -124,7 +123,7 @@ class HomeFrame(ctkFrame):
             tooltip_text="\n− Desarrollado por: Joaquín Zúñiga" +
                          "\n− Versión: 1.0" +
                          "\n− Licencia: MIT License" +
-                         "\n(haga click para ir al repositorio de Github)\n",
+                         "\n(puede hacer click para ir al repositorio de Github)\n",
             command=lambda: open_link("https://github.com/jp-zuniga/GaussBot"),
         ).grid(row=5, column=0, padx=(10, 5), pady=(3, 10), sticky="ne")
 
@@ -133,8 +132,9 @@ class HomeFrame(ctkFrame):
             app=self.app,
             height=30,
             image=INFO_ICON,
-            tooltip_text="\nTodos los datos ingresados y los resultados calculados" +
-                         "\n(excepto raíces de funciones, magnitudes de vectores y determinantes)" +
+            tooltip_text="\nTodos los datos ingresados y resultados calculados" +
+                         "\n(excepto determinantes, magnitudes de vectores, " +
+                         "   y raíces de funciones)".strip() +
                          "\npueden ser guardados para uso futuro.\n",
         ).grid(row=5, column=1, padx=(5, 10), pady=(3, 10), sticky="nw")
 

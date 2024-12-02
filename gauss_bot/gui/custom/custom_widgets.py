@@ -109,7 +109,7 @@ class CustomDropdown(ctkOptionMenu):
         self.icon_label.configure(fg_color=color)
 
         grid_info = self._text_label.grid_info()
-        grid_info["padx"], grid_info["sticky"] = right_distance, "nse"
+        grid_info["padx"], grid_info["sticky"] = right_distance, "e"
         self.icon_label.grid(**grid_info)
 
         self.icon_label.bind("<Button-1>", self._clicked)
@@ -189,12 +189,12 @@ class IconButton(ctkButton):
     def configure(self, require_redraw=False, **kwargs):
         if "tooltip_text" in kwargs:
             tt_text = kwargs.pop("tooltip_text")
-            if self.tooltip is not None and tt_text is None:
+            if self.tooltip is None and tt_text is not None:
+                self.tooltip = Tooltip(self, tt_text)
+            elif self.tooltip is not None and tt_text is None:
                 self.tooltip.destroy()
                 self.tooltip = None
-            elif self.tooltip is not None:
-                self.tooltip.configure_tooltip(message=tt_text)
             else:
-                self.tooltip = Tooltip(self, tt_text)
+                self.tooltip.configure_tooltip(message=tt_text)
 
         super().configure(require_redraw, **kwargs)

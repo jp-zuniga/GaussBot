@@ -206,7 +206,7 @@ class SumaRestaTab(CustomScrollFrame):
         self.msg_frame = place_msg_frame(
             parent_frame=self.resultado_frame,
             msg_frame=self.msg_frame,
-            msg=f"{header}:\n{str(resultado)}",  # pylint: disable=E0606
+            msg=f"\n{header}:\n{str(resultado)}\n",  # pylint: disable=E0606
             tipo="resultado",
         )
 
@@ -569,7 +569,7 @@ class MultiplicacionTab(CustomScrollFrame):
         self.msg_frame = place_msg_frame(
             parent_frame=self.resultado_escalar,
             msg_frame=self.msg_frame,
-            msg=f"{header}:\n{str(resultado)}",  # pylint: disable=E0606
+            msg=f"\n{header}:\n{str(resultado)}\n",  # pylint: disable=E0606
             tipo="resultado",
         )
 
@@ -603,7 +603,7 @@ class MultiplicacionTab(CustomScrollFrame):
         self.msg_frame = place_msg_frame(
             parent_frame=self.resultado_mats,
             msg_frame=self.msg_frame,
-            msg=f"{header}:\n{str(resultado)}",  # pylint: disable=E0606
+            msg=f"\n{header}:\n{str(resultado)}\n",  # pylint: disable=E0606
             tipo="resultado",
         )
 
@@ -641,7 +641,7 @@ class MultiplicacionTab(CustomScrollFrame):
         self.msg_frame = place_msg_frame(
             parent_frame=self.resultado_mat_vec,
             msg_frame=self.msg_frame,
-            msg=f"{header}:\n{str(resultado)}",  # pylint: disable=E0606
+            msg=f"\n{header}:\n{str(resultado)}\n",  # pylint: disable=E0606
             tipo="resultado",
         )
 
@@ -773,7 +773,7 @@ class TransposicionTab(CustomScrollFrame):
         self.msg_frame = place_msg_frame(
             parent_frame=self.resultado,
             msg_frame=self.msg_frame,
-            msg=f"{nombre_transpuesta}:\n{str(transpuesta)}",
+            msg=f"\n{nombre_transpuesta}:\n{str(transpuesta)}\n",
             tipo="resultado",
             columnspan=3,
         )
@@ -987,7 +987,7 @@ class InversaTab(CustomScrollFrame):
         self.msg_frame = place_msg_frame(
             parent_frame=self.resultado,
             msg_frame=self.msg_frame,
-            msg=f"{nombre_inversa}:\n{str(inversa)}",
+            msg=f"\n{nombre_inversa}:\n{str(inversa)}\n",
             tipo="resultado",
             columnspan=3,
         )

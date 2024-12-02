@@ -3,12 +3,12 @@ Implementación de ConfigFrame, encargado de mostrar
 y editar las configuraciones de la aplicación.
 """
 
+from tkinter import StringVar
 from typing import (
     TYPE_CHECKING,
     Optional,
 )
 
-from tkinter import StringVar
 from customtkinter import (
     CTkFrame as ctkFrame,
     CTkLabel as ctkLabel,
@@ -130,6 +130,23 @@ class ConfigFrame(ctkFrame):
         self.app.escala_actual = self.escalas_dict[escala_seleccionada]
         set_scaling(self.app.escala_actual)
 
+        if self.app.nav_frame.hidden:
+            self.app.nav_frame.app_name.grid_remove()
+            self.app.nav_frame.hide_button.grid_configure(
+                column=1,
+                columnspan=1,
+                sticky="e",
+            )
+
+        else:
+            self.app.nav_frame.app_name.grid()
+            self.app.nav_frame.hide_button.grid_configure(
+                column=0,
+                columnspan=2,
+                sticky="n",
+            )
+
+
     def cambiar_modo(self, modo_seleccionado: str) -> None:
         """
         Cambia el modo actual de apariencia de la aplicación al indicado.
@@ -173,7 +190,7 @@ class ConfigFrame(ctkFrame):
                 "El cambio tomará efecto al reiniciar la aplicación."
         )
 
-        self.msg_frame.grid(row=3, column=1, padx=10, pady=30)
+        self.msg_frame.grid(row=3, column=1, padx=10, pady=20)
 
     def update_frame(self) -> None:
         """

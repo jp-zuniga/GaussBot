@@ -183,5 +183,6 @@ class Tooltip(Toplevel):
             self.frame.configure(fg_color=kwargs.pop("bg_color"))
         if "message" in kwargs:
             self.msg_var.set(kwargs.pop("message"))
+            self.message_label.configure(textvariable=self.msg_var)
 
         self.message_label.configure(**kwargs)

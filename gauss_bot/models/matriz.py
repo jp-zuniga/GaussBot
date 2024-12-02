@@ -170,8 +170,8 @@ class Matriz:
             if isinstance(fila, int) and isinstance(columna, slice):
                 start, stop, step = columna.indices(self.columnas)
                 if (
-                   -self.filas <= start < self.filas and
-                   -self.filas <= stop <= self.filas and
+                   -self.columnas <= start < self.columnas and
+                   -self.columnas <= stop <= self.columnas and
                    -self.filas <= fila < self.filas
                 ):
 
@@ -240,7 +240,7 @@ class Matriz:
                 # .limit_denominator() para evitar fracciones gigantes
                 # .center() alinea el valor dentro de max_len
                 valor = str(
-                    self[i, j].limit_denominator(10000)
+                    self[i, j].limit_denominator(1000)
                 ).center(max_len)
 
                 # para matrices nx1, cerrar parentesis immediatamente
