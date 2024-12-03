@@ -25,7 +25,7 @@ from ....icons import (
     MOSTRAR_ICON,
 )
 
-from ....msg_frame_funcs import (
+from ....gui_util_funcs import (
     delete_msg_frame,
     place_msg_frame,
 )
@@ -266,7 +266,7 @@ class AgregarFuncs(CustomScrollFrame):
         self.msg_frame = place_msg_frame(
             parent_frame=self.func_frame,
             msg_frame=self.msg_frame,
-            msg=f"La función '{new_func.nombre}' ha sido agregada exitosamente!",
+            msg=f"La función {new_func.nombre} ha sido agregada exitosamente!",
             tipo="success",
             row=2,
             columnspan=2,
@@ -500,7 +500,7 @@ class EliminarFuncs(CustomScrollFrame):
         self.msg_frame = place_msg_frame(
             parent_frame=self,
             msg_frame=self.msg_frame,
-            msg=f"Función '{self.func_seleccionada}' eliminada!",
+            msg=f"Función {self.func_seleccionada} eliminada!",
             tipo="success",
             row=2,
             columnspan=2,

@@ -29,7 +29,7 @@ from ....icons import (
     ELIMINAR_ICON,
 )
 
-from ....msg_frame_funcs import (
+from ....gui_util_funcs import (
     delete_msg_frame,
     place_msg_frame,
 )
@@ -273,7 +273,7 @@ class AgregarVecs(CustomScrollFrame):
             msg = (
                 "El nombre del vector debe ser una letra minúscula!"
                 if not nombre_valido
-                else f"Ya existe un vector con nombrada '{nombre_nuevo_vector}'!"
+                else f"Ya existe un vector nombrado {nombre_nuevo_vector}!"
             )
 
             self.msg_frame = place_msg_frame(
@@ -290,7 +290,7 @@ class AgregarVecs(CustomScrollFrame):
         self.msg_frame = place_msg_frame(
             parent_frame=self,
             msg_frame=self.msg_frame,
-            msg=f"El vector '{nombre_nuevo_vector}' se ha agregado exitosamente!",
+            msg=f"El vector {nombre_nuevo_vector} se ha agregado exitosamente!",
             tipo="success",
             row=3,
         )
@@ -548,7 +548,7 @@ class EliminarVecs(CustomScrollFrame):
         self.msg_frame = place_msg_frame(
             parent_frame=self,
             msg_frame=self.msg_frame,
-            msg=f"Vector '{self.vec_seleccionado}' eliminado!",
+            msg=f"Vector {self.vec_seleccionado} eliminado!",
             tipo="success",
             row=2,
             columnspan=2,

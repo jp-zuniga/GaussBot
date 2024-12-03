@@ -16,7 +16,7 @@ from customtkinter import (
     CTkLabel as ctkLabel,
 )
 
-from ....msg_frame_funcs import (
+from ....gui_util_funcs import (
     delete_msg_frame,
     place_msg_frame,
 )

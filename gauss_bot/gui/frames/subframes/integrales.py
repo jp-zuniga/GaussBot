@@ -16,7 +16,7 @@ from customtkinter import (
     CTkLabel as ctkLabel,
 )
 
-from ....msg_frame_funcs import (
+from ....gui_util_funcs import (
     delete_msg_frame,
     place_msg_frame,
 )
@@ -113,7 +113,7 @@ class IntegralesFrame(CustomScrollFrame):
             integ_img = Func.latex_to_png(
                 output_file=integral.nombre,
                 nombre_expr=integral.get_di_nombre(integ=True),
-                expr=str(integral.expr),
+                expr=f"{integral.expr} + c",
                 con_nombre=True,
             )
         except RuntimeError:

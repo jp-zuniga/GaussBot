@@ -227,9 +227,19 @@ class Matriz:
         con los valores alineados y separadores correspondientes.
         """
 
+        bounds = ("[", "]") if self.columnas == 1 else ("(", ")")
+
         # longitud maxima para alinear los valores
         max_len = max(
-            len(str(self[i, j]))
+            len(
+                str(
+                    self[i, j].limit_denominator(1000)
+                    if isinstance(self[i, j], Fraction)
+                    else
+                    self[i, j]
+                )
+            )
+
             for i in range(self.filas)
             for j in range(self.columnas)
         )
@@ -241,23 +251,26 @@ class Matriz:
                 # .center() alinea el valor dentro de max_len
                 valor = str(
                     self[i, j].limit_denominator(1000)
+                    if isinstance(self[i, j], Fraction)
+                    else
+                    self[i, j]
                 ).center(max_len)
 
                 # para matrices nx1, cerrar parentesis immediatamente
                 if j == 0 and j == self.columnas - 1:
-                    matriz += f"( {valor} )"
+                    matriz += f"{bounds[0]}  {valor}  {bounds[1]}"
 
                 # abrir parentesis para la primera columna
                 elif j == 0:
-                    matriz += f"( {valor}, "
+                    matriz += f"{bounds[0]}  {valor} , "
 
                 # imprimir separador antes de columna aumentada
                 elif j == self.columnas - 2 and self.aumentada:
-                    matriz += f"{valor} | "
+                    matriz += f"{valor}  ||  "
 
                 # cerrar parentesis para la ultima columna
                 elif j == self.columnas - 1:
-                    matriz += f"{valor} )"
+                    matriz += f"{valor}  {bounds[1]}"
                 else:
                     matriz += f"{valor}, "
             matriz += "\n"

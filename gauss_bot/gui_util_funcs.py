@@ -4,18 +4,29 @@ frames de mensaje de la aplicación.
 """
 
 from typing import (
+    TYPE_CHECKING,
     Literal,
     Optional,
     Union,
 )
 
-from customtkinter import CTkFrame as ctkFrame
+from customtkinter import (
+    CTkFont as ctkFont,
+    CTkFrame as ctkFrame,
+    CTkLabel as ctkLabel,
+    CTkToplevel as ctkTop,
+)
+
+from .icons import APP_ICON
 from .gui.custom import (
     CustomScrollFrame,
     ErrorFrame,
     ResultadoFrame,
     SuccessFrame,
 )
+
+if TYPE_CHECKING:
+    from .gui import GaussUI
 
 
 __all__= [
@@ -100,3 +111,76 @@ def place_msg_frame(
 
     msg_frame.grid(**grid_kwargs)
     return msg_frame
+
+
+def toggle_proc(
+    app: "GaussUI",
+    parent_frame: CustomScrollFrame,
+    window_title: str,
+    proc_label: Optional[ctkLabel],
+    label_txt: str,
+    proc_hidden: bool,
+) -> None:
+
+    """
+    Muestra o esconde la ventana de procedimiento.
+    """
+
+    if (
+        not proc_hidden
+        or
+        any(
+            type(widget) is ctkTop  # pylint: disable=unidiomatic-typecheck
+            for widget in app.winfo_children()
+        )
+    ):
+        return
+
+    new_window = ctkTop(app)
+    new_window.title(window_title)
+
+    new_window.geometry("800x800")
+    parent_frame.after(100, new_window.focus)  # type: ignore
+
+    if app.modo_actual == "dark":
+        i = 0
+    elif app.modo_actual == "light":
+        i = 1
+
+    parent_frame.after(
+        250,
+        lambda: new_window.iconbitmap(APP_ICON[i]),  # pylint: disable=E0606
+    )
+
+    new_window.protocol(
+        "WM_DELETE_WINDOW",
+        lambda: delete_window(new_window),
+    )
+
+    dummy_frame = ctkFrame(
+        new_window,
+        fg_color="transparent",
+        corner_radius=20,
+        border_width=3,
+    )
+
+    dummy_frame.pack(expand=True, fill="both", padx=20, pady=20)
+    proc_frame = CustomScrollFrame(
+        dummy_frame,
+        fg_color="transparent",
+    )
+
+    proc_frame.pack(expand=True, fill="both", padx=10, pady=10)
+    proc_label = ctkLabel(
+        proc_frame,
+        text=label_txt.strip(),
+        font=ctkFont(size=14),
+    )
+
+    proc_label.pack(expand=True, fill="both", padx=10, pady=10)
+    proc_hidden = False
+
+    def delete_window(new_window: ctkTop) -> None:
+        proc_hidden = True  # pylint: disable=W0612  # noqa
+        new_window.destroy()
+        proc_label = None  # pylint: disable=W0612  # noqa

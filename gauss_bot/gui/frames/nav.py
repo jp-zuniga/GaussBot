@@ -56,9 +56,9 @@ class NavFrame(ctkFrame):
         self.hidden = False
         self.button_texts: dict[str, str] = {
             "home": "Inicio",
-            "inputs": "Menú de Datos",
-            "matrices": "Menú de Matrices",
-            "vectores": "Menú de Vectores",
+            "inputs": "Datos",
+            "matrices": "Matrices",
+            "vectores": "Vectores",
             "analisis": "Análisis Númerico",
             "sistemas": "Sistemas de Ecuaciones",
             "config": "Configuración",

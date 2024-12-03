@@ -10,6 +10,7 @@ Operaciones implementadas:
 """
 
 from fractions import Fraction
+from ..util_funcs import format_factor
 from ..models import Vector
 
 
@@ -127,16 +128,7 @@ class VectoresManager:
         vec = self.vecs_ingresados[nombre_vec]
         vec_multiplicado = vec * escalar
 
-        # formatear el escalar para imprimir el nombre
-        if escalar == Fraction(1):
-            escalar_str = ""
-        elif escalar == Fraction(-1):
-            escalar_str = "−"
-        elif escalar.is_integer():
-            escalar_str = str(escalar)
-        else:
-            escalar_str = f"({escalar}) • "
-
+        escalar_str = format_factor(escalar)
         nombre_vec_multiplicado = f"{escalar_str}{nombre_vec}"
         return (nombre_vec_multiplicado, vec_multiplicado)
 

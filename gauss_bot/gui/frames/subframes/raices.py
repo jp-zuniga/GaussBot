@@ -29,6 +29,7 @@ from customtkinter import (
 from sympy import (
     I,
     zoo,
+    Contains,
     Interval,
 )
 
@@ -37,7 +38,7 @@ from ....icons import (
     INFO_ICON,
 )
 
-from ....msg_frame_funcs import place_msg_frame
+from ....gui_util_funcs import place_msg_frame
 from ....util_funcs import generate_sep
 from ....models import Func
 from ....managers import (
@@ -422,31 +423,43 @@ class RaicesFrame(CustomScrollFrame):
             xi = Decimal(float(Fraction(self.xi_entry.get())))
             error = Decimal(float(Fraction(self.error_entry.get())))
             max_its = int(self.iteraciones_entry.get())
+
             if max_its <= 0:
                 raise ValueError(
                     "Debe ingresar un número entero positivo "+
                     "para el máximo de iteraciones!"
                 )
 
-            if xi not in dominio:
-                adj = "primer " if self.met_actual == 3 else ""
-                raise ArithmeticError(
-                    f"El {adj}valor inicial no es parte del " +
-                    f"dominio de {self.func.nombre}!"
-                )
+            try:
+                if xi not in dominio:
+                    adj = "primer " if self.met_actual == 3 else ""
+                    raise ArithmeticError(
+                        f"El {adj}valor inicial no es parte del " +
+                        f"dominio de {self.func.nombre}!"
+                    )
+            except TypeError as t:
+                if not Contains(xi, dominio):
+                    raise ArithmeticError(str(t)) from t
 
             if self.met_actual == 3:
                 xn = Decimal(float(Fraction(self.xn_entry.get())))
                 vals = (xi, xn)
-                if xn not in dominio:
-                    raise ArithmeticError(
-                        "El segundo valor inicial no es parte del " +
-                        f"dominio de {self.func.nombre}!"
-                    )
+
+                try:
+                    if xn not in dominio:
+                        raise ArithmeticError(
+                            "El segundo valor inicial no es parte del " +
+                            f"dominio de {self.func.nombre}!"
+                        )
+                except TypeError as t:
+                    if not Contains(xn, dominio):
+                        raise ArithmeticError(str(t)) from t
+
                 if xi == xn:
                     raise ArithmeticError(
                         "Los valores iniciales deben ser distintos!"
                     )
+
             else:
                 vals = xi  # type: ignore
 
@@ -551,7 +564,7 @@ class RaicesFrame(CustomScrollFrame):
             return
 
         x, fx, registro, its = resultado
-        x_igual = rf"\ \ \ {self.func.var} = {format(x.normalize(), "f")}"
+        x_igual = rf"{self.func.var} = {format(x.normalize(), "f")}"
         fx_igual = rf"{self.func.nombre} = {format(fx.normalize(), "f")}"
 
         raiz_img = Func.latex_to_png(

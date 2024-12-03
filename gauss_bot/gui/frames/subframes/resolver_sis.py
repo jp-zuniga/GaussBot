@@ -12,16 +12,15 @@ from tkinter import Variable
 from customtkinter import (
     CTkButton as ctkButton,
     CTkFrame as ctkFrame,
-    CTkFont as ctkFont,
     CTkLabel as ctkLabel,
-    CTkToplevel as ctkTop,
 )
 
 from ....icons import APP_ICON
 from ....util_funcs import generate_sep
-from ....msg_frame_funcs import (
+from ....gui_util_funcs import (
     delete_msg_frame,
     place_msg_frame,
+    toggle_proc,
 )
 
 from ....models import SistemaEcuaciones
@@ -68,7 +67,7 @@ class ResolverSisFrame(CustomScrollFrame):
         self.sis_mat = ""
         self.met = ""
 
-        self.proc_label: ctkLabel
+        self.proc_label: Optional[ctkLabel] = None
         self.proc_hidden = True
 
         self.setup_frame()
@@ -152,7 +151,7 @@ class ResolverSisFrame(CustomScrollFrame):
             pady=10,
         )
 
-        lambda_proc = (
+        proc_text = (
             sistema.procedimiento
             if met == "gj"
             else sistema.procedimiento + sistema.solucion
@@ -161,68 +160,17 @@ class ResolverSisFrame(CustomScrollFrame):
         ctkButton(
             self,
             text="Mostrar procedimiento",
-            command=lambda: self.toggle_proc(lambda_proc),
+            command=lambda: toggle_proc(
+                app=self.app,
+                parent_frame=self,
+                window_title="GaussBot: Procedimiento para resolver " +
+                            f"el sistema de ecuaciones {self.sis_mat} mediante " +
+                            f"{"el método" if "−" in self.met else "la"} {self.met}",
+                proc_label=self.proc_label,
+                label_txt=proc_text,
+                proc_hidden=self.proc_hidden,
+            ),
         ).grid(row=6, column=0, pady=5, sticky="n")
-
-    def toggle_proc(self, procedimiento: str) -> None:
-        """
-        Muestra o esconde la ventana de procedimiento.
-        """
-
-        if not self.proc_hidden:
-            return
-
-        new_window = ctkTop(self.app)
-        new_window.title(
-            "GaussBot: Procedimiento para resolver " +
-           f"el sistema de ecuaciones '{self.sis_mat}' mediante " +
-           f"{"el método" if "−" in self.met else "la"} {self.met}"
-        )
-
-        new_window.geometry("400x800")
-        self.after(100, new_window.focus)  # type: ignore
-
-        if self.app.modo_actual == "dark":
-            i = 0
-        elif self.app.modo_actual == "light":
-            i = 1
-
-        self.after(
-            250,
-            lambda: new_window.iconbitmap(APP_ICON[i]),  # pylint: disable=E0606
-        )
-
-        new_window.protocol(
-            "WM_DELETE_WINDOW",
-            lambda: delete_window(new_window),
-        )
-
-        dummy_frame = ctkFrame(
-            new_window,
-            fg_color="transparent",
-            corner_radius=20,
-            border_width=3,
-        )
-
-        dummy_frame.pack(expand=True, fill="both", padx=20, pady=20)
-        proc_frame = CustomScrollFrame(
-            dummy_frame,
-            fg_color="transparent",
-        )
-
-        proc_frame.pack(expand=True, fill="both", padx=10, pady=10)
-        self.proc_label = ctkLabel(
-            proc_frame,
-            text=procedimiento.strip(),
-            font=ctkFont(size=14),
-        )
-
-        self.proc_label.pack(expand=True, fill="both", padx=10, pady=10)
-        self.proc_hidden = False
-
-        def delete_window(new_window: ctkTop) -> None:
-            self.proc_hidden = True
-            new_window.destroy()
 
     def update_frame(self) -> None:
         """

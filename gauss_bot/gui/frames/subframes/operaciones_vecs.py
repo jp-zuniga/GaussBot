@@ -30,7 +30,7 @@ from ....icons import (
     INPUTS_ICON,
 )
 
-from ....msg_frame_funcs import (
+from ....gui_util_funcs import (
     delete_msg_frame,
     delete_msg_if,
     place_msg_frame,
@@ -351,7 +351,7 @@ class SumaRestaTab(CustomScrollFrame):
 
         self.ejecutar_button.configure(text=op_text)
         self.instruct_sr.configure(
-            text=f"Seleccione las matrices a {op_text.lower()}:"
+            text=f"Seleccione los vectores a {op_text.lower()}:"
         )
 
     def update_vec1(self, valor: str) -> None:
@@ -456,7 +456,7 @@ class MultiplicacionTab(CustomScrollFrame):
                 height=30,
                 text="Agregar matrices",
                 image=INPUTS_ICON,
-                command=lambda: self.app.home_frame.ir_a_matriz(mostrar=False),  # type: ignore
+                command=lambda: self.app.home_frame.ir_a_mats(mostrar=False),  # type: ignore
             ).grid(row=1, column=0, columnspan=3, padx=5, pady=5, sticky="n")
 
     def setup_escalar_tab(self) -> None:

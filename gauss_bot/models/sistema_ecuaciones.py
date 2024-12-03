@@ -7,7 +7,11 @@ resolver con la Regla de Cramer y el método Gauss-Jordan.
 from copy import deepcopy
 from fractions import Fraction
 
-from ..util_funcs import LOGGER
+from ..util_funcs import (
+    LOGGER,
+    format_factor,
+)
+
 from .matriz import Matriz
 
 
@@ -278,7 +282,7 @@ class SistemaEcuaciones:
                     self.procedimiento += f"\n\nF{fila_actual+1}  =>  -F{fila_actual+1}:\n"
                 else:
                     self.procedimiento += f"\n\nF{fila_actual+1}  =>  "
-                    self.procedimiento += f"F{fila_actual+1} / {_format_factor(pivote, False)}:\n"
+                    self.procedimiento += f"F{fila_actual+1} / {format_factor(pivote, False)}:\n"
                 self.procedimiento += str(self.matriz)
 
             # eliminar elementos debajo del pivote
@@ -290,7 +294,7 @@ class SistemaEcuaciones:
                     self.matriz.valores[f][k] -= factor * self.matriz[fila_actual, k]
 
                 self.procedimiento += f"\n\nF{fila_actual+1}  =>  F{fila_actual+1} − "
-                self.procedimiento += f"[ {_format_factor(factor)}F{fila_pivote+1} ]:\n"
+                self.procedimiento += f"[ {format_factor(factor)}F{fila_pivote+1} ]:\n"
                 self.procedimiento += str(self.matriz)
             fila_actual += 1
 
@@ -320,7 +324,7 @@ class SistemaEcuaciones:
                     self.matriz.valores[f][k] -= factor * self.matriz[i, k]
 
                 self.procedimiento += f"\n\nF{f+1}  =>  F{f+1} − "
-                self.procedimiento += f"[ {_format_factor(factor)}F{i+1} ]:\n"
+                self.procedimiento += f"[ {format_factor(factor)}F{i+1} ]:\n"
                 self.procedimiento += str(self.matriz)
 
     def _encontrar_variables_libres(self) -> list[int]:
@@ -552,6 +556,7 @@ class SistemaEcuaciones:
             self.solucion +=  "\nSistema es inconsistente!"
             self.solucion += f"\nEn la ecuación #{fila_inconsistente+1}:"
             self.solucion += f"\n0 != {self.matriz[fila_inconsistente, -1]}\n"
+            self.procedimiento += f"\n{self.solucion}"
             return
 
         if unica:
@@ -568,6 +573,7 @@ class SistemaEcuaciones:
                     LOGGER.warning("Saltando fila cero!")
                     continue
                 self.solucion += (f"X{i+1} = {self.matriz[i, -1]}\n")
+            self.procedimiento += f"\n{self.solucion}"
             return
 
         ecuaciones = self._despejar_variables(libres)
@@ -575,22 +581,4 @@ class SistemaEcuaciones:
         self.solucion += "\nSolución general encontrada:\n"
         for linea in ecuaciones:
             self.solucion += linea
-
-
-def _format_factor(factor: Fraction, mult: bool = True) -> str:
-    """
-    Formatea un factor para mostrarlo en el procedimiento.
-    * factor: fracción a formatear
-    """
-
-    if factor == 1:
-        return ""
-    if factor == -1:
-        return "−"
-    if factor.is_integer():
-        return str(factor)
-
-    frac_factor = f"( {factor} )"
-    if mult:
-        return frac_factor + " • "
-    return frac_factor
+        self.procedimiento += f"\n{self.solucion}"

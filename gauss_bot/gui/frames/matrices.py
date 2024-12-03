@@ -66,8 +66,8 @@ class MatricesFrame(ctkFrame):
             Union[
                 SumaRestaTab,
                 MultiplicacionTab,
-                TransposicionTab,
                 DeterminanteTab,
+                TransposicionTab,
                 InversaTab,
             ]
         ]
@@ -78,8 +78,8 @@ class MatricesFrame(ctkFrame):
                 Union[
                     type[SumaRestaTab],
                     type[MultiplicacionTab],
-                    type[TransposicionTab],
                     type[DeterminanteTab],
+                    type[TransposicionTab],
                     type[InversaTab],
                 ]
             ]
@@ -135,8 +135,8 @@ class MatricesFrame(ctkFrame):
         self.tabs = [
             ("Suma y Resta", SumaRestaTab),
             ("Multiplicación", MultiplicacionTab),
-            ("Transposición", TransposicionTab),
             ("Calcular Determinante", DeterminanteTab),
+            ("Transposición", TransposicionTab),
             ("Encontrar Inversa", InversaTab)
         ]
 

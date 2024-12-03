@@ -29,7 +29,7 @@ from ....icons import (
     ELIMINAR_ICON,
 )
 
-from ....msg_frame_funcs import (
+from ....gui_util_funcs import (
     delete_msg_frame,
     place_msg_frame,
 )
@@ -337,7 +337,7 @@ class AgregarMats(CustomScrollFrame):
             msg = (
                 "El nombre de la matriz debe ser una letra mayúscula!"
                 if not nombre_valido
-                else f"Ya existe una matriz nombrada '{nombre_nueva_matriz}'!"
+                else f"Ya existe una matriz nombrada {nombre_nueva_matriz}!"
             )
 
             self.msg_frame = place_msg_frame(
@@ -354,7 +354,7 @@ class AgregarMats(CustomScrollFrame):
         self.msg_frame = place_msg_frame(
             parent_frame=self,
             msg_frame=self.msg_frame,
-            msg=f"La matriz '{nombre_nueva_matriz}' se ha agregado exitosamente!",
+            msg=f"La matriz {nombre_nueva_matriz} se ha agregado exitosamente!",
             tipo="success",
             row=3,
         )
@@ -621,7 +621,7 @@ class EliminarMats(CustomScrollFrame):
         self.msg_frame = place_msg_frame(
             parent_frame=self,
             msg_frame=self.msg_frame,
-            msg=f"Matriz '{self.mat_seleccionada}' eliminada!",
+            msg=f"Matriz {self.mat_seleccionada} eliminada!",
             tipo="success",
             row=2,
             columnspan=2,

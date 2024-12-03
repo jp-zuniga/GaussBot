@@ -29,7 +29,7 @@ from ....icons import (
     ELIMINAR_ICON,
 )
 
-from ....msg_frame_funcs import (
+from ....gui_util_funcs import (
     delete_msg_frame,
     place_msg_frame,
 )
@@ -351,7 +351,7 @@ class AgregarSistemas(CustomScrollFrame):
             msg = (
                 "El nombre del sistema debe ser una letra mayúscula!"
                 if not nombre_valido
-                else f"Ya existe un sistema nombrado '{nombre_nuevo_sis}'!"
+                else f"Ya existe un sistema nombrado {nombre_nuevo_sis}!"
             )
 
             self.msg_frame = place_msg_frame(
@@ -368,7 +368,7 @@ class AgregarSistemas(CustomScrollFrame):
         self.msg_frame = place_msg_frame(
             parent_frame=self,
             msg_frame=self.msg_frame,
-            msg=f"El sistema '{nombre_nuevo_sis}' se ha agregado exitosamente!",
+            msg=f"El sistema {nombre_nuevo_sis} se ha agregado exitosamente!",
             tipo="success",
             row=3,
         )
@@ -629,7 +629,7 @@ class EliminarSistemas(CustomScrollFrame):
         self.msg_frame = place_msg_frame(
             parent_frame=self,
             msg_frame=self.msg_frame,
-            msg=f"Sistema '{self.sis_seleccionado}' eliminado!",
+            msg=f"Sistema {self.sis_seleccionado} eliminado!",
             tipo="success",
             row=2,
             columnspan=2,

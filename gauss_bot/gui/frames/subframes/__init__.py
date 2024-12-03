@@ -16,7 +16,7 @@ from customtkinter import (
 )
 
 from ....icons import SAVE_ICON
-from ....msg_frame_funcs import place_msg_frame
+from ....gui_util_funcs import place_msg_frame
 from ...custom import (
     CustomScrollFrame,
     IconButton,

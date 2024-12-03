@@ -126,7 +126,7 @@ class CustomTable(ctkFrame):
                     ),
                     text_color=ThemeManager.theme["CTkEntry"]["text_color"],
                     border_color=ThemeManager.theme["CTkFrame"]["border_color"],
-                    border_width=3 if i == len(self.values) - 2 else 1,
+                    border_width=2 if i == len(self.values) - 2 else 1,
                     border_spacing=0,
                     corner_radius=6,
                     font=ctkFont(

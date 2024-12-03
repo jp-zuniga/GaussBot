@@ -22,7 +22,11 @@ from .. import (
     VECTORES_PATH,
 )
 
-from ..util_funcs import LOGGER
+from ..util_funcs import (
+    LOGGER,
+    format_proc_num,
+)
+
 from ..models import (
     FractionEncoder,
     FractionDecoder,
@@ -73,13 +77,19 @@ class OpsManager:
             else vecs_manager
         )
 
-    def mat_por_vec(self, nombre_mat: str, nombre_vec: str) -> tuple[str, Matriz]:
+    def mat_por_vec(
+        self,
+        nombre_mat: str,
+        nombre_vec: str,
+    ) -> tuple[str, str, Matriz]:
+
         """
         Realiza la multiplicación de una matriz por un vector.
         - ArithmeticError: si la matriz y el vector no son compatibles
                            para la multiplicación.
 
         Retorna una tupla con:
+        * str: procedimiento de la operación
         * str: nombre de la matriz resultante
         * Matriz(): objeto de la matriz resultante de la multiplicación.
         """
@@ -105,7 +115,42 @@ class OpsManager:
 
         mat_resultante = Matriz(False, mat.filas, len(vec), multiplicacion)
         nombre_mat_resultante = f"{nombre_mat}{nombre_vec}"
-        return (nombre_mat_resultante, mat_resultante)
+
+        vec_proc = Matriz(
+            aumentada=False,
+            filas=len(vec),
+            columnas=1,
+            valores=[[c] for c in vec.componentes]
+        )
+
+        mat_proc = Matriz(
+            aumentada=False,
+            filas=mat.filas,
+            columnas=len(vec),
+            valores=[
+                [
+                    format_proc_num(  # type: ignore
+                        (
+                            mat[i, j].limit_denominator(1000),
+                            vec.componentes[j].limit_denominator(1000),
+                        ),
+                    )
+                    for j in range(len(vec))
+                ]
+                for i in range(mat.filas)
+            ]
+        )
+
+        proc  =  "---------------------------------------------\n"
+        proc += f"{nombre_mat}:\n{mat}\n\n"
+        proc += f"{nombre_vec}:\n{vec_proc}\n"
+        proc +=  "---------------------------------------------\n"
+        proc += f"{nombre_mat_resultante}:\n{mat_proc}\n"
+        proc +=  "---------------------------------------------\n"
+        proc += f"{nombre_mat_resultante}:\n{mat_resultante}\n"
+        proc +=  "---------------------------------------------"
+
+        return (proc, nombre_mat_resultante, mat_resultante)
 
     def save_sistemas(self) -> None:
         """

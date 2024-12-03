@@ -253,7 +253,7 @@ class FuncManager:
             if xi not in dominio_derivada:
                 return (Decimal(xi), Decimal(float(f(xi))), registro, 0, 1)
         except TypeError:
-            if not Contains(xi, dominio_derivada).simplify():
+            if not Contains(xi, dominio_derivada):
                 return (Decimal(xi), Decimal(float(f(xi))), registro, 0, 1)
 
         i = 0
@@ -269,9 +269,9 @@ class FuncManager:
                 if temp_xi not in dominio_derivada:
                     return (Decimal(temp_xi), Decimal(fxi), registro, i, 1)
             except TypeError:
-                if not Contains(temp_xi, dominio_func).simplify():
+                if not Contains(temp_xi, dominio_func):
                     return (Decimal(temp_xi), Decimal(fxi), registro, i, 1)
-                if not Contains(temp_xi, dominio_derivada).simplify():
+                if not Contains(temp_xi, dominio_derivada):
                     return (Decimal(temp_xi), Decimal(fxi), registro, i, 1)
 
             xi -= fxi / fxi_prima

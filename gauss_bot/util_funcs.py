@@ -2,6 +2,7 @@
 Funciones de utilidad para la aplicación.
 """
 
+from fractions import Fraction
 from logging import (
     DEBUG,
     Formatter,
@@ -16,6 +17,7 @@ from os import (
 
 from typing import (
     Any,
+    Literal,
     Union,
 )
 
@@ -35,6 +37,8 @@ from . import (
 
 
 __all__ = [
+    "format_factor",
+    "format_proc_num",
     "generate_range",
     "generate_sep",
     "get_dict_key",
@@ -56,6 +60,59 @@ LOG_PATH = path.join(DATA_PATH, "log.txt")
 ################################################################################
 ###################   Funciones generales de la aplicación   ###################
 ################################################################################
+
+
+def format_factor(
+    factor: Fraction,
+    mult: bool = True,
+    parenth_negs: bool = False,
+) -> str:
+
+    """
+    Formatea un factor para mostrarlo en el procedimiento.
+    * factor: fracción a formatear
+    """
+
+    if factor == 1:
+        return ""
+    if factor == -1:
+        return "−"
+    if factor.is_integer():
+        if parenth_negs and factor < 0:
+            return f"( −{-factor} )"
+        return str(factor)
+
+    str_factor = f"( {factor if factor > 0 else f"−{factor}"} )"
+    if mult:
+        return str_factor + " • "
+    return str_factor
+
+
+def format_proc_num(
+    nums: tuple[Fraction, Fraction],
+    operador: Literal["•", "+", "−"] = "•",
+) -> str:
+
+    """
+    Formatea un par de números para mostrarlos
+    en el procedimiento de la operación.
+    """
+
+    num1, num2 = nums
+    if operador == "−" and num2 < 0:
+        operador = "+"
+        num2 *= -1
+    elif operador == "+" and num2 < 0:
+        operador = "−"
+        num2 *= -1
+
+    combine_nums = (
+        f"{format_factor(num1, mult=False, parenth_negs=False)}" +
+        f" {operador} " +
+        f"{format_factor(num2, mult=False, parenth_negs=True)}"
+    )
+
+    return f"[ {combine_nums} ]"
 
 
 def log_setup(logger=LOGGER) -> None:

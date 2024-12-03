@@ -54,6 +54,7 @@ use("TkAgg")
 # para que matplotlib no mande mil mensajes al log
 getLogger("matplotlib").setLevel(WARNING)
 
+
 class Func:
     """
     Representa una función matemática, con métodos de
@@ -115,7 +116,21 @@ class Func:
             raise ValueError("La función tiene un dominio complejo!")
 
     def __str__(self) -> str:
-        return str(self.expr)
+        return f"{self.nombre} = {self.expr}"
+
+    def es_continua(self, intervalo: tuple[Decimal, Decimal]) -> bool:
+        """
+        Valida si self.expr es continua en el
+        intervalo indicado, con respecto a self.var.
+        """
+
+        a, b = intervalo
+        return Interval(
+            a,
+            b,
+            left_open=True,
+            right_open=True,
+        ).is_subset(self.get_dominio())
 
     def derivar(self) -> "Func":
         """
@@ -166,19 +181,46 @@ class Func:
 
         return continuous_domain(self.expr, self.var, Reals)
 
-    def es_continua(self, intervalo: tuple[Decimal, Decimal]) -> bool:
+    def get_di_nombre(self, diffr: bool = False, integ: bool = False) -> str:
         """
-        Valida si self.expr es continua en el
-        intervalo indicado, con respecto a self.var.
+        Llama las funciones get_derivada_nombre() o get_integral_nombre().
         """
 
-        a, b = intervalo
-        return Interval(
-            a,
-            b,
-            left_open=True,
-            right_open=True,
-        ).is_subset(self.get_dominio())
+        num_diff = self.nombre.count("′")
+        num_integ = int(
+            next(
+                (x for x in self.nombre if x.isdigit()),
+                0,
+            )
+        )
+
+        if num_diff != 0 or diffr:
+            return self.get_derivada_nombre(num_diff)
+        if num_integ != 0 or integ:
+            return self.get_integral_nombre(num_integ)
+        raise NameError("No se pudo determinar el tipo de función!")
+
+    def get_derivada_nombre(self, num_diff: int) -> str:
+        """
+        Formate el nombre de la derivada en la
+        notación dy/dx, con respecto a la variable.
+        """
+
+        return (
+            f"\\frac{{d{f"^{{{num_diff}}}" if num_diff > 1 else ""}{self.nombre[0]}}}" +
+            f"{{d{str(self.var)}{f"^{{{num_diff}}}" if num_diff > 1 else ""}}}"
+        )
+
+    def get_integral_nombre(self, num_integ: int) -> str:
+        """
+        Formate el nombre de la integral con la
+        notación ∫ f(x) dx, con respecto a la variable.
+        """
+
+        return (
+            rf"{r"".join(r"\int" for _ in range(num_integ))}" +
+            rf"{self.nombre[0] + rf"({self.var})"}d{str(self.var)}"
+        )
 
     def get_png(self) -> ctkImage:
         """
@@ -256,7 +298,7 @@ class Func:
             f"${latex_str}$",
             horizontalalignment="center",
             verticalalignment="center",
-            fontsize=kwargs.pop("font_size", 75),
+            fontsize=kwargs.get("font_size", 75),
             transform=temp_ax.transAxes
         )
 
@@ -264,7 +306,11 @@ class Func:
         temp_canvas.draw()
 
         bbox = temp_text.get_window_extent(renderer=temp_canvas.get_renderer())
-        width, height = (bbox.width / temp_fig.dpi) + 2, (bbox.height / temp_fig.dpi) + 2
+        width, height = (
+            (bbox.width / temp_fig.dpi) + 2,
+            (bbox.height / temp_fig.dpi) + 1,
+        )
+
         close(temp_fig)
 
         fig, _ = subplots(figsize=(width, height))
@@ -283,6 +329,7 @@ class Func:
             format="png",
             transparent=True,
             dpi=200,
+            pad_inches=0.1,
         )
 
         close(fig)
@@ -293,45 +340,4 @@ class Func:
             dark_image=inverted_img,
             light_image=img,
             size=(int(width * 20), int(height * 20)),
-        )
-
-    def get_di_nombre(self, diffr: bool = False, integ: bool = False) -> str:
-        """
-        Llama las funciones get_derivada_nombre() o get_integral_nombre().
-        """
-
-        num_diff = self.nombre.count("′")
-        num_integ = int(
-            next(
-                (x for x in self.nombre if x.isdigit()),
-                0,
-            )
-        )
-
-        if num_diff != 0 or diffr:
-            return self.get_derivada_nombre(num_diff)
-        if num_integ != 0 or integ:
-            return self.get_integral_nombre(num_integ)
-        raise NameError("No se pudo determinar el tipo de función!")
-
-    def get_derivada_nombre(self, num_diff: int) -> str:
-        """
-        Formate el nombre de la derivada en la
-        notación dy/dx, con respecto a la variable.
-        """
-
-        return (
-            f"\\frac{{d{f"^{{{num_diff}}}" if num_diff > 1 else ""}{self.nombre[0]}}}" +
-            f"{{d{str(self.var)}{f"^{{{num_diff}}}" if num_diff > 1 else ""}}}"
-        )
-
-    def get_integral_nombre(self, num_integ: int) -> str:
-        """
-        Formate el nombre de la integral con la
-        notación ∫ f(x) dx, con respecto a la variable.
-        """
-
-        return (
-            rf"{r"".join(r"\int" for _ in range(num_integ))} " +
-            rf"{self.nombre[0] + rf"({self.var})"} \ d{str(self.var)}"
         )
