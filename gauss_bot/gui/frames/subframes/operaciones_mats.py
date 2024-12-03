@@ -774,6 +774,137 @@ class MultiplicacionTab(CustomScrollFrame):
         self.mvec = valor
 
 
+class DeterminanteTab(CustomScrollFrame):
+    """
+    Frame para calcular el determinante de una matriz.
+    """
+
+    def __init__(
+        self,
+        app: "GaussUI",
+        master_tab: ctkFrame,
+        master_frame: "MatricesFrame",
+        mats_manager: MatricesManager
+    ) -> None:
+
+        super().__init__(master_tab, corner_radius=0, fg_color="transparent")
+        self.app = app
+        self.master_frame = master_frame
+        self.mats_manager = mats_manager
+        self.columnconfigure(0, weight=1)
+
+        # definir atributos, inicalizados en setup_frame()
+        self.msg_frame: Optional[ctkFrame] = None
+        self.select_dmat: CustomDropdown
+        self.dmat = ""
+        self.resultado: ctkFrame
+
+        self.proc_label: Optional[ctkLabel] = None
+        self.proc_hidden = True
+
+        self.setup_frame()
+
+    def setup_frame(self) -> None:
+        """
+        Inicializa y configura los widgets del frame.
+        """
+
+        delete_msg_frame(self.msg_frame)
+        instruct_d = ctkLabel(
+            self,
+            text="Seleccione una matriz para calcular su determinante:",
+        )
+
+        self.select_dmat = CustomDropdown(
+            self,
+            width=60,
+            values=self.master_frame.nombres_matrices,
+            variable=Variable(value=self.master_frame.nombres_matrices[0]),
+            command=self.update_dmat,
+        )
+
+        self.dmat = self.select_dmat.get()
+        button = ctkButton(
+            self,
+            height=30,
+            text="Calcular",
+            command=self.calcular_determinante,
+        )
+
+        self.resultado = ctkFrame(self)
+        self.resultado.columnconfigure(0, weight=1)
+
+        instruct_d.grid(row=0, column=0, padx=5, pady=5, sticky="n")
+        self.select_dmat.grid(row=1, column=0, padx=5, pady=5, sticky="n")
+        button.grid(row=2, column=0, padx=5, pady=5, sticky="n")
+        self.resultado.grid(row=3, column=0, padx=5, pady=5, sticky="n")
+
+    def calcular_determinante(self) -> None:
+        """
+        Calcula el determinante de la matriz seleccionada.
+        """
+
+        delete_msg_frame(self.msg_frame)
+        for widget in self.resultado.winfo_children():  # type: ignore
+            widget.destroy()  # type: ignore
+
+        self.update_dmat(self.select_dmat.get())
+
+        try:
+            proc, header, resultado = self.mats_manager.calcular_determinante(self.dmat)
+        except ArithmeticError as e:
+            self.msg_frame = place_msg_frame(
+                parent_frame=self.resultado,
+                msg_frame=self.msg_frame,
+                msg=str(e),
+                tipo="error",
+            )
+
+            return
+
+        self.msg_frame = place_msg_frame(
+            parent_frame=self.resultado,
+            msg_frame=self.msg_frame,
+            msg=f"{header}  =  {resultado}",
+            tipo="resultado",
+        )
+
+        ctkButton(
+            self.resultado,
+            text="Mostrar procedimiento",
+            command=lambda: toggle_proc(
+                app=self.app,
+                parent_frame=self,
+                window_title="GaussBot: Procedimiento para calcular " +
+                            f"el determinante de la matriz {self.dmat}",
+                proc_label=self.proc_label,
+                label_txt=proc,  # pylint: disable=E0606
+                proc_hidden=self.proc_hidden,
+            ),
+        ).grid(row=1, column=0, pady=5, sticky="n")
+
+    def update_frame(self) -> None:
+        """
+        Actualiza los valores del dropdown.
+        """
+
+        self.select_dmat.configure(
+            variable=Variable(value=self.master_frame.nombres_matrices[0]),
+            values=self.master_frame.nombres_matrices,
+        )
+
+        for widget in self.winfo_children():  # type: ignore
+            widget.configure(bg_color="transparent")  # type: ignore
+
+    def update_dmat(self, valor: str) -> None:
+        """
+        Actualiza self.dmat con el valor
+        seleccionado en el dropdown.
+        """
+
+        self.dmat = valor
+
+
 class TransposicionTab(CustomScrollFrame):
     """
     Frame para transponer una matriz.
@@ -892,137 +1023,6 @@ class TransposicionTab(CustomScrollFrame):
         """
 
         self.tmat = valor
-
-
-class DeterminanteTab(CustomScrollFrame):
-    """
-    Frame para calcular el determinante de una matriz.
-    """
-
-    def __init__(
-        self,
-        app: "GaussUI",
-        master_tab: ctkFrame,
-        master_frame: "MatricesFrame",
-        mats_manager: MatricesManager
-    ) -> None:
-
-        super().__init__(master_tab, corner_radius=0, fg_color="transparent")
-        self.app = app
-        self.master_frame = master_frame
-        self.mats_manager = mats_manager
-        self.columnconfigure(0, weight=1)
-
-        # definir atributos, inicalizados en setup_frame()
-        self.msg_frame: Optional[ctkFrame] = None
-        self.select_dmat: CustomDropdown
-        self.dmat = ""
-        self.resultado: ctkFrame
-
-        self.proc_label: Optional[ctkLabel] = None
-        self.proc_hidden = True
-
-        self.setup_frame()
-
-    def setup_frame(self) -> None:
-        """
-        Inicializa y configura los widgets del frame.
-        """
-
-        delete_msg_frame(self.msg_frame)
-        instruct_d = ctkLabel(
-            self,
-            text="Seleccione una matriz para calcular su determinante:",
-        )
-
-        self.select_dmat = CustomDropdown(
-            self,
-            width=60,
-            values=self.master_frame.nombres_matrices,
-            variable=Variable(value=self.master_frame.nombres_matrices[0]),
-            command=self.update_dmat,
-        )
-
-        self.dmat = self.select_dmat.get()
-        button = ctkButton(
-            self,
-            height=30,
-            text="Calcular",
-            command=self.calcular_determinante,
-        )
-
-        self.resultado = ctkFrame(self)
-        self.resultado.columnconfigure(0, weight=1)
-
-        instruct_d.grid(row=0, column=0, padx=5, pady=5, sticky="n")
-        self.select_dmat.grid(row=1, column=0, padx=5, pady=5, sticky="n")
-        button.grid(row=2, column=0, padx=5, pady=5, sticky="n")
-        self.resultado.grid(row=3, column=0, padx=5, pady=5, sticky="n")
-
-    def calcular_determinante(self) -> None:
-        """
-        Calcula el determinante de la matriz seleccionada.
-        """
-
-        delete_msg_frame(self.msg_frame)
-        for widget in self.resultado.winfo_children():  # type: ignore
-            widget.destroy()  # type: ignore
-
-        self.update_dmat(self.select_dmat.get())
-
-        try:
-            proc, header, resultado = self.mats_manager.calcular_determinante(self.dmat)
-        except ArithmeticError as e:
-            self.msg_frame = place_msg_frame(
-                parent_frame=self.resultado,
-                msg_frame=self.msg_frame,
-                msg=str(e),
-                tipo="error",
-            )
-
-            return
-
-        self.msg_frame = place_msg_frame(
-            parent_frame=self.resultado,
-            msg_frame=self.msg_frame,
-            msg=f"{header} = {resultado}",
-            tipo="resultado",
-        )
-
-        ctkButton(
-            self.resultado,
-            text="Mostrar procedimiento",
-            command=lambda: toggle_proc(
-                app=self.app,
-                parent_frame=self,
-                window_title="GaussBot: Procedimiento para calcular " +
-                            f"el determinante de la matriz {self.dmat}",
-                proc_label=self.proc_label,
-                label_txt=proc,  # pylint: disable=E0606
-                proc_hidden=self.proc_hidden,
-            ),
-        ).grid(row=1, column=0, pady=5, sticky="n")
-
-    def update_frame(self) -> None:
-        """
-        Actualiza los valores del dropdown.
-        """
-
-        self.select_dmat.configure(
-            variable=Variable(value=self.master_frame.nombres_matrices[0]),
-            values=self.master_frame.nombres_matrices,
-        )
-
-        for widget in self.winfo_children():  # type: ignore
-            widget.configure(bg_color="transparent")  # type: ignore
-
-    def update_dmat(self, valor: str) -> None:
-        """
-        Actualiza self.dmat con el valor
-        seleccionado en el dropdown.
-        """
-
-        self.dmat = valor
 
 
 class InversaTab(CustomScrollFrame):

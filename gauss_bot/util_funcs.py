@@ -66,6 +66,8 @@ def format_factor(
     factor: Fraction,
     mult: bool = True,
     parenth_negs: bool = False,
+    parenth_fracs: bool = True,
+    skip_ones: bool = True,
 ) -> str:
 
     """
@@ -74,17 +76,26 @@ def format_factor(
     """
 
     if factor == 1:
-        return ""
+        if skip_ones:
+            return ""
+        return str(factor)
     if factor == -1:
-        return "−"
+        if skip_ones:
+            return "−"
+        return "−1"
     if factor.is_integer():
         if parenth_negs and factor < 0:
             return f"( −{-factor} )"
+        if factor < 0:
+            return f"−{-factor}"
         return str(factor)
 
-    str_factor = f"( {factor if factor > 0 else f"−{factor}"} )"
+    str_factor = f"{factor if factor > 0 else f"−{-factor}"}"
+    if parenth_fracs:
+        str_factor = f"( {str_factor} )"
     if mult:
-        return str_factor + " • "
+        str_factor += " • "
+
     return str_factor
 
 

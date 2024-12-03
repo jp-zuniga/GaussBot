@@ -207,8 +207,8 @@ class MatricesManager:
         else:
             mat_resultado = mat1 - mat2
             operador = "−"
-
         nombre_mat_resultado = f"{nombre_mat1} {operador} {nombre_mat2}"
+
         mat_proc = Matriz(
             aumentada=False,
             filas=mat1.filas,
@@ -366,7 +366,7 @@ class MatricesManager:
         if used_det_formula:
             proc +=  "El determinante de una matriz 2x2 se calcula con la fórmula:\n"
             proc +=  "ad - bc\n\n"
-            proc += f"|  {nombre_mat}  | = "
+            proc += f"|  {nombre_mat}  |  =  "
             proc += f"{format_proc_num(
                 (
                     mat[0, 0].limit_denominator(1000),
@@ -385,19 +385,21 @@ class MatricesManager:
             proc +=  "y multiplicando todos elementos de la diagonal principal.\n\n"
 
             proc += f"Matriz triangular superior:\n{mat_triangular}\n\n"
-            proc += f"|  {nombre_mat}  | = "
+            proc += f"|  {nombre_mat}  |  =  "
 
             diagonales = " • ".join(
                 format_factor(
                     mat_triangular[i, i].limit_denominator(1000),
                     mult=False,
+                    parenth_negs=True,
+                    skip_ones=False,
                 ) for i in range(mat_triangular.filas)
             )
 
             proc += f"[ {diagonales} ]\n"
 
         proc +=  "---------------------------------------------\n"
-        proc += f"|  {nombre_mat}  | = "
+        proc += f"|  {nombre_mat}  |  =  "
         proc += f"{det if not used_det_formula and not intercambio else -det}"  # pylint: disable=E0606
 
         if not used_det_formula and intercambio:
@@ -405,7 +407,7 @@ class MatricesManager:
             proc += "Como hubo un intercambio de filas al "
             proc += "crear la matriz triangular superior,\n"
             proc += "se debe cambiar el signo del determinante:\n\n"
-            proc += f"|  {nombre_mat}  | = {det}"
+            proc += f"|  {nombre_mat}  |  =  {det}"
 
         return (proc, f"|  {nombre_mat}  |", det)
 
@@ -472,7 +474,7 @@ class MatricesManager:
         proc +=  "---------------------------------------------\n"
         proc += f"Matriz de cofactores de {nombre_mat}:\n{adjunta.transponer()}\n\n"
         proc += f"adj ({nombre_mat}):\n{adjunta}\n\n"
-        proc += f"|  {nombre_mat}  | = {det}\n"
+        proc += f"|  {nombre_mat}  |  =  {det}\n"
         proc +=  "---------------------------------------------\n"
         proc += f"{nombre_mat_invertida} = adj ({nombre_mat}) / det ({nombre_mat})\n\n"
         proc += f"{nombre_mat_invertida}:\n{inversa}"

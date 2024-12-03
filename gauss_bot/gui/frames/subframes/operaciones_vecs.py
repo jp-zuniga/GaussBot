@@ -1,3 +1,5 @@
+# pylint: disable=too-many-lines
+
 """
 Implementación de todos los frames
 de operaciones con vectores.
@@ -34,9 +36,11 @@ from ....gui_util_funcs import (
     delete_msg_frame,
     delete_msg_if,
     place_msg_frame,
+    toggle_proc,
 )
 
 from ....util_funcs import (
+    format_factor,
     generate_range,
     get_dict_key,
 )
@@ -78,6 +82,8 @@ class MagnitudTab(CustomScrollFrame):
         self.columnconfigure(2, weight=1)
 
         self.msg_frame: Optional[ctkFrame] = None
+        self.proc_label: Optional[ctkLabel] = None
+        self.proc_hidden = True
 
         # crear widgets
         instruct_m = ctkLabel(
@@ -113,6 +119,9 @@ class MagnitudTab(CustomScrollFrame):
         Calcula la magnitud del vector seleccionado.
         """
 
+        for widget in self.resultado_frame.winfo_children():  # type: ignore
+            widget.destroy()  # type: ignore
+
         self.resultado_frame.grid(
             row=2, column=0,
             columnspan=3,
@@ -124,8 +133,32 @@ class MagnitudTab(CustomScrollFrame):
         self.update_vec(self.select_vec.get())
         vec = self.vecs_manager.vecs_ingresados[self.vec]
 
-        header = f"|| {self.vec} ||"
+        header = f"||  {self.vec}  ||"
         resultado = Decimal(float(vec.magnitud())).normalize()
+
+        proc  =  "---------------------------------------------\n"
+        proc += f"{self.vec}:\n{vec}\n"
+        proc +=  "---------------------------------------------\n"
+        proc +=  "Para calcular la magnitud de un vector,\n"
+        proc +=  "se debe encontrar la raíz cuadrada de\n"
+        proc +=  "la suma de los cuadrados de sus componentes.\n\n"
+
+        proc += f"[ {" + ".join(
+            f"{format_factor(
+                c,
+                mult=False,
+                parenth_negs=True,
+                skip_ones=False,
+            )}^2" for c in vec.componentes
+        )} ]\n"
+
+        proc += f"=\n[ {" + ".join(str(c**2) for c in vec.componentes)} ]\n"
+
+        sum_squares = sum(c**2 for c in vec.componentes)
+        proc += f"=\n{sum_squares}\n\n"
+        proc += f"||  {self.vec}  ||  =  √( {sum_squares} )\n"
+        proc +=  "---------------------------------------------\n"
+        proc += f"||  {self.vec}  ||  =  {resultado}\n"
 
         self.msg_frame = place_msg_frame(
             parent_frame=self.resultado_frame,
@@ -133,6 +166,20 @@ class MagnitudTab(CustomScrollFrame):
             msg=f"{header}  =  {resultado}",
             tipo="resultado",
         )
+
+        ctkButton(
+            self.resultado_frame,
+            text="Mostrar procedimiento",
+            command=lambda: toggle_proc(
+                app=self.app,
+                parent_frame=self,
+                window_title="GaussBot: Procedimiento para calcular la " +
+                            f"magnitud del vector {self.vec}",
+                proc_label=self.proc_label,
+                label_txt=proc,  # pylint: disable=E0606
+                proc_hidden=self.proc_hidden,
+            ),
+        ).grid(row=1, column=0, pady=5, sticky="n")
 
     def update_frame(self) -> None:
         """
@@ -193,6 +240,9 @@ class SumaRestaTab(CustomScrollFrame):
         self.operacion = "Sumar"
         self.vec1 = ""
         self.vec2 = ""
+
+        self.proc_label: Optional[ctkLabel] = None
+        self.proc_hidden = True
 
         self.setup_frame()
 
@@ -274,6 +324,9 @@ class SumaRestaTab(CustomScrollFrame):
         Suma o resta las matrices seleccionadas.
         """
 
+        for widget in self.resultado_frame.winfo_children():  # type: ignore
+            widget.destroy()  # type: ignore
+
         self.update_operacion(self.select_operacion.get())
         self.update_vec1(self.select_1.get())
         self.update_vec2(self.select_2.get())
@@ -287,13 +340,13 @@ class SumaRestaTab(CustomScrollFrame):
         delete_msg_frame(self.msg_frame)
         try:
             if self.operacion == "+":
-                header, resultado = (
+                proc, header, resultado = (
                     self.vecs_manager.suma_resta_vecs(
                         True, self.vec1, self.vec2
                     )
                 )
             elif self.operacion == "−":
-                header, resultado = (
+                proc, header, resultado = (
                     self.vecs_manager.suma_resta_vecs(
                         False, self.vec1, self.vec2
                     )
@@ -305,6 +358,7 @@ class SumaRestaTab(CustomScrollFrame):
                 msg=str(e),
                 tipo="error",
             )
+
             return
         delete_msg_frame(self.msg_frame)
 
@@ -314,6 +368,19 @@ class SumaRestaTab(CustomScrollFrame):
             msg=f"\n{header}:\n{str(resultado)}\n",  # pylint: disable=E0606
             tipo="resultado",
         )
+
+        ctkButton(
+            self.resultado_frame,
+            text="Mostrar procedimiento",
+            command=lambda: toggle_proc(
+                app=self.app,
+                parent_frame=self,
+                window_title=f"GaussBot: Procedimiento de {header}",
+                proc_label=self.proc_label,
+                label_txt=proc,  # pylint: disable=E0606
+                proc_hidden=self.proc_hidden,
+            ),
+        ).grid(row=1, column=0, pady=5, sticky="n")
 
     def update_frame(self) -> None:
         """
@@ -406,6 +473,9 @@ class MultiplicacionTab(CustomScrollFrame):
         self.vec2 = ""
         self.vmat = ""
         self.mvec = ""
+
+        self.proc_label: Optional[ctkLabel] = None
+        self.proc_hidden = True
 
         self.tabview = ctkTabview(self, fg_color="transparent")
         self.tabview.pack(expand=True, fill="both")
@@ -778,6 +848,9 @@ class MultiplicacionTab(CustomScrollFrame):
         Realiza la multiplicación de un vector por un escalar.
         """
 
+        for widget in self.resultado_escalar.winfo_children():  # type: ignore
+            widget.destroy()  # type: ignore
+
         self.update_escalar_vec(self.select_escalar_vec.get())
         self.resultado_escalar.grid(
             row=3, column=0,
@@ -789,8 +862,8 @@ class MultiplicacionTab(CustomScrollFrame):
         delete_msg_if(self.msg_frame, (self.tab_escalar, self.resultado_escalar))
         try:
             escalar = Fraction(self.escalar_entry.get())  # type: ignore
-            header, resultado = (
-                self.vecs_manager.escalar_por_vector(
+            proc, header, resultado = (
+                self.vecs_manager.escalar_por_vec(
                     escalar,
                     self.escalar_vec,
                 )
@@ -800,12 +873,14 @@ class MultiplicacionTab(CustomScrollFrame):
                 msg = "El escalar debe ser un número racional!"
             else:
                 msg = "El denominador no puede ser 0!"
+
             self.msg_frame = place_msg_frame(
                 parent_frame=self.resultado_escalar,
                 msg_frame=self.msg_frame,
                 msg=msg,
                 tipo="error",
             )
+
             return
         delete_msg_if(self.msg_frame, (self.tab_escalar, self.resultado_escalar))
 
@@ -816,10 +891,27 @@ class MultiplicacionTab(CustomScrollFrame):
             tipo="resultado",
         )
 
+        ctkButton(
+            self.resultado_escalar,
+            text="Mostrar procedimiento",
+            command=lambda: toggle_proc(
+                app=self.app,
+                parent_frame=self,
+                window_title="GaussBot: Procedimiento de la " +
+                            f"multiplicación {header}",
+                proc_label=self.proc_label,
+                label_txt=proc,  # pylint: disable=E0606
+                proc_hidden=self.proc_hidden,
+            ),
+        ).grid(row=1, column=0, pady=5, sticky="n")
+
     def prod_punto(self) -> None:
         """
         Realiza el producto punto de dos vectores.
         """
+
+        for widget in self.resultado_punto.winfo_children():  # type: ignore
+            widget.destroy()  # type: ignore
 
         self.update_vec1(self.select_vec1.get())
         self.update_vec2(self.select_vec2.get())
@@ -832,7 +924,7 @@ class MultiplicacionTab(CustomScrollFrame):
 
         delete_msg_if(self.msg_frame, (self.tab_prod_punto, self.resultado_punto))
         try:
-            header, resultado = (
+            proc, header, resultado = (
                 self.vecs_manager.producto_punto(
                     self.vec1,
                     self.vec2
@@ -851,9 +943,25 @@ class MultiplicacionTab(CustomScrollFrame):
         self.msg_frame = place_msg_frame(
             parent_frame=self.resultado_punto,
             msg_frame=self.msg_frame,
-            msg=f"\n{header}:\n{str(resultado)}\n",  # pylint: disable=E0606
+            msg=f"{header}:\n{str(resultado)}",  # pylint: disable=E0606
             tipo="resultado",
+            ipadx=5,
+            ipady=5,
         )
+
+        ctkButton(
+            self.resultado_punto,
+            text="Mostrar procedimiento",
+            command=lambda: toggle_proc(
+                app=self.app,
+                parent_frame=self,
+                window_title="GaussBot: Procedimiento de la " +
+                            f"multiplicación {header}",
+                proc_label=self.proc_label,
+                label_txt=proc,  # pylint: disable=E0606
+                proc_hidden=self.proc_hidden,
+            ),
+        ).grid(row=1, column=0, pady=5, sticky="n")
 
     def prod_cruz(self, dropdowns: list[CustomDropdown]) -> None:
         """
@@ -900,7 +1008,7 @@ class MultiplicacionTab(CustomScrollFrame):
 
         delete_msg_if(self.msg_frame, (self.tab_mat_vec, self.resultado_mat_vec))
         try:
-            header, resultado = (
+            proc, header, resultado = (
                 self.app.ops_manager.mat_por_vec(
                     self.vmat,
                     self.mvec,
@@ -922,6 +1030,20 @@ class MultiplicacionTab(CustomScrollFrame):
             msg=f"\n{header}:\n{str(resultado)}\n",  # pylint: disable=E0606
             tipo="resultado",
         )
+
+        ctkButton(
+            self.resultado_mat_vec,
+            text="Mostrar procedimiento",
+            command=lambda: toggle_proc(
+                app=self.app,
+                parent_frame=self,
+                window_title="GaussBot: Procedimiento de la " +
+                            f"multiplicación {header}",
+                proc_label=self.proc_label,
+                label_txt=proc,  # pylint: disable=E0606
+                proc_hidden=self.proc_hidden,
+            ),
+        ).grid(row=1, column=0, pady=5, sticky="n")
 
     def update_frame(self) -> None:
         """

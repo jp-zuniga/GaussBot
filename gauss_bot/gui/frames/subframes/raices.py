@@ -564,8 +564,8 @@ class RaicesFrame(CustomScrollFrame):
             return
 
         x, fx, registro, its = resultado
-        x_igual = rf"{self.func.var} = {format(x.normalize(), "f")}"
-        fx_igual = rf"{self.func.nombre} = {format(fx.normalize(), "f")}"
+        x_igual = rf"{self.func.var} = {x.normalize()}"
+        fx_igual = rf"{self.func.nombre} = {fx.normalize()}"
 
         raiz_img = Func.latex_to_png(
             output_file="resultado_" +
@@ -621,8 +621,8 @@ class RaicesFrame(CustomScrollFrame):
         tipo_metodo = "Newton" if self.met_actual == 2 else "la secante"
         x, fx, registro, its, flag = resultado
 
-        x_igual = rf"{self.func.var} = {format(x.normalize(), "f")}"
-        fx_igual = rf"{self.func.nombre} = {format(fx.normalize(), "f")}"
+        x_igual = rf"{self.func.var} = {x.normalize()}"
+        fx_igual = rf"{self.func.nombre} = {fx.normalize()}"
 
         if flag != I:
             raiz_img = None

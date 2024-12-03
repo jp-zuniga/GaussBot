@@ -81,8 +81,8 @@ class SistemaEcuaciones:
             ]
         )
 
-        sub_dets = []
-        soluciones = []
+        sub_dets: list[Fraction] = []
+        soluciones: list[Fraction] = []
 
         if mat_variables.filas <= 2 and mat_variables.columnas <= 2:
             det = mat_variables.calcular_det()  # type: ignore
@@ -92,7 +92,7 @@ class SistemaEcuaciones:
         if det == 0:
             raise ZeroDivisionError(
                 "El determinante de la matriz de variables es 0; " +
-                "no se puede resolver el sistema mediante la Regla de Cramer!"
+                "el sistema no se puede resolver mediante la Regla de Cramer!"
             )
 
         for i in range(self.matriz.columnas - 1):
@@ -122,7 +122,7 @@ class SistemaEcuaciones:
 
             # almacenar los determinantes de las submatrices,
             # y aplicar la formula para encontrar las soluciones
-            sub_dets.append(det_submat)
+            sub_dets.append(det_submat)  # type: ignore
             soluciones.append(det_submat / det)  # type: ignore
 
         if all(sol == 0 for sol in soluciones):
@@ -132,8 +132,8 @@ class SistemaEcuaciones:
 
         # almacenar el procedimiento
         self.procedimiento +=  "---------------------------------------------\n"
-        self.procedimiento += f"{nombre}_var:\n" + str(mat_variables)
-        self.procedimiento +=  "\n\nb:\n" + str(col_aumentada)
+        self.procedimiento += f"{nombre}_var:\n{mat_variables}"
+        self.procedimiento += f"\n\nb:\n{col_aumentada}"
         self.procedimiento +=  "\n---------------------------------------------\n"
 
         self.procedimiento += f"|  {nombre}_var  |  =  {det}\n\n"
@@ -142,9 +142,16 @@ class SistemaEcuaciones:
         self.procedimiento += "---------------------------------------------\n"
 
         # almacenar la solucion
-        self.solucion += f"\nSolución {tipo_sol} encontrada:\n"
+        self.solucion += f"Solución {tipo_sol} encontrada:\n"
         for i, sol in enumerate(soluciones):
-            self.solucion += f"X{i + 1} = {sol}\n"
+            self.solucion += f"X{i + 1} = "
+            self.solucion += f"{format_factor(
+                sol.limit_denominator(1000),
+                mult=False,
+                parenth_negs=False,
+                parenth_fracs=False,
+                skip_ones=False,
+            )}\n"
 
     def gauss_jordan(self) -> None:
         """
@@ -364,7 +371,7 @@ class SistemaEcuaciones:
         * libres: lista de índices de columnas de variables libres
         """
 
-        ecuaciones = [f"X{x+1} es libre\n" for x in libres]  # agregar variables libres
+        ecuaciones = [f"X{x + 1} es libre\n" for x in libres]  # agregar variables libres
 
         for i in range(self.matriz.filas):
             for j in range(self.matriz.columnas - 1):
@@ -572,7 +579,16 @@ class SistemaEcuaciones:
                 if all(x == 0 for x in self.matriz[i]):
                     LOGGER.warning("Saltando fila cero!")
                     continue
-                self.solucion += (f"X{i+1} = {self.matriz[i, -1]}\n")
+
+                self.solucion += (
+                    f"X{i+1} = {format_factor(
+                        self.matriz[i, -1].limit_denominator(1000),
+                        mult=False,
+                        parenth_negs=False,
+                        parenth_fracs=False,
+                        skip_ones=False,
+                    )}\n"
+                )
             self.procedimiento += f"\n{self.solucion}"
             return
 

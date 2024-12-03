@@ -95,7 +95,16 @@ class Vector:
         Para imprimir vectores con un formato más legible.
         """
 
-        return f"[ {', '.join(str(c) for c in self.componentes)} ]"
+        return str(
+            Matriz(
+                aumentada=False,
+                filas=len(self),
+                columnas=1,
+                valores=[
+                    [c] for c in self.componentes
+                ]
+            )
+        )
 
     def __add__(self, vec2: "Vector") -> "Vector":
         """

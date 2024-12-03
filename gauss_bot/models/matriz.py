@@ -13,6 +13,8 @@ from typing import (
     Union,
 )
 
+from ..util_funcs import format_factor
+
 
 class Matriz:
     """
@@ -227,15 +229,19 @@ class Matriz:
         con los valores alineados y separadores correspondientes.
         """
 
-        bounds = ("[", "]") if self.columnas == 1 else ("(", ")")
+        bounds = ("[ ", " ]") if self.columnas == 1 else ("(", ")")
 
         # longitud maxima para alinear los valores
         max_len = max(
             len(
                 str(
-                    self[i, j].limit_denominator(1000)
-                    if isinstance(self[i, j], Fraction)
-                    else
+                    format_factor(
+                        self[i, j].limit_denominator(1000),
+                        mult=False,
+                        parenth_negs=False,
+                        parenth_fracs=False,
+                        skip_ones=False,
+                    ) if isinstance(self[i, j], Fraction) else
                     self[i, j]
                 )
             )
@@ -250,9 +256,13 @@ class Matriz:
                 # .limit_denominator() para evitar fracciones gigantes
                 # .center() alinea el valor dentro de max_len
                 valor = str(
-                    self[i, j].limit_denominator(1000)
-                    if isinstance(self[i, j], Fraction)
-                    else
+                    format_factor(
+                        self[i, j].limit_denominator(1000),
+                        mult=False,
+                        parenth_negs=False,
+                        parenth_fracs=False,
+                        skip_ones=False,
+                    ) if isinstance(self[i, j], Fraction) else
                     self[i, j]
                 ).center(max_len)
 
@@ -610,11 +620,6 @@ class Matriz:
         * Matriz(): adjunta
         * Fraction(): determinante
         """
-
-        if not self.es_cuadrada():
-            raise ArithmeticError(
-                "La matriz no es cuadrada; su determinante es indefinido!"
-            )
 
         if self.filas <= 2 and self.columnas <= 2:
             det = self.calcular_det()  # type: ignore

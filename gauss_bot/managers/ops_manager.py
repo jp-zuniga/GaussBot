@@ -116,13 +116,6 @@ class OpsManager:
         mat_resultante = Matriz(False, mat.filas, len(vec), multiplicacion)
         nombre_mat_resultante = f"{nombre_mat}{nombre_vec}"
 
-        vec_proc = Matriz(
-            aumentada=False,
-            filas=len(vec),
-            columnas=1,
-            valores=[[c] for c in vec.componentes]
-        )
-
         mat_proc = Matriz(
             aumentada=False,
             filas=mat.filas,
@@ -143,7 +136,7 @@ class OpsManager:
 
         proc  =  "---------------------------------------------\n"
         proc += f"{nombre_mat}:\n{mat}\n\n"
-        proc += f"{nombre_vec}:\n{vec_proc}\n"
+        proc += f"{nombre_vec}:\n{vec}\n"
         proc +=  "---------------------------------------------\n"
         proc += f"{nombre_mat_resultante}:\n{mat_proc}\n"
         proc +=  "---------------------------------------------\n"
