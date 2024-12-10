@@ -340,20 +340,8 @@
         ]
     },
     "CTkFont": {
-        "macOS": {
-            "family": "SF Display",
-            "size": 13,
-            "weight": "normal"
-        },
-        "Windows": {
-            "family": "Roboto",
-            "size": 13,
-            "weight": "normal"
-        },
-        "Linux": {
-            "family": "Roboto",
-            "size": 13,
-            "weight": "normal"
-        }
+        "family": "Cambria",
+        "size": 13,
+        "weight": "normal"
     }
 }

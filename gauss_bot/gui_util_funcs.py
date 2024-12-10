@@ -33,6 +33,7 @@ __all__= [
     "delete_msg_frame",
     "delete_msg_if",
     "place_msg_frame",
+    "toggle_proc",
 ]
 
 

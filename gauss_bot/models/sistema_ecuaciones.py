@@ -136,13 +136,17 @@ class SistemaEcuaciones:
         self.procedimiento += f"\n\nb:\n{col_aumentada}"
         self.procedimiento +=  "\n---------------------------------------------\n"
 
-        self.procedimiento += f"|  {nombre}_var  |  =  {det}\n\n"
+        self.procedimiento += f"|  {nombre}_var  |  =  "
+        self.procedimiento += f"{det if det > 0 else f"−{-det}"}\n\n"  # type: ignore
+
         for i, subdet in enumerate(sub_dets):
-            self.procedimiento += f"|  {nombre}_{i+1} (b)  |  =  {subdet}\n"
+            self.procedimiento += f"|  {nombre}_{i + 1} (b)  |  =  "
+            self.procedimiento += f"{subdet if det > 0 else f"−{-subdet}"}\n"  # type: ignore
+
         self.procedimiento += "---------------------------------------------\n"
 
         # almacenar la solucion
-        self.solucion += f"Solución {tipo_sol} encontrada:\n"
+        self.solucion += f"\nSolución {tipo_sol} encontrada:\n"
         for i, sol in enumerate(soluciones):
             self.solucion += f"X{i + 1} = "
             self.solucion += f"{format_factor(
