@@ -19,7 +19,6 @@ from customtkinter import (
 from ....gui_util_funcs import (
     delete_msg_frame,
     place_msg_frame,
-    guardar_resultado,
 )
 
 from ....util_funcs import generate_sep
@@ -48,7 +47,6 @@ class DerivadasFrame(CustomScrollFrame):
         master_frame: "AnalisisFrame",
         func_manager: FuncManager,
     ) -> None:
-
         super().__init__(master_tab, corner_radius=0, fg_color="transparent")
         self.app = app
         self.master_frame = master_frame
@@ -64,7 +62,8 @@ class DerivadasFrame(CustomScrollFrame):
             width=40,
             variable=Variable(
                 value="Seleccione una función para derivar:",
-            ), values=self.nombres_funcs,
+            ),
+            values=self.nombres_funcs,
             command=self.mostrar_func,
         )
 
@@ -120,22 +119,6 @@ class DerivadasFrame(CustomScrollFrame):
             tipo="resultado",
             row=4,
             pady=10,
-        )
-
-        guardar_resultado(
-            app=self.app,
-            frame=self,
-            msg_frame=self.msg_frame,
-            msg_exito="Derivada guardada exitosamente!",
-            msg_error="Derivada ya ha sido guardada anteriormente!",
-            frames_to_update=[self.app.inputs_frame.instances[2], self.master_frame],
-            grid_kwargs=(
-                {"row": 5, "column": 0, "pady": 5, "sticky": "n"},
-                {"row": 6, "column": 0, "pady": 5, "sticky": "n"},
-            ),
-            nombre_resultado=derivada.nombre,
-            resultado=derivada,
-            save_dict=self.func_manager.funcs_ingresadas,
         )
 
     def update_frame(self):

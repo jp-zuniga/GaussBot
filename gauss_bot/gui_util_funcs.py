@@ -5,7 +5,6 @@ frames de mensaje de la aplicación.
 
 from typing import (
     TYPE_CHECKING,
-    Any,
     Literal,
     Optional,
     Union,
@@ -18,40 +17,19 @@ from customtkinter import (
     CTkToplevel as ctkTop,
 )
 
-from .icons import (
-    APP_ICON,
-    SAVE_ICON,
-)
-
+from .icons import APP_ICON
 from .gui.custom import (
     CustomScrollFrame,
     ErrorFrame,
-    IconButton,
     ResultadoFrame,
     SuccessFrame,
 )
 
 if TYPE_CHECKING:
-    from .models import (
-        Func,
-        Matriz,
-        Vector,
-    )
-
     from .gui import GaussUI
-    from .gui.frames import (
-        ManejarMats,
-        ManejarVecs,
-        ManejarFuncs,
-        ManejarSistemas,
-        MatricesFrame,
-        VectoresFrame,
-        AnalisisFrame,
-        SistemasFrame,
-    )
 
 
-__all__= [
+__all__ = [
     "delete_msg_frame",
     "delete_msg_if",
     "place_msg_frame",
@@ -71,19 +49,17 @@ def delete_msg_frame(msg_frame: Optional[ctkFrame]) -> None:
 
 
 def delete_msg_if(
-    msg_frame: Optional[ctkFrame],
-    masters: tuple[ctkFrame, ctkFrame]
+    msg_frame: Optional[ctkFrame], masters: tuple[ctkFrame, ctkFrame]
 ) -> None:
-
     """
     Llama delete_msg_frame() si msg_frame
     esta colocado en uno de los frames indicados.
     * msg_frame: frame a eliminar
-    * masters: frames donde buscar msg_frame
+    * masters:   frames donde buscar msg_frame
     """
 
     try:
-        if msg_frame.master in masters:  # type: ignore
+        if msg_frame.master in masters:
             delete_msg_frame(msg_frame)
     except AttributeError:
         # si msg_frame == None,
@@ -91,108 +67,31 @@ def delete_msg_if(
         pass
 
 
-def guardar_resultado(
-    app: "GaussUI",
-    frame: CustomScrollFrame,
-    msg_frame: Optional[ctkFrame],
-    msg_exito: str,
-    msg_error: str,
-    frames_to_update: list[
-        Union[
-            "ManejarMats",
-            "ManejarVecs",
-            "ManejarSistemas",
-            "ManejarFuncs",
-            "MatricesFrame",
-            "VectoresFrame",
-            "AnalisisFrame",
-            "SistemasFrame",
-        ]
-    ],
-    grid_kwargs: tuple[dict[str, Any], dict[str, Any]],
-    nombre_resultado: str,
-    resultado: Union["Func", "Matriz", "Vector"],
-    save_dict: dict,
-) -> None:
-
-    """
-    Crea un IconButton para guardar el resultado de una operación,
-    imprime un mensaje de éxito y actualiza los frames especificados.
-    * frame: donde se colocarán las widgets
-    * msg_frame: donde se imprimirá el mensaje de éxito
-    * msg_exito: mensaje a imprimir
-    * frames_to_update: frames a actualizar
-    * grid_kwargs: argumentos de grid() para el IconButton y msg_frame
-    """
-
-    def guardar(
-        parent_frame=frame,
-        msg_frame=msg_frame,
-        msg_exito=msg_exito,
-        kwargs=grid_kwargs[1],
-    ) -> None:
-
-        if any(
-            elem == resultado
-            for elem in save_dict.values()
-        ):
-            msg_frame = place_msg_frame(
-                parent_frame=parent_frame,
-                msg_frame=msg_frame,
-                msg=msg_error,
-                tipo="resultado",
-                **kwargs,
-            )
-
-            return
-
-        save_dict[nombre_resultado] = resultado
-        msg_frame = place_msg_frame(
-            parent_frame=parent_frame,
-            msg_frame=msg_frame,
-            msg=msg_exito,
-            tipo="success",
-            **kwargs,
-        )
-
-        for frame in frames_to_update:
-            frame.update_all()  # type: ignore
-
-    IconButton(
-        frame,
-        app,
-        image=SAVE_ICON,
-        tooltip_text="Guardar resultado",
-        command=guardar,
-    ).grid(**grid_kwargs[0])
-
-
 def place_msg_frame(
-    parent_frame: Union[ctkFrame, CustomScrollFrame],  # noqa
+    parent_frame: Union[ctkFrame, CustomScrollFrame],
     msg_frame: Optional[ctkFrame],
     msg: Optional[str] = None,
     tipo: Literal["error", "success", "resultado"] = "error",
     **grid_kwargs,
 ) -> ctkFrame:
-
     """
     Inicializa msg_frame y lo coloca en la interfaz con grid_kwargs.
     * parent_frame: frame que contendrá msg_frame
-    * msg_frame: frame a colocar
-    * msg: mensaje a mostrar en el frame
-    * tipo: tipo de frame a crear
-    * grid_kwargs: kwargs a pasar a msg_frame.grid()
+    * msg_frame:    frame a colocar
+    * msg:          mensaje a mostrar en el frame
+    * tipo:         tipo de frame a crear
+    * grid_kwargs:  kwargs a pasar a msg_frame.grid()
     """
 
     if tipo == "error":
-        msg_frame = ErrorFrame(parent_frame, msg)  # noqa
+        msg_frame = ErrorFrame(parent_frame, msg)
     elif tipo == "success":
-        msg_frame = SuccessFrame(parent_frame, msg)  # noqa
+        msg_frame = SuccessFrame(parent_frame, msg)
 
     elif tipo == "resultado":
         bc = grid_kwargs.pop("border_color", None)
         img = grid_kwargs.pop("img", None)
-        msg_frame = ResultadoFrame(parent_frame, msg, img, bc)  # noqa
+        msg_frame = ResultadoFrame(parent_frame, msg, img, bc)
 
     else:
         raise ValueError("Valor inválido para argumento 'tipo'!")
@@ -220,26 +119,18 @@ def toggle_proc(
     label_txt: str,
     proc_hidden: bool,
 ) -> None:
-
     """
     Muestra o esconde la ventana de procedimiento.
     """
 
-    if (
-        not proc_hidden
-        or
-        any(
-            type(widget) is ctkTop  # pylint: disable=unidiomatic-typecheck
-            for widget in app.winfo_children()
-        )
-    ):
+    if not proc_hidden or any(type(widget) is ctkTop for widget in app.winfo_children()):
         return
 
     new_window = ctkTop(app)
     new_window.title(window_title)
 
     new_window.geometry("800x800")
-    parent_frame.after(100, new_window.focus)  # type: ignore
+    parent_frame.after(100, new_window.focus)
 
     if app.modo_actual == "dark":
         i = 0
@@ -248,7 +139,7 @@ def toggle_proc(
 
     parent_frame.after(
         250,
-        lambda: new_window.iconbitmap(APP_ICON[i]),  # pylint: disable=E0606
+        lambda: new_window.iconbitmap(APP_ICON[i]),
     )
 
     new_window.protocol(
@@ -280,6 +171,6 @@ def toggle_proc(
     proc_hidden = False
 
     def delete_window(new_window: ctkTop) -> None:
-        proc_hidden = True  # pylint: disable=W0612  # noqa
+        proc_hidden = True
         new_window.destroy()
-        proc_label = None  # pylint: disable=W0612  # noqa
+        proc_label = None

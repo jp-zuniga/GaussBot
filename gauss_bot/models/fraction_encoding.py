@@ -32,7 +32,7 @@ class FractionEncoder(JSONEncoder):
             return {
                 "__type__": "Fraction",
                 "numerator": o.numerator,
-                "denominator": o.denominator
+                "denominator": o.denominator,
             }
 
         # si no, llamar al metodo default() de JSONEncoder para tirar el error

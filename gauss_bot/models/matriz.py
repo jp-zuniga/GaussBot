@@ -31,7 +31,6 @@ class Matriz:
         columnas: int,
         valores: Optional[list[list[Fraction]]] = None,
     ) -> None:
-
         """
         Args:
         - aumentada: indica si la matriz representa un sistema de ecuaciones,
@@ -52,10 +51,7 @@ class Matriz:
 
         # si no se proporcionan valores, se inicializa una matriz cero
         if valores is None:
-            self._valores = [
-                [Fraction(0) for _ in range(columnas)]
-                for _ in range(filas)
-            ]
+            self._valores = [[Fraction(0) for _ in range(columnas)] for _ in range(filas)]
         else:
             self._valores = valores
 
@@ -117,10 +113,9 @@ class Matriz:
             tuple[slice, int],
             tuple[int, slice],
             tuple[int, int],
-            tuple[slice, slice]
-        ]
-    ) -> Union[ Fraction, list[Fraction],list[list[Fraction]]]:
-
+            tuple[slice, slice],
+        ],
+    ) -> Union[Fraction, list[Fraction], list[list[Fraction]]]:
         """
         Overloads para acceder a los elementos de la matriz
         sin tener que acceder al atributo 'valores' directamente.
@@ -131,39 +126,35 @@ class Matriz:
         * Matriz().valores[0:2][1:3]
         """
 
-        if (
-            isinstance(indice, int) and
-           -self.filas <= indice < self.filas
-        ):
+        if isinstance(indice, int) and -self.filas <= indice < self.filas:
             return self.valores[indice]
 
         if isinstance(indice, slice):
             start, stop, step = indice.indices(self.filas)
             if (
-                step != 0 and
-               -self.filas <= start < self.filas and
-               -self.filas <= stop <= self.filas
+                step != 0
+                and -self.filas <= start < self.filas
+                and -self.filas <= stop <= self.filas
             ):
                 return self.valores[indice]
 
         if isinstance(indice, tuple) and len(indice) == 2:
             fila, columna = indice
             if (
-                isinstance(fila, int) and
-                isinstance(columna, int) and
-               -self.filas <= fila < self.filas and
-               -self.columnas <= columna < self.columnas
+                isinstance(fila, int)
+                and isinstance(columna, int)
+                and -self.filas <= fila < self.filas
+                and -self.columnas <= columna < self.columnas
             ):
                 return self.valores[fila][columna]
 
             if isinstance(fila, slice) and isinstance(columna, int):
                 start, stop, step = fila.indices(self.filas)
                 if (
-                   -self.filas <= start < self.filas and
-                   -self.filas <= stop <= self.filas and
-                   -self.columnas <= columna < self.columnas
+                    -self.filas <= start < self.filas
+                    and -self.filas <= stop <= self.filas
+                    and -self.columnas <= columna < self.columnas
                 ):
-
                     # intercambiar start/stop si se esta recorriendo en reversa
                     if step < 0:
                         start, stop = stop + 1, start + 1
@@ -172,11 +163,10 @@ class Matriz:
             if isinstance(fila, int) and isinstance(columna, slice):
                 start, stop, step = columna.indices(self.columnas)
                 if (
-                   -self.columnas <= start < self.columnas and
-                   -self.columnas <= stop <= self.columnas and
-                   -self.filas <= fila < self.filas
+                    -self.columnas <= start < self.columnas
+                    and -self.columnas <= stop <= self.columnas
+                    and -self.filas <= fila < self.filas
                 ):
-
                     # intercambiar start/stop si se esta recorriendo en reversa
                     if step < 0:
                         start, stop = stop + 1, start + 1
@@ -186,12 +176,11 @@ class Matriz:
                 start_f, stop_f, step_f = fila.indices(self.filas)
                 start_c, stop_c, step_c = columna.indices(self.columnas)
                 if (
-                   -self.filas <= start_f < self.filas and
-                   -self.filas <= stop_f <= self.filas and
-                   -self.columnas <= start_c < self.columnas and
-                   -self.columnas <= stop_c <= self.columnas
+                    -self.filas <= start_f < self.filas
+                    and -self.filas <= stop_f <= self.filas
+                    and -self.columnas <= start_c < self.columnas
+                    and -self.columnas <= stop_c <= self.columnas
                 ):
-
                     # intercambiar start/stop si se esta recorriendo en reversa
                     if step_f < 0:
                         start_f, stop_f = stop_f + 1, start_f + 1
@@ -241,11 +230,11 @@ class Matriz:
                         parenth_negs=False,
                         parenth_fracs=False,
                         skip_ones=False,
-                    ) if isinstance(self[i, j], Fraction) else
-                    self[i, j]
+                    )
+                    if isinstance(self[i, j], Fraction)
+                    else self[i, j]
                 )
             )
-
             for i in range(self.filas)
             for j in range(self.columnas)
         )
@@ -262,8 +251,9 @@ class Matriz:
                         parenth_negs=False,
                         parenth_fracs=False,
                         skip_ones=False,
-                    ) if isinstance(self[i, j], Fraction) else
-                    self[i, j]
+                    )
+                    if isinstance(self[i, j], Fraction)
+                    else self[i, j]
                 ).center(max_len)
 
                 # para matrices nx1, cerrar parentesis immediatamente
@@ -311,9 +301,7 @@ class Matriz:
         """
 
         if self.filas != mat2.filas or self.columnas != mat2.columnas:
-            raise ArithmeticError(
-                "Las matrices deben tener las mismas dimensiones!"
-            )
+            raise ArithmeticError("Las matrices deben tener las mismas dimensiones!")
 
         # restar todos los valores correspondientes de las matrices
         mat_restada = [
@@ -334,7 +322,6 @@ class Matriz:
         self,
         multiplicador: Union["Matriz", int, float, Fraction],
     ) -> "Matriz":
-
         """
         Overloads para multiplicar matrices o multiplicar matrices por escalares:
         * Matriz() * Matriz() -> Matriz()
@@ -349,8 +336,8 @@ class Matriz:
             # validar que las matrices sean compatibles para multiplicación
             if self.columnas != multiplicador.filas:
                 raise ArithmeticError(
-                    "El número de columnas de la primera matriz debe " +
-                    "ser igual al número de filas de la segunda matriz!"
+                    "El número de columnas de la primera matriz debe "
+                    + "ser igual al número de filas de la segunda matriz!"
                 )
 
             # inicializar una matriz cero con las dimensiones correctas
@@ -363,9 +350,7 @@ class Matriz:
             for i in range(self.filas):
                 for j in range(multiplicador.columnas):
                     for k in range(self.columnas):
-                        mat_multiplicada[i][j] += (
-                            self[i, k] * multiplicador[k, j]
-                        )
+                        mat_multiplicada[i][j] += self[i, k] * multiplicador[k, j]
 
             return Matriz(
                 self.aumentada,
@@ -418,10 +403,7 @@ class Matriz:
         Verifica si todos los valores de la instancia son 0.
         """
 
-        return all(
-            all(x == Fraction(0) for x in fila)
-            for fila in self.valores
-        )
+        return all(all(x == Fraction(0) for x in fila) for fila in self.valores)
 
     def es_cuadrada(self) -> bool:
         """
@@ -438,10 +420,7 @@ class Matriz:
         * Todos los demás elementos deben ser 0
         """
 
-        diagonales_son_1 = all(
-            self[i, i] == Fraction(1)
-            for i in range(self.filas)
-        )
+        diagonales_son_1 = all(self[i, i] == Fraction(1) for i in range(self.filas))
 
         resto_son_cero = all(
             self[i, j] == Fraction(0)
@@ -511,8 +490,7 @@ class Matriz:
         """
 
         mat_transpuesta = [
-            [self[j, i] for j in range(self.filas)]
-            for i in range(self.columnas)
+            [self[j, i] for j in range(self.filas)] for i in range(self.columnas)
         ]
 
         return Matriz(self.aumentada, self.columnas, self.filas, mat_transpuesta)
@@ -576,11 +554,7 @@ class Matriz:
                 # encontrar un minor de la matriz,
                 # eliminando la fila y columna actual
                 minor = [
-                    [
-                        self[m, n]
-                        for n in range(self.columnas)
-                        if n != j
-                    ]
+                    [self[m, n] for n in range(self.columnas) if n != j]
                     for m in range(self.filas)
                     if m != i
                 ]
@@ -602,10 +576,7 @@ class Matriz:
             mat_cofactores.append(fila)
 
         return Matriz(
-            self.aumentada,
-            self.filas,
-            self.columnas,
-            mat_cofactores
+            self.aumentada, self.filas, self.columnas, mat_cofactores
         ).transponer()
 
     def invertir(self) -> tuple["Matriz", "Matriz", Fraction]:

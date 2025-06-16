@@ -24,17 +24,27 @@ from customtkinter import CTkImage as ctkImage
 from matplotlib import use
 from matplotlib.backends.backend_agg import FigureCanvasAgg
 from matplotlib.pyplot import (
-    axis, close,
-    rc, savefig,
-    subplots, text,
+    axis,
+    close,
+    rc,
+    savefig,
+    subplots,
+    text,
 )
 
 from PIL.Image import open as open_img
 from sympy import (
-    Reals, oo, zoo, nan,
-    Expr, Interval, Symbol,
-    diff, integrate,
-    latex, parse_expr,
+    Reals,
+    oo,
+    zoo,
+    nan,
+    Expr,
+    Interval,
+    Symbol,
+    diff,
+    integrate,
+    latex,
+    parse_expr,
 )
 
 from sympy.calculus.util import continuous_domain
@@ -67,7 +77,6 @@ class Func:
         expr: str,
         latexified=False,
     ) -> None:
-
         """
         * ValueError: si la expresión tiene dominio complejo
         """
@@ -75,9 +84,7 @@ class Func:
         self.nombre = nombre
 
         var_pattern = r"\(([a-z])\)"
-        self.var = Symbol(
-            comp(var_pattern).findall(nombre)[0]
-        )
+        self.var = Symbol(comp(var_pattern).findall(nombre)[0])
 
         self.latexified = latexified
         self.latex_img: Optional[ctkImage] = None
@@ -100,9 +107,7 @@ class Func:
         if "^" in expr:
             expr = expr.replace("^", "**")
 
-        expr = replace_var(
-            str(parse_expr(expr, transformations=TRANSFORMS))
-        )
+        expr = replace_var(str(parse_expr(expr, transformations=TRANSFORMS)))
 
         if "e**" in expr:
             expr = expr.replace("e**", "exp")
@@ -163,12 +168,12 @@ class Func:
         if match is not None:
             num_ints = int(next(x for x in self.nombre if x.isdigit()))
             i_nombre = (
-                self.nombre[:match.start()] +
-                f"^(-{num_ints + 1})" +
-                self.nombre[match.end():]
+                self.nombre[: match.start()]
+                + f"^(-{num_ints + 1})"
+                + self.nombre[match.end() :]
             )
         else:
-            i_nombre = rf"{self.nombre[0]}^{"(-1)"}{self.nombre[1:]}"
+            i_nombre = rf"{self.nombre[0]}^{'(-1)'}{self.nombre[1:]}"
 
         return Func(i_nombre, str(integrate(self.expr, self.var)))
 
@@ -207,8 +212,8 @@ class Func:
         """
 
         return (
-            f"\\frac{{d{f"^{{{num_diff}}}" if num_diff > 1 else ""}{self.nombre[0]}}}" +
-            f"{{d{str(self.var)}{f"^{{{num_diff}}}" if num_diff > 1 else ""}}}"
+            f"\\frac{{d{f'^{{{num_diff}}}' if num_diff > 1 else ''}{self.nombre[0]}}}"
+            + f"{{d{str(self.var)}{f'^{{{num_diff}}}' if num_diff > 1 else ''}}}"
         )
 
     def get_integral_nombre(self, num_integ: int) -> str:
@@ -218,8 +223,8 @@ class Func:
         """
 
         return (
-            rf"{r"".join(r"\int" for _ in range(num_integ))}" +
-            rf"{self.nombre[0] + rf"({self.var})"}d{str(self.var)}"
+            rf"{r''.join(r'\int' for _ in range(num_integ))}"
+            + rf"{self.nombre[0] + rf'({self.var})'}d{str(self.var)}"
         )
 
     def get_png(self) -> ctkImage:
@@ -232,11 +237,7 @@ class Func:
             self.latex_img = Func.latex_to_png(
                 nombre_expr=(
                     self.nombre
-                    if (
-                        self.nombre.count("′") == 0
-                        and
-                        self.nombre.count("∫") == 0
-                    )
+                    if (self.nombre.count("′") == 0 and self.nombre.count("∫") == 0)
                     else self.get_di_nombre()
                 ),
                 expr=str(self.expr),
@@ -255,7 +256,6 @@ class Func:
         con_nombre: bool = False,
         **kwargs,
     ) -> ctkImage:
-
         """
         Convierte texto a formato LaTeX para crear una imagen PNG.
         * output_file: nombre del archivo de salida
@@ -299,7 +299,7 @@ class Func:
             horizontalalignment="center",
             verticalalignment="center",
             fontsize=kwargs.get("font_size", 75),
-            transform=temp_ax.transAxes
+            transform=temp_ax.transAxes,
         )
 
         temp_canvas = FigureCanvasAgg(temp_fig)

@@ -54,8 +54,8 @@ NUMPAD_ICON_PATH = path.join(ASSET_PATH, "numpad_icons")
 SAVED_FUNCS_PATH = path.join(DATA_PATH, "saved_funcs")
 
 APP_ICON = (
-    path.join(ASSET_PATH, "light_logo.ico"),
-    path.join(ASSET_PATH, "dark_logo.ico"),
+    path.join("@", ASSET_PATH, "light_logo.xbm"),
+    path.join("@", ASSET_PATH, "dark_logo.xbm"),
 )
 
 
@@ -66,42 +66,42 @@ APP_ICON = (
 
 LOGO = ctkImage(
     dark_image=open_img(path.join(ASSET_PATH, "dark_mode", "light_logo.png")),
-    light_image=open_img(path.join(ASSET_PATH, "light_mode", "dark_logo.png"))
+    light_image=open_img(path.join(ASSET_PATH, "light_mode", "dark_logo.png")),
 )
 
 INPUTS_ICON = ctkImage(
     dark_image=open_img(path.join(ASSET_PATH, "dark_mode", "light_input_icon.png")),
-    light_image=open_img(path.join(ASSET_PATH, "light_mode", "dark_input_icon.png"))
+    light_image=open_img(path.join(ASSET_PATH, "light_mode", "dark_input_icon.png")),
 )
 
 MATRIZ_ICON = ctkImage(
     dark_image=open_img(path.join(ASSET_PATH, "dark_mode", "light_matriz_icon.png")),
-    light_image=open_img(path.join(ASSET_PATH, "light_mode", "dark_matriz_icon.png"))
+    light_image=open_img(path.join(ASSET_PATH, "light_mode", "dark_matriz_icon.png")),
 )
 
 VECTOR_ICON = ctkImage(
     dark_image=open_img(path.join(ASSET_PATH, "dark_mode", "light_vector_icon.png")),
-    light_image=open_img(path.join(ASSET_PATH, "light_mode", "dark_vector_icon.png"))
+    light_image=open_img(path.join(ASSET_PATH, "light_mode", "dark_vector_icon.png")),
 )
 
 ANALISIS_ICON = ctkImage(
     dark_image=open_img(path.join(ASSET_PATH, "dark_mode", "light_analisis_icon.png")),
-    light_image=open_img(path.join(ASSET_PATH, "light_mode", "dark_analisis_icon.png"))
+    light_image=open_img(path.join(ASSET_PATH, "light_mode", "dark_analisis_icon.png")),
 )
 
 ECUACIONES_ICON = ctkImage(
     dark_image=open_img(path.join(ASSET_PATH, "dark_mode", "light_ecuaciones_icon.png")),
-    light_image=open_img(path.join(ASSET_PATH, "light_mode", "dark_ecuaciones_icon.png"))
+    light_image=open_img(path.join(ASSET_PATH, "light_mode", "dark_ecuaciones_icon.png")),
 )
 
 CONFIG_ICON = ctkImage(
     dark_image=open_img(path.join(ASSET_PATH, "dark_mode", "light_config_icon.png")),
-    light_image=open_img(path.join(ASSET_PATH, "light_mode", "dark_config_icon.png"))
+    light_image=open_img(path.join(ASSET_PATH, "light_mode", "dark_config_icon.png")),
 )
 
 QUIT_ICON = ctkImage(
     dark_image=open_img(path.join(ASSET_PATH, "dark_mode", "light_quit_icon.png")),
-    light_image=open_img(path.join(ASSET_PATH, "light_mode", "dark_quit_icon.png"))
+    light_image=open_img(path.join(ASSET_PATH, "light_mode", "dark_quit_icon.png")),
 )
 
 
@@ -217,10 +217,9 @@ NUMPAD_KEYS: dict[str, ctkImage] = {
     name[:-4]: ctkImage(
         size=open_img(path.join(NUMPAD_ICON_PATH, "dark_mode", f"light_{name}")).size,
         dark_image=open_img(path.join(NUMPAD_ICON_PATH, "dark_mode", f"light_{name}")),
-        light_image=open_img(path.join(NUMPAD_ICON_PATH, "light_mode", f"dark_{name}"))
-    ) for name in {
-        name.split("_")[1]
-        for _, _, files in walk(NUMPAD_ICON_PATH)
-        for name in files
+        light_image=open_img(path.join(NUMPAD_ICON_PATH, "light_mode", f"dark_{name}")),
+    )
+    for name in {
+        name.split("_")[1] for _, _, files in walk(NUMPAD_ICON_PATH) for name in files
     }
 }

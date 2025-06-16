@@ -18,13 +18,13 @@ from os import (
 from typing import (
     Any,
     Literal,
-    Union,
+    Optional,
 )
 
 from customtkinter import CTkImage as ctkImage
 from PIL.ImageOps import invert
-from PIL.Image import (  # pylint: disable=no-name-in-module
-    LANCZOS,  # definido en PIL.Image.pyi (stub file)
+from PIL.Image import (
+    LANCZOS,
     Image,
     merge,
     open as open_img,
@@ -69,10 +69,13 @@ def format_factor(
     parenth_fracs: bool = True,
     skip_ones: bool = True,
 ) -> str:
-
     """
     Formatea un factor para mostrarlo en el procedimiento.
-    * factor: fracción a formatear
+    * factor:        fracción a formatear
+    * mult:          si se multiplicará con otro número
+    * parenth_negs:  si se debería poner números negativos en parentésis
+    * parenth_fracs: si se debería poner fracciones en parentésis
+    * skip_ones:     si se debería ignorar factores de 1
     """
 
     if factor == 1:
@@ -90,7 +93,7 @@ def format_factor(
             return f"−{-factor}"
         return str(factor)
 
-    str_factor = f"{factor if factor > 0 else f"−{-factor}"}"
+    str_factor = f"{factor if factor > 0 else f'−{-factor}'}"
     if parenth_fracs:
         str_factor = f"( {str_factor} )"
     if mult:
@@ -103,7 +106,6 @@ def format_proc_num(
     nums: tuple[Fraction, Fraction],
     operador: Literal["•", "+", "−"] = "•",
 ) -> str:
-
     """
     Formatea un par de números para mostrarlos
     en el procedimiento de la operación.
@@ -118,9 +120,9 @@ def format_proc_num(
         num2 *= -1
 
     combine_nums = (
-        f"{format_factor(num1, mult=False, parenth_negs=False)}" +
-        f" {operador} " +
-        f"{format_factor(num2, mult=False, parenth_negs=True)}"
+        f"{format_factor(num1, mult=False, parenth_negs=False)}"
+        + f" {operador} "
+        + f"{format_factor(num2, mult=False, parenth_negs=True)}"
     )
 
     return f"[ {combine_nums} ]"
@@ -143,29 +145,21 @@ def log_setup(logger=LOGGER) -> None:
             with open(LOG_PATH, mode="w", encoding="utf-8") as _:
                 pass
 
-    handler = FileHandler(
-        LOG_PATH,
-        mode="a",
-        encoding="utf-8"
-    )
+    handler = FileHandler(LOG_PATH, mode="a", encoding="utf-8")
 
     handler.setLevel(DEBUG)
-    handler.setFormatter(
-        Formatter(
-            "\n%(asctime)s - %(levelname)s:\n%(message)s"
-        )
-    )
+    handler.setFormatter(Formatter("\n%(asctime)s - %(levelname)s:\n%(message)s"))
 
     logger.addHandler(handler)
     logger.setLevel(DEBUG)
     logger.info("Logger configurado...")
 
 
-def get_dict_key(dict_lookup: dict, buscando: Any) -> Union[Any, None]:
+def get_dict_key(dict_lookup: dict, buscando: Any) -> Optional[Any]:
     """
     Busca un valor en un diccionario y retorna su llave.
     * dict_lookup: diccionario a recorrer secuencialmente
-    * buscando: valor a buscar en el diccionario
+    * buscando:    valor a buscar en el diccionario
     """
 
     for key, value in dict_lookup.items():
@@ -196,11 +190,11 @@ def generate_sep(orientation: bool, size: tuple[int, int]) -> ctkImage:
     Retorna una CTkImage de un separador vertical u horizontal
     del tamaño 'size' y orientación 'orientation.' Estos separadores
     no pueden ser constantes porque su tamaño es variable.
-    * orientation, bool: True para vertical, False para horizontal.
-    * size, tuple[int, int]: tamaño de la CTkImage en pixeles (x, y)
+    * orientation: True para vertical, False para horizontal.
+    * size:        tamaño de la CTkImage en pixeles (x, y)
 
     Usado para separar:
-    * la columna de constantes de un sistema de ecuaciones en AgregarSistemas
+    * la columna de constantes de un sistema de ecuaciones en gui.frames.subframes.input_sis.AgregarSistemas
     * los inputs de funciones en RaicesFrame.
     """
 
@@ -226,7 +220,7 @@ def resize_image(img: ctkImage, divisors: tuple = (4, 8)) -> ctkImage:
     """
     Recibe una CTkImage y retorna una nueva CTkImage
     con un tamaño reducido en base a los divisores dados.
-    * img: imagen a redimensionar
+    * img:      imagen a redimensionar
     * divisors: divisores para controlar el tamaño de la nueva imagen
     """
 

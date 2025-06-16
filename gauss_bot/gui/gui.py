@@ -60,7 +60,7 @@ class GaussUI(ctk):
         self.tema_actual: str
 
         self._load_config()
-        self.set_icon(self.modo_actual)
+        # self.set_icon(self.modo_actual)
 
         self.theme_config = ThemeManager.theme
         self.configure(fg_color=self.theme_config["CTkFrame"]["fg_color"])
@@ -85,7 +85,7 @@ class GaussUI(ctk):
                 self.func_manager,
                 self.mats_manager,
                 self.vecs_manager,
-            )
+            ),
         )
 
         self.matrices = MatricesFrame(
@@ -109,9 +109,7 @@ class GaussUI(ctk):
         )
 
         self.sistemas = SistemasFrame(
-            app=self,
-            master=self,
-            mats_manager=self.mats_manager
+            app=self, master=self, mats_manager=self.mats_manager
         )
 
         self.config_frame = ConfigFrame(app=self, master=self)
@@ -130,9 +128,9 @@ class GaussUI(ctk):
         """
 
         if modo == "light":
-            self.iconbitmap(bitmap=APP_ICON[1])
+            self.wm_iconbitmap(bitmap=APP_ICON[1])
         elif modo == "dark":
-            self.iconbitmap(bitmap=APP_ICON[0])
+            self.wm_iconbitmap(bitmap=APP_ICON[0])
         else:
             raise ValueError("Valor inválido para argumento 'modo'!")
 
@@ -167,15 +165,11 @@ class GaussUI(ctk):
                 LOGGER.info("Configuración cargada!")
         else:
             LOGGER.info(
-                "Archivo 'config.json' no existe, " +
-                "inicializando con valores por defecto..."
+                "Archivo 'config.json' no existe, "
+                + "inicializando con valores por defecto..."
             )
 
-            self.config_options = {
-                "escala": 1.0,
-                "modo": "light",
-                "tema": "sky.json"
-            }
+            self.config_options = {"escala": 1.0, "modo": "light", "tema": "sky.json"}
 
         # extrar configs individuales del diccionario
         self.escala_actual = self.config_options["escala"]  # type: ignore
