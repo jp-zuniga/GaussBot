@@ -8,5 +8,6 @@ from gauss_bot.util_funcs import log_setup
 if __name__ == "__main__":
     log_setup()  # configurar logger
     app = GaussUI()
-    # app.after(0, lambda: app.state("zoomed"))  # maximizar ventana
+    app.update_idletasks()
+    app.wm_attributes("-zoomed", True)
     app.mainloop()

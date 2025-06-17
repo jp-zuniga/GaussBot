@@ -59,11 +59,10 @@ def delete_msg_if(
     """
 
     try:
-        if msg_frame.master in masters:
+        if msg_frame.master in masters:  # type: ignore
             delete_msg_frame(msg_frame)
     except AttributeError:
-        # si msg_frame == None,
-        # .master va a tirar error
+        # por si msg_frame es None
         pass
 
 
@@ -123,7 +122,9 @@ def toggle_proc(
     Muestra o esconde la ventana de procedimiento.
     """
 
-    if not proc_hidden or any(type(widget) is ctkTop for widget in app.winfo_children()):
+    if not proc_hidden or any(
+        type(widget) is ctkTop for widget in app.winfo_children()
+    ):
         return
 
     new_window = ctkTop(app)
@@ -171,6 +172,8 @@ def toggle_proc(
     proc_hidden = False
 
     def delete_window(new_window: ctkTop) -> None:
+        nonlocal proc_hidden, proc_label  # ocupar las variables del alcance exterior
+
         proc_hidden = True
         new_window.destroy()
         proc_label = None

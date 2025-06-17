@@ -31,7 +31,6 @@ class CustomTable(ctkFrame):
         values: list[list[str]],
         header: str = "Registro de Iteraciones:",
     ):
-
         super().__init__(
             master,
             corner_radius=20,
@@ -81,7 +80,8 @@ class CustomTable(ctkFrame):
 
             cell._text_label.configure(justify="center")  # type: ignore
             cell.grid(
-                row=0, column=j,
+                row=0,
+                column=j,
                 padx=6 if j == 0 else (1, 0),
                 sticky="nsew",
             )
@@ -94,8 +94,10 @@ class CustomTable(ctkFrame):
 
         self.header_frame.grid(row=1, column=0, padx=20, sticky="nsew")
         self.cells_frame.grid(
-            row=2, column=0,
-            padx=20, pady=(0, 20),
+            row=2,
+            column=0,
+            padx=20,
+            pady=(0, 20),
             sticky="nsew",
         )
 
@@ -118,11 +120,9 @@ class CustomTable(ctkFrame):
                     fg_color=(
                         ThemeManager.theme["CTkButton"]["fg_color"]
                         if i == len(self.values) - 2
-                        else
-                        self.top_fg
+                        else self.top_fg
                         if i % 2 == 0
-                        else
-                        self.fg
+                        else self.fg
                     ),
                     text_color=ThemeManager.theme["CTkEntry"]["text_color"],
                     border_color=ThemeManager.theme["CTkFrame"]["border_color"],
@@ -130,23 +130,15 @@ class CustomTable(ctkFrame):
                     border_spacing=0,
                     corner_radius=6,
                     font=ctkFont(
-                        size=(
-                            12
-                            if j == 0 or i == len(self.values) - 2
-                            else
-                            10
-                        ),
+                        size=(12 if j == 0 or i == len(self.values) - 2 else 10),
                         weight=(
-                            "bold"
-                            if j == 0 or i == len(self.values) - 2
-                            else
-                            "normal"
+                            "bold" if j == 0 or i == len(self.values) - 2 else "normal"
                         ),
                     ),
                     hover=False,
                 )
 
-                cell._text_label.configure(justify="center")  # pylint: disable=W0212
+                cell._text_label.configure(justify="center")  # type: ignore
                 cell.grid(
                     row=i,
                     column=j,

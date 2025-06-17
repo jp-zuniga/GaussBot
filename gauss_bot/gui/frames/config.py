@@ -43,6 +43,11 @@ class ConfigFrame(ctkFrame):
             "130%": 1.3,
             "140%": 1.4,
             "150%": 1.5,
+            "160%": 1.6,
+            "170%": 1.7,
+            "180%": 1.8,
+            "190%": 1.9,
+            "200%": 2.0,
         }
 
         self.modos_dict = {
@@ -51,11 +56,9 @@ class ConfigFrame(ctkFrame):
         }
 
         self.temas_dict = {
-            "Breeze": "breeze.json",
-            "Lavender": "lavender.json",
-            "Marsh": "marsh.json",
-            "Midnight": "midnight.json",
-            "Sky": "sky.json",
+            "Cerúleo": "ceruleo.json",
+            "Verdeante": "verdeante.json",
+            "Viento": "viento.json",
         }
 
         self.escalas = list(self.escalas_dict.keys())
@@ -75,7 +78,8 @@ class ConfigFrame(ctkFrame):
             first_modo = StringVar(value=modo_actual_key)
             first_tema = StringVar(value=tema_actual_key)
         except AttributeError:
-            # si get_dict key retorna None, StringVar va a tirar error
+            # si get_dict_key() retorna None, StringVar va a tirar error,
+            # entonces se inicializan con valores por defecto
             first_escala = StringVar(value="100%")
             first_modo = StringVar(value="Claro")
             first_tema = StringVar(value="Sky")
@@ -99,7 +103,7 @@ class ConfigFrame(ctkFrame):
             width=105,
             values=self.modos,
             variable=first_modo,
-            command=self.cambiar_modo
+            command=self.cambiar_modo,
         )
 
         self.desplegar_temas = CustomDropdown(
@@ -107,12 +111,18 @@ class ConfigFrame(ctkFrame):
             width=105,
             values=self.temas,
             variable=first_tema,
-            command=self.cambiar_tema
+            command=self.cambiar_tema,
         )
 
         # colocar widgets
-        self.escala_label.grid(row=0, column=0, padx=(30, 10), pady=(20, 10), sticky="nw")
-        self.desplegar_escalas.grid(row=0, column=1, padx=10, pady=(20, 10), sticky="nw")
+        self.escala_label.grid(
+            row=0, column=0, padx=(30, 10), pady=(20, 10), sticky="nw"
+        )
+
+        self.desplegar_escalas.grid(
+            row=0, column=1, padx=10, pady=(20, 10), sticky="nw"
+        )
+
         self.modos_label.grid(row=1, column=0, padx=(30, 10), pady=10, sticky="nw")
         self.desplegar_modos.grid(row=1, column=1, padx=10, pady=10, sticky="nw")
         self.temas_label.grid(row=2, column=0, padx=(30, 10), pady=10, sticky="nw")
@@ -145,7 +155,6 @@ class ConfigFrame(ctkFrame):
                 columnspan=2,
                 sticky="n",
             )
-
 
     def cambiar_modo(self, modo_seleccionado: str) -> None:
         """
@@ -186,8 +195,8 @@ class ConfigFrame(ctkFrame):
         # explicar que se necesita reiniciar la app
         self.msg_frame = SuccessFrame(
             self,
-            msg="Tema cambiado exitosamente!\n" +
-                "El cambio tomará efecto al reiniciar la aplicación."
+            msg="Tema cambiado exitosamente!\n"
+            + "El cambio tomará efecto al reiniciar la aplicación.",
         )
 
         self.msg_frame.grid(row=3, column=1, padx=10, pady=20)

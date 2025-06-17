@@ -22,6 +22,8 @@ from customtkinter import (
     set_default_color_theme as set_theme,
 )
 
+from PIL.ImageTk import PhotoImage
+
 from .. import (
     CONFIG_PATH,
     THEMES_PATH,
@@ -60,12 +62,12 @@ class GaussUI(ctk):
         self.tema_actual: str
 
         self._load_config()
-        # self.set_icon(self.modo_actual)
+        self.set_icon(self.modo_actual)
 
         self.theme_config = ThemeManager.theme
         self.configure(fg_color=self.theme_config["CTkFrame"]["fg_color"])
 
-        self.geometry("1280x720")
+        self.geometry("1200x600")
         self.title("GaussBot")
         self.rowconfigure(0, weight=1)
         self.columnconfigure(1, weight=1)
@@ -124,13 +126,13 @@ class GaussUI(ctk):
     def set_icon(self, modo: str) -> None:
         """
         Setea el ícono de la ventana según el modo de apariencia.
-        * ValueError: si el input no es "light" o "dark"
+        * ValueError: si 'modo' no es "light" o "dark"
         """
 
         if modo == "light":
-            self.wm_iconbitmap(bitmap=APP_ICON[1])
+            self.iconphoto(False, PhotoImage(file=APP_ICON[1]))
         elif modo == "dark":
-            self.wm_iconbitmap(bitmap=APP_ICON[0])
+            self.iconphoto(False, PhotoImage(file=APP_ICON[0]))
         else:
             raise ValueError("Valor inválido para argumento 'modo'!")
 
@@ -139,7 +141,7 @@ class GaussUI(ctk):
         Guarda la configuración actual en config.json.
         """
 
-        # extrar configuracion actual
+        # extraer configuracion actual
         self.config_options["escala"] = self.escala_actual
         self.config_options["modo"] = self.modo_actual
         self.config_options["tema"] = self.tema_actual
@@ -155,8 +157,7 @@ class GaussUI(ctk):
     def _load_config(self) -> None:
         """
         Carga la configuración guardada en config.json.
-        Si config.json no existe, setea la configuración
-        con valores por defecto.
+        Si config.json no existe, utiliza valores por defecto.
         """
 
         if path.exists(CONFIG_PATH):
@@ -169,12 +170,16 @@ class GaussUI(ctk):
                 + "inicializando con valores por defecto..."
             )
 
-            self.config_options = {"escala": 1.0, "modo": "light", "tema": "sky.json"}
+            self.config_options = {
+                "escala": 1.0,
+                "modo": "light",
+                "tema": "ceruleo.json",
+            }
 
-        # extrar configs individuales del diccionario
-        self.escala_actual = self.config_options["escala"]  # type: ignore
-        self.modo_actual = self.config_options["modo"]  # type: ignore
-        self.tema_actual = self.config_options["tema"]  # type: ignore
+        # extraer configs individuales del diccionario
+        self.escala_actual = self.config_options["escala"]
+        self.modo_actual = self.config_options["modo"]
+        self.tema_actual = self.config_options["tema"]
 
         # aplicar configs
         set_mode(self.modo_actual)

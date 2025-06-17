@@ -54,8 +54,8 @@ NUMPAD_ICON_PATH = path.join(ASSET_PATH, "numpad_icons")
 SAVED_FUNCS_PATH = path.join(DATA_PATH, "saved_funcs")
 
 APP_ICON = (
-    path.join("@", ASSET_PATH, "light_logo.xbm"),
-    path.join("@", ASSET_PATH, "dark_logo.xbm"),
+    path.join(ASSET_PATH, "dark_mode", "light_logo.png"),
+    path.join(ASSET_PATH, "light_mode", "dark_logo.png"),
 )
 
 
@@ -90,8 +90,12 @@ ANALISIS_ICON = ctkImage(
 )
 
 ECUACIONES_ICON = ctkImage(
-    dark_image=open_img(path.join(ASSET_PATH, "dark_mode", "light_ecuaciones_icon.png")),
-    light_image=open_img(path.join(ASSET_PATH, "light_mode", "dark_ecuaciones_icon.png")),
+    dark_image=open_img(
+        path.join(ASSET_PATH, "dark_mode", "light_ecuaciones_icon.png")
+    ),
+    light_image=open_img(
+        path.join(ASSET_PATH, "light_mode", "dark_ecuaciones_icon.png")
+    ),
 )
 
 CONFIG_ICON = ctkImage(
@@ -168,7 +172,9 @@ DROPLEFT_ICON = ctkImage(
 
 DROPRIGHT_ICON = ctkImage(
     dark_image=open_img(path.join(ASSET_PATH, "dark_mode", "light_dropright_icon.png")),
-    light_image=open_img(path.join(ASSET_PATH, "light_mode", "dark_dropright_icon.png")),
+    light_image=open_img(
+        path.join(ASSET_PATH, "light_mode", "dark_dropright_icon.png")
+    ),
 )
 
 DROPUP_ICON = ctkImage(

@@ -21,7 +21,7 @@ from os import (
     path,
 )
 
-from typing import Union
+from typing import Any, Union, Optional
 from customtkinter import CTkImage as ctkImage
 
 from sympy.sets import Contains
@@ -49,21 +49,17 @@ class FuncManager:
     para su uso en los módulos de análisis numérico.
     """
 
-    def __init__(self, funcs_ingresadas=None):
+    def __init__(self, funcs_ingresadas: Optional[dict[str, Func]] = None):
         """
         * TypeError: Si funcs_ingresadas no es un dict[str, Func]
         """
 
         if funcs_ingresadas is None:
-            self.funcs_ingresadas: dict[str, Func] = self._load_funcs()  # type: ignore
+            self.funcs_ingresadas: dict[str, Func] = self._load_funcs()
 
-        elif (
-            isinstance(funcs_ingresadas, dict)
-            and
-            all(
-                isinstance(k, str) and isinstance(v, Func)
-                for k, v in funcs_ingresadas.items()
-            )
+        elif isinstance(funcs_ingresadas, dict) and all(
+            isinstance(k, str) and isinstance(v, Func)
+            for k, v in funcs_ingresadas.items()
         ):
             self.funcs_ingresadas = funcs_ingresadas
 
@@ -86,11 +82,8 @@ class FuncManager:
 
     @staticmethod
     def biseccion(
-        func: Func,
-        intervalo: tuple[Decimal, Decimal],
-        error: Decimal = MARGEN_ERROR
+        func: Func, intervalo: tuple[Decimal, Decimal], error: Decimal = MARGEN_ERROR
     ) -> Union[bool, tuple[Decimal, Decimal, list, int]]:
-
         """
         Implementación del método de bisección,
         un método cerrado para encontrar raíces de funciones.
@@ -99,7 +92,7 @@ class FuncManager:
         if not func.es_continua(intervalo):
             return False
 
-        registro: list[list[Union[str, int, Decimal]]] = [
+        registro: list[str] = [
             [
                 "Iteración",
                 "a",
@@ -130,7 +123,7 @@ class FuncManager:
             fb = f(b)
             registro.append(
                 [
-                    i,
+                    str(i),
                     format(Decimal(a).normalize(), "f"),
                     format(Decimal(b).normalize(), "f"),
                     format(Decimal(c).normalize(), "f"),
@@ -151,11 +144,8 @@ class FuncManager:
 
     @staticmethod
     def falsa_posicion(
-        func: Func,
-        intervalo: tuple[Decimal, Decimal],
-        error: Decimal = MARGEN_ERROR
+        func: Func, intervalo: tuple[Decimal, Decimal], error: Decimal = MARGEN_ERROR
     ) -> Union[bool, tuple[Decimal, Decimal, list, int]]:
-
         """
         Implementación del método de bisección,
         un método cerrado para encontrar raíces de funciones.
@@ -164,7 +154,7 @@ class FuncManager:
         if not func.es_continua(intervalo):
             return False
 
-        registro: list[list[Union[str, int, Decimal]]] = [
+        registro: list[str] = [
             [
                 "Iteración",
                 "a",
@@ -195,7 +185,7 @@ class FuncManager:
             fxr: float = f(xr)
             registro.append(
                 [
-                    i,
+                    str(i),
                     format(Decimal(a).normalize(), "f"),
                     format(Decimal(b).normalize(), "f"),
                     format(Decimal(xr).normalize(), "f"),
@@ -219,9 +209,8 @@ class FuncManager:
         func: Func,
         inicial: Decimal,
         error: Decimal = MARGEN_ERROR,
-        max_its: int = MAX_ITERACIONES
-    ) -> tuple[Decimal, Decimal, list, int, int]:
-
+        max_its: int = MAX_ITERACIONES,
+    ) -> tuple[Decimal, Decimal, list, int, Any]:
         """
         Implementación del método de Newton,
         un método abierto para encontrar raíces de funciones.
@@ -232,7 +221,7 @@ class FuncManager:
             str(diff(func.expr, func.var)),
         )
 
-        registro: list[list[Union[str, int, Decimal]]] = [
+        registro: list[str] = [
             [
                 "Iteración",
                 "x_i",
@@ -277,7 +266,7 @@ class FuncManager:
             xi -= fxi / fxi_prima
             registro.append(
                 [
-                    i,
+                    str(i),
                     format(Decimal(temp_xi).normalize(), "f"),
                     format(Decimal(xi).normalize(), "f"),
                     format(Decimal(fxi).normalize(), "f"),
@@ -298,15 +287,14 @@ class FuncManager:
         func: Func,
         iniciales: tuple[Decimal, Decimal],
         error: Decimal = MARGEN_ERROR,
-        max_its: int = MAX_ITERACIONES
-    ) -> tuple[Decimal, Decimal, list, int, int]:
-
+        max_its: int = MAX_ITERACIONES,
+    ) -> tuple[Decimal, Decimal, list[str], int, Any]:
         """
         Implementación del método de la secante,
         un método abierto para encontrar raíces de funciones.
         """
 
-        registro: list[list[Union[str, int, Decimal]]] = [
+        registro: list[str] = [
             [
                 "Iteración",
                 "x_i − 1",
@@ -327,7 +315,7 @@ class FuncManager:
 
             registro.append(
                 [
-                    i,
+                    str(i),
                     format(Decimal(xi).normalize(), "f"),
                     format(Decimal(xn).normalize(), "f"),
                     format(Decimal(new_xn).normalize(), "f"),
@@ -356,7 +344,8 @@ class FuncManager:
                 "nombre": func.nombre,
                 "expr": str(func.expr),
                 "latexified": func.latexified,
-            } for nombre, func in self.funcs_ingresadas.items()
+            }
+            for nombre, func in self.funcs_ingresadas.items()
         }
 
         # crear funciones.json si no existe
@@ -368,8 +357,8 @@ class FuncManager:
         if funciones_dict == {}:
             with open(FUNCIONES_PATH, "w", encoding="utf-8") as _:
                 LOGGER.info(
-                    "No hay funciones para guardar, " +
-                    "dejando 'funciones.json' vacío..."
+                    "No hay funciones para guardar, "
+                    + "dejando 'funciones.json' vacío..."
                 )
             return
 
@@ -381,9 +370,7 @@ class FuncManager:
                 sort_keys=True,
             )
 
-        LOGGER.info(
-            "Funciones guardadas en 'funciones.json'!"
-        )
+        LOGGER.info("Funciones guardadas en 'funciones.json'!")
 
     def _load_funcs(self) -> dict[str, Func]:
         """
@@ -404,7 +391,8 @@ class FuncManager:
                         nombre=func["nombre"],
                         expr=func["expr"],
                         latexified=func["latexified"],
-                    ) for nombre, func in funciones_dict.items()
+                    )
+                    for nombre, func in funciones_dict.items()
                 }
             except JSONDecodeError as j:
                 if "(char 0)" in str(j):
@@ -413,9 +401,7 @@ class FuncManager:
                     LOGGER.info("Archivo 'funciones.json' vacío...")
                 else:
                     # si no, es un error de verdad
-                    LOGGER.error(
-                        "Error al leer archivo 'funciones.json':\n%s", str(j)
-                    )
+                    LOGGER.error("Error al leer archivo 'funciones.json':\n%s", str(j))
                 return {}
 
     def _validar_funcs_ingresadas(self) -> bool:

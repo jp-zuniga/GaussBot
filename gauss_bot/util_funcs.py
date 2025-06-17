@@ -24,16 +24,13 @@ from typing import (
 from customtkinter import CTkImage as ctkImage
 from PIL.ImageOps import invert
 from PIL.Image import (
-    LANCZOS,
+    Resampling,
     Image,
     merge,
     open as open_img,
 )
 
-from . import (
-    ASSET_PATH,
-    DATA_PATH,
-)
+from . import ASSET_PATH, DATA_PATH, LOG_PATH
 
 
 __all__ = [
@@ -43,7 +40,6 @@ __all__ = [
     "generate_sep",
     "get_dict_key",
     "LOGGER",
-    "LOG_PATH",
     "log_setup",
     "resize_image",
     "transparent_invert",
@@ -53,8 +49,6 @@ __all__ = [
 # objeto logger global para la aplicacion
 # configurado en la funcion log_setup()
 LOGGER = getLogger("GaussBot")
-
-LOG_PATH = path.join(DATA_PATH, "log.txt")
 
 
 ################################################################################
@@ -194,8 +188,8 @@ def generate_sep(orientation: bool, size: tuple[int, int]) -> ctkImage:
     * size:        tamaño de la CTkImage en pixeles (x, y)
 
     Usado para separar:
-    * la columna de constantes de un sistema de ecuaciones en gui.frames.subframes.input_sis.AgregarSistemas
-    * los inputs de funciones en RaicesFrame.
+    * la columna de constantes de un sistema de ecuaciones.
+    * los inputs de funciones.
     """
 
     seps: dict[bool, tuple[Image, Image]] = {
@@ -216,7 +210,9 @@ def generate_sep(orientation: bool, size: tuple[int, int]) -> ctkImage:
     )
 
 
-def resize_image(img: ctkImage, divisors: tuple = (4, 8)) -> ctkImage:
+def resize_image(
+    img: ctkImage, divisors: tuple[int | float, int | float] = (4, 8)
+) -> ctkImage:
     """
     Recibe una CTkImage y retorna una nueva CTkImage
     con un tamaño reducido en base a los divisores dados.
@@ -234,8 +230,8 @@ def resize_image(img: ctkImage, divisors: tuple = (4, 8)) -> ctkImage:
     new_width = int(width // div1)
     new_height = int(height // div1)
 
-    dark_img = dark.resize((new_width, new_height), LANCZOS)
-    light_img = light.resize((new_width, new_height), LANCZOS)
+    dark_img = dark.resize((new_width, new_height), Resampling.LANCZOS)
+    light_img = light.resize((new_width, new_height), Resampling.LANCZOS)
     return ctkImage(
         dark_image=dark_img,
         light_image=light_img,

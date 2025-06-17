@@ -11,6 +11,7 @@ __all__ = [
     "CONFIG_PATH",
     "DATA_PATH",
     "FUNCIONES_PATH",
+    "LOG_PATH",
     "MATRICES_PATH",
     "SISTEMAS_PATH",
     "THEMES_PATH",
@@ -23,10 +24,7 @@ __all__ = [
 ################################################################################
 
 
-ASSET_PATH = path.join(
-    path.dirname(path.realpath(__file__)),
-    "assets"
-)
+ASSET_PATH = path.join(path.dirname(path.realpath(__file__)), "assets")
 
 DATA_PATH = path.join(
     path.expanduser("~"),
@@ -36,6 +34,7 @@ DATA_PATH = path.join(
 
 CONFIG_PATH = path.join(DATA_PATH, "config.json")
 FUNCIONES_PATH = path.join(DATA_PATH, "funciones.json")
+LOG_PATH = path.join(DATA_PATH, "log.txt")
 MATRICES_PATH = path.join(DATA_PATH, "matrices.json")
 SISTEMAS_PATH = path.join(DATA_PATH, "sistemas.json")
 VECTORES_PATH = path.join(DATA_PATH, "vectores.json")
