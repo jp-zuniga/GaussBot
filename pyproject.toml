@@ -8,3 +8,10 @@ dependencies = [
     "matplotlib>=3.10.3",
     "sympy>=1.14.0",
 ]
+
+[tool.ruff.lint.isort]
+case-sensitive = true
+combine-as-imports = true
+force-sort-within-sections = true
+order-by-type = true
+relative-imports-order = "closest-to-furthest"

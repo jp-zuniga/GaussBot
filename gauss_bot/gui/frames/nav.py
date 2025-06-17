@@ -13,24 +13,23 @@ from customtkinter import (
     CTkLabel as ctkLabel,
 )
 
-from ...util_funcs import get_dict_key
-from ...icons import (
-    LOGO,
-    DROPLEFT_ICON,
-    DROPRIGHT_ICON,
-    INPUTS_ICON,
-    MATRIZ_ICON,
-    VECTOR_ICON,
-    ANALISIS_ICON,
-    ECUACIONES_ICON,
-    CONFIG_ICON,
-    QUIT_ICON,
-)
-
 from ..custom import (
     CustomMessageBox,
     IconButton,
 )
+from ...icons import (
+    ANALISIS_ICON,
+    CONFIG_ICON,
+    DROPLEFT_ICON,
+    DROPRIGHT_ICON,
+    ECUACIONES_ICON,
+    INPUTS_ICON,
+    LOGO,
+    MATRIZ_ICON,
+    QUIT_ICON,
+    VECTOR_ICON,
+)
+from ...util_funcs import get_dict_key
 
 if TYPE_CHECKING:
     from .. import GaussUI
@@ -201,7 +200,7 @@ class NavFrame(ctkFrame):
             "vectores": self.app.vectores,  # type: ignore
             "analisis": self.app.analisis,  # type: ignore
             "sistemas": self.app.sistemas,  # type: ignore
-            "config": self.app.config_frame  # type: ignore
+            "config": self.app.config_frame,  # type: ignore
         }
 
         self.buttons: dict[str, IconButton] = {
@@ -273,7 +272,8 @@ class NavFrame(ctkFrame):
                     )
 
                     widget._image_label.grid_configure(  # type: ignore
-                        columnspan=1, sticky="e",
+                        columnspan=1,
+                        sticky="e",
                     )
 
             self.hidden = False
@@ -289,7 +289,8 @@ class NavFrame(ctkFrame):
                 elif isinstance(widget, IconButton):
                     widget.configure(width=20, text="")
                     widget._image_label.grid_configure(  # type: ignore
-                        columnspan=3, sticky="nsew",
+                        columnspan=3,
+                        sticky="nsew",
                     )
 
             self.hidden = True
@@ -338,7 +339,6 @@ class NavFrame(ctkFrame):
 
         self.seleccionar_frame("sistemas")
 
-
     def config_button_event(self) -> None:
         """
         Muestra ConfigFrame cuando el evento de su botón ocurre.
@@ -355,8 +355,8 @@ class NavFrame(ctkFrame):
         quit_box = CustomMessageBox(
             self.app,
             name="Cerrar aplicación",
-            msg="¿Está seguro que desea cerrar GaussBot?\n" +
-                "(sus cambios serán guardados)",
+            msg="¿Está seguro que desea cerrar GaussBot?\n"
+            + "(sus cambios serán guardados)",
             button_options=("Sí", "No", None),
             icon="error",
         )

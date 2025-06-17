@@ -10,10 +10,9 @@ from .func_manager import (
     MAX_ITERACIONES,
     FuncManager,
 )
-
 from .mats_manager import MatricesManager
-from .vecs_manager import VectoresManager
 from .ops_manager import OpsManager
+from .vecs_manager import VectoresManager
 
 __all__ = [
     "MARGEN_ERROR",

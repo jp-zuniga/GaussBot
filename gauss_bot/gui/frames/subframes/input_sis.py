@@ -7,52 +7,48 @@ from random import (
     choice,
     randint,
 )
-
 from string import ascii_uppercase
+from tkinter import Variable
 from typing import (
     TYPE_CHECKING,
     Optional,
 )
 
-from tkinter import Variable
 from customtkinter import (
     CTkFrame as ctkFrame,
     CTkLabel as ctkLabel,
 )
 
-from ....icons import (
-    ENTER_ICON,
-    SHUFFLE_ICON,
-    ACEPTAR_ICON,
-    LIMPIAR_ICON,
-    MOSTRAR_ICON,
-    ELIMINAR_ICON,
+from ...custom import (
+    CustomDropdown,
+    CustomEntry,
+    CustomScrollFrame,
+    ErrorFrame,
+    IconButton,
+    SuccessFrame,
 )
-
 from ....gui_util_funcs import (
     delete_msg_frame,
     place_msg_frame,
 )
-
-from ....util_funcs import generate_sep
-from ....models import Matriz
+from ....icons import (
+    ACEPTAR_ICON,
+    ELIMINAR_ICON,
+    ENTER_ICON,
+    LIMPIAR_ICON,
+    MOSTRAR_ICON,
+    SHUFFLE_ICON,
+)
 from ....managers import (
     KeyBindingManager,
     MatricesManager,
 )
-
-from ...custom import (
-    IconButton,
-    CustomEntry,
-    CustomDropdown,
-    CustomScrollFrame,
-    ErrorFrame,
-    SuccessFrame,
-)
+from ....models import Matriz
+from ....util_funcs import generate_sep
 
 if TYPE_CHECKING:
-    from ... import GaussUI
     from .. import ManejarSistemas
+    from ... import GaussUI
 
 
 class AgregarSistemas(CustomScrollFrame):
@@ -65,9 +61,8 @@ class AgregarSistemas(CustomScrollFrame):
         app: "GaussUI",
         master_tab: ctkFrame,
         master_frame: "ManejarSistemas",
-        mats_manager: MatricesManager
+        mats_manager: MatricesManager,
     ) -> None:
-
         super().__init__(master_tab, corner_radius=0, fg_color="transparent")
         self.app = app
         self.master_frame = master_frame
@@ -89,15 +84,11 @@ class AgregarSistemas(CustomScrollFrame):
         variables_label = ctkLabel(self.pre_sis_frame, text="Variables:")
 
         self.ecuaciones_entry = CustomEntry(
-            self.pre_sis_frame,
-            width=30,
-            placeholder_text="3"
+            self.pre_sis_frame, width=30, placeholder_text="3"
         )
 
         self.variables_entry = CustomEntry(
-            self.pre_sis_frame,
-            width=30,
-            placeholder_text="3"
+            self.pre_sis_frame, width=30, placeholder_text="3"
         )
 
         ingresar_button = IconButton(
@@ -105,7 +96,7 @@ class AgregarSistemas(CustomScrollFrame):
             self.app,
             image=ENTER_ICON,
             tooltip_text="Ingresar datos del sistema",
-            command=self.generar_casillas
+            command=self.generar_casillas,
         )
 
         aleatorio_button = IconButton(
@@ -195,9 +186,7 @@ class AgregarSistemas(CustomScrollFrame):
             fila_entries = []
             for j in range(variables):
                 input_entry = CustomEntry(
-                    self.sis_frame,
-                    width=60,
-                    placeholder_text=str(randint(-15, 15))
+                    self.sis_frame, width=60, placeholder_text=str(randint(-15, 15))
                 )
 
                 if j != variables - 1:
@@ -214,11 +203,13 @@ class AgregarSistemas(CustomScrollFrame):
         self.nombre_entry = CustomEntry(
             self.post_sis_frame,
             width=30,
-            placeholder_text=choice([
-                x
-                for x in ascii_uppercase
-                if x not in self.mats_manager.sis_ingresados.values()
-            ]),
+            placeholder_text=choice(
+                [
+                    x
+                    for x in ascii_uppercase
+                    if x not in self.mats_manager.sis_ingresados.values()
+                ]
+            ),
         )
 
         agregar_button = IconButton(
@@ -226,7 +217,7 @@ class AgregarSistemas(CustomScrollFrame):
             self.app,
             image=ACEPTAR_ICON,
             tooltip_text="Agregar sistema",
-            command=self.agregar_sis
+            command=self.agregar_sis,
         )
 
         limpiar_button = IconButton(
@@ -234,19 +225,23 @@ class AgregarSistemas(CustomScrollFrame):
             self.app,
             image=LIMPIAR_ICON,
             tooltip_text="Limpiar casillas",
-            command=self.limpiar_casillas
+            command=self.limpiar_casillas,
         )
 
         # colocar parent frames
         self.sis_frame.grid(
-            row=1, column=0,
-            padx=5, pady=5,
+            row=1,
+            column=0,
+            padx=5,
+            pady=5,
             sticky="n",
         )
 
         self.post_sis_frame.grid(
-            row=2, column=0,
-            padx=5, pady=5,
+            row=2,
+            column=0,
+            padx=5,
+            pady=5,
             sticky="n",
         )
 
@@ -291,18 +286,16 @@ class AgregarSistemas(CustomScrollFrame):
 
         # si los inputs de ecuaciones/variables
         # cambiaron despues de generar las casillas
-        dimensiones_validas = (
-            ecuaciones == len(self.input_entries)
-            and
-            variables == len(self.input_entries[0])
-        )
+        dimensiones_validas = ecuaciones == len(
+            self.input_entries
+        ) and variables == len(self.input_entries[0])
 
         if not dimensiones_validas:
             self.msg_frame = place_msg_frame(
                 parent_frame=self,
                 msg_frame=self.msg_frame,
-                msg="Las dimensiones del sistema ingresado " +
-                    "no coinciden con las dimensiones indicadas!",
+                msg="Las dimensiones del sistema ingresado "
+                + "no coinciden con las dimensiones indicadas!",
                 tipo="error",
                 row=3,
             )
@@ -335,16 +328,15 @@ class AgregarSistemas(CustomScrollFrame):
 
         nombre_nuevo_sis = self.nombre_entry.get()
         nuevo_sis = Matriz(
-            aumentada=True, filas=ecuaciones,
-            columnas=variables, valores=valores
+            aumentada=True, filas=ecuaciones, columnas=variables, valores=valores
         )
 
         # validar nombre del sistema
         nombre_repetido = nombre_nuevo_sis in self.mats_manager.sis_ingresados
         nombre_valido = (
-            nombre_nuevo_sis.isalpha() and
-            nombre_nuevo_sis.isupper() and
-            len(nombre_nuevo_sis) == 1
+            nombre_nuevo_sis.isalpha()
+            and nombre_nuevo_sis.isupper()
+            and len(nombre_nuevo_sis) == 1
         )
 
         if not nombre_valido or nombre_repetido:
@@ -395,8 +387,8 @@ class AgregarSistemas(CustomScrollFrame):
             self.msg_frame = place_msg_frame(
                 parent_frame=self,
                 msg_frame=self.msg_frame,
-                msg="Debe ingresar números enteros " +
-                    "positivos como ecuaciones y variables!",
+                msg="Debe ingresar números enteros "
+                + "positivos como ecuaciones y variables!",
                 tipo="error",
                 row=1,
             )
@@ -426,9 +418,8 @@ class MostrarSistemas(CustomScrollFrame):
         app: "GaussUI",
         master_tab: ctkFrame,
         master_frame: "ManejarSistemas",
-        mats_manager: MatricesManager
+        mats_manager: MatricesManager,
     ) -> None:
-
         super().__init__(master_tab, corner_radius=0, fg_color="transparent")
         self.app = app
         self.master_frame = master_frame
@@ -485,7 +476,7 @@ class MostrarSistemas(CustomScrollFrame):
             self.app,
             image=MOSTRAR_ICON,
             tooltip_text="Mostrar",
-            command=self.mostrar_sis
+            command=self.mostrar_sis,
         ).grid(row=0, column=1, padx=5, pady=5, sticky="w")
 
     def mostrar_sis(self) -> None:
@@ -554,9 +545,8 @@ class EliminarSistemas(CustomScrollFrame):
         app: "GaussUI",
         master_tab: ctkFrame,
         master_frame: "ManejarSistemas",
-        mats_manager: MatricesManager
+        mats_manager: MatricesManager,
     ) -> None:
-
         super().__init__(master_tab, corner_radius=0, fg_color="transparent")
         self.app = app
         self.master_frame = master_frame
@@ -613,7 +603,9 @@ class EliminarSistemas(CustomScrollFrame):
         self.sis_seleccionado = self.select_sis.get()
 
         # colocar widgets
-        instruct_eliminar.grid(row=0, column=0, columnspan=2, padx=5, pady=5, sticky="n")
+        instruct_eliminar.grid(
+            row=0, column=0, columnspan=2, padx=5, pady=5, sticky="n"
+        )
         self.select_sis.grid(row=1, column=0, padx=5, pady=5, sticky="e")
         button.grid(row=1, column=1, padx=5, pady=5, sticky="w")
 
@@ -645,11 +637,8 @@ class EliminarSistemas(CustomScrollFrame):
 
         self.nombres_sistemas = list(self.mats_manager.sis_ingresados.keys())
 
-        if (
-            len(self.nombres_sistemas) == 0
-            and
-            isinstance(self.msg_frame, SuccessFrame)
-        ):
+        if len(self.nombres_sistemas) == 0 and isinstance(self.msg_frame, SuccessFrame):
+
             def clear_after_wait() -> None:
                 delete_msg_frame(self.msg_frame)
                 self.msg_frame = place_msg_frame(
@@ -663,6 +652,7 @@ class EliminarSistemas(CustomScrollFrame):
                 for widget in self.winfo_children():
                     if not isinstance(widget, ctkFrame):
                         widget.destroy()
+
             self.after(1000, clear_after_wait)
 
         elif isinstance(self.msg_frame, ErrorFrame):

@@ -15,23 +15,21 @@ from customtkinter import (
     CTkTabview as ctkTabview,
 )
 
-from ...icons import INPUTS_ICON
-from ...managers import (
-    MatricesManager,
-    VectoresManager,
+from .subframes import (
+    DeterminanteTab,
+    InversaTab,
+    MultiplicacionTab,
+    SumaRestaTab,
+    TransposicionTab,
 )
-
 from ..custom import (
     CustomScrollFrame,
     ErrorFrame,
 )
-
-from .subframes import (
-    SumaRestaTab,
-    MultiplicacionTab,
-    TransposicionTab,
-    DeterminanteTab,
-    InversaTab,
+from ...icons import INPUTS_ICON
+from ...managers import (
+    MatricesManager,
+    VectoresManager,
 )
 
 if TYPE_CHECKING:
@@ -51,7 +49,6 @@ class MatricesFrame(ctkFrame):
         mats_manager: MatricesManager,
         vecs_manager: VectoresManager,
     ) -> None:
-
         super().__init__(master, corner_radius=0, fg_color="transparent")
         self.app = app
         self.mats_manager = mats_manager
@@ -81,7 +78,7 @@ class MatricesFrame(ctkFrame):
                     type[DeterminanteTab],
                     type[TransposicionTab],
                     type[InversaTab],
-                ]
+                ],
             ]
         ]
 
@@ -137,7 +134,7 @@ class MatricesFrame(ctkFrame):
             ("Multiplicación", MultiplicacionTab),
             ("Calcular Determinante", DeterminanteTab),
             ("Transposición", TransposicionTab),
-            ("Encontrar Inversa", InversaTab)
+            ("Encontrar Inversa", InversaTab),
         ]
 
         # iterar sobre self.tabs para:
@@ -146,8 +143,8 @@ class MatricesFrame(ctkFrame):
         # * añadir los frames a self.instances
         for nombre, cls in self.tabs:
             tab = self.tabview.add(nombre)
-            tab_instance: CustomScrollFrame = (
-                cls(self.app, tab, self, self.mats_manager)
+            tab_instance: CustomScrollFrame = cls(
+                self.app, tab, self, self.mats_manager
             )
 
             tab_instance.pack(expand=True, fill="both")
@@ -160,15 +157,11 @@ class MatricesFrame(ctkFrame):
 
         # sortear los diccionarios de datos para que esten alfabetizados
         self.mats_manager.mats_ingresadas = dict(
-            sorted(
-                self.mats_manager.mats_ingresadas.items()
-            )
+            sorted(self.mats_manager.mats_ingresadas.items())
         )
 
         self.vecs_manager.vecs_ingresados = dict(
-            sorted(
-                self.vecs_manager.vecs_ingresados.items()
-            )
+            sorted(self.vecs_manager.vecs_ingresados.items())
         )
 
         # actualizar los atributos de nombres despues que cambiaron los dicts
@@ -176,9 +169,9 @@ class MatricesFrame(ctkFrame):
         self.nombres_matrices = list(self.mats_manager.mats_ingresadas.keys())
 
         if (
-            self.msg_frame is not None or
-            len(self.nombres_matrices) == 0 or
-            self.instances == []
+            self.msg_frame is not None
+            or len(self.nombres_matrices) == 0
+            or self.instances == []
         ):
             # si hay un mensaje de error,
             # o no hay matrices ingresadas,

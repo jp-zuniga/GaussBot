@@ -16,23 +16,21 @@ from customtkinter import (
     CTkLabel as ctkLabel,
 )
 
-from ....gui_util_funcs import (
-    delete_msg_frame,
-    place_msg_frame,
-)
-
-from ....util_funcs import generate_sep
-from ....models import Func
-from ....managers import FuncManager
-
 from ...custom import (
     CustomDropdown,
     CustomScrollFrame,
 )
+from ....gui_util_funcs import (
+    delete_msg_frame,
+    place_msg_frame,
+)
+from ....managers import FuncManager
+from ....models import Func
+from ....util_funcs import generate_sep
 
 if TYPE_CHECKING:
-    from ... import GaussUI
     from .. import AnalisisFrame
+    from ... import GaussUI
 
 
 class IntegralesFrame(CustomScrollFrame):
@@ -47,7 +45,6 @@ class IntegralesFrame(CustomScrollFrame):
         master_frame: "AnalisisFrame",
         func_manager: FuncManager,
     ) -> None:
-
         super().__init__(master_tab, corner_radius=0, fg_color="transparent")
         self.app = app
         self.master_frame = master_frame

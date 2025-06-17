@@ -24,7 +24,6 @@ class KeyBindingManager:
         entry_list: Optional[Union[list[CustomEntry], list[list[CustomEntry]]]] = None,
         extra_entries: Optional[tuple[CustomEntry, CustomEntry]] = None,
     ) -> None:
-
         """
         Argumentos:
         - es_matriz: True si las entries son para una matriz,
@@ -82,7 +81,6 @@ class KeyBindingManager:
         column: int,
         entry: CustomEntry,
     ) -> None:
-
         """
         Crea los bindings de teclas de flecha
         para un entry de una matriz.
@@ -100,7 +98,6 @@ class KeyBindingManager:
         row: int,
         entry: CustomEntry,
     ) -> None:
-
         """
         Crea los bindings de teclas de flecha
         para un entry de un vector.
@@ -134,7 +131,6 @@ class KeyBindingManager:
         column: int,
         nombre_entry: CustomEntry,
     ) -> None:
-
         """
         Cambia el foco a la siguiente entry,
         o al entry de nombre si ya se llegó al final.

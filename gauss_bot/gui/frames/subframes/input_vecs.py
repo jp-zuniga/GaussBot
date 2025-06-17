@@ -7,51 +7,47 @@ from random import (
     choice,
     randint,
 )
-
 from string import ascii_lowercase
+from tkinter import Variable
 from typing import (
     TYPE_CHECKING,
     Optional,
 )
 
-from tkinter import Variable
 from customtkinter import (
     CTkFrame as ctkFrame,
     CTkLabel as ctkLabel,
 )
 
-from ....icons import (
-    ENTER_ICON,
-    SHUFFLE_ICON,
-    ACEPTAR_ICON,
-    LIMPIAR_ICON,
-    MOSTRAR_ICON,
-    ELIMINAR_ICON,
+from ...custom import (
+    CustomDropdown,
+    CustomEntry,
+    CustomScrollFrame,
+    ErrorFrame,
+    IconButton,
+    SuccessFrame,
 )
-
 from ....gui_util_funcs import (
     delete_msg_frame,
     place_msg_frame,
 )
-
-from ....models import Vector
+from ....icons import (
+    ACEPTAR_ICON,
+    ELIMINAR_ICON,
+    ENTER_ICON,
+    LIMPIAR_ICON,
+    MOSTRAR_ICON,
+    SHUFFLE_ICON,
+)
 from ....managers import (
     KeyBindingManager,
     VectoresManager,
 )
-
-from ...custom import (
-    CustomEntry,
-    CustomDropdown,
-    CustomScrollFrame,
-    IconButton,
-    ErrorFrame,
-    SuccessFrame,
-)
+from ....models import Vector
 
 if TYPE_CHECKING:
-    from ... import GaussUI
     from .. import ManejarVecs
+    from ... import GaussUI
 
 
 class AgregarVecs(CustomScrollFrame):
@@ -65,9 +61,8 @@ class AgregarVecs(CustomScrollFrame):
         app: "GaussUI",
         master_tab: ctkFrame,
         master_frame: "ManejarVecs",
-        vecs_manager: VectoresManager
+        vecs_manager: VectoresManager,
     ) -> None:
-
         super().__init__(master_tab, corner_radius=0, fg_color="transparent")
         self.master_frame = master_frame
         self.app = app
@@ -97,7 +92,7 @@ class AgregarVecs(CustomScrollFrame):
             self.app,
             image=ENTER_ICON,
             tooltip_text="Ingresar datos del vector",
-            command=self.generar_casillas
+            command=self.generar_casillas,
         )
 
         aleatorio_button = IconButton(
@@ -105,7 +100,7 @@ class AgregarVecs(CustomScrollFrame):
             self.app,
             image=SHUFFLE_ICON,
             tooltip_text="Generar vector con valores aleatorios",
-            command=self.generar_aleatorio
+            command=self.generar_aleatorio,
         )
 
         # crear bindings iniciales
@@ -151,9 +146,7 @@ class AgregarVecs(CustomScrollFrame):
         self.input_entries.clear()
         for i in range(dimension):
             input_entry = CustomEntry(
-                self.vector_frame,
-                width=60,
-                placeholder_text=str(randint(-15, 15))
+                self.vector_frame, width=60, placeholder_text=str(randint(-15, 15))
             )
 
             input_entry.grid(row=i, column=0, padx=5, pady=5)
@@ -164,11 +157,13 @@ class AgregarVecs(CustomScrollFrame):
         self.nombre_entry = CustomEntry(
             self.post_vec_frame,
             width=30,
-            placeholder_text=choice([
-                x
-                for x in ascii_lowercase
-                if x not in self.vecs_manager.vecs_ingresados.values()
-            ]),
+            placeholder_text=choice(
+                [
+                    x
+                    for x in ascii_lowercase
+                    if x not in self.vecs_manager.vecs_ingresados.values()
+                ]
+            ),
         )
 
         agregar_button = IconButton(
@@ -176,7 +171,7 @@ class AgregarVecs(CustomScrollFrame):
             self.app,
             image=ACEPTAR_ICON,
             tooltip_text="Agregar vector",
-            command=self.agregar_vector
+            command=self.agregar_vector,
         )
 
         limpiar_button = IconButton(
@@ -184,7 +179,7 @@ class AgregarVecs(CustomScrollFrame):
             self.app,
             image=LIMPIAR_ICON,
             tooltip_text="Limpiar casillas",
-            command=self.limpiar_casillas
+            command=self.limpiar_casillas,
         )
 
         # colocar widgets
@@ -229,8 +224,8 @@ class AgregarVecs(CustomScrollFrame):
             self.msg_frame = place_msg_frame(
                 parent_frame=self,
                 msg_frame=self.msg_frame,
-                msg="Las dimensiones del vector ingresado " +
-                    "no coinciden con las dimensiones indicadas!",
+                msg="Las dimensiones del vector ingresado "
+                + "no coinciden con las dimensiones indicadas!",
                 tipo="error",
                 row=3,
             )
@@ -314,8 +309,7 @@ class AgregarVecs(CustomScrollFrame):
             self.msg_frame = place_msg_frame(
                 parent_frame=self,
                 msg_frame=self.msg_frame,
-                msg="Debe ingresar un número entero " +
-                    "positivo como dimensión!",
+                msg="Debe ingresar un número entero " + "positivo como dimensión!",
                 tipo="error",
                 row=1,
             )
@@ -345,9 +339,8 @@ class MostrarVecs(CustomScrollFrame):
         app: "GaussUI",
         master_tab: ctkFrame,
         master_frame: "ManejarVecs",
-        vecs_manager: VectoresManager
+        vecs_manager: VectoresManager,
     ) -> None:
-
         super().__init__(master_tab, corner_radius=0, fg_color="transparent")
         self.app = app
         self.master_frame = master_frame
@@ -362,7 +355,7 @@ class MostrarVecs(CustomScrollFrame):
         self.opciones: dict[str, int] = {
             "Mostrar todos": -1,
             "Vectores ingresados": 0,
-            "Vectores calculados": 1
+            "Vectores calculados": 1,
         }
 
         self.select_opcion: CustomDropdown
@@ -404,7 +397,7 @@ class MostrarVecs(CustomScrollFrame):
             self.app,
             image=MOSTRAR_ICON,
             tooltip_text="Mostrar",
-            command=self.show_vecs
+            command=self.show_vecs,
         ).grid(row=0, column=1, padx=5, pady=5, sticky="w")
 
     def show_vecs(self) -> None:
@@ -473,9 +466,8 @@ class EliminarVecs(CustomScrollFrame):
         app: "GaussUI",
         master_tab: ctkFrame,
         master_frame: "ManejarVecs",
-        vecs_manager: VectoresManager
+        vecs_manager: VectoresManager,
     ) -> None:
-
         super().__init__(master_tab, corner_radius=0, fg_color="transparent")
         self.app = app
         self.master_frame = master_frame
@@ -532,7 +524,9 @@ class EliminarVecs(CustomScrollFrame):
         self.vec_seleccionado = self.select_vec.get()
 
         # colocar widgets
-        instruct_eliminar.grid(row=0, column=0, columnspan=2, padx=5, pady=5, sticky="n")
+        instruct_eliminar.grid(
+            row=0, column=0, columnspan=2, padx=5, pady=5, sticky="n"
+        )
         self.select_vec.grid(row=1, column=0, padx=5, pady=5, sticky="e")
         button.grid(row=1, column=1, padx=5, pady=5, sticky="w")
 
@@ -566,11 +560,7 @@ class EliminarVecs(CustomScrollFrame):
 
         self.nombres_vectores = list(self.vecs_manager.vecs_ingresados.keys())
 
-        if (
-            len(self.nombres_vectores) == 0
-            and
-            isinstance(self.msg_frame, SuccessFrame)
-        ):
+        if len(self.nombres_vectores) == 0 and isinstance(self.msg_frame, SuccessFrame):
 
             def clear_after_wait() -> None:
                 delete_msg_frame(self.msg_frame)
@@ -585,6 +575,7 @@ class EliminarVecs(CustomScrollFrame):
                 for widget in self.winfo_children():
                     if not isinstance(widget, ctkFrame):
                         widget.destroy()
+
             self.after(1000, clear_after_wait)
 
         elif isinstance(self.msg_frame, ErrorFrame):

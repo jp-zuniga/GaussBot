@@ -14,17 +14,16 @@ from customtkinter import (
     CTkTabview as ctkTabview,
 )
 
+from .subframes import (
+    MagnitudTab,
+    VMTab,
+    VSRTab,
+)
+from ..custom import ErrorFrame
 from ...icons import INPUTS_ICON
 from ...managers import (
     MatricesManager,
     VectoresManager,
-)
-
-from ..custom import ErrorFrame
-from .subframes import (
-    MagnitudTab,
-    VSRTab,
-    VMTab,
 )
 
 if TYPE_CHECKING:
@@ -46,7 +45,6 @@ class VectoresFrame(ctkFrame):
         vecs_manager: VectoresManager,
         mats_manager: MatricesManager,
     ) -> None:
-
         super().__init__(master, corner_radius=0, fg_color="transparent")
         self.app = app
         self.vecs_manager = vecs_manager
@@ -72,7 +70,7 @@ class VectoresFrame(ctkFrame):
                     type[MagnitudTab],
                     type[VSRTab],
                     type[VMTab],
-                ]
+                ],
             ]
         ]
 
@@ -94,8 +92,7 @@ class VectoresFrame(ctkFrame):
             # agregar boton para que el usuario sepa donde agregarlos
             self.dummy_frame = ctkFrame(self, fg_color="transparent")
             self.msg_frame = ErrorFrame(
-                self.dummy_frame,
-                msg="No se ha guardado ningún vector!"
+                self.dummy_frame, msg="No se ha guardado ningún vector!"
             )
 
             agregar_button = ctkButton(
@@ -135,8 +132,8 @@ class VectoresFrame(ctkFrame):
         # * añadir los frames a self.instances
         for nombre, cls in self.tabs:
             tab = self.tabview.add(nombre)
-            tab_instance: "CustomScrollFrame" = (
-                cls(self.app, tab, self, self.vecs_manager)
+            tab_instance: "CustomScrollFrame" = cls(
+                self.app, tab, self, self.vecs_manager
             )
 
             tab_instance.pack(expand=True, fill="both")
@@ -149,15 +146,11 @@ class VectoresFrame(ctkFrame):
 
         # sort los diccionarios de datos para que esten alfabetizados
         self.mats_manager.mats_ingresadas = dict(
-            sorted(
-                self.mats_manager.mats_ingresadas.items()
-            )
+            sorted(self.mats_manager.mats_ingresadas.items())
         )
 
         self.vecs_manager.vecs_ingresados = dict(
-            sorted(
-                self.vecs_manager.vecs_ingresados.items()
-            )
+            sorted(self.vecs_manager.vecs_ingresados.items())
         )
 
         # actualizar atributos de nombres despues que cambiaron los dicts
@@ -165,9 +158,9 @@ class VectoresFrame(ctkFrame):
         self.nombres_matrices = list(self.mats_manager.mats_ingresadas.keys())
 
         if (
-            self.msg_frame is not None or
-            len(self.nombres_vectores) == 0 or
-            self.instances == []
+            self.msg_frame is not None
+            or len(self.nombres_vectores) == 0
+            or self.instances == []
         ):
             # si hay un mensaje de error,
             # o ahora no hay vectores,

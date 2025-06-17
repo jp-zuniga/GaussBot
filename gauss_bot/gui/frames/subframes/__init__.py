@@ -4,49 +4,42 @@ que corresponden a las funcionalidades
 específicas de cada módulo de la aplicación.
 """
 
+from .derivadas import DerivadasFrame
 from .input_funcs import (
     AgregarFuncs,
-    MostrarFuncs,
     EliminarFuncs,
+    MostrarFuncs,
 )
-
-from .input_sis import (
-    AgregarSistemas,
-    MostrarSistemas,
-    EliminarSistemas,
-)
-
 from .input_mats import (
     AgregarMats,
-    MostrarMats,
     EliminarMats,
+    MostrarMats,
 )
-
+from .input_sis import (
+    AgregarSistemas,
+    EliminarSistemas,
+    MostrarSistemas,
+)
 from .input_vecs import (
     AgregarVecs,
-    MostrarVecs,
     EliminarVecs,
+    MostrarVecs,
 )
-
+from .integrales import IntegralesFrame
 from .operaciones_mats import (
-    SumaRestaTab,
-    MultiplicacionTab,
-    TransposicionTab,
     DeterminanteTab,
     InversaTab,
+    MultiplicacionTab,
+    SumaRestaTab,
+    TransposicionTab,
 )
-
 from .operaciones_vecs import (
     MagnitudTab,
-    SumaRestaTab as VSRTab,
     MultiplicacionTab as VMTab,
+    SumaRestaTab as VSRTab,
 )
-
-from .resolver_sis import ResolverSisFrame
 from .raices import RaicesFrame
-from .derivadas import DerivadasFrame
-from .integrales import IntegralesFrame
-
+from .resolver_sis import ResolverSisFrame
 
 __all__ = [
     "AgregarFuncs",

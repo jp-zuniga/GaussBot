@@ -16,11 +16,11 @@ from customtkinter import (
     set_widget_scaling as set_scaling,
 )
 
-from ...util_funcs import get_dict_key
 from ..custom import (
     CustomDropdown,
     SuccessFrame,
 )
+from ...util_funcs import get_dict_key
 
 if TYPE_CHECKING:
     from .. import GaussUI

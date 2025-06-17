@@ -9,32 +9,29 @@ from decimal import (
     Decimal,
     getcontext,
 )
-
 from json import (
+    JSONDecodeError,
     dump,
     load,
-    JSONDecodeError,
 )
-
 from os import (
     makedirs,
     path,
 )
+from typing import Any, Optional, Union
 
-from typing import Any, Union, Optional
 from customtkinter import CTkImage as ctkImage
-
-from sympy.sets import Contains
 from sympy import (
     I,
-    zoo,
     diff,
     lambdify,
+    zoo,
 )
+from sympy.sets import Contains
 
 from .. import FUNCIONES_PATH
-from ..util_funcs import LOGGER
 from ..models import Func
+from ..util_funcs import LOGGER
 
 getcontext().prec = 8  # precision de los decimales
 

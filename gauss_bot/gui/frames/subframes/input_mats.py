@@ -7,51 +7,47 @@ from random import (
     choice,
     randint,
 )
-
 from string import ascii_uppercase
+from tkinter import Variable
 from typing import (
     TYPE_CHECKING,
     Optional,
 )
 
-from tkinter import Variable
 from customtkinter import (
     CTkFrame as ctkFrame,
     CTkLabel as ctkLabel,
 )
 
-from ....icons import (
-    ENTER_ICON,
-    SHUFFLE_ICON,
-    ACEPTAR_ICON,
-    LIMPIAR_ICON,
-    MOSTRAR_ICON,
-    ELIMINAR_ICON,
+from ...custom import (
+    CustomDropdown,
+    CustomEntry,
+    CustomScrollFrame,
+    ErrorFrame,
+    IconButton,
+    SuccessFrame,
 )
-
 from ....gui_util_funcs import (
     delete_msg_frame,
     place_msg_frame,
 )
-
-from ....models import Matriz
+from ....icons import (
+    ACEPTAR_ICON,
+    ELIMINAR_ICON,
+    ENTER_ICON,
+    LIMPIAR_ICON,
+    MOSTRAR_ICON,
+    SHUFFLE_ICON,
+)
 from ....managers import (
     KeyBindingManager,
     MatricesManager,
 )
-
-from ...custom import (
-    IconButton,
-    CustomEntry,
-    CustomDropdown,
-    CustomScrollFrame,
-    ErrorFrame,
-    SuccessFrame,
-)
+from ....models import Matriz
 
 if TYPE_CHECKING:
-    from ... import GaussUI
     from .. import ManejarMats
+    from ... import GaussUI
 
 
 class AgregarMats(CustomScrollFrame):
@@ -64,9 +60,8 @@ class AgregarMats(CustomScrollFrame):
         app: "GaussUI",
         master_tab: ctkFrame,
         master_frame: "ManejarMats",
-        mats_manager: MatricesManager
+        mats_manager: MatricesManager,
     ) -> None:
-
         super().__init__(master_tab, corner_radius=0, fg_color="transparent")
         self.app = app
         self.master_frame = master_frame
@@ -104,7 +99,7 @@ class AgregarMats(CustomScrollFrame):
             self.app,
             image=ENTER_ICON,
             tooltip_text="Ingresar datos de la matriz",
-            command=self.generar_casillas
+            command=self.generar_casillas,
         )
 
         aleatoria_button = IconButton(
@@ -187,9 +182,7 @@ class AgregarMats(CustomScrollFrame):
             fila_entries = []
             for j in range(columnas):
                 input_entry = CustomEntry(
-                    self.matriz_frame,
-                    width=60,
-                    placeholder_text=str(randint(-15, 15))
+                    self.matriz_frame, width=60, placeholder_text=str(randint(-15, 15))
                 )
 
                 input_entry.grid(row=i, column=j, padx=5, pady=5)
@@ -201,11 +194,13 @@ class AgregarMats(CustomScrollFrame):
         self.nombre_entry = CustomEntry(
             self.post_mat_frame,
             width=30,
-            placeholder_text=choice([
-                x
-                for x in ascii_uppercase
-                if x not in self.mats_manager.mats_ingresadas.values()
-            ]),
+            placeholder_text=choice(
+                [
+                    x
+                    for x in ascii_uppercase
+                    if x not in self.mats_manager.mats_ingresadas.values()
+                ]
+            ),
         )
 
         agregar_button = IconButton(
@@ -226,14 +221,18 @@ class AgregarMats(CustomScrollFrame):
 
         # colocar parent frames
         self.matriz_frame.grid(
-            row=1, column=0,
-            padx=5, pady=5,
+            row=1,
+            column=0,
+            padx=5,
+            pady=5,
             sticky="n",
         )
 
         self.post_mat_frame.grid(
-            row=2, column=0,
-            padx=5, pady=5,
+            row=2,
+            column=0,
+            padx=5,
+            pady=5,
             sticky="n",
         )
 
@@ -278,18 +277,16 @@ class AgregarMats(CustomScrollFrame):
 
         # si los inputs de filas/columnas
         # cambiaron despues de generar las casillas
-        dimensiones_validas = (
-            filas == len(self.input_entries)
-            and
-            columnas == len(self.input_entries[0])
+        dimensiones_validas = filas == len(self.input_entries) and columnas == len(
+            self.input_entries[0]
         )
 
         if not dimensiones_validas:
             self.msg_frame = place_msg_frame(
                 parent_frame=self,
                 msg_frame=self.msg_frame,
-                msg="Las dimensiones de la matriz ingresada " +
-                    "no coinciden con las dimensiones indicadas!",
+                msg="Las dimensiones de la matriz ingresada "
+                + "no coinciden con las dimensiones indicadas!",
                 tipo="error",
                 row=3,
             )
@@ -321,16 +318,15 @@ class AgregarMats(CustomScrollFrame):
 
         nombre_nueva_matriz = self.nombre_entry.get()
         nueva_matriz = Matriz(
-            aumentada=False, filas=filas,
-            columnas=columnas, valores=valores
+            aumentada=False, filas=filas, columnas=columnas, valores=valores
         )
 
         # validar nombre de la matriz
         nombre_repetido = nombre_nueva_matriz in self.mats_manager.mats_ingresadas
         nombre_valido = (
-            nombre_nueva_matriz.isalpha() and
-            nombre_nueva_matriz.isupper() and
-            len(nombre_nueva_matriz) == 1
+            nombre_nueva_matriz.isalpha()
+            and nombre_nueva_matriz.isupper()
+            and len(nombre_nueva_matriz) == 1
         )
 
         if not nombre_valido or nombre_repetido:
@@ -382,8 +378,8 @@ class AgregarMats(CustomScrollFrame):
             self.msg_frame = place_msg_frame(
                 parent_frame=self,
                 msg_frame=self.msg_frame,
-                msg="Debe ingresar números enteros " +
-                    "positivos como filas y columnas!",
+                msg="Debe ingresar números enteros "
+                + "positivos como filas y columnas!",
                 tipo="error",
                 row=1,
             )
@@ -413,9 +409,8 @@ class MostrarMats(CustomScrollFrame):
         app: "GaussUI",
         master_tab: ctkFrame,
         master_frame: "ManejarMats",
-        mats_manager: MatricesManager
+        mats_manager: MatricesManager,
     ) -> None:
-
         super().__init__(master_tab, corner_radius=0, fg_color="transparent")
         self.app = app
         self.master_frame = master_frame
@@ -471,9 +466,8 @@ class MostrarMats(CustomScrollFrame):
             self.app,
             image=MOSTRAR_ICON,
             tooltip_text="Mostrar",
-            command=self.show_mats
+            command=self.show_mats,
         ).grid(row=0, column=1, padx=5, pady=5, sticky="w")
-
 
     def show_mats(self) -> None:
         """
@@ -546,9 +540,8 @@ class EliminarMats(CustomScrollFrame):
         app: "GaussUI",
         master_tab: ctkFrame,
         master_frame: "ManejarMats",
-        mats_manager: MatricesManager
+        mats_manager: MatricesManager,
     ) -> None:
-
         super().__init__(master_tab, corner_radius=0, fg_color="transparent")
         self.app = app
         self.master_frame = master_frame
@@ -605,7 +598,9 @@ class EliminarMats(CustomScrollFrame):
         self.mat_seleccionada = self.select_mat.get()
 
         # colocar widgets
-        instruct_eliminar.grid(row=0, column=0, columnspan=2, padx=5, pady=5, sticky="n")
+        instruct_eliminar.grid(
+            row=0, column=0, columnspan=2, padx=5, pady=5, sticky="n"
+        )
         self.select_mat.grid(row=1, column=0, padx=5, pady=5, sticky="e")
         button.grid(row=1, column=1, padx=5, pady=5, sticky="w")
 
@@ -639,11 +634,8 @@ class EliminarMats(CustomScrollFrame):
 
         self.nombres_matrices = list(self.mats_manager.mats_ingresadas.keys())
 
-        if (
-            len(self.nombres_matrices) == 0
-            and
-            isinstance(self.msg_frame, SuccessFrame)
-        ):
+        if len(self.nombres_matrices) == 0 and isinstance(self.msg_frame, SuccessFrame):
+
             def clear_after_wait() -> None:
                 delete_msg_frame(self.msg_frame)
                 self.msg_frame = place_msg_frame(
@@ -657,6 +649,7 @@ class EliminarMats(CustomScrollFrame):
                 for widget in self.winfo_children():
                     if not isinstance(widget, ctkFrame):
                         widget.grid_remove()
+
             self.after(1000, clear_after_wait)
 
         elif isinstance(self.msg_frame, ErrorFrame):

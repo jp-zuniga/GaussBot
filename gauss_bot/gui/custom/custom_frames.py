@@ -42,7 +42,6 @@ class ErrorFrame(ctkFrame):
         master: Union[ctkFrame, CustomScrollFrame],
         msg: Optional[str],
     ) -> None:
-
         super().__init__(
             master,
             corner_radius=8,
@@ -57,7 +56,8 @@ class ErrorFrame(ctkFrame):
 
         self.error_icon_label = ctkLabel(self, text="", image=ERROR_ICON)
         self.error_icon_label.grid(
-            row=0, column=0,
+            row=0,
+            column=0,
             padx=(15, 10),
             pady=10,
             sticky="nse",
@@ -66,7 +66,8 @@ class ErrorFrame(ctkFrame):
         if msg is not None:
             self.mensaje_error = ctkLabel(self, text=msg)
             self.mensaje_error.grid(
-                row=0, column=1,
+                row=0,
+                column=1,
                 padx=(10, 15),
                 pady=10,
                 sticky="nsw",
@@ -87,7 +88,6 @@ class SuccessFrame(ctkFrame):
         master: Union[ctkFrame, CustomScrollFrame],
         msg: Optional[str],
     ) -> None:
-
         super().__init__(
             master,
             corner_radius=8,
@@ -102,7 +102,8 @@ class SuccessFrame(ctkFrame):
 
         self.check_icon_label = ctkLabel(self, text="", image=CHECK_ICON)
         self.check_icon_label.grid(
-            row=0, column=0,
+            row=0,
+            column=0,
             padx=(15, 10),
             pady=10,
             sticky="nse",
@@ -111,7 +112,8 @@ class SuccessFrame(ctkFrame):
         if msg is not None:
             self.mensaje_exito = ctkLabel(self, text=msg)
             self.mensaje_exito.grid(
-                row=0, column=1,
+                row=0,
+                column=1,
                 padx=(10, 15),
                 pady=10,
                 sticky="nsw",
@@ -134,7 +136,6 @@ class ResultadoFrame(ctkFrame):
         img: Optional[ctkImage] = None,
         border_color: Optional[str] = None,
     ) -> None:
-
         if border_color is None:
             border_color = "#18c026"
 
@@ -154,9 +155,7 @@ class ResultadoFrame(ctkFrame):
         self.img_label: Optional[ctkLabel] = None
 
         if msg is not None and img is not None:
-            raise ValueError(
-                "No se pueden mostrar mensaje e imagen al mismo tiempo!"
-            )
+            raise ValueError("No se pueden mostrar mensaje e imagen al mismo tiempo!")
 
         if msg is not None:
             self.msg_label = ctkLabel(self, text=msg)

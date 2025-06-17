@@ -13,14 +13,14 @@ Operaciones implementadas:
 """
 
 from fractions import Fraction
-from ..util_funcs import (
-    format_factor,
-    format_proc_num,
-)
 
 from ..models import (
     Matriz,
     SistemaEcuaciones,
+)
+from ..util_funcs import (
+    format_factor,
+    format_proc_num,
 )
 
 
@@ -38,13 +38,9 @@ class MatricesManager:
         if mats_ingresadas is None:
             self.mats_ingresadas: dict[str, Matriz] = {}
 
-        elif (
-              isinstance(mats_ingresadas, dict)
-              and
-              all(
-                isinstance(k, str) and isinstance(v, Matriz)
-                for k, v in mats_ingresadas.items()
-            )
+        elif isinstance(mats_ingresadas, dict) and all(
+            isinstance(k, str) and isinstance(v, Matriz)
+            for k, v in mats_ingresadas.items()
         ):
             self.mats_ingresadas = mats_ingresadas
 
@@ -54,13 +50,9 @@ class MatricesManager:
         if sis_ingresados is None:
             self.sis_ingresados: dict[str, Matriz] = {}
 
-        elif (
-              isinstance(sis_ingresados, dict)
-              and
-              all(
-                isinstance(k, str) and isinstance(v, Matriz)
-                for k, v in sis_ingresados.items()
-            )
+        elif isinstance(sis_ingresados, dict) and all(
+            isinstance(k, str) and isinstance(v, Matriz)
+            for k, v in sis_ingresados.items()
         ):
             self.sis_ingresados = sis_ingresados
 
@@ -97,9 +89,10 @@ class MatricesManager:
         matrices += "---------------------------------------------"
         for nombre, mat in self.mats_ingresadas.items():
             if (
-                calculada == 0 and len(nombre) > 1
-                or
-                calculada == 1 and len(nombre) == 1
+                calculada == 0
+                and len(nombre) > 1
+                or calculada == 1
+                and len(nombre) == 1
             ):
                 continue
             matrices += f"\n{nombre}:\n"
@@ -143,9 +136,10 @@ class MatricesManager:
         sistemas += "---------------------------------------------"
         for nombre, sis in self.sis_ingresados.items():
             if (
-                calculado == 0 and len(nombre) > 1
-                or
-                calculado == 1 and len(nombre) == 1
+                calculado == 0
+                and len(nombre) > 1
+                or calculado == 1
+                and len(nombre) == 1
             ):
                 continue
             sistemas += f"\n{nombre}:\n"
@@ -181,12 +175,8 @@ class MatricesManager:
         return sistema
 
     def suma_resta_mats(
-        self,
-        operacion: bool,
-        nombre_mat1: str,
-        nombre_mat2: str
+        self, operacion: bool, nombre_mat1: str, nombre_mat2: str
     ) -> tuple[str, str, Matriz]:
-
         """
         Suma o resta las dos matrices indicadas, dependiendo del
         argumento 'operacion'. True para sumar, False para restar.
@@ -215,35 +205,34 @@ class MatricesManager:
             columnas=mat1.columnas,
             valores=[
                 [
-                    f"{format_proc_num(  # type: ignore
-                        (
-                            mat1[f, c].limit_denominator(1000),
-                            mat2[f, c].limit_denominator(1000),
-                        ),
-                        operador=operador,  # type: ignore
-                    )}"
+                    f"{
+                        format_proc_num(  # type: ignore
+                            (
+                                mat1[f, c].limit_denominator(1000),
+                                mat2[f, c].limit_denominator(1000),
+                            ),
+                            operador=operador,  # type: ignore
+                        )
+                    }"
                     for c in range(mat1.columnas)
                 ]
                 for f in range(mat1.filas)
             ],
         )
 
-        proc  =  "---------------------------------------------\n"
+        proc = "---------------------------------------------\n"
         proc += f"{nombre_mat1}:\n{mat1}\n\n"
         proc += f"{nombre_mat2}:\n{mat2}\n"
-        proc +=  "---------------------------------------------\n"
+        proc += "---------------------------------------------\n"
         proc += f"{nombre_mat_resultado}:\n{mat_proc}\n"
-        proc +=  "---------------------------------------------\n"
+        proc += "---------------------------------------------\n"
         proc += f"{nombre_mat_resultado}:\n{mat_resultado}"
 
         return (proc, nombre_mat_resultado, mat_resultado)
 
     def escalar_por_mat(
-        self,
-        escalar: Fraction,
-        nombre_mat: str
+        self, escalar: Fraction, nombre_mat: str
     ) -> tuple[str, str, Matriz]:
-
         """
         Realiza multiplicación escalar con
         la matriz y el escalar indicados.
@@ -266,33 +255,30 @@ class MatricesManager:
             columnas=mat.columnas,
             valores=[
                 [
-                    f"{format_proc_num(  # type: ignore
-                        (
-                            escalar,
-                            mat[f, c].limit_denominator(1000),
+                    f"{
+                        format_proc_num(  # type: ignore
+                            (
+                                escalar,
+                                mat[f, c].limit_denominator(1000),
+                            )
                         )
-                    )}"
+                    }"
                     for c in range(mat.columnas)
                 ]
                 for f in range(mat.filas)
-            ]
+            ],
         )
 
-        proc  =  "---------------------------------------------\n"
+        proc = "---------------------------------------------\n"
         proc += f"{nombre_mat}:\n{mat}\n"
-        proc +=  "---------------------------------------------\n"
+        proc += "---------------------------------------------\n"
         proc += f"{nombre_mat_mult}:\n{mat_proc}\n"
-        proc +=  "---------------------------------------------\n"
+        proc += "---------------------------------------------\n"
         proc += f"{nombre_mat_mult}:\n{mat_mult}"
 
         return (proc, nombre_mat_mult, mat_mult)
 
-    def mult_mats(
-        self,
-        nombre_mat1: str,
-        nombre_mat2: str
-    ) -> tuple[str, str, Matriz]:
-
+    def mult_mats(self, nombre_mat1: str, nombre_mat2: str) -> tuple[str, str, Matriz]:
         """
         Multiplica las matrices indicadas.
         * ArithmeticError: si las matrices no son compatibles para multiplicación
@@ -316,26 +302,28 @@ class MatricesManager:
             valores=[
                 [
                     " + ".join(  # type: ignore
-                        f"{format_proc_num(  # type: ignore
-                            (
-                                mat1[i, k].limit_denominator(1000),
-                                mat2[k, j].limit_denominator(1000),
+                        f"{
+                            format_proc_num(  # type: ignore
+                                (
+                                    mat1[i, k].limit_denominator(1000),
+                                    mat2[k, j].limit_denominator(1000),
+                                )
                             )
-                        )}"
+                        }"
                         for k in range(mat1.columnas)
                     )
                     for j in range(mat2.columnas)
                 ]
                 for i in range(mat1.filas)
-            ]
+            ],
         )
 
-        proc  =  "---------------------------------------------\n"
+        proc = "---------------------------------------------\n"
         proc += f"{nombre_mat1}:\n{mat1}\n\n"
         proc += f"{nombre_mat2}:\n{mat2}\n"
-        proc +=  "---------------------------------------------\n"
+        proc += "---------------------------------------------\n"
         proc += f"{nombre_mat_mult}:\n{mat_proc}\n"
-        proc +=  "---------------------------------------------\n"
+        proc += "---------------------------------------------\n"
         proc += f"{nombre_mat_mult}:\n{mat_mult}"
 
         return (proc, nombre_mat_mult, mat_mult)
@@ -353,36 +341,40 @@ class MatricesManager:
 
         mat = self.mats_ingresadas[nombre_mat]
 
-        used_det_formula = mat.filas <=2 and mat.columnas <= 2
+        used_det_formula = mat.filas <= 2 and mat.columnas <= 2
         if used_det_formula:
             det: Fraction = mat.calcular_det()  # type: ignore
         else:
             det, mat_triangular, intercambio = mat.calcular_det()  # type: ignore
 
-        proc  =  "---------------------------------------------\n"
+        proc = "---------------------------------------------\n"
         proc += f"{nombre_mat}:\n{mat}\n"
-        proc +=  "---------------------------------------------\n"
+        proc += "---------------------------------------------\n"
 
         if used_det_formula:
-            proc +=  "El determinante de una matriz 2x2 se calcula con la fórmula:\n"
-            proc +=  "ad - bc\n\n"
+            proc += "El determinante de una matriz 2x2 se calcula con la fórmula:\n"
+            proc += "ad - bc\n\n"
             proc += f"|  {nombre_mat}  |  =  "
-            proc += f"{format_proc_num(
-                (
-                    mat[0, 0].limit_denominator(1000),
-                    mat[1, 1].limit_denominator(1000),
+            proc += f"{
+                format_proc_num(
+                    (
+                        mat[0, 0].limit_denominator(1000),
+                        mat[1, 1].limit_denominator(1000),
+                    )
                 )
-            )} − {format_proc_num(
-                (
-                    mat[0, 1].limit_denominator(1000),
-                    mat[1, 0].limit_denominator(1000),
+            } − {
+                format_proc_num(
+                    (
+                        mat[0, 1].limit_denominator(1000),
+                        mat[1, 0].limit_denominator(1000),
+                    )
                 )
-            )}\n"
+            }\n"
 
         else:
-            proc +=  "El determinante de una matriz nxn (n > 2) se puede calcular\n"
-            proc +=  "transformando la matriz en una matriz triangular superior,\n"
-            proc +=  "y multiplicando todos elementos de la diagonal principal.\n\n"
+            proc += "El determinante de una matriz nxn (n > 2) se puede calcular\n"
+            proc += "transformando la matriz en una matriz triangular superior,\n"
+            proc += "y multiplicando todos elementos de la diagonal principal.\n\n"
 
             proc += f"Matriz triangular superior:\n{mat_triangular}\n\n"
             proc += f"|  {nombre_mat}  |  =  "
@@ -393,12 +385,13 @@ class MatricesManager:
                     mult=False,
                     parenth_negs=True,
                     skip_ones=False,
-                ) for i in range(mat_triangular.filas)
+                )
+                for i in range(mat_triangular.filas)
             )
 
             proc += f"[ {diagonales} ]\n"
 
-        proc +=  "---------------------------------------------\n"
+        proc += "---------------------------------------------\n"
         proc += f"|  {nombre_mat}  |  =  "
         proc += f"{det if not used_det_formula and not intercambio else -det}"  # pylint: disable=E0606
 
@@ -421,14 +414,14 @@ class MatricesManager:
         nombre_mat_transpuesta = f"{nombre_mat}_t"
         mat_transpuesta = mat.transponer()
 
-        proc  =  "---------------------------------------------\n"
+        proc = "---------------------------------------------\n"
         proc += f"{nombre_mat}:\n{mat}\n"
-        proc +=  "---------------------------------------------\n"
-        proc +=  "Proceso de transposición:\n\n"
+        proc += "---------------------------------------------\n"
+        proc += "Proceso de transposición:\n\n"
 
         if mat.filas > 5 or mat.columnas > 5:
             proc += f"Para una matriz {mat.filas}x{mat.columnas} como {nombre_mat},\n"
-            proc +=  "la i-ésima fila se convierte en la j-ésima columna.\n"
+            proc += "la i-ésima fila se convierte en la j-ésima columna.\n"
             proc += f"\nPor lo tanto, la transposición de {nombre_mat} sería de "
             proc += f"{mat.columnas}x{mat.filas}.\n"
 
@@ -440,16 +433,12 @@ class MatricesManager:
                 proc += f"\nLa transposición de {nombre_mat} sería "
                 proc += f"de {mat.columnas}x{mat.filas}.\n"
 
-        proc +=  "---------------------------------------------\n"
+        proc += "---------------------------------------------\n"
         proc += f"{nombre_mat_transpuesta}:\n{mat_transpuesta}"
 
         return (proc, nombre_mat_transpuesta, mat_transpuesta)
 
-    def invertir_mat(
-        self,
-        nombre_mat: str
-    ) -> tuple[str, str, "Matriz"]:
-
+    def invertir_mat(self, nombre_mat: str) -> tuple[str, str, "Matriz"]:
         """
         Encuentra la inversa de la matriz indicada.
         * ArithmeticError: si la matriz no es cuadrada
@@ -469,13 +458,13 @@ class MatricesManager:
         nombre_mat_invertida = f"{nombre_mat}_i"
         inversa, adjunta, det = mat.invertir()
 
-        proc  =  "---------------------------------------------\n"
+        proc = "---------------------------------------------\n"
         proc += f"{nombre_mat}:\n{mat}\n"
-        proc +=  "---------------------------------------------\n"
+        proc += "---------------------------------------------\n"
         proc += f"Matriz de cofactores de {nombre_mat}:\n{adjunta.transponer()}\n\n"
         proc += f"adj ({nombre_mat}):\n{adjunta}\n\n"
         proc += f"|  {nombre_mat}  |  =  {det}\n"
-        proc +=  "---------------------------------------------\n"
+        proc += "---------------------------------------------\n"
         proc += f"{nombre_mat_invertida} = adj ({nombre_mat}) / det ({nombre_mat})\n\n"
         proc += f"{nombre_mat_invertida}:\n{inversa}"
 

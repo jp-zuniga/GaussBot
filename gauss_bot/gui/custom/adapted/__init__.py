@@ -9,8 +9,8 @@ and cross-platform compatibility.
 These widgets are built to work only on Windows.
 """
 
-from .numpad import CustomNumpad
 from .messagebox import CustomMessageBox
+from .numpad import CustomNumpad
 from .scrollable_frame import CustomScrollFrame
 from .table import CustomTable
 from .tooltip import Tooltip

@@ -14,18 +14,25 @@ from customtkinter import (
     CTkTabview as ctkTabview,
 )
 
+from .subframes import (
+    AgregarFuncs,
+    AgregarMats,
+    AgregarSistemas,
+    AgregarVecs,
+    EliminarFuncs,
+    EliminarMats,
+    EliminarSistemas,
+    EliminarVecs,
+    MostrarFuncs,
+    MostrarMats,
+    MostrarSistemas,
+    MostrarVecs,
+)
+from ..custom import CustomScrollFrame
 from ...managers import (
     FuncManager,
     MatricesManager,
     VectoresManager,
-)
-
-from ..custom import CustomScrollFrame
-from .subframes import (
-    AgregarFuncs, MostrarFuncs, EliminarFuncs,
-    AgregarSistemas, MostrarSistemas, EliminarSistemas,
-    AgregarMats, MostrarMats, EliminarMats,
-    AgregarVecs, MostrarVecs, EliminarVecs,
 )
 
 if TYPE_CHECKING:
@@ -42,9 +49,8 @@ class InputsFrame(ctkFrame):
         self,
         app: "GaussUI",
         master: "GaussUI",
-        managers: tuple[FuncManager, MatricesManager, VectoresManager]
+        managers: tuple[FuncManager, MatricesManager, VectoresManager],
     ) -> None:
-
         super().__init__(master, corner_radius=0, fg_color="transparent")
         self.app = app
         self.func_manager, self.mats_manager, self.vecs_manager = managers
@@ -79,39 +85,19 @@ class InputsFrame(ctkFrame):
 
         # inicializar frames y append a lista de instancias:
         self.instances.append(
-            ManejarMats(
-                self.app,
-                matrices_tab,
-                self,
-                self.mats_manager
-            )
+            ManejarMats(self.app, matrices_tab, self, self.mats_manager)
         )
 
         self.instances.append(
-            ManejarVecs(
-                self.app,
-                vectores_tab,
-                self,
-                self.vecs_manager
-            )
+            ManejarVecs(self.app, vectores_tab, self, self.vecs_manager)
         )
 
         self.instances.append(
-            ManejarFuncs(
-                self.app,
-                funcs_tab,
-                self,
-                self.func_manager
-            )
+            ManejarFuncs(self.app, funcs_tab, self, self.func_manager)
         )
 
         self.instances.append(
-            ManejarSistemas(
-                self.app,
-                sistemas_tab,
-                self,
-                self.mats_manager
-            )
+            ManejarSistemas(self.app, sistemas_tab, self, self.mats_manager)
         )
 
         # pack frames para mostrarlos
@@ -193,7 +179,6 @@ class ManejarMats(ctkFrame):
         master_frame: InputsFrame,
         mats_manager: MatricesManager,
     ) -> None:
-
         super().__init__(master_tab, corner_radius=0, fg_color="transparent")
         self.app = app
         self.master_frame = master_frame
@@ -214,7 +199,7 @@ class ManejarMats(ctkFrame):
                     type[AgregarMats],
                     type[MostrarMats],
                     type[EliminarMats],
-                ]
+                ],
             ]
         ]
 
@@ -234,18 +219,18 @@ class ManejarMats(ctkFrame):
         tabs = [
             ("Agregar", AgregarMats),
             ("Mostrar", MostrarMats),
-            ("Eliminar", EliminarMats)
+            ("Eliminar", EliminarMats),
         ]
 
         # crear tab, inicializar y almacenar instancias
         for nombre, cls in tabs:
             tab = self.tabview.add(nombre)
-            tab_instance: CustomScrollFrame = (
-                cls(self.app, tab, self, self.mats_manager)
+            tab_instance: CustomScrollFrame = cls(
+                self.app, tab, self, self.mats_manager
             )
 
             tab_instance.pack(expand=True, fill="both")
-            self.instances.append(tab_instance)   # type: ignore
+            self.instances.append(tab_instance)  # type: ignore
 
     def update_all(self):
         """
@@ -269,7 +254,6 @@ class ManejarVecs(ctkFrame):
         master_frame: InputsFrame,
         vecs_manager: VectoresManager,
     ) -> None:
-
         super().__init__(master_tab, corner_radius=0, fg_color="transparent")
         self.app = app
         self.master_frame = master_frame
@@ -290,7 +274,7 @@ class ManejarVecs(ctkFrame):
                     type[AgregarVecs],
                     type[MostrarVecs],
                     type[EliminarVecs],
-                ]
+                ],
             ]
         ]
 
@@ -310,18 +294,18 @@ class ManejarVecs(ctkFrame):
         tabs = [
             ("Agregar", AgregarVecs),
             ("Mostrar", MostrarVecs),
-            ("Eliminar", EliminarVecs)
+            ("Eliminar", EliminarVecs),
         ]
 
         # crear tabs, inicializar y almacenar instancias
         for nombre, cls in tabs:
             tab = self.tabview.add(nombre)
-            tab_instance: CustomScrollFrame = (
-                cls(self.app, tab, self, self.vecs_manager)
+            tab_instance: CustomScrollFrame = cls(
+                self.app, tab, self, self.vecs_manager
             )
 
             tab_instance.pack(expand=True, fill="both")
-            self.instances.append(tab_instance)   # type: ignore
+            self.instances.append(tab_instance)  # type: ignore
 
     def update_all(self):
         """
@@ -346,7 +330,6 @@ class ManejarFuncs(ctkFrame):
         master_frame: InputsFrame,
         func_manager: FuncManager,
     ) -> None:
-
         super().__init__(master_tab, corner_radius=0, fg_color="transparent")
         self.app = app
         self.master_frame = master_frame
@@ -367,7 +350,7 @@ class ManejarFuncs(ctkFrame):
                     type[AgregarFuncs],
                     type[MostrarFuncs],
                     type[EliminarFuncs],
-                ]
+                ],
             ]
         ]
 
@@ -393,11 +376,14 @@ class ManejarFuncs(ctkFrame):
         for nombre, cls in tabs:
             tab = self.tabview.add(nombre)
             tab_instance: CustomScrollFrame = cls(
-                self.app, tab, self, self.func_manager,
+                self.app,
+                tab,
+                self,
+                self.func_manager,
             )
 
             tab_instance.pack(expand=True, fill="both")
-            self.instances.append(tab_instance)   # type: ignore
+            self.instances.append(tab_instance)  # type: ignore
 
     def update_all(self):
         """
@@ -422,7 +408,6 @@ class ManejarSistemas(ctkFrame):
         master_frame: InputsFrame,
         mats_manager: MatricesManager,
     ) -> None:
-
         super().__init__(master_tab, corner_radius=0, fg_color="transparent")
         self.app = app
         self.master_frame = master_frame
@@ -443,7 +428,7 @@ class ManejarSistemas(ctkFrame):
                     type[AgregarSistemas],
                     type[MostrarSistemas],
                     type[EliminarSistemas],
-                ]
+                ],
             ]
         ]
 
@@ -462,18 +447,18 @@ class ManejarSistemas(ctkFrame):
         tabs = [
             ("Agregar", AgregarSistemas),
             ("Mostrar", MostrarSistemas),
-            ("Eliminar", EliminarSistemas)
+            ("Eliminar", EliminarSistemas),
         ]
 
         # crear tab, inicializar y almacenar instancias
         for nombre, cls in tabs:
             tab = self.tabview.add(nombre)
-            tab_instance: CustomScrollFrame = (
-                cls(self.app, tab, self, self.mats_manager)
+            tab_instance: CustomScrollFrame = cls(
+                self.app, tab, self, self.mats_manager
             )
 
             tab_instance.pack(expand=True, fill="both")
-            self.instances.append(tab_instance)   # type: ignore
+            self.instances.append(tab_instance)  # type: ignore
 
     def update_all(self):
         """

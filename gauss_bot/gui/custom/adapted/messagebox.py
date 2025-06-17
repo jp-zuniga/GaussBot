@@ -8,13 +8,13 @@ Formatted file and added type annotations for personal use,
 and heavily simplified the functionality for use in this project.
 """
 
+from tkinter import Event
 from typing import (
     TYPE_CHECKING,
     Literal,
     Optional,
 )
 
-from tkinter import Event
 from customtkinter import (
     CTkButton as ctkButton,
     CTkFrame as ctkFrame,
@@ -24,12 +24,11 @@ from customtkinter import (
     ThemeManager,
 )
 
+from ..custom_widgets import IconButton
 from ....icons import (
     MSGBOX_ICONS,
     QUIT_ICON,
 )
-
-from ..custom_widgets import IconButton
 
 if TYPE_CHECKING:
     from ... import GaussUI
@@ -55,7 +54,6 @@ class CustomMessageBox(ctkTop):
         ] = "info",
         **kwargs,
     ):
-
         """
         Must receive at least one option, with support for up to 3 buttons.
         * ValueError: if width or height are less than 250 or 125, respectively.
@@ -114,7 +112,6 @@ class CustomMessageBox(ctkTop):
         self.fg_color = self._apply_appearance_mode(
             ThemeManager.theme["CTkFrame"]["top_fg_color"]
         )
-
 
         self.frame_top = ctkFrame(
             self,
@@ -276,8 +273,7 @@ class CustomMessageBox(ctkTop):
             )
 
         self._set_scaling(
-            self.master_window.escala_actual,
-            self.master_window.escala_actual
+            self.master_window.escala_actual, self.master_window.escala_actual
         )
 
         self.grab_set()

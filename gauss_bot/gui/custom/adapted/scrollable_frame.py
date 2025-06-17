@@ -7,9 +7,9 @@ Modified by: Joaquín Zúñiga, on 11/8/2024.
 Formatted file and added type annotations for personal use.
 """
 
+from tkinter import Canvas
 from typing import Optional
 
-from tkinter import Canvas
 from customtkinter import (
     CTkFrame as ctkFrame,
     CTkScrollableFrame as ctkScrollFrame,
@@ -29,7 +29,6 @@ class CustomScrollFrame(ctkFrame):
         scrollbar_button_hover_color: Optional[str] = None,
         **kwargs,
     ):
-
         self.parent_frame = ctkFrame(master=master, **kwargs)
         self.bg_color = self.parent_frame.cget("bg_color")
 
@@ -54,7 +53,9 @@ class CustomScrollFrame(ctkFrame):
             bg_color=self.parent_frame.cget("fg_color"),
         )
 
-        self.window_id = self.xy_canvas.create_window((0, 0), window=self, anchor="center")
+        self.window_id = self.xy_canvas.create_window(
+            (0, 0), window=self, anchor="center"
+        )
 
         self.v_scrollbar = ctkScrollbar(
             self.parent_frame,
@@ -81,7 +82,7 @@ class CustomScrollFrame(ctkFrame):
             xscrollcommand=lambda x, y: self.dynamic_h_scrollbar(x, y),
         )
 
-        self.xy_canvas.grid(row=0, column=0, sticky="nsew", padx=(7,0), pady=(7,0))
+        self.xy_canvas.grid(row=0, column=0, sticky="nsew", padx=(7, 0), pady=(7, 0))
 
         self.bind(
             "<Configure>",

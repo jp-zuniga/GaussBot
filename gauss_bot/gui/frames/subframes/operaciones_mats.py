@@ -8,12 +8,12 @@ de operaciones con matrices.
 
 from fractions import Fraction
 from random import choice
+from tkinter import Variable
 from typing import (
     TYPE_CHECKING,
     Optional,
 )
 
-from tkinter import Variable
 from customtkinter import (
     CTkButton as ctkButton,
     CTkFont as ctkFont,
@@ -22,29 +22,27 @@ from customtkinter import (
     CTkTabview as ctkTabview,
 )
 
-from ....icons import INPUTS_ICON
+from ...custom import (
+    CustomDropdown,
+    CustomEntry,
+    CustomScrollFrame,
+)
 from ....gui_util_funcs import (
     delete_msg_frame,
     delete_msg_if,
     place_msg_frame,
     toggle_proc,
 )
-
+from ....icons import INPUTS_ICON
+from ....managers import MatricesManager
 from ....util_funcs import (
     generate_range,
     get_dict_key,
 )
 
-from ....managers import MatricesManager
-from ...custom import (
-    CustomEntry,
-    CustomDropdown,
-    CustomScrollFrame,
-)
-
 if TYPE_CHECKING:
-    from ...gui import GaussUI
     from ..matrices import MatricesFrame
+    from ...gui import GaussUI
 
 
 class SumaRestaTab(CustomScrollFrame):
@@ -57,9 +55,8 @@ class SumaRestaTab(CustomScrollFrame):
         app: "GaussUI",
         master_tab: ctkFrame,
         master_frame: "MatricesFrame",
-        mats_manager: MatricesManager
+        mats_manager: MatricesManager,
     ) -> None:
-
         super().__init__(master_tab, corner_radius=0, fg_color="transparent")
         self.app = app
         self.master_frame = master_frame
@@ -96,22 +93,16 @@ class SumaRestaTab(CustomScrollFrame):
         """
 
         delete_msg_frame(self.msg_frame)
-        placeholder1 = Variable(
-            self, value=self.master_frame.nombres_matrices[0]
-        )
+        placeholder1 = Variable(self, value=self.master_frame.nombres_matrices[0])
 
         if len(self.master_frame.nombres_matrices) == 1:
             placeholder2 = placeholder1
         else:
-            placeholder2 = Variable(
-                self,
-                value=self.master_frame.nombres_matrices[1]
-            )
+            placeholder2 = Variable(self, value=self.master_frame.nombres_matrices[1])
 
         # crear widgets
         self.instruct_sr = ctkLabel(
-            self,
-            text=f"Seleccione las matrices a {default.lower()}:"
+            self, text=f"Seleccione las matrices a {default.lower()}:"
         )
 
         self.select_operacion = CustomDropdown(
@@ -152,9 +143,11 @@ class SumaRestaTab(CustomScrollFrame):
 
         # colocar widgets
         self.instruct_sr.grid(
-            row=0, column=0,
+            row=0,
+            column=0,
             columnspan=3,
-            padx=5, pady=5,
+            padx=5,
+            pady=5,
             sticky="n",
         )
 
@@ -162,9 +155,11 @@ class SumaRestaTab(CustomScrollFrame):
         self.select_operacion.grid(row=1, column=1, padx=5, pady=5, sticky="ew")
         self.select_2.grid(row=1, column=2, padx=5, pady=5, sticky="w")
         self.ejecutar_button.grid(
-            row=2, column=0,
+            row=2,
+            column=0,
             columnspan=3,
-            padx=5, pady=10,
+            padx=5,
+            pady=10,
             sticky="n",
         )
 
@@ -180,9 +175,11 @@ class SumaRestaTab(CustomScrollFrame):
         self.update_mat1(self.select_1.get())
         self.update_mat2(self.select_2.get())
         self.resultado_frame.grid(
-            row=3, column=0,
+            row=3,
+            column=0,
             columnspan=3,
-            padx=5, pady=5,
+            padx=5,
+            pady=5,
             sticky="n",
         )
 
@@ -243,7 +240,8 @@ class SumaRestaTab(CustomScrollFrame):
             placeholder2 = placeholder1
         else:
             placeholder2 = Variable(
-                self, value=self.master_frame.nombres_matrices[1],
+                self,
+                value=self.master_frame.nombres_matrices[1],
             )
 
         self.select_1.configure(
@@ -267,9 +265,7 @@ class SumaRestaTab(CustomScrollFrame):
         op_text: str = get_dict_key(self.operaciones, valor)  # type: ignore
 
         self.ejecutar_button.configure(text=op_text)
-        self.instruct_sr.configure(
-            text=f"Seleccione las matrices a {op_text.lower()}:"
-        )
+        self.instruct_sr.configure(text=f"Seleccione las matrices a {op_text.lower()}:")
 
     def update_mat1(self, valor: str) -> None:
         """
@@ -299,9 +295,8 @@ class MultiplicacionTab(CustomScrollFrame):
         app: "GaussUI",
         master_tab: ctkFrame,
         master_frame: "MatricesFrame",
-        mats_manager: MatricesManager
+        mats_manager: MatricesManager,
     ) -> None:
-
         super().__init__(master_tab, corner_radius=0, fg_color="transparent")
         self.app = app
         self.master_frame = master_frame
@@ -350,9 +345,7 @@ class MultiplicacionTab(CustomScrollFrame):
         # crear frames de resultado
         self.resultado_escalar = ctkFrame(self.tab_escalar, fg_color="transparent")
         self.resultado_mats = ctkFrame(self.tab_mats, fg_color="transparent")
-        self.resultado_mat_vec = ctkFrame(
-            self.tab_mat_vec, fg_color="transparent"
-        )
+        self.resultado_mat_vec = ctkFrame(self.tab_mat_vec, fg_color="transparent")
 
         self.setup_escalar_tab()
         self.setup_mult_mats_tab()
@@ -377,9 +370,11 @@ class MultiplicacionTab(CustomScrollFrame):
                 image=INPUTS_ICON,
                 command=lambda: self.app.home_frame.ir_a_vecs(mostrar=False),  # type: ignore
             ).grid(
-                row=1, column=0,
+                row=1,
+                column=0,
                 columnspan=3,
-                padx=5, pady=5,
+                padx=5,
+                pady=5,
                 sticky="n",
             )
 
@@ -405,14 +400,12 @@ class MultiplicacionTab(CustomScrollFrame):
 
         self.escalar_mat = self.select_escalar_mat.get()
         self.escalar_entry = CustomEntry(
-            self.tab_escalar, width=60,
-            placeholder_text=str(choice(generate_range(-10, 10)))
+            self.tab_escalar,
+            width=60,
+            placeholder_text=str(choice(generate_range(-10, 10))),
         )
 
-        self.escalar_entry.bind(
-            "<Return>",
-            lambda _: self.mult_por_escalar()
-        )
+        self.escalar_entry.bind("<Return>", lambda _: self.mult_por_escalar())
 
         multiplicar_button = ctkButton(
             self.tab_escalar,
@@ -425,14 +418,14 @@ class MultiplicacionTab(CustomScrollFrame):
         instruct_e.grid(row=0, column=0, columnspan=3, padx=5, pady=5, sticky="n")
         self.escalar_entry.grid(row=1, column=0, padx=5, pady=5, sticky="e")
         operador_label.grid(row=1, column=1, padx=5, pady=5, sticky="ew")
-        self.select_escalar_mat.grid(
-            row=1, column=2, padx=5, pady=5, sticky="w"
-        )
+        self.select_escalar_mat.grid(row=1, column=2, padx=5, pady=5, sticky="w")
 
         multiplicar_button.grid(
-            row=2, column=0,
+            row=2,
+            column=0,
             columnspan=3,
-            padx=5, pady=10,
+            padx=5,
+            pady=10,
             sticky="n",
         )
 
@@ -485,14 +478,14 @@ class MultiplicacionTab(CustomScrollFrame):
         instruct_ms.grid(row=0, column=0, columnspan=3, padx=5, pady=5, sticky="n")
         self.select_mat1.grid(row=1, column=0, padx=5, pady=5, sticky="e")
         operador_label.grid(row=1, column=1, padx=5, pady=5, sticky="ew")
-        self.select_mat2.grid(
-            row=1, column=2, padx=5, pady=5, sticky="w"
-        )
+        self.select_mat2.grid(row=1, column=2, padx=5, pady=5, sticky="w")
 
         multiplicar_button.grid(
-            row=2, column=0,
+            row=2,
+            column=0,
             columnspan=3,
-            padx=5, pady=10,
+            padx=5,
+            pady=10,
             sticky="n",
         )
 
@@ -541,14 +534,14 @@ class MultiplicacionTab(CustomScrollFrame):
         instruct_mv.grid(row=0, column=0, columnspan=3, padx=5, pady=5, sticky="n")
         self.select_vmat.grid(row=1, column=0, padx=5, pady=5, sticky="e")
         operador_label.grid(row=1, column=1, padx=5, pady=5, sticky="ew")
-        self.select_mvec.grid(
-            row=1, column=2, padx=5, pady=5, sticky="w"
-        )
+        self.select_mvec.grid(row=1, column=2, padx=5, pady=5, sticky="w")
 
         multiplicar_button.grid(
-            row=2, column=0,
+            row=2,
+            column=0,
             columnspan=3,
-            padx=5, pady=10,
+            padx=5,
+            pady=10,
             sticky="n",
         )
 
@@ -563,20 +556,20 @@ class MultiplicacionTab(CustomScrollFrame):
 
         self.update_escalar_mat(self.select_escalar_mat.get())
         self.resultado_escalar.grid(
-            row=3, column=0,
+            row=3,
+            column=0,
             columnspan=3,
-            padx=5, pady=5,
+            padx=5,
+            pady=5,
             sticky="n",
         )
 
         delete_msg_if(self.msg_frame, (self.tab_escalar, self.resultado_escalar))
         try:
             escalar = Fraction(self.escalar_entry.get())  # type: ignore
-            proc, header, resultado = (
-                self.mats_manager.escalar_por_mat(
-                    escalar,
-                    self.escalar_mat,
-                )
+            proc, header, resultado = self.mats_manager.escalar_por_mat(
+                escalar,
+                self.escalar_mat,
             )
         except (ValueError, ZeroDivisionError) as e:
             if isinstance(e, ValueError):
@@ -605,8 +598,8 @@ class MultiplicacionTab(CustomScrollFrame):
             command=lambda: toggle_proc(
                 app=self.app,
                 parent_frame=self,
-                window_title="GaussBot: Procedimiento de la " +
-                            f"multiplicación {header}",
+                window_title="GaussBot: Procedimiento de la "
+                + f"multiplicación {header}",
                 proc_label=self.proc_label,
                 label_txt=proc,  # pylint: disable=E0606
                 proc_hidden=self.proc_hidden,
@@ -624,9 +617,11 @@ class MultiplicacionTab(CustomScrollFrame):
         self.update_mat1(self.select_mat1.get())
         self.update_mat2(self.select_mat2.get())
         self.resultado_mats.grid(
-            row=3, column=0,
+            row=3,
+            column=0,
             columnspan=3,
-            padx=5, pady=5,
+            padx=5,
+            pady=5,
             sticky="n",
         )
 
@@ -656,8 +651,8 @@ class MultiplicacionTab(CustomScrollFrame):
             command=lambda: toggle_proc(
                 app=self.app,
                 parent_frame=self,
-                window_title="GaussBot: Procedimiento de la " +
-                            f"multiplicación {header}",
+                window_title="GaussBot: Procedimiento de la "
+                + f"multiplicación {header}",
                 proc_label=self.proc_label,
                 label_txt=proc,  # pylint: disable=E0606
                 proc_hidden=self.proc_hidden,
@@ -675,18 +670,18 @@ class MultiplicacionTab(CustomScrollFrame):
         self.update_mvec(self.select_vmat.get())
         self.update_mvec(self.select_mvec.get())
         self.resultado_mat_vec.grid(
-            row=3, column=0,
+            row=3,
+            column=0,
             columnspan=3,
-            padx=5, pady=5,
+            padx=5,
+            pady=5,
             sticky="n",
         )
 
         delete_msg_if(self.msg_frame, (self.tab_mat_vec, self.resultado_mat_vec))
         try:
-            proc, header, resultado = (
-                self.app.ops_manager.mat_por_vec(  # type: ignore
-                    self.vmat, self.mvec
-                )
+            proc, header, resultado = self.app.ops_manager.mat_por_vec(  # type: ignore
+                self.vmat, self.mvec
             )
         except ArithmeticError as e:
             self.msg_frame = place_msg_frame(
@@ -711,8 +706,8 @@ class MultiplicacionTab(CustomScrollFrame):
             command=lambda: toggle_proc(
                 app=self.app,
                 parent_frame=self,
-                window_title="GaussBot: Procedimiento de la " +
-                            f"multiplicación {header}",
+                window_title="GaussBot: Procedimiento de la "
+                + f"multiplicación {header}",
                 proc_label=self.proc_label,
                 label_txt=proc,  # pylint: disable=E0606
                 proc_hidden=self.proc_hidden,
@@ -784,9 +779,8 @@ class DeterminanteTab(CustomScrollFrame):
         app: "GaussUI",
         master_tab: ctkFrame,
         master_frame: "MatricesFrame",
-        mats_manager: MatricesManager
+        mats_manager: MatricesManager,
     ) -> None:
-
         super().__init__(master_tab, corner_radius=0, fg_color="transparent")
         self.app = app
         self.master_frame = master_frame
@@ -875,8 +869,8 @@ class DeterminanteTab(CustomScrollFrame):
             command=lambda: toggle_proc(
                 app=self.app,
                 parent_frame=self,
-                window_title="GaussBot: Procedimiento para calcular " +
-                            f"el determinante de la matriz {self.dmat}",
+                window_title="GaussBot: Procedimiento para calcular "
+                + f"el determinante de la matriz {self.dmat}",
                 proc_label=self.proc_label,
                 label_txt=proc,  # pylint: disable=E0606
                 proc_hidden=self.proc_hidden,
@@ -915,9 +909,8 @@ class TransposicionTab(CustomScrollFrame):
         app: "GaussUI",
         master_tab: ctkFrame,
         master_frame: "MatricesFrame",
-        mats_manager: MatricesManager
+        mats_manager: MatricesManager,
     ) -> None:
-
         super().__init__(master_tab, corner_radius=0, fg_color="transparent")
         self.app = app
         self.master_frame = master_frame
@@ -977,8 +970,8 @@ class TransposicionTab(CustomScrollFrame):
             widget.destroy()  # type: ignore
 
         self.update_tmat(self.select_tmat.get())
-        proc, nombre_transpuesta, transpuesta = (
-            self.mats_manager.transponer_mat(self.tmat)
+        proc, nombre_transpuesta, transpuesta = self.mats_manager.transponer_mat(
+            self.tmat
         )
 
         self.msg_frame = place_msg_frame(
@@ -995,8 +988,8 @@ class TransposicionTab(CustomScrollFrame):
             command=lambda: toggle_proc(
                 app=self.app,
                 parent_frame=self,
-                window_title="GaussBot: Procedimiento de la " +
-                            f"transposición de la matriz {self.tmat}",
+                window_title="GaussBot: Procedimiento de la "
+                + f"transposición de la matriz {self.tmat}",
                 proc_label=self.proc_label,
                 label_txt=proc,  # pylint: disable=E0606
                 proc_hidden=self.proc_hidden,
@@ -1035,9 +1028,8 @@ class InversaTab(CustomScrollFrame):
         app: "GaussUI",
         master_tab: ctkFrame,
         master_frame: "MatricesFrame",
-        mats_manager: MatricesManager
+        mats_manager: MatricesManager,
     ) -> None:
-
         super().__init__(master_tab, corner_radius=0, fg_color="transparent")
         self.app = app
         self.master_frame = master_frame
@@ -1099,9 +1091,7 @@ class InversaTab(CustomScrollFrame):
         self.update_imat(self.select_imat.get())
 
         try:
-            proc, nombre_inversa, inversa = (
-                self.mats_manager.invertir_mat(self.imat)
-            )
+            proc, nombre_inversa, inversa = self.mats_manager.invertir_mat(self.imat)
         except ArithmeticError as e:
             self.msg_frame = place_msg_frame(
                 parent_frame=self.resultado,
@@ -1126,8 +1116,8 @@ class InversaTab(CustomScrollFrame):
             command=lambda: toggle_proc(
                 app=self.app,
                 parent_frame=self,
-                window_title="GaussBot: Procedimiento para encontrar " +
-                            f"la inversa de la matriz {self.imat}",
+                window_title="GaussBot: Procedimiento para encontrar "
+                + f"la inversa de la matriz {self.imat}",
                 proc_label=self.proc_label,
                 label_txt=proc,  # pylint: disable=E0606
                 proc_hidden=self.proc_hidden,

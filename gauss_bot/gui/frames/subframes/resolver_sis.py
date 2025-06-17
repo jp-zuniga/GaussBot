@@ -3,36 +3,35 @@ Implementación de SistemasFrame, el frame que
 resuelve sistemas de ecuaciones lineales.
 """
 
+from tkinter import Variable
 from typing import (
     TYPE_CHECKING,
     Optional,
 )
 
-from tkinter import Variable
 from customtkinter import (
     CTkButton as ctkButton,
     CTkFrame as ctkFrame,
     CTkLabel as ctkLabel,
 )
 
-from ....icons import APP_ICON
-from ....util_funcs import generate_sep
+from ...custom import (
+    CustomDropdown,
+    CustomScrollFrame,
+)
 from ....gui_util_funcs import (
     delete_msg_frame,
     place_msg_frame,
     toggle_proc,
 )
-
-from ....models import SistemaEcuaciones
+from ....icons import APP_ICON
 from ....managers import MatricesManager
-from ...custom import (
-    CustomDropdown,
-    CustomScrollFrame,
-)
+from ....models import SistemaEcuaciones
+from ....util_funcs import generate_sep
 
 if TYPE_CHECKING:
-    from ... import GaussUI
     from .. import SistemasFrame
+    from ... import GaussUI
 
 
 class ResolverSisFrame(CustomScrollFrame):
@@ -48,7 +47,6 @@ class ResolverSisFrame(CustomScrollFrame):
         master_frame: "SistemasFrame",
         mats_manager: MatricesManager,
     ) -> None:
-
         super().__init__(master_frame, corner_radius=0, fg_color="transparent")
         self.app = app
         self.master_frame = master_frame
@@ -56,7 +54,7 @@ class ResolverSisFrame(CustomScrollFrame):
         self.columnconfigure(0, weight=1)
 
         self.msg_frame: Optional[ctkFrame] = None
-        self.metodos: dict[str, str ] = {
+        self.metodos: dict[str, str] = {
             "Gauss−Jordan": "gj",
             "Regla de Cramer": "c",
         }
@@ -86,9 +84,7 @@ class ResolverSisFrame(CustomScrollFrame):
             self,
             width=40,
             values=self.master_frame.nombres_sistemas,
-            variable=Variable(
-                value="Seleccione el sistema de ecuaciones a resolver:"
-            ),
+            variable=Variable(value="Seleccione el sistema de ecuaciones a resolver:"),
             command=self.update_sis_mat,
         )
 
@@ -121,14 +117,10 @@ class ResolverSisFrame(CustomScrollFrame):
             met = "gj"
 
         if met == "gj":
-            sistema = (
-                self.mats_manager.resolver_sistema(self.sis_mat, met)
-            )
+            sistema = self.mats_manager.resolver_sistema(self.sis_mat, met)
         elif met == "c":
             try:
-                sistema = (
-                    self.mats_manager.resolver_sistema(self.sis_mat, met)
-                )
+                sistema = self.mats_manager.resolver_sistema(self.sis_mat, met)
             except (ValueError, ArithmeticError, ZeroDivisionError) as e:
                 self.msg_frame = place_msg_frame(
                     parent_frame=self,
@@ -163,9 +155,9 @@ class ResolverSisFrame(CustomScrollFrame):
             command=lambda: toggle_proc(
                 app=self.app,
                 parent_frame=self,
-                window_title="GaussBot: Procedimiento para resolver " +
-                            f"el sistema de ecuaciones {self.sis_mat} mediante " +
-                            f"{"el método" if "−" in self.met else "la"} {self.met}",
+                window_title="GaussBot: Procedimiento para resolver "
+                + f"el sistema de ecuaciones {self.sis_mat} mediante "
+                + f"{'el método' if '−' in self.met else 'la'} {self.met}",
                 proc_label=self.proc_label,
                 label_txt=proc_text,
                 proc_hidden=self.proc_hidden,
@@ -179,16 +171,12 @@ class ResolverSisFrame(CustomScrollFrame):
 
         self.select_sis_mat.configure(
             values=self.master_frame.nombres_sistemas,
-            variable=Variable(
-                value="Seleccione el sistema de ecuaciones a resolver:"
-            ),
+            variable=Variable(value="Seleccione el sistema de ecuaciones a resolver:"),
         )
 
         self.select_metodo.configure(
             values=list(self.metodos.keys()),
-            variable=Variable(
-                value="Seleccione el método a utilizar:"
-            ),
+            variable=Variable(value="Seleccione el método a utilizar:"),
         )
 
         if not self.proc_hidden:
@@ -218,10 +206,9 @@ class ResolverSisFrame(CustomScrollFrame):
         delete_msg_frame(self.msg_frame)
 
         for widget in self.winfo_children():  # type: ignore
-            if (
-                widget.grid_info()["row"] > 0
-                and
-                widget not in (self.select_sis_mat, self.select_metodo)
+            if widget.grid_info()["row"] > 0 and widget not in (
+                self.select_sis_mat,
+                self.select_metodo,
             ):
                 widget.destroy()  # type: ignore
 

@@ -13,16 +13,14 @@ from re import (
     compile as comp,
     escape,
 )
-
-from typing import (
-    TYPE_CHECKING,
-    Optional,
-)
-
 from tkinter import (
     END,
     INSERT,
     Event,
+)
+from typing import (
+    TYPE_CHECKING,
+    Optional,
 )
 
 from customtkinter import (
@@ -233,8 +231,8 @@ class CustomNumpad(ctkTop):
             y_pos = self.attach.winfo_rooty() + self.attach.winfo_reqheight() + 10
 
             self.geometry(
-                f"{numpad_width}x{self.show_frame.winfo_reqheight()}" +
-                f"+{x_pos}+{y_pos}"
+                f"{numpad_width}x{self.show_frame.winfo_reqheight()}"
+                + f"+{x_pos}+{y_pos}"
             )
 
         else:

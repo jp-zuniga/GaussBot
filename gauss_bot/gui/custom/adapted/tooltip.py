@@ -39,7 +39,6 @@ class Tooltip(Toplevel):
         y_offset: int = 30,
         **message_kwargs,
     ) -> None:
-
         super().__init__()
         self.widget = widget
         self.transient()
@@ -75,7 +74,7 @@ class Tooltip(Toplevel):
             self.frame,
             font=ctkFont(size=12),
             textvariable=self.msg_var,
-            **message_kwargs
+            **message_kwargs,
         )
 
         self.message_label.pack(
@@ -85,11 +84,9 @@ class Tooltip(Toplevel):
             expand=True,
         )
 
-        if (
-            self.widget.winfo_name() != "tk"
-            and
-            self.frame.cget("fg_color") == self.widget.cget("bg_color")
-        ):
+        if self.widget.winfo_name() != "tk" and self.frame.cget(
+            "fg_color"
+        ) == self.widget.cget("bg_color"):
             self._top_fg_color = self.frame._apply_appearance_mode(
                 ThemeManager.theme["CTkFrame"]["fg_color"]
             )

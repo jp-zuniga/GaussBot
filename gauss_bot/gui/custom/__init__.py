@@ -9,17 +9,15 @@ from .adapted import (
     CustomTable,
     Tooltip,
 )
-
 from .custom_frames import (
     CustomScrollFrame,
     ErrorFrame,
-    SuccessFrame,
     ResultadoFrame,
+    SuccessFrame,
 )
-
 from .custom_widgets import (
-    CustomEntry,
     CustomDropdown,
+    CustomEntry,
     IconButton,
 )
 

@@ -3,19 +3,32 @@ Implementación de los subframes de ManejarFuncs.
 """
 
 from re import match
+from tkinter import Variable
 from typing import (
     TYPE_CHECKING,
     Optional,
 )
 
-from tkinter import Variable
 from customtkinter import (
     CTkFont as ctkFont,
     CTkFrame as ctkFrame,
     CTkLabel as ctkLabel,
 )
-
 from sympy import SympifyError
+
+from ...custom import (
+    CustomDropdown,
+    CustomEntry,
+    CustomNumpad,
+    CustomScrollFrame,
+    ErrorFrame,
+    IconButton,
+    SuccessFrame,
+)
+from ....gui_util_funcs import (
+    delete_msg_frame,
+    place_msg_frame,
+)
 from ....icons import (
     ACEPTAR_ICON,
     ELIMINAR_ICON,
@@ -24,36 +37,19 @@ from ....icons import (
     LIMPIAR_ICON,
     MOSTRAR_ICON,
 )
-
-from ....gui_util_funcs import (
-    delete_msg_frame,
-    place_msg_frame,
+from ....managers import (
+    FuncManager,
+    KeyBindingManager,
 )
-
+from ....models import Func
 from ....util_funcs import (
     generate_sep,
     resize_image,
 )
 
-from ....models import Func
-from ....managers import (
-    FuncManager,
-    KeyBindingManager,
-)
-
-from ...custom import (
-    CustomEntry,
-    CustomDropdown,
-    CustomNumpad,
-    CustomScrollFrame,
-    ErrorFrame,
-    IconButton,
-    SuccessFrame,
-)
-
 if TYPE_CHECKING:
-    from ... import GaussUI
     from .. import ManejarFuncs
+    from ... import GaussUI
 
 
 class AgregarFuncs(CustomScrollFrame):
@@ -69,7 +65,6 @@ class AgregarFuncs(CustomScrollFrame):
         master_frame: "ManejarFuncs",
         func_manager: FuncManager,
     ) -> None:
-
         super().__init__(master_tab, corner_radius=0, fg_color="transparent")
         self.app = app
         self.master_frame = master_frame
@@ -90,14 +85,14 @@ class AgregarFuncs(CustomScrollFrame):
             self,
             self.app,
             image=INFO_ICON,
-            tooltip_text="\nEl numpad le permite ingresar funciones" +
-                         "\nmatemáticas de una forma más sencilla.\n" +
-                         "\nMientras el cursor este en la entrada de términos," +
-                         "\npresione CTRL+TAB para abrirlo y ESC para cerrarlo.\n" +
-                         "\nPara mejores resultados,\nasegúrese que los argumentos " +
-                         "de la función\nestén en paréntesis, y operaciones " +
-                         "complejas\ncomo multiplicación y división de funciones" +
-                         "\nestén encerradas en paréntesis también.\n",
+            tooltip_text="\nEl numpad le permite ingresar funciones"
+            + "\nmatemáticas de una forma más sencilla.\n"
+            + "\nMientras el cursor este en la entrada de términos,"
+            + "\npresione CTRL+TAB para abrirlo y ESC para cerrarlo.\n"
+            + "\nPara mejores resultados,\nasegúrese que los argumentos "
+            + "de la función\nestén en paréntesis, y operaciones "
+            + "complejas\ncomo multiplicación y división de funciones"
+            + "\nestén encerradas en paréntesis también.\n",
         )
 
         self.instruct_nombre = ctkLabel(self, text="Nombre de la función:")
@@ -131,39 +126,49 @@ class AgregarFuncs(CustomScrollFrame):
         self.func_entry.bind("<Return>", lambda _: self.leer_func())
 
         self.instruct_numpad.grid(
-            row=0, column=0,
+            row=0,
+            column=0,
             columnspan=2,
-            padx=5, pady=5,
+            padx=5,
+            pady=5,
             sticky="n",
         )
 
         self.instruct_nombre.grid(
-            row=1, column=0,
+            row=1,
+            column=0,
             columnspan=2,
-            padx=5, pady=(3, 1),
+            padx=5,
+            pady=(3, 1),
             sticky="n",
         )
 
         self.nombre_entry.grid(
-            row=2, column=0,
+            row=2,
+            column=0,
             columnspan=2,
-            padx=5, pady=(1, 3),
+            padx=5,
+            pady=(1, 3),
             sticky="n",
         )
 
         self.instruct_func.grid(
-            row=3, column=0,
+            row=3,
+            column=0,
             columnspan=2,
-            padx=5, pady=(3, 1),
+            padx=5,
+            pady=(3, 1),
             sticky="n",
         )
 
         self.func_entry.grid(row=4, column=0, padx=5, pady=(1, 3), sticky="e")
         self.leer_button.grid(row=4, column=1, padx=5, pady=(1, 3), sticky="w")
         self.func_frame.grid(
-            row=5, column=0,
+            row=5,
+            column=0,
             columnspan=2,
-            padx=5, pady=5,
+            padx=5,
+            pady=5,
             sticky="n",
         )
 
@@ -240,13 +245,14 @@ class AgregarFuncs(CustomScrollFrame):
 
         if (
             new_func.nombre in self.func_manager.funcs_ingresadas
-            or
-            not self.validar_nombre(new_func.nombre)
+            or not self.validar_nombre(new_func.nombre)
         ):
             if not self.validar_nombre(new_func.nombre):
                 error_msg = "El nombre de la función debe tener la forma 'f(x)'!"
             elif str(new_func.var) not in str(new_func.expr):
-                error_msg = f"La función ingresada no contiene la variable {new_func.var}!"
+                error_msg = (
+                    f"La función ingresada no contiene la variable {new_func.var}!"
+                )
             else:
                 error_msg = f"Ya existe una función llamada {new_func.nombre}!"
 
@@ -274,9 +280,7 @@ class AgregarFuncs(CustomScrollFrame):
         )
 
         self.func_manager.funcs_ingresadas = dict(
-            sorted(
-                self.func_manager.funcs_ingresadas.items()
-            )
+            sorted(self.func_manager.funcs_ingresadas.items())
         )
 
         self.master_frame.update_all()
@@ -309,6 +313,7 @@ class AgregarFuncs(CustomScrollFrame):
         for widget in self.winfo_children():  # type: ignore
             widget.configure(bg_color="transparent")  # type: ignore
 
+
 class MostrarFuncs(CustomScrollFrame):
     """
     Frame para mostrar las funciones ingresadas.
@@ -321,7 +326,6 @@ class MostrarFuncs(CustomScrollFrame):
         master_frame: "ManejarFuncs",
         func_manager: FuncManager,
     ) -> None:
-
         super().__init__(master_tab, corner_radius=0, fg_color="transparent")
         self.app = app
         self.master_frame = master_frame
@@ -362,7 +366,7 @@ class MostrarFuncs(CustomScrollFrame):
             border_color=self.app.theme_config["CTkFrame"]["top_fg_color"],
             image=resize_image(MOSTRAR_ICON, (0.75, 1)),
             tooltip_text="Mostrar funciones",
-            command=self.show_funcs
+            command=self.show_funcs,
         ).grid(row=0, column=0, padx=5, pady=5, sticky="n")
 
     def show_funcs(self) -> None:
@@ -429,7 +433,6 @@ class EliminarFuncs(CustomScrollFrame):
         master_frame: "ManejarFuncs",
         func_manager: FuncManager,
     ) -> None:
-
         super().__init__(master_tab, corner_radius=0, fg_color="transparent")
         self.app = app
         self.master_frame = master_frame
@@ -484,7 +487,9 @@ class EliminarFuncs(CustomScrollFrame):
         self.func_seleccionada = self.select_func.get()
 
         # colocar widgets
-        instruct_eliminar.grid(row=0, column=0, columnspan=2, padx=5, pady=5, sticky="n")
+        instruct_eliminar.grid(
+            row=0, column=0, columnspan=2, padx=5, pady=5, sticky="n"
+        )
         self.select_func.grid(row=1, column=0, padx=5, pady=5, sticky="e")
         button.grid(row=1, column=1, padx=5, pady=5, sticky="w")
 
@@ -517,11 +522,8 @@ class EliminarFuncs(CustomScrollFrame):
 
         self.nombres_funcs = list(self.func_manager.funcs_ingresadas.keys())
 
-        if (
-            len(self.nombres_funcs) == 0
-            and
-            isinstance(self.msg_frame, SuccessFrame)
-        ):
+        if len(self.nombres_funcs) == 0 and isinstance(self.msg_frame, SuccessFrame):
+
             def clear_after_wait() -> None:
                 delete_msg_frame(self.msg_frame)
                 self.msg_frame = place_msg_frame(
@@ -535,6 +537,7 @@ class EliminarFuncs(CustomScrollFrame):
                 for widget in self.winfo_children():
                     if not isinstance(widget, ctkFrame):
                         widget.destroy()
+
             self.after(1000, clear_after_wait)
 
         elif isinstance(self.msg_frame, ErrorFrame):

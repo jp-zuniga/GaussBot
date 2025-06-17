@@ -16,8 +16,8 @@ from customtkinter import (
     CTkOptionMenu as ctkOptionMenu,
 )
 
-from ...icons import DROPDOWN_ICON
 from .adapted.tooltip import Tooltip
+from ...icons import DROPDOWN_ICON
 
 if TYPE_CHECKING:
     from ..gui import GaussUI
@@ -29,12 +29,8 @@ class CustomEntry(ctkEntry):
     """
 
     def __init__(
-        self,
-        master: Any,
-        placeholder_text: Optional[str] = None,
-        **kwargs
+        self, master: Any, placeholder_text: Optional[str] = None, **kwargs
     ) -> None:
-
         justify = kwargs.pop("justify", "center")
         super().__init__(
             master,
@@ -71,18 +67,13 @@ class CustomDropdown(ctkOptionMenu):
     OptionMenu personalizado con un ícono mejor.
     """
 
-    def __init__(
-        self,
-        master: Any,
-        **kwargs
-    ) -> None:
-
+    def __init__(self, master: Any, **kwargs) -> None:
         anchor = kwargs.pop("text_anchor", "center")
         super().__init__(
             master,
             width=kwargs.pop("width", 140),
             height=kwargs.pop("height", 30),
-            **kwargs
+            **kwargs,
         )
 
         self.icon_label: ctkLabel
@@ -147,9 +138,8 @@ class IconButton(ctkButton):
         app: "GaussUI",
         image: Optional[ctkImage] = None,
         tooltip_text: Optional[str] = None,
-        **kwargs
+        **kwargs,
     ) -> None:
-
         self.app = app
 
         text = kwargs.pop("text", "")

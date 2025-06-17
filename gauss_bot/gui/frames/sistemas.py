@@ -14,14 +14,13 @@ from customtkinter import (
     CTkFrame as ctkFrame,
 )
 
-from ...icons import INPUTS_ICON
-from ...managers import MatricesManager
+from .subframes import ResolverSisFrame
 from ..custom import (
     CustomScrollFrame,
     ErrorFrame,
 )
-
-from .subframes import ResolverSisFrame
+from ...icons import INPUTS_ICON
+from ...managers import MatricesManager
 
 if TYPE_CHECKING:
     from gauss_bot.gui import GaussUI
@@ -33,12 +32,8 @@ class SistemasFrame(ctkFrame):
     """
 
     def __init__(
-        self,
-        app: "GaussUI",
-        master: "GaussUI",
-        mats_manager: MatricesManager
+        self, app: "GaussUI", master: "GaussUI", mats_manager: MatricesManager
     ) -> None:
-
         super().__init__(master, corner_radius=0, fg_color="transparent")
         self.app = app
         self.mats_manager = mats_manager
@@ -106,18 +101,16 @@ class SistemasFrame(ctkFrame):
 
         # sortear los diccionarios de datos para que esten alfabetizados
         self.mats_manager.sis_ingresados = dict(
-            sorted(
-                self.mats_manager.sis_ingresados.items()
-            )
+            sorted(self.mats_manager.sis_ingresados.items())
         )
 
         # actualizar los atributos de nombres despues que cambiaron los dicts
         self.nombres_sistemas = list(self.mats_manager.sis_ingresados.keys())
 
         if (
-            self.msg_frame is not None or
-            self.resolver_frame is None or
-            len(self.nombres_sistemas) == 0
+            self.msg_frame is not None
+            or self.resolver_frame is None
+            or len(self.nombres_sistemas) == 0
         ):
             # si hay un mensaje de error,
             # o no hay sistemas ingresados,

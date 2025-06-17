@@ -3,11 +3,7 @@ Implementación de MatricesFrame, el parent frame
 de todos los subframes relacionados con matrices.
 """
 
-from typing import (
-    TYPE_CHECKING,
-    Optional,
-    Union
-)
+from typing import TYPE_CHECKING, Optional, Union
 
 from customtkinter import (
     CTkButton as ctkButton,
@@ -15,14 +11,14 @@ from customtkinter import (
     CTkTabview as ctkTabview,
 )
 
-from ...icons import INPUTS_ICON
-from ...managers import FuncManager
-from ..custom import ErrorFrame
 from .subframes import (
     DerivadasFrame,
     IntegralesFrame,
     RaicesFrame,
 )
+from ..custom import ErrorFrame
+from ...icons import INPUTS_ICON
+from ...managers import FuncManager
 
 if TYPE_CHECKING:
     from .. import GaussUI
@@ -40,7 +36,6 @@ class AnalisisFrame(ctkFrame):
         master: "GaussUI",
         func_manager: FuncManager,
     ) -> None:
-
         super().__init__(master, corner_radius=0, fg_color="transparent")
         self.app = app
         self.func_manager = func_manager
@@ -119,8 +114,8 @@ class AnalisisFrame(ctkFrame):
         # * añadir los frames a self.instances
         for nombre, cls in self.tabs:
             tab = self.tabview.add(nombre)
-            tab_instance: "CustomScrollFrame" = (
-                cls(self.app, tab, self, self.func_manager)
+            tab_instance: "CustomScrollFrame" = cls(
+                self.app, tab, self, self.func_manager
             )
 
             tab_instance.pack(expand=True, fill="both")
@@ -132,17 +127,15 @@ class AnalisisFrame(ctkFrame):
         """
 
         self.func_manager.funcs_ingresadas = dict(
-            sorted(
-                self.func_manager.funcs_ingresadas.items()
-            )
+            sorted(self.func_manager.funcs_ingresadas.items())
         )
 
         self.nombres_funciones = list(self.func_manager.funcs_ingresadas.keys())
 
         if (
-            self.msg_frame is not None or
-            len(self.nombres_funciones) == 0 or
-            self.instances == []
+            self.msg_frame is not None
+            or len(self.nombres_funciones) == 0
+            or self.instances == []
         ):
             # si hay un mensaje de error,
             # o no hay funciones ingresadas,

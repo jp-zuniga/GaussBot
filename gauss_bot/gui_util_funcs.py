@@ -17,13 +17,13 @@ from customtkinter import (
     CTkToplevel as ctkTop,
 )
 
-from .icons import APP_ICON
 from .gui.custom import (
     CustomScrollFrame,
     ErrorFrame,
     ResultadoFrame,
     SuccessFrame,
 )
+from .icons import APP_ICON
 
 if TYPE_CHECKING:
     from .gui import GaussUI

@@ -10,32 +10,27 @@ from json import (
     dump,
     load,
 )
-
 from os import (
     makedirs,
     path,
 )
 
+from . import MatricesManager, VectoresManager
 from .. import (
     MATRICES_PATH,
     SISTEMAS_PATH,
     VECTORES_PATH,
 )
-
+from ..models import (
+    FractionDecoder,
+    FractionEncoder,
+    Matriz,
+    Vector,
+)
 from ..util_funcs import (
     LOGGER,
     format_proc_num,
 )
-
-from ..models import (
-    FractionEncoder,
-    FractionDecoder,
-    Matriz,
-    Vector,
-)
-
-from . import MatricesManager
-from . import VectoresManager
 
 
 class OpsManager:
@@ -51,18 +46,10 @@ class OpsManager:
         * TypeError: si mats_manager/vecs_manager no son MatricesManager/VectoresManager
         """
 
-        if (
-            mats_manager is not None
-            and
-            not isinstance(mats_manager, MatricesManager)
-        ):
+        if mats_manager is not None and not isinstance(mats_manager, MatricesManager):
             raise TypeError("Argumento inválido para 'mats_manager'!")
 
-        if (
-            vecs_manager is not None
-            and
-            not isinstance(vecs_manager, VectoresManager)
-        ):
+        if vecs_manager is not None and not isinstance(vecs_manager, VectoresManager):
             raise TypeError("Argumento inválido para 'vecs_manager'!")
 
         self.mats_manager = (
@@ -82,7 +69,6 @@ class OpsManager:
         nombre_mat: str,
         nombre_vec: str,
     ) -> tuple[str, str, Matriz]:
-
         """
         Realiza la multiplicación de una matriz por un vector.
         - ArithmeticError: si la matriz y el vector no son compatibles
@@ -98,14 +84,13 @@ class OpsManager:
         vec = self.vecs_manager.vecs_ingresados[nombre_vec]
         if mat.columnas != len(vec):
             raise ArithmeticError(
-                "El número de columnas de la matriz debe ser " +
-                "igual al número de componentes del vector!"
+                "El número de columnas de la matriz debe ser "
+                + "igual al número de componentes del vector!"
             )
 
         # inicializar la lista 2D de la matriz resultante
         multiplicacion = [
-            [Fraction(0) for _ in range(len(vec))]
-            for _ in range(mat.filas)
+            [Fraction(0) for _ in range(len(vec))] for _ in range(mat.filas)
         ]
 
         # realizar la multiplicacion
@@ -131,17 +116,17 @@ class OpsManager:
                     for j in range(len(vec))
                 ]
                 for i in range(mat.filas)
-            ]
+            ],
         )
 
-        proc  =  "---------------------------------------------\n"
+        proc: str = "---------------------------------------------\n"
         proc += f"{nombre_mat}:\n{mat}\n\n"
         proc += f"{nombre_vec}:\n{vec}\n"
-        proc +=  "---------------------------------------------\n"
+        proc += "---------------------------------------------\n"
         proc += f"{nombre_mat_resultante}:\n{mat_proc}\n"
-        proc +=  "---------------------------------------------\n"
+        proc += "---------------------------------------------\n"
         proc += f"{nombre_mat_resultante}:\n{mat_resultante}\n"
-        proc +=  "---------------------------------------------"
+        proc += "---------------------------------------------"
 
         return (proc, nombre_mat_resultante, mat_resultante)
 
@@ -159,8 +144,9 @@ class OpsManager:
                 "aumentada": mat.aumentada,
                 "filas": mat.filas,
                 "columnas": mat.columnas,
-                "valores": mat.valores
-            } for nombre, mat in self.mats_manager.sis_ingresados.items()
+                "valores": mat.valores,
+            }
+            for nombre, mat in self.mats_manager.sis_ingresados.items()
         }
 
         # crear sistemas.json si no existe
@@ -172,8 +158,8 @@ class OpsManager:
         if sistemas_dict == {}:
             with open(SISTEMAS_PATH, "w", encoding="utf-8") as _:
                 LOGGER.info(
-                    "No hay sistemas de ecuaciones para guardar, " +
-                    "dejando 'sistemas.json' vacío..."
+                    "No hay sistemas de ecuaciones para guardar, "
+                    + "dejando 'sistemas.json' vacío..."
                 )
             return
 
@@ -186,9 +172,7 @@ class OpsManager:
                 cls=FractionEncoder,
             )
 
-            LOGGER.info(
-                "Sistemas de ecuaciones guardados en 'sistemas.json'!"
-            )
+            LOGGER.info("Sistemas de ecuaciones guardados en 'sistemas.json'!")
 
     def save_matrices(self) -> None:
         """
@@ -204,8 +188,9 @@ class OpsManager:
                 "aumentada": mat.aumentada,
                 "filas": mat.filas,
                 "columnas": mat.columnas,
-                "valores": mat.valores
-            } for nombre, mat in self.mats_manager.mats_ingresadas.items()
+                "valores": mat.valores,
+            }
+            for nombre, mat in self.mats_manager.mats_ingresadas.items()
         }
 
         # crear matrices.json si no existe
@@ -217,8 +202,8 @@ class OpsManager:
         if matrices_dict == {}:
             with open(MATRICES_PATH, "w", encoding="utf-8") as _:
                 LOGGER.info(
-                    "No hay matrices para guardar, " +
-                    "dejando 'matrices.json' vacío..."
+                    "No hay matrices para guardar, "
+                    + "dejando 'matrices.json' vacío..."
                 )
             return
 
@@ -231,9 +216,7 @@ class OpsManager:
                 cls=FractionEncoder,
             )
 
-            LOGGER.info(
-                "Matrices guardadas en 'matrices.json'!"
-            )
+            LOGGER.info("Matrices guardadas en 'matrices.json'!")
 
     def save_vectores(self) -> None:
         """
@@ -258,8 +241,8 @@ class OpsManager:
         if vectores_dict == {}:
             with open(VECTORES_PATH, "w", encoding="utf-8") as _:
                 LOGGER.info(
-                    "No hay vectores para guardar, " +
-                    "dejando 'vectores.json' vacío..."
+                    "No hay vectores para guardar, "
+                    + "dejando 'vectores.json' vacío..."
                 )
             return
 
@@ -272,9 +255,7 @@ class OpsManager:
                 cls=FractionEncoder,
             )
 
-            LOGGER.info(
-                "Vectores guardados en 'vectores.json'!"
-            )
+            LOGGER.info("Vectores guardados en 'vectores.json'!")
 
     def _load_sistemas(self) -> dict[str, Matriz]:
         """
@@ -299,7 +280,8 @@ class OpsManager:
                         matriz["filas"],
                         matriz["columnas"],
                         matriz["valores"],
-                    ) for nombre, matriz in sistemas_dict.items()
+                    )
+                    for nombre, matriz in sistemas_dict.items()
                 }
             except JSONDecodeError as j:
                 if "(char 0)" in str(j):
@@ -308,9 +290,7 @@ class OpsManager:
                     LOGGER.info("Archivo 'sistemas.json' vacío...")
                 else:
                     # si no, es un error de verdad
-                    LOGGER.error(
-                        "Error al leer archivo 'sistemas.json':\n%s", str(j)
-                    )
+                    LOGGER.error("Error al leer archivo 'sistemas.json':\n%s", str(j))
                 return {}
 
     def _load_matrices(self) -> dict[str, Matriz]:
@@ -335,7 +315,8 @@ class OpsManager:
                         matriz["filas"],
                         matriz["columnas"],
                         matriz["valores"],
-                    ) for nombre, matriz in matrices_dict.items()
+                    )
+                    for nombre, matriz in matrices_dict.items()
                 }
             except JSONDecodeError as j:
                 if "(char 0)" in str(j):
@@ -344,9 +325,7 @@ class OpsManager:
                     LOGGER.info("Archivo 'matrices.json' vacío...")
                 else:
                     # si no, es un error de verdad
-                    LOGGER.error(
-                        "Error al leer archivo 'matrices.json':\n%s", str(j)
-                    )
+                    LOGGER.error("Error al leer archivo 'matrices.json':\n%s", str(j))
                 return {}
 
     def _load_vectores(self) -> dict[str, Vector]:
@@ -376,7 +355,5 @@ class OpsManager:
                     LOGGER.info("Archivo 'vectores.json' vacío...")
                 else:
                     # si no, es un error de verdad
-                    LOGGER.error(
-                        "Error al leer archivo 'vectores.json':\n%s", str(j)
-                    )
+                    LOGGER.error("Error al leer archivo 'vectores.json':\n%s", str(j))
                 return {}

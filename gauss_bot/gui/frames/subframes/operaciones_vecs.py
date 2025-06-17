@@ -9,15 +9,14 @@ from decimal import (
     Decimal,
     getcontext,
 )
-
 from fractions import Fraction
 from random import choice
+from tkinter import Variable
 from typing import (
     TYPE_CHECKING,
     Optional,
 )
 
-from tkinter import Variable
 from customtkinter import (
     CTkButton as ctkButton,
     CTkFont as ctkFont,
@@ -26,37 +25,34 @@ from customtkinter import (
     CTkTabview as ctkTabview,
 )
 
-from ....icons import (
-    ENTER_ICON,
-    INFO_ICON,
-    INPUTS_ICON,
+from ...custom import (
+    CustomDropdown,
+    CustomEntry,
+    CustomScrollFrame,
+    IconButton,
 )
-
 from ....gui_util_funcs import (
     delete_msg_frame,
     delete_msg_if,
     place_msg_frame,
     toggle_proc,
 )
-
+from ....icons import (
+    ENTER_ICON,
+    INFO_ICON,
+    INPUTS_ICON,
+)
+from ....managers import VectoresManager
+from ....models import Vector
 from ....util_funcs import (
     format_factor,
     generate_range,
     get_dict_key,
 )
 
-from ....models import Vector
-from ....managers import VectoresManager
-from ...custom import (
-    CustomEntry,
-    CustomDropdown,
-    CustomScrollFrame,
-    IconButton,
-)
-
 if TYPE_CHECKING:
-    from ... import GaussUI
     from .. import VectoresFrame
+    from ... import GaussUI
 
 getcontext().prec = 8
 
@@ -71,9 +67,8 @@ class MagnitudTab(CustomScrollFrame):
         app: "GaussUI",
         master_tab: ctkFrame,
         master_frame: "VectoresFrame",
-        vecs_manager: VectoresManager
+        vecs_manager: VectoresManager,
     ) -> None:
-
         super().__init__(master_tab, corner_radius=0, fg_color="transparent")
         self.master_frame = master_frame
         self.app = app
@@ -123,9 +118,11 @@ class MagnitudTab(CustomScrollFrame):
             widget.destroy()  # type: ignore
 
         self.resultado_frame.grid(
-            row=2, column=0,
+            row=2,
+            column=0,
             columnspan=3,
-            padx=5, pady=5,
+            padx=5,
+            pady=5,
             sticky="n",
         )
 
@@ -136,28 +133,33 @@ class MagnitudTab(CustomScrollFrame):
         header = f"||  {self.vec}  ||"
         resultado = Decimal(float(vec.magnitud())).normalize()
 
-        proc  =  "---------------------------------------------\n"
+        proc = "---------------------------------------------\n"
         proc += f"{self.vec}:\n{vec}\n"
-        proc +=  "---------------------------------------------\n"
-        proc +=  "Para calcular la magnitud de un vector,\n"
-        proc +=  "se debe encontrar la raíz cuadrada de\n"
-        proc +=  "la suma de los cuadrados de sus componentes.\n\n"
+        proc += "---------------------------------------------\n"
+        proc += "Para calcular la magnitud de un vector,\n"
+        proc += "se debe encontrar la raíz cuadrada de\n"
+        proc += "la suma de los cuadrados de sus componentes.\n\n"
 
-        proc += f"[ {" + ".join(
-            f"{format_factor(
-                c,
-                mult=False,
-                parenth_negs=True,
-                skip_ones=False,
-            )}^2" for c in vec.componentes
-        )} ]\n"
+        proc += f"[ {
+            ' + '.join(
+                f'{
+                    format_factor(
+                        c,
+                        mult=False,
+                        parenth_negs=True,
+                        skip_ones=False,
+                    )
+                }^2'
+                for c in vec.componentes
+            )
+        } ]\n"
 
-        proc += f"=\n[ {" + ".join(str(c**2) for c in vec.componentes)} ]\n"
+        proc += f"=\n[ {' + '.join(str(c**2) for c in vec.componentes)} ]\n"
 
         sum_squares = sum(c**2 for c in vec.componentes)
         proc += f"=\n{sum_squares}\n\n"
         proc += f"||  {self.vec}  ||  =  √( {sum_squares} )\n"
-        proc +=  "---------------------------------------------\n"
+        proc += "---------------------------------------------\n"
         proc += f"||  {self.vec}  ||  =  {resultado}\n"
 
         self.msg_frame = place_msg_frame(
@@ -173,8 +175,8 @@ class MagnitudTab(CustomScrollFrame):
             command=lambda: toggle_proc(
                 app=self.app,
                 parent_frame=self,
-                window_title="GaussBot: Procedimiento para calcular la " +
-                            f"magnitud del vector {self.vec}",
+                window_title="GaussBot: Procedimiento para calcular la "
+                + f"magnitud del vector {self.vec}",
                 proc_label=self.proc_label,
                 label_txt=proc,  # pylint: disable=E0606
                 proc_hidden=self.proc_hidden,
@@ -212,9 +214,8 @@ class SumaRestaTab(CustomScrollFrame):
         app: "GaussUI",
         master_tab: ctkFrame,
         master_frame: "VectoresFrame",
-        vecs_manager: VectoresManager
+        vecs_manager: VectoresManager,
     ) -> None:
-
         super().__init__(master_tab, corner_radius=0, fg_color="transparent")
         self.master_frame = master_frame
         self.app = app
@@ -260,8 +261,7 @@ class SumaRestaTab(CustomScrollFrame):
 
         # crear widgets
         self.instruct_sr = ctkLabel(
-            self,
-            text=f"Seleccione los vectores a {default.lower()}:"
+            self, text=f"Seleccione los vectores a {default.lower()}:"
         )
 
         self.select_operacion = CustomDropdown(
@@ -301,21 +301,18 @@ class SumaRestaTab(CustomScrollFrame):
         self.resultado_frame = ctkFrame(self, fg_color="transparent")
 
         # colocar widgets
-        self.instruct_sr.grid(
-            row=0, column=0,
-            columnspan=3,
-            padx=5, pady=5,
-            sticky="n"
-        )
+        self.instruct_sr.grid(row=0, column=0, columnspan=3, padx=5, pady=5, sticky="n")
 
         self.select_1.grid(row=1, column=0, padx=5, pady=5, sticky="e")
         self.select_operacion.grid(row=1, column=1, padx=5, pady=5, sticky="ew")
         self.select_2.grid(row=1, column=2, padx=5, pady=5, sticky="w")
 
         self.ejecutar_button.grid(
-            row=2, column=0,
+            row=2,
+            column=0,
             columnspan=3,
-            padx=5, pady=10,
+            padx=5,
+            pady=10,
             sticky="n",
         )
 
@@ -331,25 +328,23 @@ class SumaRestaTab(CustomScrollFrame):
         self.update_vec1(self.select_1.get())
         self.update_vec2(self.select_2.get())
         self.resultado_frame.grid(
-            row=3, column=0,
+            row=3,
+            column=0,
             columnspan=3,
-            padx=5, pady=5,
+            padx=5,
+            pady=5,
             sticky="n",
         )
 
         delete_msg_frame(self.msg_frame)
         try:
             if self.operacion == "+":
-                proc, header, resultado = (
-                    self.vecs_manager.suma_resta_vecs(
-                        True, self.vec1, self.vec2
-                    )
+                proc, header, resultado = self.vecs_manager.suma_resta_vecs(
+                    True, self.vec1, self.vec2
                 )
             elif self.operacion == "−":
-                proc, header, resultado = (
-                    self.vecs_manager.suma_resta_vecs(
-                        False, self.vec1, self.vec2
-                    )
+                proc, header, resultado = self.vecs_manager.suma_resta_vecs(
+                    False, self.vec1, self.vec2
                 )
         except ArithmeticError as e:
             self.msg_frame = place_msg_frame(
@@ -417,9 +412,7 @@ class SumaRestaTab(CustomScrollFrame):
         op_text: str = get_dict_key(self.operaciones, valor)  # type: ignore
 
         self.ejecutar_button.configure(text=op_text)
-        self.instruct_sr.configure(
-            text=f"Seleccione los vectores a {op_text.lower()}:"
-        )
+        self.instruct_sr.configure(text=f"Seleccione los vectores a {op_text.lower()}:")
 
     def update_vec1(self, valor: str) -> None:
         """
@@ -449,9 +442,8 @@ class MultiplicacionTab(CustomScrollFrame):
         app: "GaussUI",
         master_tab: ctkFrame,
         master_frame: "VectoresFrame",
-        vecs_manager: VectoresManager
+        vecs_manager: VectoresManager,
     ) -> None:
-
         super().__init__(master_tab, corner_radius=0, fg_color="transparent")
         self.master_frame = master_frame
         self.app = app
@@ -502,9 +494,7 @@ class MultiplicacionTab(CustomScrollFrame):
         self.resultado_escalar = ctkFrame(self.tab_escalar, fg_color="transparent")
         self.resultado_punto = ctkFrame(self.tab_prod_punto, fg_color="transparent")
         self.resultado_cruz = ctkFrame(self.tab_prod_cruz, fg_color="transparent")
-        self.resultado_mat_vec = ctkFrame(
-            self.tab_mat_vec, fg_color="transparent"
-        )
+        self.resultado_mat_vec = ctkFrame(self.tab_mat_vec, fg_color="transparent")
 
         self.setup_escalar_tab()
         self.setup_prod_punto_tab()
@@ -574,14 +564,14 @@ class MultiplicacionTab(CustomScrollFrame):
         instruct_e.grid(row=0, column=0, columnspan=3, padx=5, pady=5, sticky="n")
         self.escalar_entry.grid(row=1, column=0, padx=5, pady=5, sticky="e")
         operador_label.grid(row=1, column=1, padx=5, pady=5, sticky="ew")
-        self.select_escalar_vec.grid(
-            row=1, column=2, padx=5, pady=5, sticky="w"
-        )
+        self.select_escalar_vec.grid(row=1, column=2, padx=5, pady=5, sticky="w")
 
         multiplicar_button.grid(
-            row=2, column=0,
+            row=2,
+            column=0,
             columnspan=3,
-            padx=5, pady=10,
+            padx=5,
+            pady=10,
             sticky="n",
         )
 
@@ -638,14 +628,14 @@ class MultiplicacionTab(CustomScrollFrame):
         instruct_v.grid(row=0, column=0, columnspan=3, padx=5, pady=5, sticky="n")
         self.select_vec1.grid(row=1, column=0, padx=5, pady=5, sticky="e")
         operador_label.grid(row=1, column=1, padx=5, pady=5, sticky="ew")
-        self.select_vec2.grid(
-            row=1, column=2, padx=5, pady=5, sticky="w"
-        )
+        self.select_vec2.grid(row=1, column=2, padx=5, pady=5, sticky="w")
 
         multiplicar_button.grid(
-            row=2, column=0,
+            row=2,
+            column=0,
             columnspan=3,
-            padx=5, pady=10,
+            padx=5,
+            pady=10,
             sticky="n",
         )
 
@@ -673,8 +663,10 @@ class MultiplicacionTab(CustomScrollFrame):
         )
 
         self.dimensiones_entry.grid(
-            row=0, column=1,
-            padx=5, pady=5,
+            row=0,
+            column=1,
+            padx=5,
+            pady=5,
             sticky="n",
         )
 
@@ -691,8 +683,7 @@ class MultiplicacionTab(CustomScrollFrame):
             for widget in self.tab_prod_cruz.winfo_children():  # type: ignore
                 if (
                     widget is not self.resultado_cruz
-                    and
-                    dict(widget.grid_info()).get("row", -1) > 0  # type: ignore
+                    and dict(widget.grid_info()).get("row", -1) > 0  # type: ignore
                 ):
                     widget.destroy()  # type: ignore
 
@@ -702,8 +693,8 @@ class MultiplicacionTab(CustomScrollFrame):
                     raise ValueError
                 if dimensiones - 1 > len(self.master_frame.nombres_vectores):
                     raise ValueError(
-                        f"No hay suficientes vectores en R{dimensiones} " +
-                         "para calcular un producto cruz!"
+                        f"No hay suficientes vectores en R{dimensiones} "
+                        + "para calcular un producto cruz!"
                     )
             except ValueError as e:
                 str_e = str(e)
@@ -746,8 +737,8 @@ class MultiplicacionTab(CustomScrollFrame):
                 self.tab_prod_cruz,
                 app=self.app,
                 image=INFO_ICON,
-                tooltip_text="Solamente se están mostrando " +
-                            f"los vectores guardados en R{dimensiones}.",
+                tooltip_text="Solamente se están mostrando "
+                + f"los vectores guardados en R{dimensiones}.",
             ).grid(row=1, column=0, columnspan=3, padx=5, pady=(15, 3), sticky="n")
 
             ctkLabel(
@@ -762,7 +753,7 @@ class MultiplicacionTab(CustomScrollFrame):
                         self.tab_prod_cruz,
                         width=60,
                         values=vecs_validos,
-                        variable=Variable(value=vecs_validos[i])
+                        variable=Variable(value=vecs_validos[i]),
                     )
                 )
 
@@ -770,7 +761,8 @@ class MultiplicacionTab(CustomScrollFrame):
                     row=i + 3,
                     column=0,
                     columnspan=3,
-                    padx=5, pady=5,
+                    padx=5,
+                    pady=5,
                     sticky="n",
                 )
 
@@ -783,7 +775,8 @@ class MultiplicacionTab(CustomScrollFrame):
                 row=dimensiones + 3,
                 column=0,
                 columnspan=3,
-                padx=5, pady=10,
+                padx=5,
+                pady=10,
                 sticky="n",
             )
 
@@ -832,14 +825,14 @@ class MultiplicacionTab(CustomScrollFrame):
         instruct_mv.grid(row=0, column=0, columnspan=3, padx=5, pady=5, sticky="n")
         self.select_vmat.grid(row=1, column=0, padx=5, pady=5, sticky="e")
         operador_label.grid(row=1, column=1, padx=5, pady=5, sticky="ew")
-        self.select_mvec.grid(
-            row=1, column=2, padx=5, pady=5, sticky="w"
-        )
+        self.select_mvec.grid(row=1, column=2, padx=5, pady=5, sticky="w")
 
         multiplicar_button.grid(
-            row=2, column=0,
+            row=2,
+            column=0,
             columnspan=3,
-            padx=5, pady=10,
+            padx=5,
+            pady=10,
             sticky="n",
         )
 
@@ -853,20 +846,20 @@ class MultiplicacionTab(CustomScrollFrame):
 
         self.update_escalar_vec(self.select_escalar_vec.get())
         self.resultado_escalar.grid(
-            row=3, column=0,
+            row=3,
+            column=0,
             columnspan=3,
-            padx=5, pady=5,
+            padx=5,
+            pady=5,
             sticky="n",
         )
 
         delete_msg_if(self.msg_frame, (self.tab_escalar, self.resultado_escalar))
         try:
             escalar = Fraction(self.escalar_entry.get())  # type: ignore
-            proc, header, resultado = (
-                self.vecs_manager.escalar_por_vec(
-                    escalar,
-                    self.escalar_vec,
-                )
+            proc, header, resultado = self.vecs_manager.escalar_por_vec(
+                escalar,
+                self.escalar_vec,
             )
         except (ValueError, ZeroDivisionError) as e:
             if isinstance(e, ValueError):
@@ -897,8 +890,8 @@ class MultiplicacionTab(CustomScrollFrame):
             command=lambda: toggle_proc(
                 app=self.app,
                 parent_frame=self,
-                window_title="GaussBot: Procedimiento de la " +
-                            f"multiplicación {header}",
+                window_title="GaussBot: Procedimiento de la "
+                + f"multiplicación {header}",
                 proc_label=self.proc_label,
                 label_txt=proc,  # pylint: disable=E0606
                 proc_hidden=self.proc_hidden,
@@ -916,19 +909,18 @@ class MultiplicacionTab(CustomScrollFrame):
         self.update_vec1(self.select_vec1.get())
         self.update_vec2(self.select_vec2.get())
         self.resultado_punto.grid(
-            row=3, column=0,
+            row=3,
+            column=0,
             columnspan=3,
-            padx=5, pady=5,
+            padx=5,
+            pady=5,
             sticky="n",
         )
 
         delete_msg_if(self.msg_frame, (self.tab_prod_punto, self.resultado_punto))
         try:
-            proc, header, resultado = (
-                self.vecs_manager.producto_punto(
-                    self.vec1,
-                    self.vec2
-                )
+            proc, header, resultado = self.vecs_manager.producto_punto(
+                self.vec1, self.vec2
             )
         except ArithmeticError as e:
             self.msg_frame = place_msg_frame(
@@ -955,8 +947,8 @@ class MultiplicacionTab(CustomScrollFrame):
             command=lambda: toggle_proc(
                 app=self.app,
                 parent_frame=self,
-                window_title="GaussBot: Procedimiento de la " +
-                            f"multiplicación {header}",
+                window_title="GaussBot: Procedimiento de la "
+                + f"multiplicación {header}",
                 proc_label=self.proc_label,
                 label_txt=proc,  # pylint: disable=E0606
                 proc_hidden=self.proc_hidden,
@@ -970,15 +962,15 @@ class MultiplicacionTab(CustomScrollFrame):
 
         delete_msg_frame(self.msg_frame)
         vectores = [
-            self.vecs_manager.vecs_ingresados[dropdown.get()]
-            for dropdown in dropdowns
+            self.vecs_manager.vecs_ingresados[dropdown.get()] for dropdown in dropdowns
         ]
 
         self.resultado_cruz.grid(
             row=len(vectores) + 5,
             column=0,
             columnspan=3,
-            padx=5, pady=5,
+            padx=5,
+            pady=5,
             sticky="n",
         )
 
@@ -1000,19 +992,19 @@ class MultiplicacionTab(CustomScrollFrame):
         self.update_vmat(self.select_vmat.get())
         self.update_mvec(self.select_mvec.get())
         self.resultado_mat_vec.grid(
-            row=3, column=0,
+            row=3,
+            column=0,
             columnspan=3,
-            padx=5, pady=5,
+            padx=5,
+            pady=5,
             sticky="n",
         )
 
         delete_msg_if(self.msg_frame, (self.tab_mat_vec, self.resultado_mat_vec))
         try:
-            proc, header, resultado = (
-                self.app.ops_manager.mat_por_vec(
-                    self.vmat,
-                    self.mvec,
-                )
+            proc, header, resultado = self.app.ops_manager.mat_por_vec(
+                self.vmat,
+                self.mvec,
             )
         except ArithmeticError as e:
             self.msg_frame = place_msg_frame(
@@ -1037,8 +1029,8 @@ class MultiplicacionTab(CustomScrollFrame):
             command=lambda: toggle_proc(
                 app=self.app,
                 parent_frame=self,
-                window_title="GaussBot: Procedimiento de la " +
-                            f"multiplicación {header}",
+                window_title="GaussBot: Procedimiento de la "
+                + f"multiplicación {header}",
                 proc_label=self.proc_label,
                 label_txt=proc,  # pylint: disable=E0606
                 proc_hidden=self.proc_hidden,

@@ -4,18 +4,17 @@ e imagenes de la aplicación.
 """
 
 from os import (
-    walk,
     path,
+    walk,
 )
 
-from customtkinter import CTkImage as ctkImage
 from PIL.Image import open as open_img
+from customtkinter import CTkImage as ctkImage
 
 from . import (
     ASSET_PATH,
     DATA_PATH,
 )
-
 
 __all__ = [
     "ABOUT_US_ICON",

@@ -4,10 +4,9 @@ Implementaciones de matrices, vectores y sistemas de ecuaciones.
 """
 
 from .fraction_encoding import (
-    FractionEncoder,
     FractionDecoder,
+    FractionEncoder,
 )
-
 from .func import Func
 from .matriz import Matriz
 from .sistema_ecuaciones import SistemaEcuaciones

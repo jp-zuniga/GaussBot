@@ -11,7 +11,7 @@ from customtkinter import (
     CTkLabel as ctkLabel,
 )
 
-from ...util_funcs import generate_sep
+from ..custom import IconButton
 from ...icons import (
     ABOUT_US_ICON,
     ANALISIS_ICON,
@@ -20,8 +20,7 @@ from ...icons import (
     MATRIZ_ICON,
     VECTOR_ICON,
 )
-
-from ..custom import IconButton
+from ...util_funcs import generate_sep
 
 if TYPE_CHECKING:
     from .. import GaussUI
@@ -53,10 +52,10 @@ class HomeFrame(ctkFrame):
 
         ctkLabel(
             self,
-            text="GaussBot es una aplicación para realizar cálculos matemáticos como:\n" +
-                 "− Operaciones con matrices y vectores\n" +
-                 "− Resolución de sistemas de ecuaciones\n" +
-                 "− Análisis númerico",
+            text="GaussBot es una aplicación para realizar cálculos matemáticos como:\n"
+            + "− Operaciones con matrices y vectores\n"
+            + "− Resolución de sistemas de ecuaciones\n"
+            + "− Análisis númerico",
         ).grid(row=1, column=0, columnspan=2, pady=0, sticky="s")
 
         ctkLabel(
@@ -72,9 +71,9 @@ class HomeFrame(ctkFrame):
             image=MATRIZ_ICON,
             text="Operaciones de Matrices",
             text_color=self.app.theme_config["CTkLabel"]["text_color"],
-            tooltip_text="\nSuma, resta, multiplicación," +
-                         "\ntransposición, calcular determinante," +
-                         "\nencontrar inversa.\n",
+            tooltip_text="\nSuma, resta, multiplicación,"
+            + "\ntransposición, calcular determinante,"
+            + "\nencontrar inversa.\n",
             command=self.ir_a_mats,
         ).grid(row=3, column=0, padx=(10, 5), pady=(10, 3), sticky="se")
 
@@ -85,9 +84,9 @@ class HomeFrame(ctkFrame):
             image=VECTOR_ICON,
             text="Operaciones de Vectores",
             text_color=self.app.theme_config["CTkLabel"]["text_color"],
-            tooltip_text="\nMagnitud, suma, resta," +
-                         "\nmultiplicación escalar," +
-                         "\nproducto punto, producto cruz.\n",
+            tooltip_text="\nMagnitud, suma, resta,"
+            + "\nmultiplicación escalar,"
+            + "\nproducto punto, producto cruz.\n",
             command=self.ir_a_vecs,
         ).grid(row=3, column=1, padx=(5, 10), pady=(10, 3), sticky="sw")
 
@@ -109,9 +108,9 @@ class HomeFrame(ctkFrame):
             image=ECUACIONES_ICON,
             text="Sistemas de Ecuaciones",
             text_color=self.app.theme_config["CTkLabel"]["text_color"],
-            tooltip_text="\nResolver sistemas de ecuaciones por los métodos de:" +
-                         "\n− Gauss−Jordan" +
-                         "\n− Regla de Cramer\n",
+            tooltip_text="\nResolver sistemas de ecuaciones por los métodos de:"
+            + "\n− Gauss−Jordan"
+            + "\n− Regla de Cramer\n",
             command=self.ir_a_sis,
         ).grid(row=4, column=1, padx=(5, 10), pady=3, sticky="nw")
 
@@ -120,10 +119,10 @@ class HomeFrame(ctkFrame):
             app=self.app,
             height=30,
             image=ABOUT_US_ICON,
-            tooltip_text="\n− Desarrollado por: Joaquín Zúñiga" +
-                         "\n− Versión: 1.0" +
-                         "\n− Licencia: MIT License" +
-                         "\n(puede hacer click para ir al repositorio de Github)\n",
+            tooltip_text="\n− Desarrollado por: Joaquín Zúñiga"
+            + "\n− Versión: 1.0"
+            + "\n− Licencia: MIT License"
+            + "\n(puede hacer click para ir al repositorio de Github)\n",
             command=lambda: open_link("https://github.com/jp-zuniga/GaussBot"),
         ).grid(row=5, column=0, padx=(10, 5), pady=(3, 10), sticky="ne")
 
@@ -132,10 +131,10 @@ class HomeFrame(ctkFrame):
             app=self.app,
             height=30,
             image=INFO_ICON,
-            tooltip_text="\nTodos los datos ingresados y resultados calculados" +
-                         "\n(excepto determinantes, magnitudes de vectores, " +
-                         "   y raíces de funciones)".strip() +
-                         "\npueden ser guardados para uso futuro.\n",
+            tooltip_text="\nTodos los datos ingresados y resultados calculados"
+            + "\n(excepto determinantes, magnitudes de vectores, "
+            + "   y raíces de funciones)".strip()
+            + "\npueden ser guardados para uso futuro.\n",
         ).grid(row=5, column=1, padx=(5, 10), pady=(3, 10), sticky="nw")
 
     def ir_a_mats(self) -> None:

@@ -4,35 +4,33 @@ un frame que permite encontrar
 las raíces de funciones matemáticas.
 """
 
+from tkinter import Variable
 from typing import (
     TYPE_CHECKING,
     Optional,
 )
 
-from tkinter import Variable
 from customtkinter import (
     CTkButton as ctkButton,
     CTkFrame as ctkFrame,
     CTkLabel as ctkLabel,
 )
 
-from ....gui_util_funcs import (
-    delete_msg_frame,
-    place_msg_frame,
-)
-
-from ....util_funcs import generate_sep
-from ....models import Func
-from ....managers import FuncManager
-
 from ...custom import (
     CustomDropdown,
     CustomScrollFrame,
 )
+from ....gui_util_funcs import (
+    delete_msg_frame,
+    place_msg_frame,
+)
+from ....managers import FuncManager
+from ....models import Func
+from ....util_funcs import generate_sep
 
 if TYPE_CHECKING:
-    from ... import GaussUI
     from .. import AnalisisFrame
+    from ... import GaussUI
 
 
 class DerivadasFrame(CustomScrollFrame):

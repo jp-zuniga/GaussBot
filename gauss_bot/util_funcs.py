@@ -5,33 +5,30 @@ Funciones de utilidad para la aplicación.
 from fractions import Fraction
 from logging import (
     DEBUG,
-    Formatter,
     FileHandler,
+    Formatter,
     getLogger,
 )
-
 from os import (
     makedirs,
     path,
 )
-
 from typing import (
     Any,
     Literal,
     Optional,
 )
 
-from customtkinter import CTkImage as ctkImage
-from PIL.ImageOps import invert
 from PIL.Image import (
-    Resampling,
     Image,
+    Resampling,
     merge,
     open as open_img,
 )
+from PIL.ImageOps import invert
+from customtkinter import CTkImage as ctkImage
 
 from . import ASSET_PATH, DATA_PATH, LOG_PATH
-
 
 __all__ = [
     "format_factor",

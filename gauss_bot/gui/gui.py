@@ -7,45 +7,41 @@ from json import (
     dump,
     load,
 )
-
 from os import (
     makedirs,
     path,
 )
-
 from typing import Union
+
+from PIL.ImageTk import PhotoImage
 from customtkinter import (
     CTk as ctk,
     ThemeManager,
     set_appearance_mode as set_mode,
-    set_widget_scaling as set_scaling,
     set_default_color_theme as set_theme,
+    set_widget_scaling as set_scaling,
 )
 
-from PIL.ImageTk import PhotoImage
-
+from .frames import (
+    AnalisisFrame,
+    ConfigFrame,
+    HomeFrame,
+    InputsFrame,
+    MatricesFrame,
+    NavFrame,
+    SistemasFrame,
+    VectoresFrame,
+)
 from .. import (
     CONFIG_PATH,
     THEMES_PATH,
 )
-
 from ..icons import APP_ICON
-from ..util_funcs import LOGGER
 from ..managers import (
     FuncManager,
     OpsManager,
 )
-
-from .frames import (
-    NavFrame,
-    HomeFrame,
-    InputsFrame,
-    SistemasFrame,
-    MatricesFrame,
-    VectoresFrame,
-    AnalisisFrame,
-    ConfigFrame,
-)
+from ..util_funcs import LOGGER
 
 
 class GaussUI(ctk):

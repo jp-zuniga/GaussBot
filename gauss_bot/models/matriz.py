@@ -8,9 +8,9 @@ métodos para transponer, calcular determinante, encontrar inversa, etc.
 from copy import deepcopy
 from fractions import Fraction
 from typing import (
-    overload,
     Optional,
     Union,
+    overload,
 )
 
 from ..util_funcs import format_factor
@@ -51,7 +51,9 @@ class Matriz:
 
         # si no se proporcionan valores, se inicializa una matriz cero
         if valores is None:
-            self._valores = [[Fraction(0) for _ in range(columnas)] for _ in range(filas)]
+            self._valores = [
+                [Fraction(0) for _ in range(columnas)] for _ in range(filas)
+            ]
         else:
             self._valores = valores
 

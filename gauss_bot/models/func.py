@@ -7,20 +7,18 @@ from logging import (
     WARNING,
     getLogger,
 )
-
 from os import (
     makedirs,
     path,
 )
-
 from re import (
     compile as comp,
     sub,
 )
-
 from typing import Optional
-from customtkinter import CTkImage as ctkImage
 
+from PIL.Image import open as open_img
+from customtkinter import CTkImage as ctkImage
 from matplotlib import use
 from matplotlib.backends.backend_agg import FigureCanvasAgg
 from matplotlib.pyplot import (
@@ -31,22 +29,19 @@ from matplotlib.pyplot import (
     subplots,
     text,
 )
-
-from PIL.Image import open as open_img
 from sympy import (
-    Reals,
-    oo,
-    zoo,
-    nan,
     Expr,
     Interval,
+    Reals,
     Symbol,
     diff,
     integrate,
     latex,
+    nan,
+    oo,
     parse_expr,
+    zoo,
 )
-
 from sympy.calculus.util import continuous_domain
 from sympy.parsing.sympy_parser import (
     implicit_multiplication_application,

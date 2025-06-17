@@ -5,10 +5,9 @@ para leer y escribir objetos Fraction() a archivos .json.
 
 from fractions import Fraction
 from json import (
-    JSONEncoder,
     JSONDecoder,
+    JSONEncoder,
 )
-
 from typing import (
     Any,
     Union,

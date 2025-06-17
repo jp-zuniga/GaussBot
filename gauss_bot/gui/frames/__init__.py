@@ -3,21 +3,20 @@ Implementación de los parents frame de
 los módulos de la aplciación.
 """
 
-from .nav import NavFrame
+from .analisis import AnalisisFrame
+from .config import ConfigFrame
+from .home import HomeFrame
 from .inputs import (
     InputsFrame,
-    ManejarMats,
-    ManejarVecs,
     ManejarFuncs,
+    ManejarMats,
     ManejarSistemas,
+    ManejarVecs,
 )
-
-from .home import HomeFrame
 from .matrices import MatricesFrame
-from .vectores import VectoresFrame
-from .analisis import AnalisisFrame
+from .nav import NavFrame
 from .sistemas import SistemasFrame
-from .config import ConfigFrame
+from .vectores import VectoresFrame
 
 __all__ = [
     "AnalisisFrame",
