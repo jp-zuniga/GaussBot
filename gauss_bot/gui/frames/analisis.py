@@ -17,8 +17,8 @@ from .subframes import (
     RaicesFrame,
 )
 from ..custom import ErrorFrame
-from ...icons import INPUTS_ICON
 from ...managers import FuncManager
+from ...utils import INPUTS_ICON
 
 if TYPE_CHECKING:
     from .. import GaussUI

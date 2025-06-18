@@ -32,16 +32,16 @@ from .frames import (
     SistemasFrame,
     VectoresFrame,
 )
-from .. import (
-    CONFIG_PATH,
-    THEMES_PATH,
-)
-from ..icons import APP_ICON
 from ..managers import (
     FuncManager,
     OpsManager,
 )
-from ..util_funcs import LOGGER
+from ..utils import (
+    APP_ICON,
+    CONFIG_PATH,
+    LOGGER,
+    THEMES_PATH,
+)
 
 
 class GaussUI(ctk):

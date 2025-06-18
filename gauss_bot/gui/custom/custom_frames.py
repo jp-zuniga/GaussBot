@@ -15,7 +15,7 @@ from customtkinter import (
     CTkScrollableFrame as ctkScrollFrame,
 )
 
-from ...icons import (
+from ...utils import (
     CHECK_ICON,
     ERROR_ICON,
 )
@@ -159,10 +159,10 @@ class ResultadoFrame(ctkFrame):
 
         if msg is not None:
             self.msg_label = ctkLabel(self, text=msg)
-            self.msg_label.grid(row=0, column=0, padx=20, pady=10)
+            self.msg_label.grid(row=0, column=0, padx=20, pady=10)  # type: ignore
         elif img is not None:
             self.img_label = ctkLabel(self, text="", image=img)
-            self.img_label.grid(row=0, column=0, padx=10, pady=10)
+            self.img_label.grid(row=0, column=0, padx=10, pady=10)  # type: ignore
         else:
             raise ValueError(
                 "Se necesita un mensaje o una imagen para mostrar en el frame!"

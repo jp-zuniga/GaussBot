@@ -17,7 +17,7 @@ from ..custom import (
     CustomMessageBox,
     IconButton,
 )
-from ...icons import (
+from ...utils import (
     ANALISIS_ICON,
     CONFIG_ICON,
     DROPLEFT_ICON,
@@ -28,8 +28,8 @@ from ...icons import (
     MATRIZ_ICON,
     QUIT_ICON,
     VECTOR_ICON,
+    get_dict_key,
 )
-from ...util_funcs import get_dict_key
 
 if TYPE_CHECKING:
     from .. import GaussUI

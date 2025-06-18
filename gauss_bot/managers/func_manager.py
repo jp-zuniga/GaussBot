@@ -29,9 +29,8 @@ from sympy import (
 )
 from sympy.sets import Contains
 
-from .. import FUNCIONES_PATH
 from ..models import Func
-from ..util_funcs import LOGGER
+from ..utils import FUNCIONES_PATH, LOGGER
 
 getcontext().prec = 8  # precision de los decimales
 

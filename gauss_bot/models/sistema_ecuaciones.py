@@ -8,7 +8,7 @@ from copy import deepcopy
 from fractions import Fraction
 
 from .matriz import Matriz
-from ..util_funcs import (
+from ..utils import (
     LOGGER,
     format_factor,
 )

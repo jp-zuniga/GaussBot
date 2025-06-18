@@ -1,0 +1,3 @@
+procs:
+  ruff-check: "uv tool run ruff check ."
+  ty-check: "uv tool run ty check ."

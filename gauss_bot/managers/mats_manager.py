@@ -18,7 +18,7 @@ from ..models import (
     Matriz,
     SistemaEcuaciones,
 )
-from ..util_funcs import (
+from ..utils import (
     format_factor,
     format_proc_num,
 )

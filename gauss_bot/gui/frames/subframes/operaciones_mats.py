@@ -27,17 +27,15 @@ from ...custom import (
     CustomEntry,
     CustomScrollFrame,
 )
-from ....gui_util_funcs import (
+from ....managers import MatricesManager
+from ....utils import (
+    INPUTS_ICON,
     delete_msg_frame,
     delete_msg_if,
-    place_msg_frame,
-    toggle_proc,
-)
-from ....icons import INPUTS_ICON
-from ....managers import MatricesManager
-from ....util_funcs import (
     generate_range,
     get_dict_key,
+    place_msg_frame,
+    toggle_proc,
 )
 
 if TYPE_CHECKING:

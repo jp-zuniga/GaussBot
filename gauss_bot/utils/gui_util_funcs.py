@@ -17,24 +17,16 @@ from customtkinter import (
     CTkToplevel as ctkTop,
 )
 
-from .gui.custom import (
+from .icons import APP_ICON
+from ..gui.custom import (
     CustomScrollFrame,
     ErrorFrame,
     ResultadoFrame,
     SuccessFrame,
 )
-from .icons import APP_ICON
 
 if TYPE_CHECKING:
-    from .gui import GaussUI
-
-
-__all__ = [
-    "delete_msg_frame",
-    "delete_msg_if",
-    "place_msg_frame",
-    "toggle_proc",
-]
+    from ..gui import GaussUI
 
 
 def delete_msg_frame(msg_frame: Optional[ctkFrame]) -> None:

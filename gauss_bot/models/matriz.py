@@ -13,7 +13,7 @@ from typing import (
     overload,
 )
 
-from ..util_funcs import format_factor
+from ..utils import format_factor
 
 
 class Matriz:

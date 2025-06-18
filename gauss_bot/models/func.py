@@ -48,8 +48,7 @@ from sympy.parsing.sympy_parser import (
     standard_transformations,
 )
 
-from ..icons import SAVED_FUNCS_PATH
-from ..util_funcs import transparent_invert
+from ..utils import SAVED_FUNCS_PATH, transparent_invert
 
 TRANSFORMS = standard_transformations + (implicit_multiplication_application,)
 

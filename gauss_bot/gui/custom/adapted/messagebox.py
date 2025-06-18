@@ -25,7 +25,7 @@ from customtkinter import (
 )
 
 from ..custom_widgets import IconButton
-from ....icons import (
+from ....utils import (
     MSGBOX_ICONS,
     QUIT_ICON,
 )

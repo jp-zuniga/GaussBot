@@ -14,7 +14,7 @@ Operaciones implementadas:
 from fractions import Fraction
 
 from ..models import Vector
-from ..util_funcs import (
+from ..utils import (
     format_factor,
     format_proc_num,
 )

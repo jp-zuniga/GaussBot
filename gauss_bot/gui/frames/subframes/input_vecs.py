@@ -27,23 +27,21 @@ from ...custom import (
     IconButton,
     SuccessFrame,
 )
-from ....gui_util_funcs import (
-    delete_msg_frame,
-    place_msg_frame,
+from ....managers import (
+    KeyBindingManager,
+    VectoresManager,
 )
-from ....icons import (
+from ....models import Vector
+from ....utils import (
     ACEPTAR_ICON,
     ELIMINAR_ICON,
     ENTER_ICON,
     LIMPIAR_ICON,
     MOSTRAR_ICON,
     SHUFFLE_ICON,
+    delete_msg_frame,
+    place_msg_frame,
 )
-from ....managers import (
-    KeyBindingManager,
-    VectoresManager,
-)
-from ....models import Vector
 
 if TYPE_CHECKING:
     from .. import ManejarVecs

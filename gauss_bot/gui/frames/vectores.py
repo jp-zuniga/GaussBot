@@ -20,11 +20,11 @@ from .subframes import (
     VSRTab,
 )
 from ..custom import ErrorFrame
-from ...icons import INPUTS_ICON
 from ...managers import (
     MatricesManager,
     VectoresManager,
 )
+from ...utils import INPUTS_ICON
 
 if TYPE_CHECKING:
     from .. import GaussUI

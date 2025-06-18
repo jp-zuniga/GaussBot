@@ -16,19 +16,17 @@ from os import (
 )
 
 from . import MatricesManager, VectoresManager
-from .. import (
-    MATRICES_PATH,
-    SISTEMAS_PATH,
-    VECTORES_PATH,
-)
 from ..models import (
     FractionDecoder,
     FractionEncoder,
     Matriz,
     Vector,
 )
-from ..util_funcs import (
+from ..utils import (
     LOGGER,
+    MATRICES_PATH,
+    SISTEMAS_PATH,
+    VECTORES_PATH,
     format_proc_num,
 )
 

@@ -1,6 +1,5 @@
 """
-Definiciones de todos los íconos
-e imagenes de la aplicación.
+Definiciones de todos los íconos e imagenes de la aplicación.
 """
 
 from os import (
@@ -11,46 +10,7 @@ from os import (
 from PIL.Image import open as open_img
 from customtkinter import CTkImage as ctkImage
 
-from . import (
-    ASSET_PATH,
-    DATA_PATH,
-)
-
-__all__ = [
-    "ABOUT_US_ICON",
-    "ACEPTAR_ICON",
-    "ANALISIS_ICON",
-    "APP_ICON",
-    "CHECK_ICON",
-    "CONFIG_ICON",
-    "DROPDOWN_ICON",
-    "DROPLEFT_ICON",
-    "DROPRIGHT_ICON",
-    "DROPUP_ICON",
-    "ECUACIONES_ICON",
-    "ELIMINAR_ICON",
-    "ENTER_ICON",
-    "ERROR_ICON",
-    "NUMPAD_KEYS",
-    "INFO_ICON",
-    "INPUTS_ICON",
-    "LIMPIAR_ICON",
-    "LOGO",
-    "MATRIZ_ICON",
-    "MOSTRAR_ICON",
-    "MSGBOX_ICONS",
-    "NUMPAD_ICON_PATH",
-    "QUESTION_ICON",
-    "QUIT_ICON",
-    "SAVE_ICON",
-    "SHUFFLE_ICON",
-    "VECTOR_ICON",
-    "WARNING_ICON",
-]
-
-
-NUMPAD_ICON_PATH = path.join(ASSET_PATH, "numpad_icons")
-SAVED_FUNCS_PATH = path.join(DATA_PATH, "saved_funcs")
+from .paths import ASSET_PATH, NUMPAD_ICON_PATH
 
 APP_ICON = (
     path.join(ASSET_PATH, "dark_mode", "light_logo.png"),

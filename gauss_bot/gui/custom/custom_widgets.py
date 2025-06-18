@@ -17,7 +17,7 @@ from customtkinter import (
 )
 
 from .adapted.tooltip import Tooltip
-from ...icons import DROPDOWN_ICON
+from ...utils import DROPDOWN_ICON
 
 if TYPE_CHECKING:
     from ..gui import GaussUI

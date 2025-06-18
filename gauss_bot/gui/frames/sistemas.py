@@ -19,8 +19,8 @@ from ..custom import (
     CustomScrollFrame,
     ErrorFrame,
 )
-from ...icons import INPUTS_ICON
 from ...managers import MatricesManager
+from ...utils import INPUTS_ICON
 
 if TYPE_CHECKING:
     from gauss_bot.gui import GaussUI

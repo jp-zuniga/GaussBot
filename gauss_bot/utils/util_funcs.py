@@ -1,5 +1,5 @@
 """
-Funciones de utilidad para la aplicación.
+Funciones de utilidad generales para la aplicación.
 """
 
 from fractions import Fraction
@@ -28,29 +28,11 @@ from PIL.Image import (
 from PIL.ImageOps import invert
 from customtkinter import CTkImage as ctkImage
 
-from . import ASSET_PATH, DATA_PATH, LOG_PATH
-
-__all__ = [
-    "format_factor",
-    "format_proc_num",
-    "generate_range",
-    "generate_sep",
-    "get_dict_key",
-    "LOGGER",
-    "log_setup",
-    "resize_image",
-    "transparent_invert",
-]
-
+from .paths import ASSET_PATH, DATA_PATH, LOG_PATH
 
 # objeto logger global para la aplicacion
 # configurado en la funcion log_setup()
 LOGGER = getLogger("GaussBot")
-
-
-################################################################################
-###################   Funciones generales de la aplicación   ###################
-################################################################################
 
 
 def format_factor(

@@ -31,23 +31,19 @@ from ...custom import (
     CustomScrollFrame,
     IconButton,
 )
-from ....gui_util_funcs import (
-    delete_msg_frame,
-    delete_msg_if,
-    place_msg_frame,
-    toggle_proc,
-)
-from ....icons import (
+from ....managers import VectoresManager
+from ....models import Vector
+from ....utils import (
     ENTER_ICON,
     INFO_ICON,
     INPUTS_ICON,
-)
-from ....managers import VectoresManager
-from ....models import Vector
-from ....util_funcs import (
+    delete_msg_frame,
+    delete_msg_if,
     format_factor,
     generate_range,
     get_dict_key,
+    place_msg_frame,
+    toggle_proc,
 )
 
 if TYPE_CHECKING:

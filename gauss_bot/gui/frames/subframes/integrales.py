@@ -20,13 +20,13 @@ from ...custom import (
     CustomDropdown,
     CustomScrollFrame,
 )
-from ....gui_util_funcs import (
-    delete_msg_frame,
-    place_msg_frame,
-)
 from ....managers import FuncManager
 from ....models import Func
-from ....util_funcs import generate_sep
+from ....utils import (
+    delete_msg_frame,
+    generate_sep,
+    place_msg_frame,
+)
 
 if TYPE_CHECKING:
     from .. import AnalisisFrame

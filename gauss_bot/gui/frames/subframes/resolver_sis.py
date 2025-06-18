@@ -19,15 +19,15 @@ from ...custom import (
     CustomDropdown,
     CustomScrollFrame,
 )
-from ....gui_util_funcs import (
+from ....managers import MatricesManager
+from ....models import SistemaEcuaciones
+from ....utils import (
+    APP_ICON,
     delete_msg_frame,
+    generate_sep,
     place_msg_frame,
     toggle_proc,
 )
-from ....icons import APP_ICON
-from ....managers import MatricesManager
-from ....models import SistemaEcuaciones
-from ....util_funcs import generate_sep
 
 if TYPE_CHECKING:
     from .. import SistemasFrame

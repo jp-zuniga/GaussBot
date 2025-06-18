@@ -38,18 +38,18 @@ from ...custom import (
     CustomTable,
     IconButton,
 )
-from ....gui_util_funcs import place_msg_frame
-from ....icons import (
-    APP_ICON,
-    INFO_ICON,
-)
 from ....managers import (
     MARGEN_ERROR,
     MAX_ITERACIONES,
     FuncManager,
 )
 from ....models import Func
-from ....util_funcs import generate_sep
+from ....utils import (
+    APP_ICON,
+    INFO_ICON,
+    generate_sep,
+    place_msg_frame,
+)
 
 if TYPE_CHECKING:
     from .. import AnalisisFrame

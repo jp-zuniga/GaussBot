@@ -31,8 +31,7 @@ from customtkinter import (
     ThemeManager,
 )
 
-from ....icons import NUMPAD_KEYS
-from ....util_funcs import resize_image
+from ....utils import NUMPAD_KEYS, resize_image
 
 if TYPE_CHECKING:
     from ..custom_widgets import CustomEntry

@@ -12,15 +12,15 @@ from customtkinter import (
 )
 
 from ..custom import IconButton
-from ...icons import (
+from ...utils import (
     ABOUT_US_ICON,
     ANALISIS_ICON,
     ECUACIONES_ICON,
     INFO_ICON,
     MATRIZ_ICON,
     VECTOR_ICON,
+    generate_sep,
 )
-from ...util_funcs import generate_sep
 
 if TYPE_CHECKING:
     from .. import GaussUI

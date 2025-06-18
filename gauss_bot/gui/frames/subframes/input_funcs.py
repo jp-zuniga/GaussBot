@@ -25,25 +25,21 @@ from ...custom import (
     IconButton,
     SuccessFrame,
 )
-from ....gui_util_funcs import (
-    delete_msg_frame,
-    place_msg_frame,
+from ....managers import (
+    FuncManager,
+    KeyBindingManager,
 )
-from ....icons import (
+from ....models import Func
+from ....utils import (
     ACEPTAR_ICON,
     ELIMINAR_ICON,
     ENTER_ICON,
     INFO_ICON,
     LIMPIAR_ICON,
     MOSTRAR_ICON,
-)
-from ....managers import (
-    FuncManager,
-    KeyBindingManager,
-)
-from ....models import Func
-from ....util_funcs import (
+    delete_msg_frame,
     generate_sep,
+    place_msg_frame,
     resize_image,
 )
 
