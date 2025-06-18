@@ -5,7 +5,7 @@ Direcciones de los archivos utilizados por la aplicación.
 from os import path
 
 # assets y temas
-ASSET_PATH = path.join(path.dirname(path.realpath(__file__)), "assets")
+ASSET_PATH = path.join(path.dirname(path.dirname(path.realpath(__file__))), "assets")
 
 # root folder de todos los datos
 DATA_PATH = path.join(path.expanduser("~"), "GaussBot", "data")

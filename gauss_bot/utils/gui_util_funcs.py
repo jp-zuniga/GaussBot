@@ -13,10 +13,10 @@ from customtkinter import (
 )
 
 from .icons import APP_ICON
-from ..gui.custom import CustomScrollFrame, ErrorFrame, ResultadoFrame, SuccessFrame
 
 if TYPE_CHECKING:
     from ..gui import GaussUI
+    from ..gui.custom import CustomScrollFrame
 
 
 def delete_msg_frame(msg_frame: Optional[ctkFrame]) -> None:
@@ -49,7 +49,7 @@ def delete_msg_if(
 
 
 def place_msg_frame(
-    parent_frame: Union[ctkFrame, CustomScrollFrame],
+    parent_frame: Union[ctkFrame, "CustomScrollFrame"],
     msg_frame: Optional[ctkFrame],
     msg: Optional[str] = None,
     tipo: Literal["error", "success", "resultado"] = "error",
@@ -63,6 +63,8 @@ def place_msg_frame(
     * tipo:         tipo de frame a crear
     * grid_kwargs:  kwargs a pasar a msg_frame.grid()
     """
+
+    from ..gui.custom import ErrorFrame, ResultadoFrame, SuccessFrame
 
     if tipo == "error":
         msg_frame = ErrorFrame(parent_frame, msg)
@@ -94,7 +96,7 @@ def place_msg_frame(
 
 def toggle_proc(
     app: "GaussUI",
-    parent_frame: CustomScrollFrame,
+    parent_frame: "CustomScrollFrame",
     window_title: str,
     proc_label: Optional[ctkLabel],
     label_txt: str,
@@ -103,6 +105,8 @@ def toggle_proc(
     """
     Muestra o esconde la ventana de procedimiento.
     """
+
+    from ..gui.custom import CustomScrollFrame
 
     if not proc_hidden or any(
         type(widget) is ctkTop for widget in app.winfo_children()

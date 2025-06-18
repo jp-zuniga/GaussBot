@@ -2,11 +2,18 @@
 Módulo de utilidades de la aplicación.
 """
 
-from .gui_util_funcs import (
-    delete_msg_frame,
-    delete_msg_if,
-    place_msg_frame,
-    toggle_proc,
+from .paths import (
+    ASSET_PATH,
+    CONFIG_PATH,
+    DATA_PATH,
+    FUNCIONES_PATH,
+    LOG_PATH,
+    MATRICES_PATH,
+    NUMPAD_ICON_PATH,
+    SAVED_FUNCS_PATH,
+    SISTEMAS_PATH,
+    THEMES_PATH,
+    VECTORES_PATH,
 )
 from .icons import (
     ABOUT_US_ICON,
@@ -38,19 +45,6 @@ from .icons import (
     VECTOR_ICON,
     WARNING_ICON,
 )
-from .paths import (
-    ASSET_PATH,
-    CONFIG_PATH,
-    DATA_PATH,
-    FUNCIONES_PATH,
-    LOG_PATH,
-    MATRICES_PATH,
-    NUMPAD_ICON_PATH,
-    SAVED_FUNCS_PATH,
-    SISTEMAS_PATH,
-    THEMES_PATH,
-    VECTORES_PATH,
-)
 from .util_funcs import (
     LOGGER,
     format_factor,
@@ -61,6 +55,12 @@ from .util_funcs import (
     log_setup,
     resize_image,
     transparent_invert,
+)
+from .gui_util_funcs import (
+    delete_msg_frame,
+    delete_msg_if,
+    place_msg_frame,
+    toggle_proc,
 )
 
 __all__ = [

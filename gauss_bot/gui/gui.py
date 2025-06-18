@@ -26,8 +26,8 @@ from .frames import (
     SistemasFrame,
     VectoresFrame,
 )
-from ..managers import FuncManager, OpsManager
 from ..utils import APP_ICON, CONFIG_PATH, LOGGER, THEMES_PATH
+from ..managers import FuncManager, OpsManager
 
 
 class GaussUI(ctk):

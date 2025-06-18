@@ -100,7 +100,7 @@ wheels = [
 ]
 
 [[package]]
-name = "gauss-bot"
+name = "gaussbot"
 version = "1.0.0"
 source = { virtual = "." }
 dependencies = [
