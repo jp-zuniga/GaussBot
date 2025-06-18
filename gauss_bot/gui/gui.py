@@ -3,14 +3,8 @@ Implementación de ventana principal, que contiene
 todos los frames y managers necesarios para el GUI.
 """
 
-from json import (
-    dump,
-    load,
-)
-from os import (
-    makedirs,
-    path,
-)
+from json import dump, load
+from os import makedirs, path
 from typing import Union
 
 from PIL.ImageTk import PhotoImage
@@ -32,16 +26,8 @@ from .frames import (
     SistemasFrame,
     VectoresFrame,
 )
-from ..managers import (
-    FuncManager,
-    OpsManager,
-)
-from ..utils import (
-    APP_ICON,
-    CONFIG_PATH,
-    LOGGER,
-    THEMES_PATH,
-)
+from ..managers import FuncManager, OpsManager
+from ..utils import APP_ICON, CONFIG_PATH, LOGGER, THEMES_PATH
 
 
 class GaussUI(ctk):
@@ -79,11 +65,7 @@ class GaussUI(ctk):
         self.inputs_frame = InputsFrame(
             app=self,
             master=self,
-            managers=(
-                self.func_manager,
-                self.mats_manager,
-                self.vecs_manager,
-            ),
+            managers=(self.func_manager, self.mats_manager, self.vecs_manager),
         )
 
         self.matrices = MatricesFrame(
@@ -101,9 +83,7 @@ class GaussUI(ctk):
         )
 
         self.analisis = AnalisisFrame(
-            app=self,
-            master=self,
-            func_manager=self.func_manager,
+            app=self, master=self, func_manager=self.func_manager
         )
 
         self.sistemas = SistemasFrame(

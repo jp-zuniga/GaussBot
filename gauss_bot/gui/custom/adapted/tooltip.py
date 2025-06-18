@@ -8,11 +8,7 @@ Formatted file and added type annotations for personal use.
 """
 
 from time import time
-from tkinter import (
-    Event,
-    Frame,
-    Toplevel,
-)
+from tkinter import Event, Frame, Toplevel
 
 from customtkinter import (
     CTkBaseClass as ctkBase,
@@ -77,12 +73,7 @@ class Tooltip(Toplevel):
             **message_kwargs,
         )
 
-        self.message_label.pack(
-            fill="both",
-            padx=10,
-            pady=5,
-            expand=True,
-        )
+        self.message_label.pack(fill="both", padx=10, pady=5, expand=True)
 
         if self.widget.winfo_name() != "tk" and self.frame.cget(
             "fg_color"

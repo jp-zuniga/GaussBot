@@ -9,11 +9,7 @@ and heavily simplified the functionality for use in this project.
 """
 
 from tkinter import Event
-from typing import (
-    TYPE_CHECKING,
-    Literal,
-    Optional,
-)
+from typing import TYPE_CHECKING, Literal, Optional
 
 from customtkinter import (
     CTkButton as ctkButton,
@@ -25,10 +21,7 @@ from customtkinter import (
 )
 
 from ..custom_widgets import IconButton
-from ....utils import (
-    MSGBOX_ICONS,
-    QUIT_ICON,
-)
+from ....utils import MSGBOX_ICONS, QUIT_ICON
 
 if TYPE_CHECKING:
     from ... import GaussUI
@@ -45,13 +38,7 @@ class CustomMessageBox(ctkTop):
         name: str,
         msg: str,
         button_options: tuple[str, Optional[str], Optional[str]],
-        icon: Literal[
-            "check",
-            "error",
-            "info",
-            "question",
-            "warning",
-        ] = "info",
+        icon: Literal["check", "error", "info", "question", "warning"] = "info",
         **kwargs,
     ):
         """
@@ -129,18 +116,10 @@ class CustomMessageBox(ctkTop):
         self.frame_top.bind("<B1-Motion>", self.move_window)
         self.frame_top.bind("<ButtonPress-1>", self.set_old_xy)
 
-        self.title_label = ctkLabel(
-            self.frame_top,
-            text=self.msgbox_name,
-        )
+        self.title_label = ctkLabel(self.frame_top, text=self.msgbox_name)
 
         self.title_label.grid(
-            row=0,
-            column=0,
-            columnspan=6,
-            padx=(15, 0),
-            pady=(10, 8),
-            sticky="nsw",
+            row=0, column=0, columnspan=6, padx=(15, 0), pady=(10, 8), sticky="nsw"
         )
 
         self.title_label.bind("<B1-Motion>", self.move_window)
@@ -155,11 +134,7 @@ class CustomMessageBox(ctkTop):
         )
 
         self.button_close.grid(
-            row=0,
-            column=5,
-            padx=(0, 15),
-            pady=(10, 8),
-            sticky="nse",
+            row=0, column=5, padx=(0, 15), pady=(10, 8), sticky="nse"
         )
 
         msg_button = ctkButton(
@@ -175,14 +150,7 @@ class CustomMessageBox(ctkTop):
 
         msg_button._image_label.grid_configure(padx=5)  # type: ignore
         msg_button._text_label.grid_configure(padx=5)  # type: ignore
-        msg_button.grid(
-            row=1,
-            column=0,
-            columnspan=6,
-            ipadx=5,
-            padx=3,
-            sticky="nsew",
-        )
+        msg_button.grid(row=1, column=0, columnspan=6, ipadx=5, padx=3, sticky="nsew")
 
         self.button_1 = ctkButton(
             self.frame_top,
@@ -246,19 +214,11 @@ class CustomMessageBox(ctkTop):
             self.frame_top.columnconfigure((0, 4), weight=1)
             columns = (4, 5)  # type: ignore
             self.button_1.grid(
-                row=2,
-                column=columns[0],
-                sticky="nse",
-                padx=(0, 5),
-                pady=10,
+                row=2, column=columns[0], sticky="nse", padx=(0, 5), pady=10
             )
 
             self.button_2.grid(
-                row=2,
-                column=columns[1],
-                sticky="nse",
-                padx=(5, 10),
-                pady=10,
+                row=2, column=columns[1], sticky="nse", padx=(5, 10), pady=10
             )
 
         else:

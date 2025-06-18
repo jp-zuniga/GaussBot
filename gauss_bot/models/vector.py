@@ -5,10 +5,7 @@ y multiplicación usando sobrecarga de operadores.
 """
 
 from fractions import Fraction
-from typing import (
-    Union,
-    overload,
-)
+from typing import Union, overload
 
 from . import Matriz
 
@@ -36,10 +33,7 @@ class Vector:
     @overload
     def __getitem__(self, indice: slice) -> list[Fraction]: ...
 
-    def __getitem__(
-        self,
-        indice: Union[int, slice],
-    ) -> Union[Fraction, list[Fraction]]:
+    def __getitem__(self, indice: Union[int, slice]) -> Union[Fraction, list[Fraction]]:
         """
         Para acceder a los componentes del vector
         directamente como si fuera lista: Vector()[indice].
@@ -122,8 +116,7 @@ class Vector:
     def __mul__(self, escalar: Union[int, float, Fraction]) -> "Vector": ...
 
     def __mul__(
-        self,
-        multiplicador: Union["Vector", int, float, Fraction],
+        self, multiplicador: Union["Vector", int, float, Fraction]
     ) -> Union[Fraction, "Vector"]:
         """
         Overloads para realizar producto punto o multiplicación por escalar:
@@ -146,10 +139,7 @@ class Vector:
             return Vector([Fraction(c * multiplicador) for c in self.componentes])
         raise TypeError("Tipo de dato inválido!")
 
-    def __rmul__(
-        self,
-        multiplicador: Union[int, float, Fraction],
-    ) -> "Vector":
+    def __rmul__(self, multiplicador: Union[int, float, Fraction]) -> "Vector":
         """
         Realiza multiplicación por escalar:
         * Union[int, float, Fraction] * Vector() -> Vector()
@@ -206,11 +196,7 @@ class Vector:
             a1, a2, a3 = vecs[0].componentes
             b1, b2, b3 = vecs[1].componentes
             return Vector(
-                [
-                    (a2 * b3) - (a3 * b2),
-                    (a3 * b1) - (a1 * b3),
-                    (a1 * b2) - (a2 * b1),
-                ]
+                [(a2 * b3) - (a3 * b2), (a3 * b1) - (a1 * b3), (a1 * b2) - (a2 * b1)]
             )
 
         mat_prod_cruz = (

@@ -32,10 +32,7 @@ class CustomTable(ctkFrame):
         header: str = "Registro de Iteraciones:",
     ):
         super().__init__(
-            master,
-            corner_radius=20,
-            border_width=3,
-            fg_color="transparent",
+            master, corner_radius=20, border_width=3, fg_color="transparent"
         )
 
         self.parent = master
@@ -47,20 +44,10 @@ class CustomTable(ctkFrame):
         self.fg = ThemeManager.theme["CTkFrame"]["fg_color"]
 
         ctkLabel(
-            self,
-            text=header,
-            font=ctkFont(
-                size=14,
-                weight="bold",
-                underline=True,
-            ),
+            self, text=header, font=ctkFont(size=14, weight="bold", underline=True)
         ).grid(row=0, column=0, padx=20, pady=20, sticky="new")
 
-        self.header_frame = ctkFrame(
-            self,
-            fg_color="transparent",
-            border_width=0,
-        )
+        self.header_frame = ctkFrame(self, fg_color="transparent", border_width=0)
 
         self.header_frame.rowconfigure(0, weight=1)
         for j, value in enumerate(self.values[0]):
@@ -79,27 +66,14 @@ class CustomTable(ctkFrame):
             )
 
             cell._text_label.configure(justify="center")  # type: ignore
-            cell.grid(
-                row=0,
-                column=j,
-                padx=6 if j == 0 else (1, 0),
-                sticky="nsew",
-            )
+            cell.grid(row=0, column=j, padx=6 if j == 0 else (1, 0), sticky="nsew")
 
         self.cells_frame = CustomScrollFrame(
-            self,
-            border_width=0,
-            fg_color="transparent",
+            self, border_width=0, fg_color="transparent"
         )
 
         self.header_frame.grid(row=1, column=0, padx=20, sticky="nsew")
-        self.cells_frame.grid(
-            row=2,
-            column=0,
-            padx=20,
-            pady=(0, 20),
-            sticky="nsew",
-        )
+        self.cells_frame.grid(row=2, column=0, padx=20, pady=(0, 20), sticky="nsew")
 
         self.cells: list[list[ctkButton]] = [[]]
         self.init_table()

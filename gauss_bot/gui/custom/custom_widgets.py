@@ -2,11 +2,7 @@
 Implementaciones de widgets personalizadas.
 """
 
-from typing import (
-    TYPE_CHECKING,
-    Any,
-    Optional,
-)
+from typing import TYPE_CHECKING, Any, Optional
 
 from customtkinter import (
     CTkButton as ctkButton,
@@ -89,11 +85,7 @@ class CustomDropdown(ctkOptionMenu):
         Cambia el ícono del dropdown
         """
 
-        self.icon_label = ctkLabel(
-            self,
-            text="",
-            image=image,
-        )
+        self.icon_label = ctkLabel(self, text="", image=image)
 
         self._canvas.delete("dropdown_arrow")
         color = self._canvas.itemcget("inner_parts_right", "fill")
@@ -149,8 +141,7 @@ class IconButton(ctkButton):
         border_spacing = kwargs.pop("border_spacing", 0)
         fg_color = kwargs.pop("fg_color", "transparent")
         hover_color = kwargs.pop(
-            "hover_color",
-            self.app.theme_config["CTkFrame"]["top_fg_color"],
+            "hover_color", self.app.theme_config["CTkFrame"]["top_fg_color"]
         )
 
         super().__init__(

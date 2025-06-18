@@ -4,10 +4,7 @@ y editar las configuraciones de la aplicación.
 """
 
 from tkinter import StringVar
-from typing import (
-    TYPE_CHECKING,
-    Optional,
-)
+from typing import TYPE_CHECKING, Optional
 
 from customtkinter import (
     CTkFrame as ctkFrame,
@@ -16,10 +13,7 @@ from customtkinter import (
     set_widget_scaling as set_scaling,
 )
 
-from ..custom import (
-    CustomDropdown,
-    SuccessFrame,
-)
+from ..custom import CustomDropdown, SuccessFrame
 from ...utils import get_dict_key
 
 if TYPE_CHECKING:
@@ -50,10 +44,7 @@ class ConfigFrame(ctkFrame):
             "200%": 2.0,
         }
 
-        self.modos_dict = {
-            "Claro": "light",
-            "Oscuro": "dark",
-        }
+        self.modos_dict = {"Claro": "light", "Oscuro": "dark"}
 
         self.temas_dict = {
             "Cerúleo": "ceruleo.json",
@@ -143,17 +134,13 @@ class ConfigFrame(ctkFrame):
         if self.app.nav_frame.hidden:
             self.app.nav_frame.app_name.grid_remove()
             self.app.nav_frame.hide_button.grid_configure(
-                column=1,
-                columnspan=1,
-                sticky="e",
+                column=1, columnspan=1, sticky="e"
             )
 
         else:
             self.app.nav_frame.app_name.grid()
             self.app.nav_frame.hide_button.grid_configure(
-                column=0,
-                columnspan=2,
-                sticky="n",
+                column=0, columnspan=2, sticky="n"
             )
 
     def cambiar_modo(self, modo_seleccionado: str) -> None:

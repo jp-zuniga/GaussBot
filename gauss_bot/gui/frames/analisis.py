@@ -11,11 +11,7 @@ from customtkinter import (
     CTkTabview as ctkTabview,
 )
 
-from .subframes import (
-    DerivadasFrame,
-    IntegralesFrame,
-    RaicesFrame,
-)
+from .subframes import DerivadasFrame, IntegralesFrame, RaicesFrame
 from ..custom import ErrorFrame
 from ...managers import FuncManager
 from ...utils import INPUTS_ICON
@@ -31,10 +27,7 @@ class AnalisisFrame(ctkFrame):
     """
 
     def __init__(
-        self,
-        app: "GaussUI",
-        master: "GaussUI",
-        func_manager: FuncManager,
+        self, app: "GaussUI", master: "GaussUI", func_manager: FuncManager
     ) -> None:
         super().__init__(master, corner_radius=0, fg_color="transparent")
         self.app = app
@@ -44,22 +37,12 @@ class AnalisisFrame(ctkFrame):
         self.dummy_frame: ctkFrame
         self.msg_frame: Optional[ctkFrame] = None
 
-        self.instances: list[
-            Union[
-                RaicesFrame,
-                DerivadasFrame,
-                IntegralesFrame,
-            ],
-        ]
+        self.instances: list[Union[RaicesFrame, DerivadasFrame, IntegralesFrame],]
 
         self.tabs: list[
             tuple[
                 str,
-                Union[
-                    type[RaicesFrame],
-                    type[DerivadasFrame],
-                    type[IntegralesFrame],
-                ],
+                Union[type[RaicesFrame], type[DerivadasFrame], type[IntegralesFrame]],
             ]
         ]
 
@@ -79,8 +62,7 @@ class AnalisisFrame(ctkFrame):
             # agregar boton para dirigir al usuario adonde se agregan
             self.dummy_frame = ctkFrame(self, fg_color="transparent")
             self.msg_frame = ErrorFrame(
-                self.dummy_frame,
-                msg="No se ha guardado ninguna función!",
+                self.dummy_frame, msg="No se ha guardado ninguna función!"
             )
 
             agregar_button = ctkButton(

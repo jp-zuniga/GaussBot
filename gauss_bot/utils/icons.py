@@ -2,10 +2,7 @@
 Definiciones de todos los íconos e imagenes de la aplicación.
 """
 
-from os import (
-    path,
-    walk,
-)
+from os import path, walk
 
 from PIL.Image import open as open_img
 from customtkinter import CTkImage as ctkImage
@@ -73,17 +70,11 @@ QUIT_ICON = ctkImage(
 ################################################################################
 
 
-CHECK_ICON = ctkImage(
-    open_img(path.join(ASSET_PATH, "check_icon.png")),
-)
+CHECK_ICON = ctkImage(open_img(path.join(ASSET_PATH, "check_icon.png")))
 
-ERROR_ICON = ctkImage(
-    open_img(path.join(ASSET_PATH, "error_icon.png")),
-)
+ERROR_ICON = ctkImage(open_img(path.join(ASSET_PATH, "error_icon.png")))
 
-WARNING_ICON = ctkImage(
-    open_img(path.join(ASSET_PATH, "warning_icon.png")),
-)
+WARNING_ICON = ctkImage(open_img(path.join(ASSET_PATH, "warning_icon.png")))
 
 INFO_ICON = ctkImage(
     dark_image=open_img(path.join(ASSET_PATH, "dark_mode", "light_info_icon.png")),

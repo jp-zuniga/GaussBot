@@ -4,16 +4,9 @@ Implementación de los subframes de ManejarFuncs.
 
 from re import match
 from tkinter import Variable
-from typing import (
-    TYPE_CHECKING,
-    Optional,
-)
+from typing import TYPE_CHECKING, Optional
 
-from customtkinter import (
-    CTkFont as ctkFont,
-    CTkFrame as ctkFrame,
-    CTkLabel as ctkLabel,
-)
+from customtkinter import CTkFont as ctkFont, CTkFrame as ctkFrame, CTkLabel as ctkLabel
 from sympy import SympifyError
 
 from ...custom import (
@@ -25,10 +18,7 @@ from ...custom import (
     IconButton,
     SuccessFrame,
 )
-from ....managers import (
-    FuncManager,
-    KeyBindingManager,
-)
+from ....managers import FuncManager, KeyBindingManager
 from ....models import Func
 from ....utils import (
     ACEPTAR_ICON,
@@ -94,10 +84,7 @@ class AgregarFuncs(CustomScrollFrame):
         self.instruct_nombre = ctkLabel(self, text="Nombre de la función:")
         self.nombre_entry = CustomEntry(self, width=40, placeholder_text="f(x)")
 
-        self.instruct_func = ctkLabel(
-            self,
-            text="Ingrese los términos de la función:",
-        )
+        self.instruct_func = ctkLabel(self, text="Ingrese los términos de la función:")
 
         self.func_entry = CustomEntry(
             self,
@@ -122,51 +109,24 @@ class AgregarFuncs(CustomScrollFrame):
         self.func_entry.bind("<Return>", lambda _: self.leer_func())
 
         self.instruct_numpad.grid(
-            row=0,
-            column=0,
-            columnspan=2,
-            padx=5,
-            pady=5,
-            sticky="n",
+            row=0, column=0, columnspan=2, padx=5, pady=5, sticky="n"
         )
 
         self.instruct_nombre.grid(
-            row=1,
-            column=0,
-            columnspan=2,
-            padx=5,
-            pady=(3, 1),
-            sticky="n",
+            row=1, column=0, columnspan=2, padx=5, pady=(3, 1), sticky="n"
         )
 
         self.nombre_entry.grid(
-            row=2,
-            column=0,
-            columnspan=2,
-            padx=5,
-            pady=(1, 3),
-            sticky="n",
+            row=2, column=0, columnspan=2, padx=5, pady=(1, 3), sticky="n"
         )
 
         self.instruct_func.grid(
-            row=3,
-            column=0,
-            columnspan=2,
-            padx=5,
-            pady=(3, 1),
-            sticky="n",
+            row=3, column=0, columnspan=2, padx=5, pady=(3, 1), sticky="n"
         )
 
         self.func_entry.grid(row=4, column=0, padx=5, pady=(1, 3), sticky="e")
         self.leer_button.grid(row=4, column=1, padx=5, pady=(1, 3), sticky="w")
-        self.func_frame.grid(
-            row=5,
-            column=0,
-            columnspan=2,
-            padx=5,
-            pady=5,
-            sticky="n",
-        )
+        self.func_frame.grid(row=5, column=0, columnspan=2, padx=5, pady=5, sticky="n")
 
     def leer_func(self) -> None:
         """
@@ -381,24 +341,18 @@ class MostrarFuncs(CustomScrollFrame):
             font=ctkFont(size=12, weight="bold", underline=True),
         ).grid(row=0, column=0, pady=(10, 0), sticky="n")
 
-        ctkLabel(
-            self.show_frame,
-            text="",
-            image=generate_sep(False, (400, 3)),
-        ).grid(row=1, column=0, sticky="n")
+        ctkLabel(self.show_frame, text="", image=generate_sep(False, (400, 3))).grid(
+            row=1, column=0, sticky="n"
+        )
 
         r = 2
         for func in self.funcs_guardadas:
-            ctkLabel(
-                self.show_frame,
-                text="",
-                image=func,
-            ).grid(row=r, column=0, sticky="n")
+            ctkLabel(self.show_frame, text="", image=func).grid(
+                row=r, column=0, sticky="n"
+            )
 
             ctkLabel(
-                self.show_frame,
-                text="",
-                image=generate_sep(False, (400, 3)),
+                self.show_frame, text="", image=generate_sep(False, (400, 3))
             ).grid(row=r + 1, column=0, sticky="n")
             r += 2
 

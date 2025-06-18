@@ -3,32 +3,16 @@ Implementación de la clase Func.
 """
 
 from decimal import Decimal
-from logging import (
-    WARNING,
-    getLogger,
-)
-from os import (
-    makedirs,
-    path,
-)
-from re import (
-    compile as comp,
-    sub,
-)
+from logging import WARNING, getLogger
+from os import makedirs, path
+from re import compile as comp, sub
 from typing import Optional
 
 from PIL.Image import open as open_img
 from customtkinter import CTkImage as ctkImage
 from matplotlib import use
 from matplotlib.backends.backend_agg import FigureCanvasAgg
-from matplotlib.pyplot import (
-    axis,
-    close,
-    rc,
-    savefig,
-    subplots,
-    text,
-)
+from matplotlib.pyplot import axis, close, rc, savefig, subplots, text
 from sympy import (
     Expr,
     Interval,
@@ -65,12 +49,7 @@ class Func:
     utilidad para validar su nombre y su continuidad.
     """
 
-    def __init__(
-        self,
-        nombre: str,
-        expr: str,
-        latexified=False,
-    ) -> None:
+    def __init__(self, nombre: str, expr: str, latexified=False) -> None:
         """
         * ValueError: si la expresión tiene dominio complejo
         """
@@ -89,11 +68,7 @@ class Func:
 
             replaced_expr = expr
             for _ in list(comp(patt).finditer(expr)):
-                replaced_expr = sub(
-                    patt,
-                    var_str,
-                    expr,
-                )
+                replaced_expr = sub(patt, var_str, expr)
             return replaced_expr
 
         if "sen" in expr:
@@ -106,10 +81,7 @@ class Func:
         if "e**" in expr:
             expr = expr.replace("e**", "exp")
 
-        self.expr: Expr = parse_expr(
-            expr,
-            transformations=TRANSFORMS,
-        )
+        self.expr: Expr = parse_expr(expr, transformations=TRANSFORMS)
 
         if self.expr.has(oo, -oo, zoo, nan):
             raise ValueError("La función tiene un dominio complejo!")
@@ -124,12 +96,9 @@ class Func:
         """
 
         a, b = intervalo
-        return Interval(
-            a,
-            b,
-            left_open=True,
-            right_open=True,
-        ).is_subset(self.get_dominio())
+        return Interval(a, b, left_open=True, right_open=True).is_subset(
+            self.get_dominio()
+        )
 
     def derivar(self) -> "Func":
         """
@@ -186,12 +155,7 @@ class Func:
         """
 
         num_diff = self.nombre.count("′")
-        num_integ = int(
-            next(
-                (x for x in self.nombre if x.isdigit()),
-                0,
-            )
-        )
+        num_integ = int(next((x for x in self.nombre if x.isdigit()), 0))
 
         if num_diff != 0 or diffr:
             return self.get_derivada_nombre(num_diff)
@@ -264,10 +228,7 @@ class Func:
         """
 
         makedirs(SAVED_FUNCS_PATH, exist_ok=True)
-        output_file = path.join(
-            SAVED_FUNCS_PATH,
-            rf"{output_file or nombre_expr}.png",
-        )
+        output_file = path.join(SAVED_FUNCS_PATH, rf"{output_file or nombre_expr}.png")
 
         if expr is not None:
             latex_str: str = latex(
@@ -318,13 +279,7 @@ class Func:
             fontsize=kwargs.pop("font_size", 75),
         )
 
-        savefig(
-            output_file,
-            format="png",
-            transparent=True,
-            dpi=200,
-            pad_inches=0.1,
-        )
+        savefig(output_file, format="png", transparent=True, dpi=200, pad_inches=0.1)
 
         close(fig)
 

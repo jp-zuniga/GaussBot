@@ -3,10 +3,7 @@ Implementación de KeyBindingManager, encargado de crear
 bindings a las teclas de flecha para navegar entre entries.
 """
 
-from typing import (
-    Optional,
-    Union,
-)
+from typing import Optional, Union
 
 from ..gui.custom import CustomEntry
 
@@ -75,12 +72,7 @@ class KeyBindingManager:
             for i, entry in enumerate(self.entry_list):
                 self._bind_vec_entry(i, entry)
 
-    def _bind_mat_entry(
-        self,
-        row: int,
-        column: int,
-        entry: CustomEntry,
-    ) -> None:
+    def _bind_mat_entry(self, row: int, column: int, entry: CustomEntry) -> None:
         """
         Crea los bindings de teclas de flecha
         para un entry de una matriz.
@@ -93,11 +85,7 @@ class KeyBindingManager:
         entry.bind("<Right>", lambda _: self._entry_move_right(row, column))
         entry.bind("<Control-Tab>", self.autocomplete_all)
 
-    def _bind_vec_entry(
-        self,
-        row: int,
-        entry: CustomEntry,
-    ) -> None:
+    def _bind_vec_entry(self, row: int, entry: CustomEntry) -> None:
         """
         Crea los bindings de teclas de flecha
         para un entry de un vector.
@@ -126,10 +114,7 @@ class KeyBindingManager:
                 KeyBindingManager.focus_dimensiones(data_entry)
 
     def _entry_move_down(
-        self,
-        row: int,
-        column: int,
-        nombre_entry: CustomEntry,
+        self, row: int, column: int, nombre_entry: CustomEntry
     ) -> None:
         """
         Cambia el foco a la siguiente entry,

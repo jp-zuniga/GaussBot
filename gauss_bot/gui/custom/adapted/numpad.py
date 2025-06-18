@@ -9,19 +9,9 @@ Transformed for use as a calculator-like numpad
 with mathematical functions for use in this project.
 """
 
-from re import (
-    compile as comp,
-    escape,
-)
-from tkinter import (
-    END,
-    INSERT,
-    Event,
-)
-from typing import (
-    TYPE_CHECKING,
-    Optional,
-)
+from re import compile as comp, escape
+from tkinter import END, INSERT, Event
+from typing import TYPE_CHECKING, Optional
 
 from customtkinter import (
     CTkButton as ctkButton,
@@ -91,10 +81,7 @@ class CustomNumpad(ctkTop):
 
         self.fg_color = ThemeManager.theme["CTkFrame"]["fg_color"]
         self.show_frame = ctkFrame(
-            self,
-            fg_color=self.fg_color,
-            corner_radius=0,
-            border_width=3,
+            self, fg_color=self.fg_color, corner_radius=0, border_width=3
         )
 
         self.show_frame.columnconfigure(0, weight=1)

@@ -14,10 +14,7 @@ Operaciones implementadas:
 from fractions import Fraction
 
 from ..models import Vector
-from ..utils import (
-    format_factor,
-    format_proc_num,
-)
+from ..utils import format_factor, format_proc_num
 
 
 class VectoresManager:
@@ -127,7 +124,7 @@ class VectoresManager:
                     )
                 }"
                 for i in range(len(vec1))
-            ],
+            ]
         )
 
         proc = "---------------------------------------------\n"
@@ -141,9 +138,7 @@ class VectoresManager:
         return (proc, nombre_vec_resultado, vec_resultado)
 
     def escalar_por_vec(
-        self,
-        escalar: Fraction,
-        nombre_vec: str,
+        self, escalar: Fraction, nombre_vec: str
     ) -> tuple[str, str, Vector]:
         """
         Multiplica un vector por un escalar.
@@ -181,9 +176,7 @@ class VectoresManager:
         return (proc, nombre_vec_multiplicado, vec_multiplicado)
 
     def producto_punto(
-        self,
-        nombre_vec1: str,
-        nombre_vec2: str,
+        self, nombre_vec1: str, nombre_vec2: str
     ) -> tuple[str, str, Fraction]:
         """
         Calcula el producto punto de los dos vectores indicados.
@@ -205,8 +198,7 @@ class VectoresManager:
             componentes=[
                 f"{
                     format_factor(  # type: ignore
-                        vec1[i].limit_denominator(1000),
-                        mult=False,
+                        vec1[i].limit_denominator(1000), mult=False
                     )
                 }"
                 for i in range(len(vec1))
@@ -217,8 +209,7 @@ class VectoresManager:
             componentes=[
                 f"{
                     format_factor(  # type: ignore
-                        vec2[i].limit_denominator(1000),
-                        mult=False,
+                        vec2[i].limit_denominator(1000), mult=False
                     )
                 }"
                 for i in range(len(vec2))
@@ -232,7 +223,7 @@ class VectoresManager:
                         (
                             vec1[i].limit_denominator(1000),
                             vec2[i].limit_denominator(1000),
-                        ),
+                        )
                     )
                 }"
                 for i in range(len(vec1))

@@ -5,10 +5,7 @@ las raíces de funciones matemáticas.
 """
 
 from tkinter import Variable
-from typing import (
-    TYPE_CHECKING,
-    Optional,
-)
+from typing import TYPE_CHECKING, Optional
 
 from customtkinter import (
     CTkButton as ctkButton,
@@ -16,17 +13,10 @@ from customtkinter import (
     CTkLabel as ctkLabel,
 )
 
-from ...custom import (
-    CustomDropdown,
-    CustomScrollFrame,
-)
+from ...custom import CustomDropdown, CustomScrollFrame
 from ....managers import FuncManager
 from ....models import Func
-from ....utils import (
-    delete_msg_frame,
-    generate_sep,
-    place_msg_frame,
-)
+from ....utils import delete_msg_frame, generate_sep, place_msg_frame
 
 if TYPE_CHECKING:
     from .. import AnalisisFrame
@@ -58,9 +48,7 @@ class DerivadasFrame(CustomScrollFrame):
         self.func_select = CustomDropdown(
             self,
             width=40,
-            variable=Variable(
-                value="Seleccione una función para derivar:",
-            ),
+            variable=Variable(value="Seleccione una función para derivar:"),
             values=self.nombres_funcs,
             command=self.mostrar_func,
         )
@@ -79,17 +67,13 @@ class DerivadasFrame(CustomScrollFrame):
                 widget.destroy()  # type: ignore
 
         self.func = self.func_manager.funcs_ingresadas[nombre_func]
-        ctkLabel(
-            self,
-            text="",
-            image=self.func.get_png(),
-        ).grid(row=1, column=0, pady=(10, 5), sticky="n")
+        ctkLabel(self, text="", image=self.func.get_png()).grid(
+            row=1, column=0, pady=(10, 5), sticky="n"
+        )
 
-        ctkLabel(
-            self,
-            text="",
-            image=generate_sep(False, (250, 5)),
-        ).grid(row=2, column=0, sticky="n")
+        ctkLabel(self, text="", image=generate_sep(False, (250, 5))).grid(
+            row=2, column=0, sticky="n"
+        )
 
         ctkButton(
             self,

@@ -8,11 +8,7 @@ from os import path
 ASSET_PATH = path.join(path.dirname(path.realpath(__file__)), "assets")
 
 # root folder de todos los datos
-DATA_PATH = path.join(
-    path.expanduser("~"),
-    "GaussBot",
-    "data",
-)
+DATA_PATH = path.join(path.expanduser("~"), "GaussBot", "data")
 
 THEMES_PATH = path.join(ASSET_PATH, "themes")
 NUMPAD_ICON_PATH = path.join(ASSET_PATH, "numpad_icons")

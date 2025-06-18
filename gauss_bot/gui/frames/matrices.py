@@ -3,11 +3,7 @@ Implementación de MatricesFrame, el parent frame
 de todos los subframes relacionados con matrices.
 """
 
-from typing import (
-    TYPE_CHECKING,
-    Optional,
-    Union,
-)
+from typing import TYPE_CHECKING, Optional, Union
 
 from customtkinter import (
     CTkButton as ctkButton,
@@ -22,14 +18,8 @@ from .subframes import (
     SumaRestaTab,
     TransposicionTab,
 )
-from ..custom import (
-    CustomScrollFrame,
-    ErrorFrame,
-)
-from ...managers import (
-    MatricesManager,
-    VectoresManager,
-)
+from ..custom import CustomScrollFrame, ErrorFrame
+from ...managers import MatricesManager, VectoresManager
 from ...utils import INPUTS_ICON
 
 if TYPE_CHECKING:
@@ -100,8 +90,7 @@ class MatricesFrame(ctkFrame):
             # agregar boton para dirigir al usuario adonde se agregan
             self.dummy_frame = ctkFrame(self, fg_color="transparent")
             self.msg_frame = ErrorFrame(
-                self.dummy_frame,
-                msg="No se ha guardado ninguna matriz!",
+                self.dummy_frame, msg="No se ha guardado ninguna matriz!"
             )
 
             agregar_button = ctkButton(

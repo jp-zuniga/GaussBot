@@ -14,14 +14,8 @@ Operaciones implementadas:
 
 from fractions import Fraction
 
-from ..models import (
-    Matriz,
-    SistemaEcuaciones,
-)
-from ..utils import (
-    format_factor,
-    format_proc_num,
-)
+from ..models import Matriz, SistemaEcuaciones
+from ..utils import format_factor, format_proc_num
 
 
 class MatricesManager:
@@ -257,10 +251,7 @@ class MatricesManager:
                 [
                     f"{
                         format_proc_num(  # type: ignore
-                            (
-                                escalar,
-                                mat[f, c].limit_denominator(1000),
-                            )
+                            (escalar, mat[f, c].limit_denominator(1000))
                         )
                     }"
                     for c in range(mat.columnas)

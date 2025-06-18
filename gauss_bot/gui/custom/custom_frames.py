@@ -2,11 +2,7 @@
 Implementaciones de frames personalizados.
 """
 
-from typing import (
-    Any,
-    Optional,
-    Union,
-)
+from typing import Any, Optional, Union
 
 from customtkinter import (
     CTkFrame as ctkFrame,
@@ -15,10 +11,7 @@ from customtkinter import (
     CTkScrollableFrame as ctkScrollFrame,
 )
 
-from ...utils import (
-    CHECK_ICON,
-    ERROR_ICON,
-)
+from ...utils import CHECK_ICON, ERROR_ICON
 
 
 class CustomScrollFrame(ctkScrollFrame):
@@ -38,9 +31,7 @@ class ErrorFrame(ctkFrame):
     """
 
     def __init__(
-        self,
-        master: Union[ctkFrame, CustomScrollFrame],
-        msg: Optional[str],
+        self, master: Union[ctkFrame, CustomScrollFrame], msg: Optional[str]
     ) -> None:
         super().__init__(
             master,
@@ -56,21 +47,13 @@ class ErrorFrame(ctkFrame):
 
         self.error_icon_label = ctkLabel(self, text="", image=ERROR_ICON)
         self.error_icon_label.grid(
-            row=0,
-            column=0,
-            padx=(15, 10),
-            pady=10,
-            sticky="nse",
+            row=0, column=0, padx=(15, 10), pady=10, sticky="nse"
         )
 
         if msg is not None:
             self.mensaje_error = ctkLabel(self, text=msg)
             self.mensaje_error.grid(
-                row=0,
-                column=1,
-                padx=(10, 15),
-                pady=10,
-                sticky="nsw",
+                row=0, column=1, padx=(10, 15), pady=10, sticky="nsw"
             )
 
     def destroy(self) -> None:
@@ -84,9 +67,7 @@ class SuccessFrame(ctkFrame):
     """
 
     def __init__(
-        self,
-        master: Union[ctkFrame, CustomScrollFrame],
-        msg: Optional[str],
+        self, master: Union[ctkFrame, CustomScrollFrame], msg: Optional[str]
     ) -> None:
         super().__init__(
             master,
@@ -102,21 +83,13 @@ class SuccessFrame(ctkFrame):
 
         self.check_icon_label = ctkLabel(self, text="", image=CHECK_ICON)
         self.check_icon_label.grid(
-            row=0,
-            column=0,
-            padx=(15, 10),
-            pady=10,
-            sticky="nse",
+            row=0, column=0, padx=(15, 10), pady=10, sticky="nse"
         )
 
         if msg is not None:
             self.mensaje_exito = ctkLabel(self, text=msg)
             self.mensaje_exito.grid(
-                row=0,
-                column=1,
-                padx=(10, 15),
-                pady=10,
-                sticky="nsw",
+                row=0, column=1, padx=(10, 15), pady=10, sticky="nsw"
             )
 
     def destroy(self) -> None:

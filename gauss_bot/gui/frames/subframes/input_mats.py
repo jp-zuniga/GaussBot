@@ -3,21 +3,12 @@ Implementación de los subframes de ManejarMats.
 """
 
 from fractions import Fraction
-from random import (
-    choice,
-    randint,
-)
+from random import choice, randint
 from string import ascii_uppercase
 from tkinter import Variable
-from typing import (
-    TYPE_CHECKING,
-    Optional,
-)
+from typing import TYPE_CHECKING, Optional
 
-from customtkinter import (
-    CTkFrame as ctkFrame,
-    CTkLabel as ctkLabel,
-)
+from customtkinter import CTkFrame as ctkFrame, CTkLabel as ctkLabel
 
 from ...custom import (
     CustomDropdown,
@@ -27,10 +18,7 @@ from ...custom import (
     IconButton,
     SuccessFrame,
 )
-from ....managers import (
-    KeyBindingManager,
-    MatricesManager,
-)
+from ....managers import KeyBindingManager, MatricesManager
 from ....models import Matriz
 from ....utils import (
     ACEPTAR_ICON,
@@ -81,15 +69,11 @@ class AgregarMats(CustomScrollFrame):
         columnas_label = ctkLabel(self.pre_mat_frame, text="Columnas:")
 
         self.filas_entry = CustomEntry(
-            self.pre_mat_frame,
-            width=30,
-            placeholder_text="3",
+            self.pre_mat_frame, width=30, placeholder_text="3"
         )
 
         self.columnas_entry = CustomEntry(
-            self.pre_mat_frame,
-            width=30,
-            placeholder_text="3",
+            self.pre_mat_frame, width=30, placeholder_text="3"
         )
 
         ingresar_button = IconButton(
@@ -112,25 +96,21 @@ class AgregarMats(CustomScrollFrame):
         # para que se pueda navegar con las flechas
         self.filas_entry.bind("<Return>", lambda _: self.generar_casillas())
         self.filas_entry.bind(
-            "<Left>",
-            lambda _: self.key_binder.focus_columnas(self.columnas_entry),
+            "<Left>", lambda _: self.key_binder.focus_columnas(self.columnas_entry)
         )
 
         self.filas_entry.bind(
-            "<Right>",
-            lambda _: self.key_binder.focus_columnas(self.columnas_entry),
+            "<Right>", lambda _: self.key_binder.focus_columnas(self.columnas_entry)
         )
 
         self.filas_entry.bind("<Down>", lambda _: self.key_binder.focus_first())
         self.columnas_entry.bind("<Return>", lambda _: self.generar_casillas())
         self.columnas_entry.bind(
-            "<Left>",
-            lambda _: self.key_binder.focus_filas(self.filas_entry),
+            "<Left>", lambda _: self.key_binder.focus_filas(self.filas_entry)
         )
 
         self.columnas_entry.bind(
-            "<Right>",
-            lambda _: self.key_binder.focus_filas(self.filas_entry),
+            "<Right>", lambda _: self.key_binder.focus_filas(self.filas_entry)
         )
 
         self.columnas_entry.bind("<Down>", lambda _: self.key_binder.focus_first())
@@ -218,21 +198,9 @@ class AgregarMats(CustomScrollFrame):
         )
 
         # colocar parent frames
-        self.matriz_frame.grid(
-            row=1,
-            column=0,
-            padx=5,
-            pady=5,
-            sticky="n",
-        )
+        self.matriz_frame.grid(row=1, column=0, padx=5, pady=5, sticky="n")
 
-        self.post_mat_frame.grid(
-            row=2,
-            column=0,
-            padx=5,
-            pady=5,
-            sticky="n",
-        )
+        self.post_mat_frame.grid(row=2, column=0, padx=5, pady=5, sticky="n")
 
         # colocar widgets
         nombre_label.grid(row=0, column=0, padx=5, pady=5)
@@ -516,7 +484,7 @@ class MostrarMats(CustomScrollFrame):
             self.setup_frame()
         else:
             self.select_opcion.configure(
-                variable=Variable(value="Seleccione un filtro:"),
+                variable=Variable(value="Seleccione un filtro:")
             )
 
     def update_opcion(self, valor: str) -> None:

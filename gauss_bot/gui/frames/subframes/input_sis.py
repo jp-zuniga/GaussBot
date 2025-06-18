@@ -3,21 +3,12 @@ Implementación de los subframes de ManejarSistemas.
 """
 
 from fractions import Fraction
-from random import (
-    choice,
-    randint,
-)
+from random import choice, randint
 from string import ascii_uppercase
 from tkinter import Variable
-from typing import (
-    TYPE_CHECKING,
-    Optional,
-)
+from typing import TYPE_CHECKING, Optional
 
-from customtkinter import (
-    CTkFrame as ctkFrame,
-    CTkLabel as ctkLabel,
-)
+from customtkinter import CTkFrame as ctkFrame, CTkLabel as ctkLabel
 
 from ...custom import (
     CustomDropdown,
@@ -27,10 +18,7 @@ from ...custom import (
     IconButton,
     SuccessFrame,
 )
-from ....managers import (
-    KeyBindingManager,
-    MatricesManager,
-)
+from ....managers import KeyBindingManager, MatricesManager
 from ....models import Matriz
 from ....utils import (
     ACEPTAR_ICON,
@@ -113,23 +101,19 @@ class AgregarSistemas(CustomScrollFrame):
         self.variables_entry.bind("<Down>", lambda _: self.key_binder.focus_first())
 
         self.ecuaciones_entry.bind(
-            "<Left>",
-            lambda _: self.key_binder.focus_columnas(self.variables_entry),
+            "<Left>", lambda _: self.key_binder.focus_columnas(self.variables_entry)
         )
 
         self.ecuaciones_entry.bind(
-            "<Right>",
-            lambda _: self.key_binder.focus_columnas(self.variables_entry),
+            "<Right>", lambda _: self.key_binder.focus_columnas(self.variables_entry)
         )
 
         self.variables_entry.bind(
-            "<Left>",
-            lambda _: self.key_binder.focus_filas(self.ecuaciones_entry),
+            "<Left>", lambda _: self.key_binder.focus_filas(self.ecuaciones_entry)
         )
 
         self.variables_entry.bind(
-            "<Right>",
-            lambda _: self.key_binder.focus_filas(self.ecuaciones_entry),
+            "<Right>", lambda _: self.key_binder.focus_filas(self.ecuaciones_entry)
         )
 
         # colocar widgets
@@ -173,9 +157,7 @@ class AgregarSistemas(CustomScrollFrame):
 
         # crear separador para la columna de constantes
         sep_label = ctkLabel(
-            self.sis_frame,
-            text="",
-            image=generate_sep(True, (8, 40 * ecuaciones)),
+            self.sis_frame, text="", image=generate_sep(True, (8, 40 * ecuaciones))
         )
 
         # crear entries para ingresar elementos
@@ -227,21 +209,9 @@ class AgregarSistemas(CustomScrollFrame):
         )
 
         # colocar parent frames
-        self.sis_frame.grid(
-            row=1,
-            column=0,
-            padx=5,
-            pady=5,
-            sticky="n",
-        )
+        self.sis_frame.grid(row=1, column=0, padx=5, pady=5, sticky="n")
 
-        self.post_sis_frame.grid(
-            row=2,
-            column=0,
-            padx=5,
-            pady=5,
-            sticky="n",
-        )
+        self.post_sis_frame.grid(row=2, column=0, padx=5, pady=5, sticky="n")
 
         # colocar widgets
         nombre_label.grid(row=0, column=0, padx=5, pady=5)
@@ -521,7 +491,7 @@ class MostrarSistemas(CustomScrollFrame):
             self.setup_frame()
         else:
             self.select_opcion.configure(
-                variable=Variable(value="Seleccione un filtro:"),
+                variable=Variable(value="Seleccione un filtro:")
             )
 
     def update_opcion(self, valor: str) -> None:

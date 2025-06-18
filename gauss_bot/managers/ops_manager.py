@@ -5,30 +5,12 @@ los datos de MatricesManager y VectoresManager.
 """
 
 from fractions import Fraction
-from json import (
-    JSONDecodeError,
-    dump,
-    load,
-)
-from os import (
-    makedirs,
-    path,
-)
+from json import JSONDecodeError, dump, load
+from os import makedirs, path
 
 from . import MatricesManager, VectoresManager
-from ..models import (
-    FractionDecoder,
-    FractionEncoder,
-    Matriz,
-    Vector,
-)
-from ..utils import (
-    LOGGER,
-    MATRICES_PATH,
-    SISTEMAS_PATH,
-    VECTORES_PATH,
-    format_proc_num,
-)
+from ..models import FractionDecoder, FractionEncoder, Matriz, Vector
+from ..utils import LOGGER, MATRICES_PATH, SISTEMAS_PATH, VECTORES_PATH, format_proc_num
 
 
 class OpsManager:
@@ -62,11 +44,7 @@ class OpsManager:
             else vecs_manager
         )
 
-    def mat_por_vec(
-        self,
-        nombre_mat: str,
-        nombre_vec: str,
-    ) -> tuple[str, str, Matriz]:
+    def mat_por_vec(self, nombre_mat: str, nombre_vec: str) -> tuple[str, str, Matriz]:
         """
         Realiza la multiplicación de una matriz por un vector.
         - ArithmeticError: si la matriz y el vector no son compatibles
@@ -109,7 +87,7 @@ class OpsManager:
                         (
                             mat[i, j].limit_denominator(1000),
                             vec.componentes[j].limit_denominator(1000),
-                        ),
+                        )
                     )
                     for j in range(len(vec))
                 ]

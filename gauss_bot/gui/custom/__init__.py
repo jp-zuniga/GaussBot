@@ -9,17 +9,8 @@ from .adapted import (
     CustomTable,
     Tooltip,
 )
-from .custom_frames import (
-    CustomScrollFrame,
-    ErrorFrame,
-    ResultadoFrame,
-    SuccessFrame,
-)
-from .custom_widgets import (
-    CustomDropdown,
-    CustomEntry,
-    IconButton,
-)
+from .custom_frames import CustomScrollFrame, ErrorFrame, ResultadoFrame, SuccessFrame
+from .custom_widgets import CustomDropdown, CustomEntry, IconButton
 
 __all__ = [
     "CustomDropdown",

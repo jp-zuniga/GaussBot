@@ -4,14 +4,8 @@ para leer y escribir objetos Fraction() a archivos .json.
 """
 
 from fractions import Fraction
-from json import (
-    JSONDecoder,
-    JSONEncoder,
-)
-from typing import (
-    Any,
-    Union,
-)
+from json import JSONDecoder, JSONEncoder
+from typing import Any, Union
 
 
 class FractionEncoder(JSONEncoder):

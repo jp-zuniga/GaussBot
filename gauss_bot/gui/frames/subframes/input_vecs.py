@@ -3,21 +3,12 @@ Implementación de los subframes de ManejarVecs.
 """
 
 from fractions import Fraction
-from random import (
-    choice,
-    randint,
-)
+from random import choice, randint
 from string import ascii_lowercase
 from tkinter import Variable
-from typing import (
-    TYPE_CHECKING,
-    Optional,
-)
+from typing import TYPE_CHECKING, Optional
 
-from customtkinter import (
-    CTkFrame as ctkFrame,
-    CTkLabel as ctkLabel,
-)
+from customtkinter import CTkFrame as ctkFrame, CTkLabel as ctkLabel
 
 from ...custom import (
     CustomDropdown,
@@ -27,10 +18,7 @@ from ...custom import (
     IconButton,
     SuccessFrame,
 )
-from ....managers import (
-    KeyBindingManager,
-    VectoresManager,
-)
+from ....managers import KeyBindingManager, VectoresManager
 from ....models import Vector
 from ....utils import (
     ACEPTAR_ICON,
@@ -80,9 +68,7 @@ class AgregarVecs(CustomScrollFrame):
         # crear widgets iniciales para ingresar dimensiones
         dimension_label = ctkLabel(self.pre_vec_frame, text="Dimensiones:")
         self.dimension_entry = CustomEntry(
-            self.pre_vec_frame,
-            width=30,
-            placeholder_text="3",
+            self.pre_vec_frame, width=30, placeholder_text="3"
         )
 
         ingresar_button = IconButton(
@@ -442,7 +428,7 @@ class MostrarVecs(CustomScrollFrame):
             self.setup_frame()
         else:
             self.select_opcion.configure(
-                variable=Variable(value="Seleccione un filtro:"),
+                variable=Variable(value="Seleccione un filtro:")
             )
 
     def update_opcion(self, valor: str) -> None:

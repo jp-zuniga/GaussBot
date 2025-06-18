@@ -3,12 +3,7 @@ Funciones para colocar y eliminar los
 frames de mensaje de la aplicación.
 """
 
-from typing import (
-    TYPE_CHECKING,
-    Literal,
-    Optional,
-    Union,
-)
+from typing import TYPE_CHECKING, Literal, Optional, Union
 
 from customtkinter import (
     CTkFont as ctkFont,
@@ -18,12 +13,7 @@ from customtkinter import (
 )
 
 from .icons import APP_ICON
-from ..gui.custom import (
-    CustomScrollFrame,
-    ErrorFrame,
-    ResultadoFrame,
-    SuccessFrame,
-)
+from ..gui.custom import CustomScrollFrame, ErrorFrame, ResultadoFrame, SuccessFrame
 
 if TYPE_CHECKING:
     from ..gui import GaussUI
@@ -130,35 +120,19 @@ def toggle_proc(
     elif app.modo_actual == "light":
         i = 1
 
-    parent_frame.after(
-        250,
-        lambda: new_window.iconbitmap(APP_ICON[i]),
-    )
+    parent_frame.after(250, lambda: new_window.iconbitmap(APP_ICON[i]))
 
-    new_window.protocol(
-        "WM_DELETE_WINDOW",
-        lambda: delete_window(new_window),
-    )
+    new_window.protocol("WM_DELETE_WINDOW", lambda: delete_window(new_window))
 
     dummy_frame = ctkFrame(
-        new_window,
-        fg_color="transparent",
-        corner_radius=20,
-        border_width=3,
+        new_window, fg_color="transparent", corner_radius=20, border_width=3
     )
 
     dummy_frame.pack(expand=True, fill="both", padx=20, pady=20)
-    proc_frame = CustomScrollFrame(
-        dummy_frame,
-        fg_color="transparent",
-    )
+    proc_frame = CustomScrollFrame(dummy_frame, fg_color="transparent")
 
     proc_frame.pack(expand=True, fill="both", padx=10, pady=10)
-    proc_label = ctkLabel(
-        proc_frame,
-        text=label_txt.strip(),
-        font=ctkFont(size=14),
-    )
+    proc_label = ctkLabel(proc_frame, text=label_txt.strip(), font=ctkFont(size=14))
 
     proc_label.pack(expand=True, fill="both", padx=10, pady=10)
     proc_hidden = False

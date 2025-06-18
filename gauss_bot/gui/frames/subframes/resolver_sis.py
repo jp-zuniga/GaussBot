@@ -4,10 +4,7 @@ resuelve sistemas de ecuaciones lineales.
 """
 
 from tkinter import Variable
-from typing import (
-    TYPE_CHECKING,
-    Optional,
-)
+from typing import TYPE_CHECKING, Optional
 
 from customtkinter import (
     CTkButton as ctkButton,
@@ -15,10 +12,7 @@ from customtkinter import (
     CTkLabel as ctkLabel,
 )
 
-from ...custom import (
-    CustomDropdown,
-    CustomScrollFrame,
-)
+from ...custom import CustomDropdown, CustomScrollFrame
 from ....managers import MatricesManager
 from ....models import SistemaEcuaciones
 from ....utils import (
@@ -54,10 +48,7 @@ class ResolverSisFrame(CustomScrollFrame):
         self.columnconfigure(0, weight=1)
 
         self.msg_frame: Optional[ctkFrame] = None
-        self.metodos: dict[str, str] = {
-            "Gauss−Jordan": "gj",
-            "Regla de Cramer": "c",
-        }
+        self.metodos: dict[str, str] = {"Gauss−Jordan": "gj", "Regla de Cramer": "c"}
 
         # definir atributos, se inicializan en setup_frame
         self.select_sis_mat: CustomDropdown
@@ -212,25 +203,19 @@ class ResolverSisFrame(CustomScrollFrame):
             ):
                 widget.destroy()  # type: ignore
 
-        ctkLabel(
-            self,
-            text=str(self.mats_manager.sis_ingresados[self.sis_mat]),
-        ).grid(row=1, column=0, pady=10, sticky="n")
+        ctkLabel(self, text=str(self.mats_manager.sis_ingresados[self.sis_mat])).grid(
+            row=1, column=0, pady=10, sticky="n"
+        )
 
-        ctkLabel(
-            self,
-            text="",
-            image=generate_sep(False, (300, 3)),
-        ).grid(row=2, column=0, sticky="n")
+        ctkLabel(self, text="", image=generate_sep(False, (300, 3))).grid(
+            row=2, column=0, sticky="n"
+        )
 
         self.select_metodo.grid_configure(row=3)
         if "" not in (self.sis_mat, self.met):
-            ctkButton(
-                self,
-                height=30,
-                text="Resolver",
-                command=self.resolver,
-            ).grid(row=4, column=0, pady=5, sticky="n")
+            ctkButton(self, height=30, text="Resolver", command=self.resolver).grid(
+                row=4, column=0, pady=5, sticky="n"
+            )
 
     def update_metodo(self, valor: str) -> None:
         """
@@ -244,9 +229,6 @@ class ResolverSisFrame(CustomScrollFrame):
                 widget.destroy()  # type: ignore
 
         if "" not in (self.sis_mat, self.met):
-            ctkButton(
-                self,
-                height=30,
-                text="Resolver",
-                command=self.resolver,
-            ).grid(row=4, column=0, pady=5, sticky="n")
+            ctkButton(self, height=30, text="Resolver", command=self.resolver).grid(
+                row=4, column=0, pady=5, sticky="n"
+            )

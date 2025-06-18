@@ -4,15 +4,9 @@ ManejarMats, y ManejarVecs, los frames que contienen
 subframes para agregar, mostrar, y eliminar los datos.
 """
 
-from typing import (
-    TYPE_CHECKING,
-    Union,
-)
+from typing import TYPE_CHECKING, Union
 
-from customtkinter import (
-    CTkFrame as ctkFrame,
-    CTkTabview as ctkTabview,
-)
+from customtkinter import CTkFrame as ctkFrame, CTkTabview as ctkTabview
 
 from .subframes import (
     AgregarFuncs,
@@ -29,11 +23,7 @@ from .subframes import (
     MostrarVecs,
 )
 from ..custom import CustomScrollFrame
-from ...managers import (
-    FuncManager,
-    MatricesManager,
-    VectoresManager,
-)
+from ...managers import FuncManager, MatricesManager, VectoresManager
 
 if TYPE_CHECKING:
     from .. import GaussUI
@@ -56,12 +46,7 @@ class InputsFrame(ctkFrame):
         self.func_manager, self.mats_manager, self.vecs_manager = managers
 
         self.instances: list[
-            Union[
-                ManejarFuncs,
-                ManejarSistemas,
-                ManejarMats,
-                ManejarVecs,
-            ]
+            Union[ManejarFuncs, ManejarSistemas, ManejarMats, ManejarVecs]
         ]
 
         self.tabview: ctkTabview
@@ -184,23 +169,10 @@ class ManejarMats(ctkFrame):
         self.master_frame = master_frame
         self.mats_manager = mats_manager
 
-        self.instances: list[
-            Union[
-                AgregarMats,
-                MostrarMats,
-                EliminarMats,
-            ]
-        ]
+        self.instances: list[Union[AgregarMats, MostrarMats, EliminarMats]]
 
         self.tabs: list[
-            tuple[
-                str,
-                Union[
-                    type[AgregarMats],
-                    type[MostrarMats],
-                    type[EliminarMats],
-                ],
-            ]
+            tuple[str, Union[type[AgregarMats], type[MostrarMats], type[EliminarMats]]]
         ]
 
         self.tabview: ctkTabview
@@ -259,23 +231,10 @@ class ManejarVecs(ctkFrame):
         self.master_frame = master_frame
         self.vecs_manager = vecs_manager
 
-        self.instances: list[
-            Union[
-                AgregarVecs,
-                MostrarVecs,
-                EliminarVecs,
-            ]
-        ]
+        self.instances: list[Union[AgregarVecs, MostrarVecs, EliminarVecs]]
 
         self.tabs: list[
-            tuple[
-                str,
-                Union[
-                    type[AgregarVecs],
-                    type[MostrarVecs],
-                    type[EliminarVecs],
-                ],
-            ]
+            tuple[str, Union[type[AgregarVecs], type[MostrarVecs], type[EliminarVecs]]]
         ]
 
         self.tabview: ctkTabview
@@ -335,22 +294,11 @@ class ManejarFuncs(ctkFrame):
         self.master_frame = master_frame
         self.func_manager = func_manager
 
-        self.instances: list[
-            Union[
-                AgregarFuncs,
-                MostrarFuncs,
-                EliminarFuncs,
-            ]
-        ]
+        self.instances: list[Union[AgregarFuncs, MostrarFuncs, EliminarFuncs]]
 
         self.tabs: list[
             tuple[
-                str,
-                Union[
-                    type[AgregarFuncs],
-                    type[MostrarFuncs],
-                    type[EliminarFuncs],
-                ],
+                str, Union[type[AgregarFuncs], type[MostrarFuncs], type[EliminarFuncs]]
             ]
         ]
 
@@ -376,10 +324,7 @@ class ManejarFuncs(ctkFrame):
         for nombre, cls in tabs:
             tab = self.tabview.add(nombre)
             tab_instance: CustomScrollFrame = cls(
-                self.app,
-                tab,
-                self,
-                self.func_manager,
+                self.app, tab, self, self.func_manager
             )
 
             tab_instance.pack(expand=True, fill="both")
@@ -413,21 +358,13 @@ class ManejarSistemas(ctkFrame):
         self.master_frame = master_frame
         self.mats_manager = mats_manager
 
-        self.instances: list[
-            Union[
-                AgregarSistemas,
-                MostrarSistemas,
-                EliminarSistemas,
-            ]
-        ]
+        self.instances: list[Union[AgregarSistemas, MostrarSistemas, EliminarSistemas]]
 
         self.tabs: list[
             tuple[
                 str,
                 Union[
-                    type[AgregarSistemas],
-                    type[MostrarSistemas],
-                    type[EliminarSistemas],
+                    type[AgregarSistemas], type[MostrarSistemas], type[EliminarSistemas]
                 ],
             ]
         ]

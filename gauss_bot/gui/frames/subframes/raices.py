@@ -4,18 +4,11 @@ un frame que permite encontrar
 las raíces de funciones matemáticas.
 """
 
-from decimal import (
-    Decimal,
-    getcontext,
-)
+from decimal import Decimal, getcontext
 from fractions import Fraction
 from random import randint
 from tkinter import Variable
-from typing import (
-    TYPE_CHECKING,
-    Optional,
-    Union,
-)
+from typing import TYPE_CHECKING, Optional, Union
 
 from customtkinter import (
     CTkButton as ctkButton,
@@ -24,12 +17,7 @@ from customtkinter import (
     CTkLabel as ctkLabel,
     CTkToplevel as ctkTop,
 )
-from sympy import (
-    Contains,
-    I,
-    Interval,
-    zoo,
-)
+from sympy import Contains, I, Interval, zoo
 
 from ...custom import (
     CustomDropdown,
@@ -38,18 +26,9 @@ from ...custom import (
     CustomTable,
     IconButton,
 )
-from ....managers import (
-    MARGEN_ERROR,
-    MAX_ITERACIONES,
-    FuncManager,
-)
+from ....managers import MARGEN_ERROR, MAX_ITERACIONES, FuncManager
 from ....models import Func
-from ....utils import (
-    APP_ICON,
-    INFO_ICON,
-    generate_sep,
-    place_msg_frame,
-)
+from ....utils import APP_ICON, INFO_ICON, generate_sep, place_msg_frame
 
 if TYPE_CHECKING:
     from .. import AnalisisFrame
@@ -112,7 +91,7 @@ class RaicesFrame(CustomScrollFrame):
             width=40,
             values=self.nombres_funcs,
             variable=Variable(
-                value="Seleccione una función para encontrar sus raíces:",
+                value="Seleccione una función para encontrar sus raíces:"
             ),
             command=self.mostrar_func,
         )
@@ -135,17 +114,13 @@ class RaicesFrame(CustomScrollFrame):
         for widget in self.resultado.winfo_children():  # type: ignore
             widget.destroy()  # type: ignore
 
-        ctkLabel(
-            self.metodo_frame,
-            text="",
-            image=self.func.get_png(),
-        ).grid(row=0, column=0, pady=5, sticky="n")
+        ctkLabel(self.metodo_frame, text="", image=self.func.get_png()).grid(
+            row=0, column=0, pady=5, sticky="n"
+        )
 
-        ctkLabel(
-            self.metodo_frame,
-            text="",
-            image=generate_sep(False, (250, 5)),
-        ).grid(row=1, column=0, sticky="n")
+        ctkLabel(self.metodo_frame, text="", image=generate_sep(False, (250, 5))).grid(
+            row=1, column=0, sticky="n"
+        )
 
         CustomDropdown(
             self.metodo_frame,
@@ -192,41 +167,32 @@ class RaicesFrame(CustomScrollFrame):
         de intervalo y margen de error para métodos cerrados.
         """
 
-        ctkLabel(
-            self.datos_frame,
-            text="Intervalo:",
-        ).grid(row=0, column=0, padx=5, pady=(5, 2), sticky="ne")
+        ctkLabel(self.datos_frame, text="Intervalo:").grid(
+            row=0, column=0, padx=5, pady=(5, 2), sticky="ne"
+        )
 
         self.a_entry = CustomEntry(
             self.datos_frame, width=60, placeholder_text=str(randint(-10, -1))
         )
 
         self.a_entry.grid(row=0, column=1, padx=5, pady=(5, 2), sticky="ne")
-        ctkLabel(
-            self.datos_frame,
-            text=",",
-            font=ctkFont(size=18),
-        ).grid(row=0, column=2, padx=3, pady=(5, 2), sticky="nw")
+        ctkLabel(self.datos_frame, text=",", font=ctkFont(size=18)).grid(
+            row=0, column=2, padx=3, pady=(5, 2), sticky="nw"
+        )
 
         self.b_entry = CustomEntry(
             self.datos_frame, width=60, placeholder_text=str(randint(1, 10))
         )
 
         self.b_entry.grid(row=0, column=3, padx=5, pady=(5, 2), sticky="nw")
-        ctkLabel(
-            self.datos_frame,
-            text="Margen de error:",
-        ).grid(row=1, column=0, padx=5, pady=(2, 5), sticky="ne")
+        ctkLabel(self.datos_frame, text="Margen de error:").grid(
+            row=1, column=0, padx=5, pady=(2, 5), sticky="ne"
+        )
 
         self.error_entry = CustomEntry(self.datos_frame)
         self.error_entry.insert(0, format(MARGEN_ERROR.normalize(), "f"))
         self.error_entry.grid(
-            row=1,
-            column=1,
-            columnspan=3,
-            padx=5,
-            pady=(2, 5),
-            sticky="nw",
+            row=1, column=1, columnspan=3, padx=5, pady=(2, 5), sticky="nw"
         )
 
         self.a_entry.bind("<Up>", lambda _: self.error_entry.focus_set())
@@ -254,8 +220,7 @@ class RaicesFrame(CustomScrollFrame):
         """
 
         ctkLabel(
-            self.datos_frame,
-            text="Valor inicial:" if newton else "Valores iniciales:",
+            self.datos_frame, text="Valor inicial:" if newton else "Valores iniciales:"
         ).grid(row=0, column=0, padx=5, pady=(5, 2), sticky="ne")
 
         xi_width = 140 if newton else 60
@@ -269,59 +234,34 @@ class RaicesFrame(CustomScrollFrame):
             )
 
             self.xi_entry.grid(row=0, column=1, padx=5, pady=(5, 2), sticky="nw")
-            ctkLabel(
-                self.datos_frame,
-                text=",",
-                font=ctkFont(size=18),
-            ).grid(row=0, column=2, padx=2, pady=(5, 2), sticky="nw")
-
-            self.xn_entry.grid(
-                row=0,
-                column=3,
-                padx=5,
-                pady=(5, 2),
-                sticky="nw",
+            ctkLabel(self.datos_frame, text=",", font=ctkFont(size=18)).grid(
+                row=0, column=2, padx=2, pady=(5, 2), sticky="nw"
             )
+
+            self.xn_entry.grid(row=0, column=3, padx=5, pady=(5, 2), sticky="nw")
         else:
             self.xi_entry.grid(
-                row=0,
-                column=1,
-                columnspan=3,
-                padx=5,
-                pady=(5, 2),
-                sticky="nw",
+                row=0, column=1, columnspan=3, padx=5, pady=(5, 2), sticky="nw"
             )
 
-        ctkLabel(
-            self.datos_frame,
-            text="Margen de error:",
-        ).grid(row=2, column=0, padx=5, pady=2, sticky="ne")
+        ctkLabel(self.datos_frame, text="Margen de error:").grid(
+            row=2, column=0, padx=5, pady=2, sticky="ne"
+        )
 
         self.error_entry = CustomEntry(self.datos_frame)
         self.error_entry.insert(0, format(MARGEN_ERROR.normalize(), "f"))
         self.error_entry.grid(
-            row=2,
-            column=1,
-            columnspan=3,
-            padx=5,
-            pady=2,
-            sticky="nw",
+            row=2, column=1, columnspan=3, padx=5, pady=2, sticky="nw"
         )
 
-        ctkLabel(
-            self.datos_frame,
-            text="Máximo de iteraciones:",
-        ).grid(row=3, column=0, padx=5, pady=(2, 5), sticky="ne")
+        ctkLabel(self.datos_frame, text="Máximo de iteraciones:").grid(
+            row=3, column=0, padx=5, pady=(2, 5), sticky="ne"
+        )
 
         self.iteraciones_entry = CustomEntry(self.datos_frame)
         self.iteraciones_entry.insert(0, MAX_ITERACIONES)
         self.iteraciones_entry.grid(
-            row=3,
-            column=1,
-            columnspan=3,
-            padx=5,
-            pady=(2, 5),
-            sticky="nw",
+            row=3, column=1, columnspan=3, padx=5, pady=(2, 5), sticky="nw"
         )
 
         self.xi_entry.bind("<Up>", lambda _: self.iteraciones_entry.focus_set())
@@ -524,8 +464,7 @@ class RaicesFrame(CustomScrollFrame):
             self.mostrar_r_abierto(resultado)  # type: ignore
 
     def mostrar_r_cerrado(
-        self,
-        resultado: Union[bool, tuple[Decimal, Decimal, list, int]],
+        self, resultado: Union[bool, tuple[Decimal, Decimal, list, int]]
     ) -> None:
         """
         Se encarga de mostrar los resultados de métodos cerrados.
@@ -570,10 +509,9 @@ class RaicesFrame(CustomScrollFrame):
                 + f"Raíz{' ' if fx == 0 else ' aproximada '}encontrada: "
             )
 
-            ctkLabel(
-                self.resultado,
-                text=interpretacion,
-            ).grid(row=0, column=0, pady=5, sticky="n")
+            ctkLabel(self.resultado, text=interpretacion).grid(
+                row=0, column=0, pady=5, sticky="n"
+            )
 
         self.msg_frame = place_msg_frame(
             parent_frame=self.resultado,
@@ -593,8 +531,7 @@ class RaicesFrame(CustomScrollFrame):
         ).grid(row=2, column=0, ipadx=5, pady=5, sticky="n")
 
     def mostrar_r_abierto(
-        self,
-        resultado: tuple[Decimal, Decimal, list, int, bool],
+        self, resultado: tuple[Decimal, Decimal, list, int, bool]
     ) -> None:
         """
         Se encarga de mostrar los resultados de métodos abiertos.
@@ -683,20 +620,11 @@ class RaicesFrame(CustomScrollFrame):
         self.after(100, new_window.focus)  # type: ignore
 
         if self.app.modo_actual == "dark":
-            self.after(
-                250,
-                lambda: new_window.iconbitmap(APP_ICON[0]),
-            )
+            self.after(250, lambda: new_window.iconbitmap(APP_ICON[0]))
         elif self.app.modo_actual == "light":
-            self.after(
-                250,
-                lambda: new_window.iconbitmap(APP_ICON[1]),
-            )
+            self.after(250, lambda: new_window.iconbitmap(APP_ICON[1]))
 
-        new_window.protocol(
-            "WM_DELETE_WINDOW",
-            lambda: delete_window(new_window),
-        )
+        new_window.protocol("WM_DELETE_WINDOW", lambda: delete_window(new_window))
 
         self.tabla_its = CustomTable(new_window, registro)
         self.tabla_its.pack(expand=True, fill="both", padx=20, pady=20)
@@ -716,21 +644,15 @@ class RaicesFrame(CustomScrollFrame):
         self.func_select.configure(
             values=self.nombres_funcs,
             variable=Variable(
-                value="Seleccione una función para encontrar sus raíces:",
+                value="Seleccione una función para encontrar sus raíces:"
             ),
         )
 
         if not self.table_hidden:
             if self.app.modo_actual == "dark":
-                self.after(
-                    250,
-                    lambda: self.tabla_its.parent.iconbitmap(APP_ICON[1]),
-                )
+                self.after(250, lambda: self.tabla_its.parent.iconbitmap(APP_ICON[1]))
             elif self.app.modo_actual == "light":
-                self.after(
-                    250,
-                    lambda: self.tabla_its.parent.iconbitmap(APP_ICON[0]),
-                )
+                self.after(250, lambda: self.tabla_its.parent.iconbitmap(APP_ICON[0]))
 
         for widget in self.metodo_frame.winfo_children():  # type: ignore
             widget.destroy()  # type: ignore

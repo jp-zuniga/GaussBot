@@ -5,28 +5,13 @@ Se encarga de aplicar diferentes métodos para encontrar
 raíces de las funciones ingresadas, y retorna los resultados.
 """
 
-from decimal import (
-    Decimal,
-    getcontext,
-)
-from json import (
-    JSONDecodeError,
-    dump,
-    load,
-)
-from os import (
-    makedirs,
-    path,
-)
+from decimal import Decimal, getcontext
+from json import JSONDecodeError, dump, load
+from os import makedirs, path
 from typing import Any, Optional, Union
 
 from customtkinter import CTkImage as ctkImage
-from sympy import (
-    I,
-    diff,
-    lambdify,
-    zoo,
-)
+from sympy import I, diff, lambdify, zoo
 from sympy.sets import Contains
 
 from ..models import Func
@@ -213,8 +198,7 @@ class FuncManager:
         """
 
         derivada = Func(
-            f"{func.nombre[0]}′({func.var})",
-            str(diff(func.expr, func.var)),
+            f"{func.nombre[0]}′({func.var})", str(diff(func.expr, func.var))
         )
 
         registro: list[str] = [
@@ -290,14 +274,7 @@ class FuncManager:
         un método abierto para encontrar raíces de funciones.
         """
 
-        registro: list[str] = [
-            [
-                "Iteración",
-                "x_i − 1",
-                "x_i",
-                "x_i + 1",
-            ]
-        ]
+        registro: list[str] = [["Iteración", "x_i − 1", "x_i", "x_i + 1"]]
 
         xi, xn = float(iniciales[0]), float(iniciales[1])
         f = lambdify(func.var, func.expr)
@@ -359,12 +336,7 @@ class FuncManager:
             return
 
         with open(FUNCIONES_PATH, mode="w", encoding="utf-8") as funciones_file:
-            dump(
-                funciones_dict,
-                funciones_file,
-                indent=4,
-                sort_keys=True,
-            )
+            dump(funciones_dict, funciones_file, indent=4, sort_keys=True)
 
         LOGGER.info("Funciones guardadas en 'funciones.json'!")
 

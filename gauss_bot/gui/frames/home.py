@@ -5,11 +5,7 @@ Home frame de la interfaz.
 from typing import TYPE_CHECKING
 from webbrowser import open as open_link
 
-from customtkinter import (
-    CTkFont as ctkFont,
-    CTkFrame as ctkFrame,
-    CTkLabel as ctkLabel,
-)
+from customtkinter import CTkFont as ctkFont, CTkFrame as ctkFrame, CTkLabel as ctkLabel
 
 from ..custom import IconButton
 from ...utils import (
@@ -42,12 +38,7 @@ class HomeFrame(ctkFrame):
         self.rowconfigure(5, weight=1)
 
         ctkLabel(
-            self,
-            text="¡Bienvenido a GaussBot!",
-            font=ctkFont(
-                size=20,
-                weight="bold",
-            ),
+            self, text="¡Bienvenido a GaussBot!", font=ctkFont(size=20, weight="bold")
         ).grid(row=0, column=0, columnspan=2, pady=10, sticky="s")
 
         ctkLabel(
@@ -58,11 +49,9 @@ class HomeFrame(ctkFrame):
             + "− Análisis númerico",
         ).grid(row=1, column=0, columnspan=2, pady=0, sticky="s")
 
-        ctkLabel(
-            self,
-            text="",
-            image=generate_sep(False, (600, 8)),
-        ).grid(row=2, column=0, columnspan=2, pady=10, sticky="s")
+        ctkLabel(self, text="", image=generate_sep(False, (600, 8))).grid(
+            row=2, column=0, columnspan=2, pady=10, sticky="s"
+        )
 
         IconButton(
             self,

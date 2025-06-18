@@ -8,10 +8,7 @@ from copy import deepcopy
 from fractions import Fraction
 
 from .matriz import Matriz
-from ..utils import (
-    LOGGER,
-    format_factor,
-)
+from ..utils import LOGGER, format_factor
 
 
 class SistemaEcuaciones:

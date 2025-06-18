@@ -2,11 +2,7 @@
 Implementación de todos los frames relacionados con vectores.
 """
 
-from typing import (
-    TYPE_CHECKING,
-    Optional,
-    Union,
-)
+from typing import TYPE_CHECKING, Optional, Union
 
 from customtkinter import (
     CTkButton as ctkButton,
@@ -14,16 +10,9 @@ from customtkinter import (
     CTkTabview as ctkTabview,
 )
 
-from .subframes import (
-    MagnitudTab,
-    VMTab,
-    VSRTab,
-)
+from .subframes import MagnitudTab, VMTab, VSRTab
 from ..custom import ErrorFrame
-from ...managers import (
-    MatricesManager,
-    VectoresManager,
-)
+from ...managers import MatricesManager, VectoresManager
 from ...utils import INPUTS_ICON
 
 if TYPE_CHECKING:
@@ -55,24 +44,9 @@ class VectoresFrame(ctkFrame):
         self.nombres_vectores = list(self.vecs_manager.vecs_ingresados.keys())
         self.nombres_matrices = list(self.mats_manager.mats_ingresadas.keys())
 
-        self.instances: list[
-            Union[
-                MagnitudTab,
-                VSRTab,
-                VMTab,
-            ]
-        ]
+        self.instances: list[Union[MagnitudTab, VSRTab, VMTab]]
 
-        self.tabs: list[
-            tuple[
-                str,
-                Union[
-                    type[MagnitudTab],
-                    type[VSRTab],
-                    type[VMTab],
-                ],
-            ]
-        ]
+        self.tabs: list[tuple[str, Union[type[MagnitudTab], type[VSRTab], type[VMTab]]]]
 
         self.tabview: ctkTabview
         self.setup_tabview()

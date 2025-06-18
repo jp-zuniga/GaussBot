@@ -7,16 +7,9 @@ la barra de navegación de la aplicación.
 
 from typing import TYPE_CHECKING
 
-from customtkinter import (
-    CTkFont as ctkFont,
-    CTkFrame as ctkFrame,
-    CTkLabel as ctkLabel,
-)
+from customtkinter import CTkFont as ctkFont, CTkFrame as ctkFrame, CTkLabel as ctkLabel
 
-from ..custom import (
-    CustomMessageBox,
-    IconButton,
-)
+from ..custom import CustomMessageBox, IconButton
 from ...utils import (
     ANALISIS_ICON,
     CONFIG_ICON,
@@ -66,9 +59,7 @@ class NavFrame(ctkFrame):
 
         # label y logo de la barra de navegacion
         self.app_name = ctkLabel(
-            self,
-            text="GaussBot",
-            font=ctkFont(size=16, weight="bold"),
+            self, text="GaussBot", font=ctkFont(size=16, weight="bold")
         )
 
         self.hide_button = IconButton(
@@ -272,8 +263,7 @@ class NavFrame(ctkFrame):
                     )
 
                     widget._image_label.grid_configure(  # type: ignore
-                        columnspan=1,
-                        sticky="e",
+                        columnspan=1, sticky="e"
                     )
 
             self.hidden = False
@@ -289,8 +279,7 @@ class NavFrame(ctkFrame):
                 elif isinstance(widget, IconButton):
                     widget.configure(width=20, text="")
                     widget._image_label.grid_configure(  # type: ignore
-                        columnspan=3,
-                        sticky="nsew",
+                        columnspan=3, sticky="nsew"
                     )
 
             self.hidden = True

@@ -6,13 +6,7 @@ los módulos de la aplciación.
 from .analisis import AnalisisFrame
 from .config import ConfigFrame
 from .home import HomeFrame
-from .inputs import (
-    InputsFrame,
-    ManejarFuncs,
-    ManejarMats,
-    ManejarSistemas,
-    ManejarVecs,
-)
+from .inputs import InputsFrame, ManejarFuncs, ManejarMats, ManejarSistemas, ManejarVecs
 from .matrices import MatricesFrame
 from .nav import NavFrame
 from .sistemas import SistemasFrame

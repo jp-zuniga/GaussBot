@@ -4,21 +4,12 @@ el frame que contiene todos los
 subframes relacionados a ecuaciones.
 """
 
-from typing import (
-    TYPE_CHECKING,
-    Optional,
-)
+from typing import TYPE_CHECKING, Optional
 
-from customtkinter import (
-    CTkButton as ctkButton,
-    CTkFrame as ctkFrame,
-)
+from customtkinter import CTkButton as ctkButton, CTkFrame as ctkFrame
 
 from .subframes import ResolverSisFrame
-from ..custom import (
-    CustomScrollFrame,
-    ErrorFrame,
-)
+from ..custom import CustomScrollFrame, ErrorFrame
 from ...managers import MatricesManager
 from ...utils import INPUTS_ICON
 
@@ -61,8 +52,7 @@ class SistemasFrame(ctkFrame):
             # agregar boton para dirigir al usuario adonde se agregan
             self.dummy_frame = ctkFrame(self, fg_color="transparent")
             self.msg_frame = ErrorFrame(
-                self.dummy_frame,
-                msg="No se ha guardado ningún sistema de ecuaciones!",
+                self.dummy_frame, msg="No se ha guardado ningún sistema de ecuaciones!"
             )
 
             agregar_button = ctkButton(
@@ -87,9 +77,7 @@ class SistemasFrame(ctkFrame):
             self.msg_frame = None
 
         self.resolver_frame = ResolverSisFrame(
-            app=self.app,
-            master_frame=self,
-            mats_manager=self.mats_manager,
+            app=self.app, master_frame=self, mats_manager=self.mats_manager
         )
 
         self.resolver_frame.pack(expand=True, fill="both", padx=5, pady=5)

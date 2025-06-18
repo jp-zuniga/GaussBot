@@ -3,28 +3,11 @@ Funciones de utilidad generales para la aplicación.
 """
 
 from fractions import Fraction
-from logging import (
-    DEBUG,
-    FileHandler,
-    Formatter,
-    getLogger,
-)
-from os import (
-    makedirs,
-    path,
-)
-from typing import (
-    Any,
-    Literal,
-    Optional,
-)
+from logging import DEBUG, FileHandler, Formatter, getLogger
+from os import makedirs, path
+from typing import Any, Literal, Optional
 
-from PIL.Image import (
-    Image,
-    Resampling,
-    merge,
-    open as open_img,
-)
+from PIL.Image import Image, Resampling, merge, open as open_img
 from PIL.ImageOps import invert
 from customtkinter import CTkImage as ctkImage
 
@@ -76,8 +59,7 @@ def format_factor(
 
 
 def format_proc_num(
-    nums: tuple[Fraction, Fraction],
-    operador: Literal["•", "+", "−"] = "•",
+    nums: tuple[Fraction, Fraction], operador: Literal["•", "+", "−"] = "•"
 ) -> str:
     """
     Formatea un par de números para mostrarlos
@@ -183,9 +165,7 @@ def generate_sep(orientation: bool, size: tuple[int, int]) -> ctkImage:
     }
 
     return ctkImage(
-        size=size,
-        dark_image=seps[orientation][1],
-        light_image=seps[orientation][0],
+        size=size, dark_image=seps[orientation][1], light_image=seps[orientation][0]
     )
 
 

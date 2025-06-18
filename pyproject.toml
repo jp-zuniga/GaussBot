@@ -9,9 +9,13 @@ dependencies = [
     "sympy>=1.14.0",
 ]
 
+[tool.ruff.format]
+skip-magic-trailing-comma = true
+
 [tool.ruff.lint.isort]
 case-sensitive = true
 combine-as-imports = true
 force-sort-within-sections = true
 order-by-type = true
 relative-imports-order = "closest-to-furthest"
+split-on-trailing-comma = false

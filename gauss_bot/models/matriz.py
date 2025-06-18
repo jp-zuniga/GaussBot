@@ -7,11 +7,7 @@ métodos para transponer, calcular determinante, encontrar inversa, etc.
 
 from copy import deepcopy
 from fractions import Fraction
-from typing import (
-    Optional,
-    Union,
-    overload,
-)
+from typing import Optional, Union, overload
 
 from ..utils import format_factor
 
@@ -320,10 +316,7 @@ class Matriz:
     @overload
     def __mul__(self, escalar: Union[int, float, Fraction]) -> "Matriz": ...
 
-    def __mul__(
-        self,
-        multiplicador: Union["Matriz", int, float, Fraction],
-    ) -> "Matriz":
+    def __mul__(self, multiplicador: Union["Matriz", int, float, Fraction]) -> "Matriz":
         """
         Overloads para multiplicar matrices o multiplicar matrices por escalares:
         * Matriz() * Matriz() -> Matriz()
@@ -355,10 +348,7 @@ class Matriz:
                         mat_multiplicada[i][j] += self[i, k] * multiplicador[k, j]
 
             return Matriz(
-                self.aumentada,
-                self.filas,
-                multiplicador.columnas,
-                mat_multiplicada,
+                self.aumentada, self.filas, multiplicador.columnas, mat_multiplicada
             )
 
         if isinstance(multiplicador, (int, float, Fraction)):
@@ -368,12 +358,7 @@ class Matriz:
                 for fila in self.valores
             ]
 
-            return Matriz(
-                self.aumentada,
-                self.filas,
-                self.columnas,
-                mat_multiplicada,
-            )
+            return Matriz(self.aumentada, self.filas, self.columnas, mat_multiplicada)
 
         raise TypeError("Tipo de dato inválido!")
 
@@ -392,12 +377,7 @@ class Matriz:
                 for fila in self.valores
             ]
 
-            return Matriz(
-                self.aumentada,
-                self.filas,
-                self.columnas,
-                mat_multiplicada,
-            )
+            return Matriz(self.aumentada, self.filas, self.columnas, mat_multiplicada)
         raise TypeError("Tipo de dato inválido!")
 
     def es_matriz_cero(self) -> bool:
@@ -476,12 +456,7 @@ class Matriz:
                     mat_triangular[j][k] -= factor * mat_triangular[i][k]
 
         return (
-            Matriz(
-                self.aumentada,
-                self.filas,
-                self.columnas,
-                mat_triangular,
-            ),
+            Matriz(self.aumentada, self.filas, self.columnas, mat_triangular),
             intercambio,
         )
 

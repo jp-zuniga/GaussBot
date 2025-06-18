@@ -85,8 +85,7 @@ class CustomScrollFrame(ctkFrame):
         self.xy_canvas.grid(row=0, column=0, sticky="nsew", padx=(7, 0), pady=(7, 0))
 
         self.bind(
-            "<Configure>",
-            lambda _, canvas=self.xy_canvas: self.on_frame_config(canvas),
+            "<Configure>", lambda _, canvas=self.xy_canvas: self.on_frame_config(canvas)
         )
 
         self.xy_canvas.bind_all(

@@ -5,26 +5,10 @@ específicas de cada módulo de la aplicación.
 """
 
 from .derivadas import DerivadasFrame
-from .input_funcs import (
-    AgregarFuncs,
-    EliminarFuncs,
-    MostrarFuncs,
-)
-from .input_mats import (
-    AgregarMats,
-    EliminarMats,
-    MostrarMats,
-)
-from .input_sis import (
-    AgregarSistemas,
-    EliminarSistemas,
-    MostrarSistemas,
-)
-from .input_vecs import (
-    AgregarVecs,
-    EliminarVecs,
-    MostrarVecs,
-)
+from .input_funcs import AgregarFuncs, EliminarFuncs, MostrarFuncs
+from .input_mats import AgregarMats, EliminarMats, MostrarMats
+from .input_sis import AgregarSistemas, EliminarSistemas, MostrarSistemas
+from .input_vecs import AgregarVecs, EliminarVecs, MostrarVecs
 from .integrales import IntegralesFrame
 from .operaciones_mats import (
     DeterminanteTab,
