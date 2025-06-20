@@ -10,6 +10,7 @@ from random import randint
 from tkinter import Variable
 from typing import TYPE_CHECKING, Optional, Union
 
+from PIL.ImageTk import PhotoImage
 from customtkinter import (
     CTkButton as ctkButton,
     CTkFont as ctkFont,
@@ -309,9 +310,9 @@ class RaicesFrame(CustomScrollFrame):
         """
 
         try:
-            a = Decimal(float(Fraction(self.a_entry.get())))
-            b = Decimal(float(Fraction(self.b_entry.get())))
-            error = Decimal(float(Fraction(self.error_entry.get())))
+            a = Decimal(float(self.handle_pi(self.a_entry.get())))
+            b = Decimal(float(self.handle_pi(self.b_entry.get())))
+            error = Decimal(float(self.handle_pi(self.error_entry.get())))
 
             if a > b:
                 raise ArithmeticError(
@@ -341,8 +342,8 @@ class RaicesFrame(CustomScrollFrame):
         """
 
         try:
-            xi = Decimal(float(Fraction(self.xi_entry.get())))
-            error = Decimal(float(Fraction(self.error_entry.get())))
+            xi = Decimal(float(self.handle_pi(self.xi_entry.get())))
+            error = Decimal(float(self.handle_pi(self.error_entry.get())))
             max_its = int(self.iteraciones_entry.get())
 
             if max_its <= 0:
@@ -363,7 +364,7 @@ class RaicesFrame(CustomScrollFrame):
                     raise ArithmeticError(str(t)) from t
 
             if self.met_actual == 3:
-                xn = Decimal(float(Fraction(self.xn_entry.get())))
+                xn = Decimal(float(self.handle_pi(self.xn_entry.get())))
                 vals = (xi, xn)
 
                 try:
@@ -617,12 +618,15 @@ class RaicesFrame(CustomScrollFrame):
         new_window = ctkTop(self.app)
         new_window.title("GaussBot: Registro de Iteraciones")
         new_window.geometry("1000x500")
-        self.after(100, new_window.focus)  # type: ignore
 
-        if self.app.modo_actual == "dark":
-            self.after(250, lambda: new_window.iconbitmap(APP_ICON[0]))
-        elif self.app.modo_actual == "light":
-            self.after(250, lambda: new_window.iconbitmap(APP_ICON[1]))
+        self.after(100, new_window.focus)  # type: ignore
+        self.after(
+            50,
+            lambda: new_window.iconphoto(
+                False,
+                PhotoImage(file=APP_ICON[0 if self.app.modo_actual == "dark" else 1]),  # type: ignore
+            ),
+        )
 
         new_window.protocol("WM_DELETE_WINDOW", lambda: delete_window(new_window))
 
@@ -633,6 +637,31 @@ class RaicesFrame(CustomScrollFrame):
         def delete_window(new_window: ctkTop) -> None:
             self.table_hidden = True
             new_window.destroy()
+
+    def handle_pi(self, num_input: str) -> Fraction:
+        """
+        Procesar el input del usuario si ingresaron 'pi' en su número.
+        """
+
+        PI = Fraction(355, 133)
+        if "pi" not in num_input:
+            return Fraction(num_input)
+        if "pi" == num_input:
+            return PI
+        if "/" in num_input:
+            num, den = num_input.split("/")
+            num_input = (
+                num.replace("pi", "").replace("*", "").strip()
+                if "pi" in num
+                else den.replace("pi", "").replace("*", "").strip()
+            )
+
+            if "pi" in num:
+                return (Fraction(num_input) * PI) / Fraction(den)
+            return Fraction(num) / (Fraction(num_input) * PI)
+
+        num_input = num_input.replace("pi", "").replace("*", "").strip()
+        return Fraction(num_input) * PI
 
     def update_frame(self):
         """
