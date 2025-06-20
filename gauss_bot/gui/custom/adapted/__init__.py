@@ -11,14 +11,7 @@ These widgets are built to work only on Windows.
 
 from .messagebox import CustomMessageBox
 from .numpad import CustomNumpad
-from .scrollable_frame import CustomScrollFrame
 from .table import CustomTable
 from .tooltip import Tooltip
 
-__all__ = [
-    "CustomMessageBox",
-    "CustomNumpad",
-    "CustomScrollFrame",
-    "CustomTable",
-    "Tooltip",
-]
+__all__ = ["CustomMessageBox", "CustomNumpad", "CustomTable", "Tooltip"]

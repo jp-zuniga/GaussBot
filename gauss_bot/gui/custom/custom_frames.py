@@ -22,7 +22,16 @@ class CustomScrollFrame(ctkScrollFrame):
 
     def __init__(self, master: Any, **kwargs) -> None:
         super().__init__(master, **kwargs)
-        self._scrollbar.grid_forget()
+        # self._scrollbar.grid_forget()  # esconder scrollbar
+
+        # mousewheel bindings para linux
+        self.bind(
+            "<Button-4>", lambda e: self._parent_canvas.yview("scroll", -1, "units")
+        )
+
+        self.bind(
+            "<Button-5>", lambda e: self._parent_canvas.yview("scroll", 1, "units")
+        )
 
 
 class ErrorFrame(ctkFrame):
