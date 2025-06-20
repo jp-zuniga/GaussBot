@@ -5,6 +5,7 @@ frames de mensaje de la aplicación.
 
 from typing import TYPE_CHECKING, Literal, Optional, Union
 
+from PIL.ImageTk import PhotoImage
 from customtkinter import (
     CTkFont as ctkFont,
     CTkFrame as ctkFrame,
@@ -118,13 +119,13 @@ def toggle_proc(
 
     new_window.geometry("800x800")
     parent_frame.after(100, new_window.focus)
-
-    if app.modo_actual == "dark":
-        i = 0
-    elif app.modo_actual == "light":
-        i = 1
-
-    parent_frame.after(250, lambda: new_window.iconbitmap(APP_ICON[i]))
+    parent_frame.after(
+        50,
+        lambda: new_window.iconphoto(
+            False,
+            PhotoImage(file=APP_ICON[0 if app.modo_actual == "dark" else 1]),  # type: ignore
+        ),
+    )
 
     new_window.protocol("WM_DELETE_WINDOW", lambda: delete_window(new_window))
 

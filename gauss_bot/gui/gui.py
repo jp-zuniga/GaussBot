@@ -26,8 +26,8 @@ from .frames import (
     SistemasFrame,
     VectoresFrame,
 )
-from ..utils import APP_ICON, CONFIG_PATH, LOGGER, THEMES_PATH
 from ..managers import FuncManager, OpsManager
+from ..utils import APP_ICON, CONFIG_PATH, LOGGER, THEMES_PATH
 
 
 class GaussUI(ctk):
@@ -105,10 +105,10 @@ class GaussUI(ctk):
         * ValueError: si 'modo' no es "light" o "dark"
         """
 
-        if modo == "light":
-            self.iconphoto(False, PhotoImage(file=APP_ICON[1]))
-        elif modo == "dark":
+        if modo == "dark":
             self.iconphoto(False, PhotoImage(file=APP_ICON[0]))
+        elif modo == "light":
+            self.iconphoto(False, PhotoImage(file=APP_ICON[1]))
         else:
             raise ValueError("Valor inválido para argumento 'modo'!")
 
@@ -148,8 +148,8 @@ class GaussUI(ctk):
 
             self.config_options = {
                 "escala": 1.0,
-                "modo": "light",
-                "tema": "ceruleo.json",
+                "modo": "dark",
+                "tema": "viento.json",
             }
 
         # extraer configs individuales del diccionario

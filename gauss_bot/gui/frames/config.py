@@ -45,11 +45,10 @@ class ConfigFrame(ctkFrame):
         }
 
         self.modos_dict = {"Claro": "light", "Oscuro": "dark"}
-
         self.temas_dict = {
             "Cerúleo": "ceruleo.json",
-            "Verdeante": "verdeante.json",
             "Viento": "viento.json",
+            "Violeta": "violeta.json",
         }
 
         self.escalas = list(self.escalas_dict.keys())
