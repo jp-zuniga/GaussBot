@@ -197,11 +197,6 @@ class CustomNumpad(ctkTop):
         return "break"
 
     def render(self, event: Optional[Event] = None) -> str:
-        """
-        Wrapper for iconify() to handle custom key-bindings.
-        """
-
-        del event
         if self.disabled:
             return "break"
 
@@ -211,17 +206,37 @@ class CustomNumpad(ctkTop):
             self.lift()
             self.hidden = False
 
-            attach_width = self.attach.winfo_reqwidth()
-            numpad_width = self.show_frame.winfo_reqwidth()
-            x_pos = self.attach.winfo_rootx() + (attach_width - numpad_width) // 2
-            y_pos = self.attach.winfo_rooty() + self.attach.winfo_reqheight() + 10
+            if not hasattr(self, "_first_render_done"):
+                self.after(50, self._adjust_position)
+                self._first_render_done = True
+                return "break"
 
-            self.geometry(
-                f"{numpad_width}x{self.show_frame.winfo_reqheight()}"
-                + f"+{x_pos}+{y_pos}"
-            )
+            self._adjust_position()
 
         else:
             self.hide()
             self.hidden = True
         return "break"
+
+    def _adjust_position(self):
+        """
+        Adjust position after initial rendering.
+        """
+
+        if not self.winfo_viewable():
+            return
+
+        self.update_idletasks()
+
+        numpad_width = self.winfo_width()
+        numpad_height = self.winfo_height()
+
+        attach_x = self.attach.winfo_rootx()
+        attach_y = self.attach.winfo_rooty()
+        attach_width = self.attach.winfo_width()
+        attach_height = self.attach.winfo_height()
+
+        x_pos = attach_x + (attach_width - numpad_width) // 2
+        y_pos = attach_y + attach_height + 10
+
+        self.geometry(f"{numpad_width}x{numpad_height}+{x_pos}+{y_pos}")
