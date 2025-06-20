@@ -9,6 +9,7 @@ from PIL.ImageTk import PhotoImage
 from customtkinter import (
     CTkFont as ctkFont,
     CTkFrame as ctkFrame,
+    CTkImage as ctkImage,
     CTkLabel as ctkLabel,
     CTkToplevel as ctkTop,
 )
@@ -35,8 +36,8 @@ def delete_msg_if(
     msg_frame: Optional[ctkFrame], masters: tuple[ctkFrame, ctkFrame]
 ) -> None:
     """
-    Llama delete_msg_frame() si msg_frame
-    esta colocado en uno de los frames indicados.
+    Llama delete_msg_frame() si 'msg_frame'
+    está colocado en uno de los frames indicados.
     * msg_frame: frame a eliminar
     * masters:   frames donde buscar msg_frame
     """
@@ -57,7 +58,7 @@ def place_msg_frame(
     **grid_kwargs,
 ) -> ctkFrame:
     """
-    Inicializa msg_frame y lo coloca en la interfaz con grid_kwargs.
+    Inicializa msg_frame y lo coloca en la interfaz según 'grid_kwargs'.
     * parent_frame: frame que contendrá msg_frame
     * msg_frame:    frame a colocar
     * msg:          mensaje a mostrar en el frame
@@ -65,21 +66,22 @@ def place_msg_frame(
     * grid_kwargs:  kwargs a pasar a msg_frame.grid()
     """
 
+    # import local para evitar errores de imports circulares
     from ..gui.custom import ErrorFrame, ResultadoFrame, SuccessFrame
 
     if tipo == "error":
         msg_frame = ErrorFrame(parent_frame, msg)
     elif tipo == "success":
         msg_frame = SuccessFrame(parent_frame, msg)
-
     elif tipo == "resultado":
-        bc = grid_kwargs.pop("border_color", None)
-        img = grid_kwargs.pop("img", None)
+        bc: Optional[str] = grid_kwargs.pop("border_color", None)
+        img: Optional[ctkImage] = grid_kwargs.pop("img", None)
         msg_frame = ResultadoFrame(parent_frame, msg, img, bc)
 
     else:
         raise ValueError("Valor inválido para argumento 'tipo'!")
 
+    # inicializar kwargs por defecto
     if "row" not in grid_kwargs:
         grid_kwargs["row"] = 0
     if "column" not in grid_kwargs:
@@ -104,11 +106,12 @@ def toggle_proc(
     proc_hidden: bool,
 ) -> None:
     """
-    Muestra o esconde la ventana de procedimiento.
+    Muestra o esconde la ventana de procedimiento de una operación.
     """
 
     from ..gui.custom import CustomScrollFrame
 
+    # si no esta escondido el procedimiento, o existe una Toplevel widget
     if not proc_hidden or any(
         type(widget) is ctkTop for widget in app.winfo_children()
     ):
@@ -116,8 +119,8 @@ def toggle_proc(
 
     new_window = ctkTop(app)
     new_window.title(window_title)
-
     new_window.geometry("800x800")
+
     parent_frame.after(100, new_window.focus)
     parent_frame.after(
         50,

@@ -63,7 +63,7 @@ from .gui_util_funcs import (
     toggle_proc,
 )
 
-__all__ = [
+__all__: list[str] = [
     "ABOUT_US_ICON",
     "ACEPTAR_ICON",
     "ANALISIS_ICON",

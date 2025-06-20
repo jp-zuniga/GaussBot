@@ -71,11 +71,8 @@ QUIT_ICON = ctkImage(
 
 
 CHECK_ICON = ctkImage(open_img(path.join(ASSET_PATH, "check_icon.png")))
-
 ERROR_ICON = ctkImage(open_img(path.join(ASSET_PATH, "error_icon.png")))
-
 WARNING_ICON = ctkImage(open_img(path.join(ASSET_PATH, "warning_icon.png")))
-
 INFO_ICON = ctkImage(
     dark_image=open_img(path.join(ASSET_PATH, "dark_mode", "light_info_icon.png")),
     light_image=open_img(path.join(ASSET_PATH, "light_mode", "dark_info_icon.png")),
