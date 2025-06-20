@@ -9,7 +9,8 @@ from typing import TYPE_CHECKING
 
 from customtkinter import CTkFont as ctkFont, CTkFrame as ctkFrame, CTkLabel as ctkLabel
 
-from ..custom import CustomMessageBox, IconButton
+from ..custom import IconButton
+from ..custom.adapted import CustomMessageBox
 from ...utils import (
     ANALISIS_ICON,
     CONFIG_ICON,

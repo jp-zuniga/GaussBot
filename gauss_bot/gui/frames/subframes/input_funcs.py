@@ -12,12 +12,12 @@ from sympy import SympifyError
 from ...custom import (
     CustomDropdown,
     CustomEntry,
-    CustomNumpad,
     CustomScrollFrame,
     ErrorFrame,
     IconButton,
     SuccessFrame,
 )
+from ...custom.adapted import CustomNumpad
 from ....managers import FuncManager, KeyBindingManager
 from ....models import Func
 from ....utils import (

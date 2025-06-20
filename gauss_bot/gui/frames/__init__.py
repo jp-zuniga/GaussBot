@@ -3,6 +3,7 @@ Implementación de los parents frame de
 los módulos de la aplciación.
 """
 
+from . import subframes
 from .analisis import AnalisisFrame
 from .config import ConfigFrame
 from .home import HomeFrame
@@ -13,6 +14,7 @@ from .sistemas import SistemasFrame
 from .vectores import VectoresFrame
 
 __all__ = [
+    "subframes",
     "AnalisisFrame",
     "ConfigFrame",
     "HomeFrame",

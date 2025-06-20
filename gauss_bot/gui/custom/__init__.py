@@ -2,20 +2,17 @@
 Customized UI elements for customtkinter.
 """
 
-from .adapted import CustomMessageBox, CustomNumpad, CustomTable, Tooltip
+from . import adapted
 from .custom_frames import CustomScrollFrame, ErrorFrame, ResultadoFrame, SuccessFrame
 from .custom_widgets import CustomDropdown, CustomEntry, IconButton
 
 __all__ = [
+    "adapted",
     "CustomDropdown",
     "CustomEntry",
-    "CustomMessageBox",
-    "CustomNumpad",
     "CustomScrollFrame",
-    "CustomTable",
     "ErrorFrame",
     "IconButton",
     "ResultadoFrame",
     "SuccessFrame",
-    "Tooltip",
 ]
