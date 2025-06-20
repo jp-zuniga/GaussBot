@@ -1,5 +1,5 @@
 [project]
-name = "gauss-bot"
+name = "GaussBot"
 version = "1.0.0"
 description = "Aplicación para resolver sistemas de ecuaciones, realizar cálculos con matrices y vectores, y más."
 requires-python = ">=3.12"
