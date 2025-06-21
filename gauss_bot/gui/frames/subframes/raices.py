@@ -613,8 +613,8 @@ class RaicesFrame(CustomScrollFrame):
         new_window.title("GaussBot: Registro de Iteraciones")
         new_window.geometry("1000x500")
 
-        self.after(50, lambda: set_icon(self.app, new_window))
         self.after(100, new_window.focus)
+        self.after(250, lambda: set_icon(self.app, new_window))
 
         new_window.protocol("WM_DELETE_WINDOW", lambda: delete_window(new_window))
 
@@ -666,7 +666,7 @@ class RaicesFrame(CustomScrollFrame):
         )
 
         if not self.table_hidden:
-            self.after(50, lambda: set_icon(self.app, self.tabla_its.parent))
+            self.after(250, lambda: set_icon(self.app, self.tabla_its.parent))
 
         for widget in self.metodo_frame.winfo_children():  # type: ignore
             widget.destroy()  # type: ignore

@@ -165,8 +165,8 @@ def toggle_proc(
     new_window.title(window_title)
     new_window.geometry("800x800")
 
-    parent_frame.after(50, lambda: set_icon(app, new_window))
     parent_frame.after(100, new_window.focus)
+    parent_frame.after(250, lambda: set_icon(app, new_window))
 
     dummy_frame = ctkFrame(
         new_window, fg_color="transparent", corner_radius=20, border_width=3

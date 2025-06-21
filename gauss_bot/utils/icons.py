@@ -11,13 +11,13 @@ from customtkinter import CTkImage as ctkImage
 from .paths import ASSET_PATH, NUMPAD_ICON_PATH
 
 if system() == "Windows":
-    # iconbitmap() compatible files
+    # archivos para iconbitmap()
     APP_ICON = (
         path.join(ASSET_PATH, "dark_mode", "light_logo.ico"),
         path.join(ASSET_PATH, "light_mode", "dark_logo.ico"),
     )
 else:
-    # iconphoto compatible files
+    # archivos para iconphoto()
     APP_ICON = (
         path.join(ASSET_PATH, "dark_mode", "light_logo.png"),
         path.join(ASSET_PATH, "light_mode", "dark_logo.png"),
