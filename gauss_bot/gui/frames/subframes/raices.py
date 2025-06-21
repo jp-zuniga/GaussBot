@@ -613,8 +613,8 @@ class RaicesFrame(CustomScrollFrame):
         new_window.title("GaussBot: Registro de Iteraciones")
         new_window.geometry("1000x500")
 
-        self.after(100, new_window.focus)
         self.after(50, lambda: set_icon(self.app, new_window))
+        self.after(100, new_window.focus)
 
         new_window.protocol("WM_DELETE_WINDOW", lambda: delete_window(new_window))
 

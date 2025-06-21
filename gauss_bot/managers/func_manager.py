@@ -73,7 +73,7 @@ class FuncManager:
         if not func.es_continua(intervalo):
             return False
 
-        registro: list[str] = [
+        registro: list[list[str]] = [
             [
                 "Iteración",
                 "a",
@@ -135,7 +135,7 @@ class FuncManager:
         if not func.es_continua(intervalo):
             return False
 
-        registro: list[str] = [
+        registro: list[list[str]] = [
             [
                 "Iteración",
                 "a",
@@ -201,7 +201,7 @@ class FuncManager:
             f"{func.nombre[0]}′({func.var})", str(diff(func.expr, func.var))
         )
 
-        registro: list[str] = [
+        registro: list[list[str]] = [
             [
                 "Iteración",
                 "x_i",
@@ -274,7 +274,7 @@ class FuncManager:
         un método abierto para encontrar raíces de funciones.
         """
 
-        registro: list[str] = [["Iteración", "x_i − 1", "x_i", "x_i + 1"]]
+        registro: list[list[str]] = [["Iteración", "x_i − 1", "x_i", "x_i + 1"]]
 
         xi, xn = float(iniciales[0]), float(iniciales[1])
         f = lambdify(func.var, func.expr)
