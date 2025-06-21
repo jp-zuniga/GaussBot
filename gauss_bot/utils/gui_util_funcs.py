@@ -23,8 +23,11 @@ if TYPE_CHECKING:
 
 def delete_msg_frame(msg_frame: Optional[ctkFrame]) -> None:
     """
-    Elimina un frame de mensaje si existe.
-    * msg_frame: frame a eliminar
+    Eliminar un frame de mensaje, si existe.
+
+    Args:
+        msg_frame: Frame a eliminar.
+    ---
     """
 
     if msg_frame is not None:
@@ -36,10 +39,12 @@ def delete_msg_if(
     msg_frame: Optional[ctkFrame], masters: tuple[ctkFrame, ctkFrame]
 ) -> None:
     """
-    Llama delete_msg_frame() si 'msg_frame'
-    está colocado en uno de los frames indicados.
-    * msg_frame: frame a eliminar
-    * masters:   frames donde buscar msg_frame
+    Eliminar un frame si está colocado en uno de los frames indicados.
+
+    Args:
+        msg_frame: Frame a eliminar.
+        masters:   Frames donde buscar msg_frame.master.
+    ---
     """
 
     try:
@@ -58,12 +63,21 @@ def place_msg_frame(
     **grid_kwargs,
 ) -> ctkFrame:
     """
-    Inicializa msg_frame y lo coloca en la interfaz según 'grid_kwargs'.
-    * parent_frame: frame que contendrá msg_frame
-    * msg_frame:    frame a colocar
-    * msg:          mensaje a mostrar en el frame
-    * tipo:         tipo de frame a crear
-    * grid_kwargs:  kwargs a pasar a msg_frame.grid()
+    Inicializar msg_frame y colocarlo en la interfaz.
+
+    Args:
+        parent_frame: Frame que contendrá msg_frame.
+        msg_frame:    Frame a colocar.
+        msg:          Mensaje a mostrar en el frame.
+        tipo:         Tipo de frame a crear.
+        grid_kwargs:  Kwargs a pasar a msg_frame.grid().
+
+    Returns:
+        CTkFrame: El frame colocado.
+
+    Raises:
+        ValueError: Si 'tipo' no es igual a "error", "success", o "resultado".
+    ---
     """
 
     # import local para evitar errores de imports circulares
@@ -79,7 +93,7 @@ def place_msg_frame(
         msg_frame = ResultadoFrame(parent_frame, msg, img, bc)
 
     else:
-        raise ValueError("Valor inválido para argumento 'tipo'!")
+        raise ValueError("¡Valor inválido para argumento 'tipo'!")
 
     # inicializar kwargs por defecto
     if "row" not in grid_kwargs:
@@ -106,7 +120,16 @@ def toggle_proc(
     proc_hidden: bool,
 ) -> None:
     """
-    Muestra o esconde la ventana de procedimiento de una operación.
+    Mostrar o esconder la ventana de procedimiento de una operación.
+
+    Args:
+        app:          Instancia root de GaussUI.
+        parent_frame: Frame donde el usuario lanza la ventana de procedimiento.
+        window_title: Título de la ventana a crear.
+        proc_label:   Label que contiene el procedimiento.
+        label_txt:    Texto del procedimiento.
+        proc_hidden:  Bandera para identificar si esta abierta la ventana.
+    ---
     """
 
     from ..gui.custom import CustomScrollFrame
@@ -130,8 +153,6 @@ def toggle_proc(
         ),
     )
 
-    new_window.protocol("WM_DELETE_WINDOW", lambda: delete_window(new_window))
-
     dummy_frame = ctkFrame(
         new_window, fg_color="transparent", corner_radius=20, border_width=3
     )
@@ -144,6 +165,8 @@ def toggle_proc(
 
     proc_label.pack(expand=True, fill="both", padx=10, pady=10)
     proc_hidden = False
+
+    new_window.protocol("WM_DELETE_WINDOW", lambda: delete_window(new_window))
 
     def delete_window(new_window: ctkTop) -> None:
         nonlocal proc_hidden, proc_label  # ocupar las variables del alcance exterior

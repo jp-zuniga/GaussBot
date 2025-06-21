@@ -26,12 +26,18 @@ def format_factor(
     skip_ones: bool = True,
 ) -> str:
     """
-    Formatea un factor para mostrarlo en el procedimiento de una operación.
-    * factor:        fracción a formatear
-    * mult:          si se multiplicará con otro número
-    * parenth_negs:  si se debería poner números negativos en parentésis
-    * parenth_fracs: si se debería poner fracciones en parentésis
-    * skip_ones:     si se debería ignorar factores de 1
+    Formatear un factor para mostrarlo en el procedimiento de una operación.
+
+    Args:
+        factor:        Fracción a formatear.
+        mult:          Si se multiplicará con otro número.
+        parenth_negs:  Si se debería poner números negativos en parentésis.
+        parenth_fracs: Si se debería poner fracciones en parentésis.
+        skip_ones:     Si se debería ignorar factores de 1.
+
+    Returns:
+        str: El factor formateado según los parámetros.
+    ---
     """
 
     if factor == 1:
@@ -62,16 +68,24 @@ def format_proc_num(
     nums: tuple[Fraction, Fraction], operador: Literal["•", "+", "−"] = "•"
 ) -> str:
     """
-    Formatea un par de números para mostrarlos
+    Formatear un par de números para mostrarlos
     en el procedimiento de una operación.
+
+    Args:
+        nums:     El par de números a formatear.
+        operador: El operador matemático a colocar entre los números.
+
+    Returns:
+        str: La operación entre los números formateada.
+    ---
     """
 
     num1, num2 = nums
     if operador == "−" and num2 < 0:
-        operador = "+"
+        operador: str = "+"
         num2 *= -1
     elif operador == "+" and num2 < 0:
-        operador = "−"
+        operador: str = "−"
         num2 *= -1
 
     combine_nums = (
@@ -85,8 +99,12 @@ def format_proc_num(
 
 def log_setup(logger: Logger = LOGGER) -> None:
     """
-    Configura el logger de la aplicación y
-    crea el archivo 'log.txt' si no existe.
+    Configurar el logger de la aplicación y
+    crear el archivo 'log.txt' si no existe.
+
+    Args:
+        logger: Objeto Logger a configurar.
+    ---
     """
 
     if not path.exists(LOG_PATH):
@@ -109,26 +127,43 @@ def log_setup(logger: Logger = LOGGER) -> None:
     logger.info("Logger configurado...")
 
 
-def get_dict_key(dict_lookup: dict[Any, Any], buscando: Any) -> Optional[Any]:
+def get_dict_key(dict_lookup: dict, buscando: Any) -> Optional[Any]:
     """
-    Busca un valor en un diccionario y retorna su llave.
-    * dict_lookup: diccionario a recorrer secuencialmente
-    * buscando:    valor a buscar en el diccionario
+    Buscar un valor en un diccionario y retornar su llave.
+
+    Args:
+        dict_lookup: Diccionario a recorrer secuencialmente.
+        buscando:    Valor a buscar en el diccionario.
+
+    Returns:
+        Any:  La llave del valor especificado, si se encuentra.
+        None: Si la llave no se encuentra.
+    ---
     """
+
+    if buscando not in dict_lookup.values():
+        return None
 
     for key, value in dict_lookup.items():
         # comparar igualdad e identidad
         if value == buscando or value is buscando:
             return key
+
+    # fallback, la función debería retornar antes de llegar aquí
     return None
 
 
 def generate_range(start: int, end: int) -> list[int]:
     """
-    Genera una lista de enteros en un rango dado, excluyendo 0 y 1.
-    Utilizado para generar coeficientes válidos en generate_funcs().
-    * start: inicio del rango
-    * end:   final del rango
+    Generar una lista de enteros en un rango dado, excluyendo 0 y 1.
+
+    Args:
+        start: Inicio del rango.
+        end:   Final del rango.
+
+    Returns:
+        list[int]: Números aleatorios generados.
+    ---
     """
 
     valid = list(range(start + 1, end))
@@ -142,14 +177,15 @@ def generate_range(start: int, end: int) -> list[int]:
 
 def generate_sep(orientation: bool, size: tuple[int, int]) -> ctkImage:
     """
-    Retorna una CTkImage de un separador vertical u horizontal
-    del tamaño 'size' y orientación 'orientation.' Estos separadores
-    no pueden ser constantes porque su tamaño es variable.
-    * orientation: True para vertical, False para horizontal.
-    * size:        tamaño de la CTkImage en pixeles (x, y)
+    Crear una imagen de un separador vertical u horizontal.
 
-    Usado para separar la columna de constantes de
-    un sistema de ecuaciones y los inputs de funciones.
+    Args:
+        orientation: Dirección del separador: True para vertical, False para horizontal.
+        size:        Tamaño de la CTkImage en pixeles (x, y).
+
+    Returns:
+        CTkImage: Imagen del separador creada.
+    ---
     """
 
     seps: dict[bool, tuple[Image, Image]] = {
@@ -172,10 +208,15 @@ def resize_image(
     img: ctkImage, divisors: tuple[int | float, int | float] = (4, 8)
 ) -> ctkImage:
     """
-    Recibe una CTkImage y retorna una nueva CTkImage
-    con un tamaño reducido en base a los divisores dados.
-    * img:      imagen a redimensionar
-    * divisors: divisores para controlar el tamaño de la nueva imagen
+    Reducir el tamaño de una CTkImage según los divisores dados.
+
+    Args:
+        img:      Imagen a redimensionar.
+        divisors: Divisores para controlar el tamaño de la nueva imagen.
+
+    Returns:
+        CTkImage: Imagen redimensionar.
+    ---
     """
 
     div1, div2 = divisors
@@ -199,15 +240,14 @@ def resize_image(
 
 def transparent_invert(img: Image) -> Image:
     """
-    Invierte los colores de una imagen sin perder su transparencia.
-    La funcion invert() de PIL no acepta imagenes con un canal alpha,
-    entonces esta función toma un objeto Image RGBA, separa los canales,
-    invierte solamente los canales RBG, y retorna una nueva imagen con
-    los canales invertidos unidos con el canal alpha original.
-    * img: imagen RGBA a invertir
+    Invertir los colores de una imagen sin perder su transparencia.
 
-    Utilizada cuando se genera un PNG de un string LaTeX, para que
-    la imagen generada sea compatible con el modo claro y oscuro.
+    Args:
+        img: Imagen RGBA a invertir.
+
+    Returns:
+        Image: Imagen transparente invertida.
+    ---
     """
 
     r, g, b, a = img.split()

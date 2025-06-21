@@ -34,29 +34,33 @@ from sympy.parsing.sympy_parser import (
 
 from ..utils import SAVED_FUNCS_PATH, transparent_invert
 
-TRANSFORMS = standard_transformations + (implicit_multiplication_application,)
+TRANSFORMS: tuple = standard_transformations + (implicit_multiplication_application,)
 
-# para que matplotlib sepa que se esta usando tkinter
 use("TkAgg")
-
-# para que matplotlib no mande mil mensajes al log
 getLogger("matplotlib").setLevel(WARNING)
 
 
 class Func:
     """
-    Representa una función matemática, con métodos de
-    utilidad para validar su nombre y su continuidad.
+    Representa una función matemática, con métodos
+    para encontrar su derivada e integral.
     """
 
-    def __init__(self, nombre: str, expr: str, latexified=False) -> None:
+    def __init__(self, nombre: str, expr: str, latexified: bool = False) -> None:
         """
-        * ValueError: si la expresión tiene dominio complejo
+        Args:
+            nombre:     Nombre de la función en la notación f(x).
+            expr:       La expresión matemática que define la función.
+            latexified: Si la función se ha convertido en notación LaTeX.
+
+        Raises:
+            ValueError: Si la expresión tiene un dominio complejo.
+        ---
         """
 
         self.nombre = nombre
 
-        var_pattern = r"\(([a-z])\)"
+        var_pattern: str = r"\(([a-z])\)"
         self.var = Symbol(comp(var_pattern).findall(nombre)[0])
 
         self.latexified = latexified
@@ -64,7 +68,7 @@ class Func:
 
         def replace_var(expr: str) -> str:
             var_str = str(self.var)
-            patt = r"\bx\b"
+            patt: str = r"\bx\b"
 
             replaced_expr = expr
             for _ in list(comp(patt).finditer(expr)):
@@ -84,15 +88,33 @@ class Func:
         self.expr: Expr = parse_expr(expr, transformations=TRANSFORMS)
 
         if self.expr.has(oo, -oo, zoo, nan):
-            raise ValueError("La función tiene un dominio complejo!")
+            raise ValueError("¡La función tiene un dominio complejo!")
 
     def __str__(self) -> str:
         return f"{self.nombre} = {self.expr}"
 
+    def get_dominio(self) -> Interval:
+        """
+        Wrapper para continuous_domain() de sympy.
+
+        Returns:
+            Interval: El dominio real de 'self.expr'.
+        ---
+        """
+
+        return continuous_domain(self.expr, self.var, Reals)
+
     def es_continua(self, intervalo: tuple[Decimal, Decimal]) -> bool:
         """
-        Valida si self.expr es continua en el
-        intervalo indicado, con respecto a self.var.
+        Valida si 'self.expr' es continua en el
+        intervalo indicado, con respecto a 'self.var'.
+
+        Args:
+            intervalo: Par de números que encierran el intervalo.
+
+        Returns:
+            bool: Si la función es continua o no.
+        ---
         """
 
         a, b = intervalo
@@ -102,35 +124,42 @@ class Func:
 
     def derivar(self) -> "Func":
         """
-        Retorna un nuevo objeto Func() que representa la derivada de self.
+        Encontrar la derivada de self.
+
+        Returns:
+            Func: Derivada de 'self.expr'.
+        ---
         """
 
         if "′" not in self.nombre:
             d_nombre = f"{self.nombre[0]}′{self.nombre[1:]}"
 
         else:
-            num_diff = self.nombre.count("′")
-            d_nombre = self.nombre.replace(
+            num_diff: int = self.nombre.count("′")
+            d_nombre: str = self.nombre.replace(
                 "".join("′" for _ in range(num_diff)),
                 "".join("′" for _ in range(num_diff + 1)),
             )
 
-        return Func(d_nombre, str(diff(self.expr, self.var)))  # pylint: disable=E0606
+        return Func(d_nombre, str(diff(self.expr, self.var)))
 
     def integrar(self) -> "Func":
         """
-        Retorna un nuevo objeto Func() que
-        representa el integral indefinido de self.
+        Encontrar la integral indefinida de self.
+
+        Returns:
+            Func: Integral indefinida de 'self.expr'.
+        ---
         """
 
         try:
-            match = list(comp(r"\^\(-\d+\)").finditer(self.nombre))[-1]
+            match: Optional[list] = list(comp(r"\^\(-\d+\)").finditer(self.nombre))[-1]
         except IndexError:
-            match = None  # type: ignore
+            match = None
 
         if match is not None:
             num_ints = int(next(x for x in self.nombre if x.isdigit()))
-            i_nombre = (
+            i_nombre: str = (
                 self.nombre[: match.start()]
                 + f"^(-{num_ints + 1})"
                 + self.nombre[match.end() :]
@@ -140,33 +169,41 @@ class Func:
 
         return Func(i_nombre, str(integrate(self.expr, self.var)))
 
-    def get_dominio(self) -> Interval:
-        """
-        Wrapper para continuous_domain de sympy().
-        Retorna un objeto Interval que representa el
-        dominio real de self.expr.
-        """
-
-        return continuous_domain(self.expr, self.var, Reals)
-
     def get_di_nombre(self, diffr: bool = False, integ: bool = False) -> str:
         """
-        Llama las funciones get_derivada_nombre() o get_integral_nombre().
+        Encontrar el nombre de la derivada o integral de self.
+
+        Args:
+            diffr: Si se quiere encontrar el nombre de la derivada.
+            integ: Si se quiere encontrar el nombre de la integral.
+
+        Returns:
+            str: El nombre de la derivada/integral.
+
+        Raises:
+            NotImplementedError: Bajo circumstancias misteriosas inimaginables.
+        ---
         """
 
-        num_diff = self.nombre.count("′")
-        num_integ = int(next((x for x in self.nombre if x.isdigit()), 0))
-
-        if num_diff != 0 or diffr:
-            return self.get_derivada_nombre(num_diff)
-        if num_integ != 0 or integ:
-            return self.get_integral_nombre(num_integ)
-        raise NameError("No se pudo determinar el tipo de función!")
+        if diffr:
+            return self.get_derivada_nombre(self.nombre.count("′"))
+        if integ:
+            return self.get_integral_nombre(
+                int(next((x for x in self.nombre if x.isdigit()), 0))
+            )
+        raise NotImplementedError("¿Cómo llegamos aquí?")
 
     def get_derivada_nombre(self, num_diff: int) -> str:
         """
-        Formate el nombre de la derivada en la
-        notación dy/dx, con respecto a la variable.
+        Formatear el nombre de la derivada en la
+        notación dy/dx en LaTeX, con respecto a la variable.
+
+        Args:
+            num_diff: Cuantas veces se ha derivado la función original.
+
+        Returns:
+            str: El nombre de la derivada formateado.
+        ---
         """
 
         return (
@@ -176,8 +213,15 @@ class Func:
 
     def get_integral_nombre(self, num_integ: int) -> str:
         """
-        Formate el nombre de la integral con la
+        Formatear el nombre de la integral con la
         notación ∫ f(x) dx, con respecto a la variable.
+
+        Args:
+            num_integ: Número de veces que se ha integrado la función original.
+
+        Returns:
+            str: El nombre del integral formateado.
+        ---
         """
 
         return (
@@ -187,8 +231,11 @@ class Func:
 
     def get_png(self) -> ctkImage:
         """
-        Retorna la imagen PNG de la función si ya había sido generada.
-        Si no, llama a latex_to_png() para generarla, y la retorna.
+        Retornar una imagen PNG de self.
+
+        Returns:
+            CTkImage: Imagen de self generada con LaTeX y matplotlib.
+        ---
         """
 
         if not self.latexified or self.latex_img is None:
@@ -203,7 +250,7 @@ class Func:
             )
 
             self.latexified = True
-        return self.latex_img  # type: ignore
+        return self.latex_img
 
     @staticmethod
     def latex_to_png(
@@ -215,16 +262,22 @@ class Func:
         **kwargs,
     ) -> ctkImage:
         """
-        Convierte texto a formato LaTeX para crear una imagen PNG.
-        * output_file: nombre del archivo de salida
-        * nombre_expr: nombre de la función a mostrar
-        * expr: string de la expresión a convertir
-        * misc_str: string de texto a convertir
-        * con_nombre: si se debe incluir el nombre de la función en la imagen
+        Convertir texto a formato LaTeX para crear una imagen PNG.
 
-        - kwargs:
-            - ln_notation: si se debe usar ln en lugar de log
-            - font_size: tamaño de la fuente en la imagen
+        Args:
+            output_file: Nombre del archivo de salida.
+            nombre_expr: Nombre de la función a mostrar.
+            expr:        String de la expresión a convertir.
+            misc_str:    String de texto a convertir.
+            con_nombre:  Si se debe incluir el nombre de la función en la imagen.
+            kwargs:      Kwargs para sympy.latex().
+
+        Returns:
+            CTkImage: Imagen PNG creada a partir del texto LaTeX generado.
+
+        Raises:
+            ValueError: Si no se recibe texto a convertir.
+        ---
         """
 
         makedirs(SAVED_FUNCS_PATH, exist_ok=True)
@@ -238,7 +291,7 @@ class Func:
         elif misc_str is not None:
             latex_str = misc_str.replace("log", "ln")
         else:
-            raise ValueError("No se recibió un string a convertir en PNG!")
+            raise ValueError("¡No se recibió un string a convertir en PNG!")
 
         if con_nombre and nombre_expr is not None:
             latex_str = f"{nombre_expr} = {latex_str}"

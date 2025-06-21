@@ -9,7 +9,7 @@ from .matriz import Matriz
 from .sistema_ecuaciones import SistemaEcuaciones
 from .vector import Vector
 
-__all__ = [
+__all__: list[str] = [
     "FractionEncoder",
     "FractionDecoder",
     "Func",
