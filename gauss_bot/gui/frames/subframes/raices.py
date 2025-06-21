@@ -10,7 +10,6 @@ from random import randint
 from tkinter import Variable
 from typing import TYPE_CHECKING, Optional, Union
 
-from PIL.ImageTk import PhotoImage
 from customtkinter import (
     CTkButton as ctkButton,
     CTkFont as ctkFont,
@@ -24,7 +23,7 @@ from ...custom import CustomDropdown, CustomEntry, CustomScrollFrame, IconButton
 from ...custom.adapted import CustomTable
 from ....managers import MARGEN_ERROR, MAX_ITERACIONES, FuncManager
 from ....models import Func
-from ....utils import APP_ICON, INFO_ICON, generate_sep, place_msg_frame
+from ....utils import INFO_ICON, generate_sep, place_msg_frame, set_icon
 
 if TYPE_CHECKING:
     from .. import AnalisisFrame
@@ -614,14 +613,8 @@ class RaicesFrame(CustomScrollFrame):
         new_window.title("GaussBot: Registro de Iteraciones")
         new_window.geometry("1000x500")
 
-        self.after(100, new_window.focus)  # type: ignore
-        self.after(
-            50,
-            lambda: new_window.iconphoto(
-                False,
-                PhotoImage(file=APP_ICON[0 if self.app.modo_actual == "dark" else 1]),  # type: ignore
-            ),
-        )
+        self.after(100, new_window.focus)
+        self.after(50, lambda: set_icon(self.app, new_window))
 
         new_window.protocol("WM_DELETE_WINDOW", lambda: delete_window(new_window))
 
@@ -673,10 +666,7 @@ class RaicesFrame(CustomScrollFrame):
         )
 
         if not self.table_hidden:
-            if self.app.modo_actual == "dark":
-                self.after(250, lambda: self.tabla_its.parent.iconbitmap(APP_ICON[1]))
-            elif self.app.modo_actual == "light":
-                self.after(250, lambda: self.tabla_its.parent.iconbitmap(APP_ICON[0]))
+            self.after(50, lambda: set_icon(self.app, self.tabla_its.parent))
 
         for widget in self.metodo_frame.winfo_children():  # type: ignore
             widget.destroy()  # type: ignore

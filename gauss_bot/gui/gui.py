@@ -7,7 +7,6 @@ from json import dump, load
 from os import makedirs, path
 from typing import Union
 
-from PIL.ImageTk import PhotoImage
 from customtkinter import (
     CTk as ctk,
     ThemeManager,
@@ -27,7 +26,7 @@ from .frames import (
     VectoresFrame,
 )
 from ..managers import FuncManager, OpsManager
-from ..utils import APP_ICON, CONFIG_PATH, LOGGER, THEMES_PATH
+from ..utils import CONFIG_PATH, LOGGER, THEMES_PATH, set_icon
 
 
 class GaussUI(ctk):
@@ -44,7 +43,7 @@ class GaussUI(ctk):
         self.tema_actual: str
 
         self._load_config()
-        self.set_icon(self.modo_actual)
+        set_icon(self, self)
 
         self.theme_config = ThemeManager.theme
         self.configure(fg_color=self.theme_config["CTkFrame"]["fg_color"])
@@ -98,19 +97,6 @@ class GaussUI(ctk):
 
         # configurar evento de cierre de ventana
         self.protocol("WM_DELETE_WINDOW", self.nav_frame.quit_event)
-
-    def set_icon(self, modo: str) -> None:
-        """
-        Setea el ícono de la ventana según el modo de apariencia.
-        * ValueError: si 'modo' no es "light" o "dark"
-        """
-
-        if modo == "dark":
-            self.iconphoto(False, PhotoImage(file=APP_ICON[0]))
-        elif modo == "light":
-            self.iconphoto(False, PhotoImage(file=APP_ICON[1]))
-        else:
-            raise ValueError("Valor inválido para argumento 'modo'!")
 
     def save_config(self) -> None:
         """

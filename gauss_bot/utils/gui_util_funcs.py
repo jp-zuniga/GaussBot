@@ -3,6 +3,7 @@ Funciones para colocar y eliminar los
 frames de mensaje de la aplicación.
 """
 
+from platform import system
 from typing import TYPE_CHECKING, Literal, Optional, Union
 
 from PIL.ImageTk import PhotoImage
@@ -111,6 +112,26 @@ def place_msg_frame(
     return msg_frame
 
 
+def set_icon(app: "GaussUI", window: Union["GaussUI", ctkTop]) -> None:
+    """
+    Establecer el ícono de una ventana según
+    la plataforma y el modo actual de la aplicación.
+
+    Args:
+        app:    Instancia root de GaussUI.
+        window: Ventana a modificar.
+    ---
+    """
+
+    if system() == "Windows":
+        window.iconbitmap(bitmap=APP_ICON[0 if app.modo_actual == "dark" else 1])
+    else:
+        window.iconphoto(
+            False,
+            PhotoImage(file=APP_ICON[0 if app.modo_actual == "dark" else 1]),  # type: ignore
+        )
+
+
 def toggle_proc(
     app: "GaussUI",
     parent_frame: "CustomScrollFrame",
@@ -145,13 +166,7 @@ def toggle_proc(
     new_window.geometry("800x800")
 
     parent_frame.after(100, new_window.focus)
-    parent_frame.after(
-        50,
-        lambda: new_window.iconphoto(
-            False,
-            PhotoImage(file=APP_ICON[0 if app.modo_actual == "dark" else 1]),  # type: ignore
-        ),
-    )
+    parent_frame.after(50, lambda: set_icon(app, new_window))
 
     dummy_frame = ctkFrame(
         new_window, fg_color="transparent", corner_radius=20, border_width=3

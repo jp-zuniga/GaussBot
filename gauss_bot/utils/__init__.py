@@ -60,6 +60,7 @@ from .gui_util_funcs import (
     delete_msg_frame,
     delete_msg_if,
     place_msg_frame,
+    set_icon,
     toggle_proc,
 )
 
@@ -114,6 +115,7 @@ __all__: list[str] = [
     "log_setup",
     "place_msg_frame",
     "resize_image",
+    "set_icon",
     "toggle_proc",
     "transparent_invert",
 ]

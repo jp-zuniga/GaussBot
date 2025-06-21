@@ -14,7 +14,7 @@ from customtkinter import (
 )
 
 from ..custom import CustomDropdown, SuccessFrame
-from ...utils import get_dict_key
+from ...utils import get_dict_key, set_icon
 
 if TYPE_CHECKING:
     from .. import GaussUI
@@ -155,7 +155,7 @@ class ConfigFrame(ctkFrame):
         set_mode(self.app.modo_actual)
 
         # mandar a actualizar todo
-        self.app.set_icon(self.app.modo_actual)
+        set_icon(self.app, self.app)
         self.app.home_frame.update_frame()  # type: ignore
         self.app.inputs_frame.update_all()  # type: ignore
         self.app.matrices.update_all()  # type: ignore

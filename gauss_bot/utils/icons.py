@@ -3,16 +3,25 @@ Definiciones de todos los íconos e imagenes de la aplicación.
 """
 
 from os import path, walk
+from platform import system
 
 from PIL.Image import open as open_img
 from customtkinter import CTkImage as ctkImage
 
 from .paths import ASSET_PATH, NUMPAD_ICON_PATH
 
-APP_ICON = (
-    path.join(ASSET_PATH, "dark_mode", "light_logo.png"),
-    path.join(ASSET_PATH, "light_mode", "dark_logo.png"),
-)
+if system() == "Windows":
+    # iconbitmap() compatible files
+    APP_ICON = (
+        path.join(ASSET_PATH, "dark_mode", "light_logo.ico"),
+        path.join(ASSET_PATH, "light_mode", "dark_logo.ico"),
+    )
+else:
+    # iconphoto compatible files
+    APP_ICON = (
+        path.join(ASSET_PATH, "dark_mode", "light_logo.png"),
+        path.join(ASSET_PATH, "light_mode", "dark_logo.png"),
+    )
 
 
 ################################################################################
