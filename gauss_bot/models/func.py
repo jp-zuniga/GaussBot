@@ -34,10 +34,10 @@ from sympy.parsing.sympy_parser import (
 
 from ..utils import SAVED_FUNCS_PATH, transparent_invert
 
-TRANSFORMS: tuple = standard_transformations + (implicit_multiplication_application,)
-
 use("TkAgg")
 getLogger("matplotlib").setLevel(WARNING)
+
+TRANSFORMS: tuple = standard_transformations + (implicit_multiplication_application,)
 
 
 class Func:
@@ -226,7 +226,7 @@ class Func:
 
         return (
             rf"{r''.join(r'\int' for _ in range(num_integ))}"
-            + rf"{self.nombre[0] + rf'({self.var})'}d{str(self.var)}"
+            + rf" {self.nombre[0] + rf'({self.var})'}d{str(self.var)}"
         )
 
     def get_png(self) -> ctkImage:
@@ -294,7 +294,7 @@ class Func:
             raise ValueError("¡No se recibió un string a convertir en PNG!")
 
         if con_nombre and nombre_expr is not None:
-            latex_str = f"{nombre_expr} = {latex_str}"
+            latex_str = rf"{nombre_expr} = {latex_str}"
 
         rc("text", usetex=True)
         rc("font", family="serif")

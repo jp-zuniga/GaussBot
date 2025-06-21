@@ -647,7 +647,7 @@ class Matriz:
         """
 
         if self.filas <= 2 and self.columnas <= 2:
-            det: Fraction = self.calcular_det()
+            det = self.calcular_det()
         else:
             det, _, _ = self.calcular_det()
 
