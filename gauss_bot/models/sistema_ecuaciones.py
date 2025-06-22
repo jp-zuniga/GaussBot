@@ -64,8 +64,8 @@ class SistemaEcuaciones:
         if not self.matriz.filas == self.matriz.columnas - 1:
             raise ArithmeticError(
                 "La matriz de variables no es cuadrada.\n"
-                + "Como su determinante es indefinido, "
-                + "no se puede resolver el sistema mediante la Regla de Cramer."
+                + "Como su determinante es indefinido, no se puede\n"
+                + "resolver el sistema mediante la Regla de Cramer."
             )
 
         # descomponer la matriz para obtener solo las variables
@@ -94,7 +94,7 @@ class SistemaEcuaciones:
 
         if det == 0:
             raise ZeroDivisionError(
-                "El determinante de la matriz de variables es 0;  por lo tanto, "
+                "El determinante de la matriz de variables es 0;  por lo tanto,\n"
                 + "el sistema no se puede resolver mediante la Regla de Cramer."
             )
 

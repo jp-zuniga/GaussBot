@@ -375,8 +375,8 @@ class Matriz:
             multiplicador: Escalar/matriz a multiplicar.
 
         Raises:
-            TypeError:       Si el tipo de dato es inválido.
             ArithmeticError: Si las dimensiones de las matrices son inválidas.
+            TypeError:       Si el tipo de dato del argumento es inválido.
         ---
         """
 
@@ -384,8 +384,9 @@ class Matriz:
             # validar que las matrices sean compatibles para multiplicación
             if self.columnas != multiplicador.filas:
                 raise ArithmeticError(
-                    "¡El número de columnas de la primera matriz debe "
-                    + "ser igual al número de filas de la segunda matriz!"
+                    "Las matrices no son compatibles para multiplicación.\n"
+                    + "El número de columnas de la primera matriz debe ser\n"
+                    + "igual al número de filas de la segunda matriz."
                 )
 
             # inicializar una matriz cero con las dimensiones correctas
@@ -419,14 +420,14 @@ class Matriz:
         """
         Overload de operador para realizar multiplicación entre un escalar y una matriz.
 
-        Utilizado de la forma:
+        Utilizado cuando el escalar está a la izquierda del operador:
         - Union[int, float, Fraction] * Matriz() -> Matriz()
 
         Args:
             multiplicador: Escalar a multiplicar.
 
         Raises:
-            TypeError: Si el tipo de dato es inválido.
+            TypeError: Si el tipo de dato del argumento es inválido.
         ---
         """
 
