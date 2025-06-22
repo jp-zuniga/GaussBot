@@ -6,6 +6,7 @@ resolver con la Regla de Cramer y el método Gauss-Jordan.
 
 from copy import deepcopy
 from fractions import Fraction
+from typing import Optional
 
 from .matriz import Matriz
 from ..utils import LOGGER, format_factor
@@ -13,24 +14,23 @@ from ..utils import LOGGER, format_factor
 
 class SistemaEcuaciones:
     """
-    Representa un sistema de ecuaciones lineales con una instancia de Matriz() aumentada.
-
-    - cramer() y gauss_jordan() son los métodos principales para resolver un sistema.
-    - La solución se almacena en el atributo .solucion,
-      y el procedimiento realizado en .procedimiento
-      (ambos como strings)
+    Representa un sistema de ecuaciones lineales como
+    una matriz con una columna aumentada de constantes.
     """
 
     def __init__(self, matriz: Matriz) -> None:
         """
-        Recibe una matriz para representar el sistema de ecuaciones,
-        y almacena una deepcopy() para no afectar al objeto original.
-        * TypeError: si la matriz dada no es aumentada
+        Args:
+            matriz: Sistema de ecuaciones con columna aumentada.
+
+        Raises:
+            TypeError: Si la matriz no tiene una columna aumentada.
+        ---
         """
 
         if not matriz.aumentada:
             raise TypeError(
-                "Matriz debe ser aumentada para "
+                "¡La matriz debe ser aumentada para "
                 + "representar un sistema de ecuaciones!"
             )
 
@@ -42,17 +42,30 @@ class SistemaEcuaciones:
         self.procedimiento = ""
 
     def __str__(self) -> str:
+        """
+        Utilizar la implementación de __str__() de Matriz().
+        """
+
         return str(self.matriz)
 
     def cramer(self, nombre: str) -> None:
         """
-        Resuelve un sistema de ecuaciones ocupando la Regla de Cramer.
+        Resolver self ocupando la Regla de Cramer.
+
+        Args:
+            nombre: Nombre del sistemas de ecuaciones.
+
+        Raises:
+            ArithmeticError:   Si la matriz de variables del sistema no es cuadrada.
+            ZeroDivisionError: Si el determinante de la matriz de variables es 0.
+        ---
         """
 
         if not self.matriz.filas == self.matriz.columnas - 1:
             raise ArithmeticError(
-                "La matriz de variables no es cuadrada; "
-                + "su determinante es indefinido!"
+                "La matriz de variables no es cuadrada.\n"
+                + "Como su determinante es indefinido, "
+                + "no se puede resolver el sistema mediante la Regla de Cramer."
             )
 
         # descomponer la matriz para obtener solo las variables
@@ -75,45 +88,45 @@ class SistemaEcuaciones:
         soluciones: list[Fraction] = []
 
         if mat_variables.filas <= 2 and mat_variables.columnas <= 2:
-            det = mat_variables.calcular_det()  # type: ignore
+            det = mat_variables.calcular_det()
         else:
             det, _, _ = mat_variables.calcular_det()  # type: ignore
 
         if det == 0:
             raise ZeroDivisionError(
-                "El determinante de la matriz de variables es 0; "
-                + "el sistema no se puede resolver mediante la Regla de Cramer!"
+                "El determinante de la matriz de variables es 0;  por lo tanto, "
+                + "el sistema no se puede resolver mediante la Regla de Cramer."
             )
 
         for i in range(self.matriz.columnas - 1):
             # encontrar la submatriz de la variable i
-            submat_valores: list[list[Fraction]] = []
-            for j in range(self.matriz.filas):
-                submat_valores.append(
+            submat = Matriz(
+                False,
+                self.matriz.filas,
+                self.matriz.columnas - 1,
+                [
                     [
                         self.matriz[j, k] if k != i else col_aumentada[j, 0]
                         for k in range(self.matriz.columnas - 1)
                     ]
-                )
-
-            submat = Matriz(
-                False, self.matriz.filas, self.matriz.columnas - 1, submat_valores
+                    for j in range(self.matriz.filas)
+                ],
             )
 
             if submat.filas <= 2 and submat.columnas <= 2:
-                det_submat = submat.calcular_det()  # type: ignore
+                det_submat = submat.calcular_det()
             else:
                 det_submat, _, _ = submat.calcular_det()  # type: ignore
 
             # almacenar los determinantes de las submatrices,
             # y aplicar la formula para encontrar las soluciones
-            sub_dets.append(det_submat)  # type: ignore
+            sub_dets.append(det_submat)
             soluciones.append(det_submat / det)  # type: ignore
 
         if all(sol == 0 for sol in soluciones):
-            tipo_sol = "trivial"
+            tipo_sol: str = "trivial"
         else:
-            tipo_sol = "no trivial"
+            tipo_sol: str = "no trivial"
 
         # almacenar el procedimiento
         self.procedimiento += "---------------------------------------------\n"
@@ -121,11 +134,11 @@ class SistemaEcuaciones:
         self.procedimiento += f"\n\nb:\n{col_aumentada}"
         self.procedimiento += "\n---------------------------------------------\n"
 
-        self.procedimiento += f"|  {nombre}_var  |  =  "
+        self.procedimiento += f"| {nombre}_var |  =  "
         self.procedimiento += f"{det if det > 0 else f'−{-det}'}\n\n"  # type: ignore
 
         for i, subdet in enumerate(sub_dets):
-            self.procedimiento += f"|  {nombre}_{i + 1} (b)  |  =  "
+            self.procedimiento += f"| {nombre}_{i + 1} (b) |  =  "
             self.procedimiento += f"{subdet if det > 0 else f'−{-subdet}'}\n"  # type: ignore
 
         self.procedimiento += "---------------------------------------------\n"
@@ -146,22 +159,19 @@ class SistemaEcuaciones:
 
     def gauss_jordan(self) -> None:
         """
-        Resuelve un sistema de ecuaciones lineales aplicando
-        el método de Gauss-Jordan. Realiza operaciones de fila
-        para reducir la matriz y encontrar las soluciones.
+        Resolver el sistema aplicando el método de Gauss-Jordan,
+        realizando operaciones de fila para reducir
+        la matriz y encontrar las soluciones.
 
-        - Valida si la matriz es cero o inconsistente de antemano
-        - Valida si la matriz ya esta en su forma escalonada
-          reducida para no hacer operaciones innecesarias
+        ---
 
-        - Reduce la matriz a su forma escalonada y
-          valida si resulta inconsistente
-
-        - Encuentra variables libres y determina
-          si el sistema tiene una solución única
-
-        - Almacena la solución encontrada en .solucion
-          y el procedimiento en .procedimiento
+        Procedimiento:
+        - Validar si la matriz es cero o inconsistente de antemano.
+        - Validar si la matriz está en su forma escalonada reducida.
+        - Reducir la matriz a su forma escalonada y validar si resulta inconsistente.
+        - Encontrar variables libres y determinar si existe una solución única.
+        - Almacenar solución y operaciones realizadas.
+        ---
         """
 
         self.procedimiento += "\nMatriz original:\n"
@@ -170,13 +180,11 @@ class SistemaEcuaciones:
         if self.matriz.es_matriz_cero():
             self.solucion += "\nSistema tiene soluciones infinitas!\n"
             self.procedimiento += "\nTodas las ecuaciones tienen la forma 0 = 0, "
-            self.procedimiento += "  lo cual siempre es verdadero.".strip()
-            self.procedimiento += (
-                "\nPor lo tanto, el sistema tiene soluciones infinitas.\n"
-            )
+            self.procedimiento += "lo cual siempre es verdadero.\n"
+            self.procedimiento += "Por lo tanto, existen soluciones infinitas.\n"
             return
 
-        test_inicial = self._validar_consistencia()
+        test_inicial: tuple[bool, int] = self._validar_consistencia()
         if not test_inicial[0]:
             if self._validar_escalonada_reducida():
                 self.procedimiento += (
@@ -185,24 +193,22 @@ class SistemaEcuaciones:
 
             self.procedimiento += str(self.matriz)
             self._obtener_soluciones_gj(unica=False, libres=[], validacion=test_inicial)
-
             return
 
         if self._validar_escalonada_reducida():
             self.procedimiento += (
-                "\nMatriz ya esta en su forma escalonada reducida!\n\n"
+                f"\nMatriz ya esta en su forma escalonada reducida!\n\n{self.matriz}"
             )
-            self.procedimiento += str(self.matriz)
-        self._reducir_matriz()
+        else:
+            self._reducir_matriz()
 
-        test_final = self._validar_consistencia()
+        test_final: tuple[bool, int] = self._validar_consistencia()
         if not test_final[0]:
             self._obtener_soluciones_gj(unica=False, libres=[], validacion=test_final)
-
             return
 
-        libres = self._encontrar_variables_libres()
-        solucion_unica = self._validar_escalonada_reducida() and libres == []
+        libres: list[int] = self._encontrar_variables_libres()
+        solucion_unica: bool = self._validar_escalonada_reducida() and libres == []
 
         self._obtener_soluciones_gj(
             unica=solucion_unica,
@@ -212,22 +218,8 @@ class SistemaEcuaciones:
 
     def _reducir_matriz(self) -> None:
         """
-        * Reduce la matriz a su forma escalonada usando el método de reducción por filas
-        * Actualiza .procedimiento con cada operación realizada
-
-        Nota:
-        -----
-
-        Los métodos _eliminar_debajo() y _eliminar_encima() utilizan el
-        __getitem__() de Matriz() para acceder a los valores de la matriz.
-        Sin embargo, para asignar valores a la matriz, se accede directamente
-        a la lista de valores, porque Matriz() no tiene una implementación
-        de __setitem__(), para evitar cambios en la matriz original.
-
-        Resolver sistemas de ecuaciones es un caso especial, entonces
-        se accede a .valores directamente, porque se sabe que se esta
-        trabajando con una deepcopy() del objeto original.
-        (see: SistemasEcuaciones().__init__())
+        Reducir la matriz a su forma escalonada usando el método de reducción por filas.
+        ---
         """
 
         self._eliminar_debajo()
@@ -235,22 +227,23 @@ class SistemaEcuaciones:
 
     def _eliminar_debajo(self) -> None:
         """
-        Para cada fila en la matriz:
-        * Encuentra entradas pivotes maximas
-        * Normaliza fila pivote
-        * Elimina elementos debajo del pivote
+        Para cada fila de la matriz:
+        - Encontrar entradas pivotes maximas.
+        - Normalizar fila pivote.
+        - Eliminar elementos debajo del pivote.
+        ---
         """
 
         fila_actual: int = 0
         for j in range(self.matriz.columnas - 1):
-            fila_pivote = None
+            fila_pivote: Optional[int] = None
             maximo = Fraction(0)
 
             # encontrar la fila pivote de la columna actual
             for i in range(fila_actual, self.matriz.filas):
                 if abs(self.matriz[i, j]) > maximo:
-                    maximo = abs(self.matriz[i, j])
-                    fila_pivote = i
+                    maximo: Fraction = abs(self.matriz[i, j])
+                    fila_pivote: Optional[int] = i
 
             # si las variables no han cambiado, saltar a la siguiente columna
             if fila_pivote is None or maximo == 0:
@@ -264,12 +257,11 @@ class SistemaEcuaciones:
                 )
 
                 self.procedimiento += (
-                    f"\n\nF{fila_actual + 1}  <=>  F{fila_pivote + 1}:\n"
+                    f"\n\nF{fila_actual + 1}  <=>  F{fila_pivote + 1}:\n{self.matriz}"
                 )
-                self.procedimiento += str(self.matriz)
 
             # normalizar fila pivote (convertir elemento pivote en 1)
-            pivote = self.matriz[fila_actual, j]
+            pivote: Fraction = self.matriz[fila_actual, j]
             if pivote not in (1, 0):
                 for k in range(self.matriz.columnas):
                     self.matriz.valores[fila_actual][k] /= pivote
@@ -287,9 +279,10 @@ class SistemaEcuaciones:
 
             # eliminar elementos debajo del pivote
             for f in range(fila_actual + 1, self.matriz.filas):
-                factor = self.matriz[f, j]
+                factor: Fraction = self.matriz[f, j]
                 if factor == 0:
                     continue
+
                 for k in range(self.matriz.columnas):
                     self.matriz.valores[f][k] -= factor * self.matriz[fila_actual, k]
 
@@ -297,21 +290,21 @@ class SistemaEcuaciones:
                     f"\n\nF{fila_actual + 1}  =>  F{fila_actual + 1} − "
                 )
                 self.procedimiento += (
-                    f"[ {format_factor(factor)}F{fila_pivote + 1} ]:\n"
+                    f"[ {format_factor(factor)}F{fila_pivote + 1} ]:\n{self.matriz}"
                 )
-                self.procedimiento += str(self.matriz)
             fila_actual += 1
 
     def _eliminar_encima(self) -> None:
         """
-        * Elimina elementos encima de los pivotes
-         (empezando desde la ultima fila y la ultima columna)
+        Eliminar elementos encima de los pivotes,
+        empezando desde la última fila y la última columna.
+        ---
         """
 
         for i in reversed(range(self.matriz.filas)):
             try:
                 # encontrar pivote en la fila actual
-                columna_pivote = self.matriz[i].index(
+                columna_pivote: int = self.matriz[i].index(
                     next(filter(lambda x: x != 0, self.matriz[i]))
                 )
             except StopIteration:
@@ -321,9 +314,10 @@ class SistemaEcuaciones:
             # para cada fila encima de la fila actual
             # eliminar elementos empezando desde abajo
             for f in reversed(range(i)):
-                factor = self.matriz[f, columna_pivote]
+                factor: Fraction = self.matriz[f, columna_pivote]
                 if factor == 0:
                     continue
+
                 for k in range(self.matriz.columnas):
                     self.matriz.valores[f][k] -= factor * self.matriz[i, k]
 
@@ -333,14 +327,14 @@ class SistemaEcuaciones:
 
     def _encontrar_variables_libres(self) -> list[int]:
         """
-        Encuentra variables básicas del sistema, para retornar
-        las variables libres (las que no se agregaron a la lista de básicas).
+        Encontrar variables libres de self mediante las variables básicas.
 
-        Retorna:
-        * list[int]: lista de índices de variables libres
+        Returns:
+            list[int]: Lista de índices de variables libres.
+        ---
         """
 
-        entradas_principales = []
+        entradas_principales: list[int] = []
         for i in range(self.matriz.filas):
             try:
                 # encontrar una entrada distinta de 0 en la fila
@@ -352,31 +346,36 @@ class SistemaEcuaciones:
                     )
                 )
             except StopIteration:
-                # la fila no tiene entrada principal
+                # la fila es una fila cero
                 continue
 
-        # las columnas no registradas en entradas_principales representan variables libres
+        # las variables libres no son entradas principales
         return [
             x for x in range(self.matriz.columnas - 1) if x not in entradas_principales
         ]
 
     def _despejar_variables(self, libres: list[int]) -> list[str]:
         """
-        Ocupa _despejar_expresion() para mover
-        terminos al lado derecho de la ecuación/fila
-        * libres: lista de índices de columnas de variables libres
+        Despejar las variables de las ecuaciones de self.
+
+        Args:
+            libres: Lista de índices de columnas de variables libres.
+
+        Returns:
+            list[str]: Lista de ecuaciones despejadas.
+        ---
         """
 
-        ecuaciones = [
-            f"X{x + 1} es libre\n" for x in libres
-        ]  # agregar variables libres
+        # agregar variables libres
+        ecuaciones: list[str] = [f"X{x + 1} es libre\n" for x in libres]
 
         for i in range(self.matriz.filas):
             for j in range(self.matriz.columnas - 1):
-                if self.matriz[i, j] == 0:  # si no es la entrada principal:
+                # ignorar entradas distintas a 0
+                if self.matriz[i, j] == 0:
                     continue
 
-                expresion = self._despejar_expresion(fila=i, columna=j)
+                expresion: str = self._despejar_expresion(i, j)
                 ecuaciones.append(f"X{j + 1} = {expresion}\n")
                 break
 
@@ -385,21 +384,29 @@ class SistemaEcuaciones:
 
     def _despejar_expresion(self, fila: int, columna: int) -> str:
         """
-        'Despeja' una ecuación/fila de la matriz en términos de la variable principal:
-        * (1, 0, -1/2 | 3)  # fila
-        * X1 − 1/2*X3 = 3   # fila escrita como ecuación
-        * X1 = 3 + 1/2*X3   # ecuación despejada (output)
+        Despejar la variable principal de una ecuación.
+
+        Examples:
+            - (1, 0, -1/2 | 3)  # fila
+            - X1 - 1/2*X3 = 3   # fila escrita como ecuación
+            - X1 = 3 + 1/2*X3   # ecuación despejada (output)
+
+        Args:
+            fila:    Ecuación del sistema a despejar.
+            columna: Variable principal de la ecuación.
+
+        Returns:
+            str: La ecuación despejada y formateada.
+        ---
         """
 
         # validar si el resto de los elementos de la fila son 0
-        variable_igual_cero = all(
+        if all(
             self.matriz[fila, x] == 0 for x in range(self.matriz.columnas) if x != fila
-        )
-
-        if variable_igual_cero:
+        ):
             return "0"
 
-        constante = self.matriz[fila, -1]
+        constante: Fraction = self.matriz[fila, -1]
 
         # si la constante es 0, no agregar nada
         expresion = str(constante) if constante != 0 else ""
@@ -410,7 +417,7 @@ class SistemaEcuaciones:
             if coeficiente == 0:
                 continue
 
-            signo = " + " if coeficiente > 0 else " − "
+            signo: str = " + " if coeficiente > 0 else " − "
 
             if coeficiente in (1, -1):
                 variable = f"X{j + 1}"
@@ -431,80 +438,103 @@ class SistemaEcuaciones:
 
     def _validar_consistencia(self) -> tuple[bool, int]:
         """
-        Valida si la matriz es consistente o inconsistente.
+        Validar si self es consistente o inconsistente.
 
-        Retorna tuple[bool, int]:
-        * bool = si la matriz es consistente
-        * int = fila donde se encontro inconsistencia (-1 si no hay)
+        Returns:
+            tuple[bool, int]: Si la matriz es consistente; el número
+                              de fila donde se encontró la inconsistencia
+                             (-1 si la matriz es consistente).
+        ---
         """
 
         if self.matriz.es_matriz_cero():
             return (True, -1)
 
-        variables_0 = [0 for _ in range(self.matriz.columnas - 1)]
+        variables_0: list[int] = [0 for _ in range(self.matriz.columnas - 1)]
+
         for i in range(self.matriz.filas):
-            constante_es_0 = self.matriz[i, -1] == 0
-            variables_actuales = self.matriz[i, :-1]
+            constante_es_0: bool = self.matriz[i, -1] == 0
+            variables_actuales: list[Fraction] = self.matriz[i, :-1]
 
             # si la fila tiene la forma 0 = b (donde b != 0), es inconsistente
             if variables_actuales == variables_0 and not constante_es_0:
                 return (False, i)
+
         return (True, -1)
 
     def _validar_escalonada(self) -> bool:
         """
-        Valida si la matriz esta en su forma escalonada o no.
+        Validar si self está en su forma escalonada o no.
+
+        ---
 
         Condiciones para que una matriz sea escalonada:
-        - 1. Todas las filas no cero estan encima de las filas cero
-        - 2. La entrada principal de cada fila esta a la derecha
-             de la entrada principal de la fila anterior
-        - 3. Todas las entradas debajo de la entrada principal de una fila son cero
+        1. Todas las filas no cero están encima de las filas cero.
+        2. La entrada principal de cada fila está a la
+           derecha de la entrada principal de la fila anterior.
+        3. Todas las entradas debajo de la entrada principal de una fila son cero.
+
+        ---
+
+        Returns:
+            bool: Si self es una matriz escalonada.
+        ---
         """
 
         if self.matriz.es_matriz_cero():
             return False
 
-        fila_cero = [0 for _ in range(self.matriz.columnas)]
+        fila_cero: list[Fraction] = [Fraction(0) for _ in range(self.matriz.columnas)]
         for i in range(self.matriz.filas):
             if self.matriz[i] != fila_cero:
                 continue
 
-            # condicion 1:
+            # condición 1:
             if any(
                 self.matriz[j] != fila_cero for j in range(i + 1, self.matriz.filas)
             ):
                 return False
 
-        entrada_anterior = -1
+        entrada_anterior: int = -1
         for i in range(self.matriz.filas):
             try:
                 # encontrar la entrada principal de la fila actual
-                entrada_actual = next(
+                entrada_actual: int = next(
                     j for j in range(self.matriz.columnas - 1) if self.matriz[i, j] != 0
                 )
             except StopIteration:
                 # no hay entrada principal en la fila
                 continue
 
-            entradas_inferiores_cero = any(
+            entradas_inferiores_no_cero = any(
                 self.matriz[k, entrada_actual] != 0
                 for k in range(i + 1, self.matriz.filas)
             )
 
             # condiciones 2 y 3
-            if entrada_actual <= entrada_anterior or entradas_inferiores_cero:
+            if entrada_actual <= entrada_anterior or entradas_inferiores_no_cero:
                 return False
 
-            entrada_anterior = entrada_actual
+            entrada_anterior: int = entrada_actual
+
+        # las 3 condiciones se cumplieron, es escalonada
         return True
 
     def _validar_escalonada_reducida(self) -> bool:
         """
-        Valida si la matriz esta en su forma escalonada reducida o no.
+        Validar si la matriz está en su forma escalonada reducida o no.
+
+        ---
+
         Condiciones para que una matriz sea escalonada reducida:
-        * 1. La matriz esta en su forma escalonada
-        * 2. La entrada principal de cada fila es 1
+        1. La matriz está en su forma escalonada.
+        2. La entrada principal de cada fila es 1.
+
+        ---
+
+        Returns:
+            bool: Si self es una matriz escalonada reducida.
+        ---
         """
 
         # condicion 1:
@@ -513,7 +543,7 @@ class SistemaEcuaciones:
 
         for i in range(self.matriz.filas):
             try:
-                entrada_principal = next(
+                entrada_principal: int = next(
                     j for j in range(self.matriz.columnas - 1) if self.matriz[i, j] == 1
                 )
             except StopIteration:
@@ -527,22 +557,30 @@ class SistemaEcuaciones:
 
             if entradas_inferiores_cero:
                 return False
+
+        # ambas condiciones se cumplieron
         return True
 
     def _obtener_soluciones_gj(
         self, unica: bool, libres: list[int], validacion: tuple[bool, int]
     ) -> None:
         """
-        Analiza la matriz para encontrar la solución del sistema de ecuaciones.
+        Analizar la matriz para encontrar la solución del sistema de ecuaciones.
 
-        * unica = si el sistema tiene una solución única
-        * libres = lista de indices de variables libres
-        * validacion = tupla retornada por _validar_consistencia()
+        ---
 
         Soluciones posibles:
-        * Sistema inconsistente: se determina la fila inconsistente de la matriz
-        * Solución única: se deduce si es una solución trivial o no
-        * Solución general: se despejan las ecuaciones
+            Sistema inconsistente: Se determina la fila inconsistente de la matriz.
+            Solución única:        Se deduce si es una solución trivial o no.
+            Solución general:      Se despejan las ecuaciones.
+
+        ---
+
+        Args:
+            unica:      Si el sistema tiene una solución única.
+            libres:     Lista de indices de las variables libres.
+            validacion: Tupla retornada por self._validar_consistencia().
+        ---
         """
 
         # unpack la validacion recibida:
@@ -560,9 +598,9 @@ class SistemaEcuaciones:
                 self.matriz[i, -1] == 0 for i in range(self.matriz.filas)
             )
 
-            tipo_solucion = "trivial" if solucion_trivial else "no trivial"
-            self.solucion += f"\nSolución {tipo_solucion} encontrada:\n"
+            tipo_solucion: str = "trivial" if solucion_trivial else "no trivial"
 
+            self.solucion += f"\nSolución {tipo_solucion} encontrada:\n"
             for i in range(self.matriz.filas):
                 if all(x == 0 for x in self.matriz[i]):
                     LOGGER.warning("Saltando fila cero!")
@@ -580,7 +618,8 @@ class SistemaEcuaciones:
             self.procedimiento += f"\n{self.solucion}"
             return
 
-        ecuaciones = self._despejar_variables(libres)
+        ecuaciones: list[str] = self._despejar_variables(libres)
+
         self.solucion += "\nSistema no tiene solución única!\n"
         self.solucion += "\nSolución general encontrada:\n"
         for linea in ecuaciones:
