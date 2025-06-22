@@ -17,7 +17,7 @@ def main() -> None:
     if system() == "Windows":
         app.after(0, lambda: app.state("zoomed"))
     else:
-        app.wm_attributes("-fullscreen", True)
+        app.wm_attributes("-zoomed", True)
 
     app.mainloop()
 
