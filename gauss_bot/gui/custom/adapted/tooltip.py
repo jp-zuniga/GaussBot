@@ -59,7 +59,6 @@ class Tooltip(Toplevel):
 
         self.frame: ctkFrame = ctkFrame(  # type: ignore
             self.transparent_frame,
-            corner_radius=10,
             border_width=2,
             bg_color=self.bg_color,
             fg_color=self.bg_color,
@@ -68,7 +67,7 @@ class Tooltip(Toplevel):
         self.frame.pack(expand=True, fill="both")
         self.message_label = ctkLabel(
             self.frame,
-            font=ctkFont(size=12),
+            font=ctkFont(size=10),
             textvariable=self.msg_var,
             **message_kwargs,
         )

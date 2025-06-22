@@ -134,8 +134,8 @@ class GaussUI(ctk):
 
             self.config_options = {
                 "escala": 1.0,
-                "modo": "dark",
-                "tema": "viento.json",
+                "modo": "light",
+                "tema": "ceruleo.json",
             }
 
         # extraer configs individuales del diccionario

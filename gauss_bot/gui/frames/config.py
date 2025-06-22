@@ -37,17 +37,14 @@ class ConfigFrame(ctkFrame):
             "130%": 1.3,
             "140%": 1.4,
             "150%": 1.5,
-            "160%": 1.6,
             "170%": 1.7,
             "180%": 1.8,
-            "190%": 1.9,
-            "200%": 2.0,
         }
 
         self.modos_dict = {"Claro": "light", "Oscuro": "dark"}
         self.temas_dict = {
             "Cerúleo": "ceruleo.json",
-            "Viento": "viento.json",
+            "Otoño": "otono.json",
             "Violeta": "violeta.json",
         }
 
