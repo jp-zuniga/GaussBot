@@ -219,7 +219,6 @@ class SistemaEcuaciones:
     def _reducir_matriz(self) -> None:
         """
         Reducir la matriz a su forma escalonada usando el método de reducción por filas.
-        ---
         """
 
         self._eliminar_debajo()
@@ -298,7 +297,6 @@ class SistemaEcuaciones:
         """
         Eliminar elementos encima de los pivotes,
         empezando desde la última fila y la última columna.
-        ---
         """
 
         for i in reversed(range(self.matriz.filas)):
@@ -386,10 +384,14 @@ class SistemaEcuaciones:
         """
         Despejar la variable principal de una ecuación.
 
-        Examples:
-            - (1, 0, -1/2 | 3)  # fila
-            - X1 - 1/2*X3 = 3   # fila escrita como ecuación
-            - X1 = 3 + 1/2*X3   # ecuación despejada (output)
+        ---
+
+        Ejemplo:
+        -  1, 0, -1/2 | 3   # fila
+        - X1 - 1/2*X3 = 3   # fila escrita como ecuación
+        - X1 = 3 + 1/2*X3   # ecuación despejada (output)
+
+        ---
 
         Args:
             fila:    Ecuación del sistema a despejar.
@@ -441,9 +443,8 @@ class SistemaEcuaciones:
         Validar si self es consistente o inconsistente.
 
         Returns:
-            tuple[bool, int]: Si la matriz es consistente; el número
-                              de fila donde se encontró la inconsistencia
-                             (-1 si la matriz es consistente).
+            (bool, int): Si la matriz es consistente;
+                         el número de fila donde se encontró la inconsistencia.
         ---
         """
 
@@ -570,9 +571,9 @@ class SistemaEcuaciones:
         ---
 
         Soluciones posibles:
-            Sistema inconsistente: Se determina la fila inconsistente de la matriz.
-            Solución única:        Se deduce si es una solución trivial o no.
-            Solución general:      Se despejan las ecuaciones.
+        1. Sistema inconsistente: Se determina la fila inconsistente de la matriz.
+        2. Solución única:        Se deduce si es una solución trivial o no.
+        3. Solución general:      Se despejan las ecuaciones.
 
         ---
 

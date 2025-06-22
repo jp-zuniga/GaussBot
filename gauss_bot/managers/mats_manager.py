@@ -363,7 +363,7 @@ class MatricesManager:
             }\n"
 
         else:
-            proc += "El determinante de una matriz nxn (n > 2) se puede calcular\n"
+            proc += "El determinante de una matriz nxn (n >= 3) se puede calcular\n"
             proc += "transformando la matriz en una matriz triangular superior,\n"
             proc += "y multiplicando todos elementos de la diagonal principal.\n\n"
 

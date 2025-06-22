@@ -15,9 +15,6 @@ from ..utils import format_factor
 class Matriz:
     """
     Representa una matriz matemática de cualquier dimensión.
-    Los valores se almacenan como objetos Fraction().
-    Para representar un sistema de ecuaciones lineales,
-    se puede indicar que incluye una columna aumentada.
     """
 
     def __init__(
@@ -29,12 +26,12 @@ class Matriz:
     ) -> None:
         """
         Args:
-            aumentada:      indica si representa un sistema de ecuaciones
-            filas/columnas: dimensiones de la matriz
-            valores:        lista de elementos
+            aumentada:      Indica si representa un sistema de ecuaciones.
+            filas/columnas: Dimensiones de la matriz.
+            valores:        Lista de elementos.
 
         Raises:
-            ValueError: si las dimensiones de la matriz no son positivas
+            ValueError: si las dimensiones de la matriz no son positivas.
         """
 
         if filas < 1 or columnas < 1:
@@ -133,8 +130,9 @@ class Matriz:
             list[list[Fraction]]: Submatriz de self.
 
         Raises:
-            IndexError: si los índices están fuera de rango.
-            TypeError:  si los índices son de tipo inválido.
+            IndexError: Si los índices están fuera de rango.
+            TypeError:  Si los índices son de tipo inválido.
+        ---
         """
 
         if isinstance(indice, int) and -self.filas <= indice < self.filas:
@@ -219,7 +217,7 @@ class Matriz:
         Comparar igualdad entre self y otro objeto.
 
         Args:
-            other: objeto a comparar
+            other: Objeto a comparar.
 
         Returns:
             bool: Si self es igual a other.
@@ -247,7 +245,7 @@ class Matriz:
         con los valores alineados y separadores correspondientes.
 
         Returns:
-            str: self representado como texto formateado y legible.
+            str: self representado en texto formateado y legible.
         ---
         """
 
@@ -420,6 +418,7 @@ class Matriz:
     def __rmul__(self, multiplicador: Union[int, float, Fraction]) -> "Matriz":
         """
         Overload de operador para realizar multiplicación entre un escalar y una matriz.
+
         Utilizado de la forma:
         - Union[int, float, Fraction] * Matriz() -> Matriz()
 
@@ -427,7 +426,7 @@ class Matriz:
             multiplicador: Escalar a multiplicar.
 
         Raises:
-            TypeError: si el tipo de dato es inválido.
+            TypeError: Si el tipo de dato es inválido.
         ---
         """
 
@@ -488,8 +487,8 @@ class Matriz:
         la matriz en una matriz triangular superior.
 
         Returns:
-            tuple[Matriz, bool]: Los valores modificados y una bandera
-                                 indicando si hubo intercambio de filas.
+            (Matriz, bool): Los valores modificados;
+                            una bandera indicando si hubo intercambio de filas.
         ---
         """
 
@@ -550,11 +549,11 @@ class Matriz:
         Calcular el determinante de la instancia.
 
         Returns:
-            Fraction:                      Determinante (para matrices 1x1 y 2x2).
-            tuple[Fraction, Matriz, bool]: Determinante,
-                                           matriz triangular superior,
-                                           bandera de intercambio de filas
-                                           (para matrices nxn, n >= 3).
+            Fraction:                 Determinante (para matrices 1x1 y 2x2).
+            (Fraction, Matriz, bool): Determinante;
+                                      matriz triangular superior;
+                                      bandera de intercambio de filas
+                                     (para matrices nxn, n >= 3).
         Raises:
             ArithmeticError: Si la matriz no es cuadrada.
         ---
@@ -573,7 +572,7 @@ class Matriz:
         if self.filas == 2 and self.columnas == 2:
             return (self[0, 0] * self[1, 1]) - (self[0, 1] * self[1, 0])
 
-        # para matrices nxn (n > 2),
+        # para matrices nxn (n >= 3),
         # encontrar la triangular superior,
         # y multiplicar todos los diagonales
         mat_triangular, intercambio = self.hacer_triangular_superior()
@@ -638,7 +637,7 @@ class Matriz:
         Calcular la inversa de self.
 
         Returns:
-            tuple[Matriz, Matriz, Fraction]: Inversa, adjunta, determinante.
+            (Matriz, Matriz, Fraction): Inversa; adjunta; determinante.
 
         Raises:
             ArithmeticError:   Si la matriz no es cuadrada.
