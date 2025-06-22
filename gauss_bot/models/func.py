@@ -4,7 +4,6 @@ Implementación de la clase Func.
 
 from decimal import Decimal
 from logging import WARNING, getLogger
-from os import makedirs, path
 from re import compile as comp, sub
 from typing import Optional
 
@@ -280,8 +279,8 @@ class Func:
         ---
         """
 
-        makedirs(SAVED_FUNCS_PATH, exist_ok=True)
-        output_file = path.join(SAVED_FUNCS_PATH, rf"{output_file or nombre_expr}.png")
+        SAVED_FUNCS_PATH.mkdir(exist_ok=True)
+        output_file = SAVED_FUNCS_PATH / rf"{output_file or nombre_expr}.png"
 
         if expr is not None:
             latex_str: str = latex(

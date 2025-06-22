@@ -4,7 +4,6 @@ Funciones de utilidad generales para la aplicación.
 
 from fractions import Fraction
 from logging import DEBUG, FileHandler, Formatter, getLogger, Logger
-from os import makedirs, path
 from typing import Any, Literal, Optional
 
 from PIL.Image import Image, Resampling, merge, open as open_img
@@ -107,16 +106,14 @@ def log_setup(logger: Logger = LOGGER) -> None:
     ---
     """
 
-    if not path.exists(LOG_PATH):
-        makedirs(DATA_PATH, exist_ok=True)
-        with open(LOG_PATH, mode="w", encoding="utf-8") as _:
-            pass
+    if not LOG_PATH.exists():
+        DATA_PATH.mkdir(exist_ok=True)
+        LOG_PATH.touch()
 
     # si hay mas de 500 lineas en el log, limpiarlo
     with open(LOG_PATH, mode="r", encoding="utf-8") as log_file:
         if len(log_file.readlines()) > 500:
-            with open(LOG_PATH, mode="w", encoding="utf-8") as _:
-                pass
+            LOG_PATH.write_text("")
 
     handler = FileHandler(LOG_PATH, mode="a", encoding="utf-8")
     handler.setLevel(DEBUG)
@@ -190,12 +187,12 @@ def generate_sep(orientation: bool, size: tuple[int, int]) -> ctkImage:
 
     seps: dict[bool, tuple[Image, Image]] = {
         True: (
-            open_img(path.join(ASSET_PATH, "light_mode", "dark_vseparator.png")),
-            open_img(path.join(ASSET_PATH, "dark_mode", "light_vseparator.png")),
+            open_img(ASSET_PATH / "light_mode" / "dark_vseparator.png"),
+            open_img(ASSET_PATH / "dark_mode" / "light_vseparator.png"),
         ),
         False: (
-            open_img(path.join(ASSET_PATH, "light_mode", "dark_hseparator.png")),
-            open_img(path.join(ASSET_PATH, "dark_mode", "light_hseparator.png")),
+            open_img(ASSET_PATH / "light_mode" / "dark_hseparator.png"),
+            open_img(ASSET_PATH / "dark_mode" / "light_hseparator.png"),
         ),
     }
 

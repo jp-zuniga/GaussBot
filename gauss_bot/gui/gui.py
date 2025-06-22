@@ -4,7 +4,6 @@ todos los frames y managers necesarios para el GUI.
 """
 
 from json import dump, load
-from os import makedirs, path
 from typing import Union
 
 from customtkinter import (
@@ -108,13 +107,13 @@ class GaussUI(ctk):
         self.config_options["modo"] = self.modo_actual
         self.config_options["tema"] = self.tema_actual
 
-        if not path.exists(CONFIG_PATH):
-            makedirs(path.dirname(CONFIG_PATH), exist_ok=True)
-            LOGGER.info("Creando archivo 'config.json'...")
+        if not CONFIG_PATH.exists():
+            CONFIG_PATH.parent.mkdir(parents=True, exist_ok=True)
+            LOGGER.info(f"Creando archivo '{CONFIG_PATH}'...")
 
         with open(CONFIG_PATH, mode="w", encoding="utf-8") as config_file:
             dump(self.config_options, config_file, indent=4, sort_keys=True)
-            LOGGER.info("Configuración guardada!")
+            LOGGER.info("¡Configuración guardada exitosamente!")
 
     def _load_config(self) -> None:
         """
@@ -122,13 +121,13 @@ class GaussUI(ctk):
         Si config.json no existe, utiliza valores por defecto.
         """
 
-        if path.exists(CONFIG_PATH):
+        if CONFIG_PATH.exists():
             with open(CONFIG_PATH, mode="r", encoding="utf-8") as config_file:
                 self.config_options = load(config_file)
-                LOGGER.info("Configuración cargada!")
+                LOGGER.info("¡Configuración cargada exitosamente!")
         else:
             LOGGER.info(
-                "Archivo 'config.json' no existe, "
+                f"Archivo '{CONFIG_PATH}' no existe, "
                 + "inicializando con valores por defecto..."
             )
 
@@ -146,5 +145,5 @@ class GaussUI(ctk):
         # aplicar configs
         set_mode(self.modo_actual)
         set_scaling(self.escala_actual)
-        set_theme(path.join(THEMES_PATH, self.tema_actual))
+        set_theme(THEMES_PATH / self.tema_actual)
         LOGGER.info("Configuración aplicada!")

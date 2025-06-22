@@ -6,7 +6,6 @@ los datos de MatricesManager y VectoresManager.
 
 from fractions import Fraction
 from json import JSONDecodeError, dump, load
-from os import makedirs, path
 
 from . import MatricesManager, VectoresManager
 from ..models import FractionDecoder, FractionEncoder, Matriz, Vector
@@ -27,10 +26,10 @@ class OpsManager:
         """
 
         if mats_manager is not None and not isinstance(mats_manager, MatricesManager):
-            raise TypeError("Argumento inválido para 'mats_manager'!")
+            raise TypeError("¡Argumento inválido para 'mats_manager'!")
 
         if vecs_manager is not None and not isinstance(vecs_manager, VectoresManager):
-            raise TypeError("Argumento inválido para 'vecs_manager'!")
+            raise TypeError("¡Argumento inválido para 'vecs_manager'!")
 
         self.mats_manager = (
             MatricesManager(self._load_matrices(), self._load_sistemas())
@@ -61,7 +60,7 @@ class OpsManager:
         if mat.columnas != len(vec):
             raise ArithmeticError(
                 "El número de columnas de la matriz debe ser "
-                + "igual al número de componentes del vector!"
+                + "igual al número de componentes del vector."
             )
 
         # inicializar la lista 2D de la matriz resultante
@@ -126,17 +125,18 @@ class OpsManager:
         }
 
         # crear sistemas.json si no existe
-        if not path.exists(SISTEMAS_PATH):
-            makedirs(path.dirname(SISTEMAS_PATH), exist_ok=True)
-            LOGGER.info("Creando archivo 'sistemas.json'...")
+        if not SISTEMAS_PATH.exists():
+            SISTEMAS_PATH.parent.mkdir(parents=True, exist_ok=True)
+            SISTEMAS_PATH.write_text("")
+            LOGGER.info(f"Creando '{SISTEMAS_PATH}'...")
 
         # si sis_ingresados esta vacio, dejar sistemas.json vacio y retornar
         if sistemas_dict == {}:
-            with open(SISTEMAS_PATH, "w", encoding="utf-8") as _:
-                LOGGER.info(
-                    "No hay sistemas de ecuaciones para guardar, "
-                    + "dejando 'sistemas.json' vacío..."
-                )
+            SISTEMAS_PATH.write_text("")
+            LOGGER.info(
+                "No hay sistemas de ecuaciones para guardar, dejando archivo vacío..."
+            )
+
             return
 
         with open(SISTEMAS_PATH, mode="w", encoding="utf-8") as sistemas_file:
@@ -148,7 +148,9 @@ class OpsManager:
                 cls=FractionEncoder,
             )
 
-            LOGGER.info("Sistemas de ecuaciones guardados en 'sistemas.json'!")
+            LOGGER.info(
+                f"¡Sistemas de ecuaciones guardados en '{SISTEMAS_PATH}' exitosamente!"
+            )
 
     def save_matrices(self) -> None:
         """
@@ -170,17 +172,15 @@ class OpsManager:
         }
 
         # crear matrices.json si no existe
-        if not path.exists(MATRICES_PATH):
-            makedirs(path.dirname(MATRICES_PATH), exist_ok=True)
-            LOGGER.info("Creando archivo 'matrices.json'...")
+        if not MATRICES_PATH.exists():
+            MATRICES_PATH.parent.mkdir(parents=True, exist_ok=True)
+            MATRICES_PATH.write_text("")
+            LOGGER.info(f"Creando '{MATRICES_PATH}'...")
 
         # si mats_ingresadas esta vacio, dejar matrices.json vacio y retornar
         if matrices_dict == {}:
-            with open(MATRICES_PATH, "w", encoding="utf-8") as _:
-                LOGGER.info(
-                    "No hay matrices para guardar, "
-                    + "dejando 'matrices.json' vacío..."
-                )
+            MATRICES_PATH.write_text("")
+            LOGGER.info("No hay matrices para guardar, dejando archivo vacío...")
             return
 
         with open(MATRICES_PATH, mode="w", encoding="utf-8") as matrices_file:
@@ -192,7 +192,7 @@ class OpsManager:
                 cls=FractionEncoder,
             )
 
-            LOGGER.info("Matrices guardadas en 'matrices.json'!")
+            LOGGER.info(f"¡Matrices guardadas en '{MATRICES_PATH}' exitosamente!")
 
     def save_vectores(self) -> None:
         """
@@ -209,17 +209,15 @@ class OpsManager:
         }
 
         # crear vectores.json si no existe
-        if not path.exists(VECTORES_PATH):
-            makedirs(path.dirname(VECTORES_PATH), exist_ok=True)
-            LOGGER.info("Creando archivo 'vectores.json'...")
+        if not VECTORES_PATH.exists():
+            VECTORES_PATH.parent.mkdir(parents=True, exist_ok=True)
+            VECTORES_PATH.write_text("")
+            LOGGER.info(f"Creando '{VECTORES_PATH}'...")
 
         # si vecs_ingresados esta vacio, dejar vectores.json vacio y retornar
         if vectores_dict == {}:
-            with open(VECTORES_PATH, "w", encoding="utf-8") as _:
-                LOGGER.info(
-                    "No hay vectores para guardar, "
-                    + "dejando 'vectores.json' vacío..."
-                )
+            VECTORES_PATH.write_text("")
+            LOGGER.info("No hay vectores para guardar, dejando archivo vacío...")
             return
 
         with open(VECTORES_PATH, "w", encoding="utf-8") as vectores_file:
@@ -231,7 +229,7 @@ class OpsManager:
                 cls=FractionEncoder,
             )
 
-            LOGGER.info("Vectores guardados en 'vectores.json'!")
+            LOGGER.info(f"¡Vectores guardados en '{VECTORES_PATH}' exitosamente!")
 
     def _load_sistemas(self) -> dict[str, Matriz]:
         """
@@ -242,14 +240,14 @@ class OpsManager:
         """
 
         # si no existe sistemas.json, retornar un diccionario vacio
-        if not path.exists(SISTEMAS_PATH):
-            LOGGER.info("Archivo 'sistemas.json' no existe...")
+        if not SISTEMAS_PATH.exists():
+            LOGGER.info(f"Archivo {SISTEMAS_PATH} no existe...")
             return {}
 
         with open(SISTEMAS_PATH, mode="r", encoding="utf-8") as sistemas_file:
             try:
                 sistemas_dict: dict = load(sistemas_file, cls=FractionDecoder)
-                LOGGER.info("Sistemas de ecuaciones cargados!")
+                LOGGER.info("¡Sistemas de ecuaciones cargados exitosamente!")
                 return {
                     nombre: Matriz(
                         matriz["aumentada"],
@@ -263,10 +261,10 @@ class OpsManager:
                 if "(char 0)" in str(j):
                     # si la lectura del archivo fallo en
                     # el primer caracter, es que esta vacio
-                    LOGGER.info("Archivo 'sistemas.json' vacío...")
+                    LOGGER.info(f"Archivo {SISTEMAS_PATH} está vacío...")
                 else:
                     # si no, es un error de verdad
-                    LOGGER.error("Error al leer archivo 'sistemas.json':\n%s", str(j))
+                    LOGGER.error(f"Error al leer archivo '{SISTEMAS_PATH}':\n{str(j)}")
                 return {}
 
     def _load_matrices(self) -> dict[str, Matriz]:
@@ -277,14 +275,14 @@ class OpsManager:
         Retorna un diccionario con las matrices cargadas y sus nombres.
         """
 
-        if not path.exists(MATRICES_PATH):
-            LOGGER.info("Archivo 'matrices.json' no existe...")
+        if not MATRICES_PATH.exists():
+            LOGGER.info(f"Archivo '{MATRICES_PATH}' no existe...")
             return {}
 
         with open(MATRICES_PATH, mode="r", encoding="utf-8") as matrices_file:
             try:
                 matrices_dict: dict = load(matrices_file, cls=FractionDecoder)
-                LOGGER.info("Matrices cargadas!")
+                LOGGER.info("¡Matrices cargadas exitosamente!")
                 return {
                     nombre: Matriz(
                         matriz["aumentada"],
@@ -298,10 +296,10 @@ class OpsManager:
                 if "(char 0)" in str(j):
                     # si la lectura del archivo fallo en
                     # el primer caracter, es que esta vacio
-                    LOGGER.info("Archivo 'matrices.json' vacío...")
+                    LOGGER.info(f"Archivo '{MATRICES_PATH}' vacío...")
                 else:
                     # si no, es un error de verdad
-                    LOGGER.error("Error al leer archivo 'matrices.json':\n%s", str(j))
+                    LOGGER.error(f"Error al leer archivo '{MATRICES_PATH}':\n{str(j)}")
                 return {}
 
     def _load_vectores(self) -> dict[str, Vector]:
@@ -312,14 +310,14 @@ class OpsManager:
         Retorna un diccionario con los vectores cargados y sus nombres.
         """
 
-        if not path.exists(VECTORES_PATH):
-            LOGGER.info("Archivo 'vectores.json' no existe...")
+        if not VECTORES_PATH.exists():
+            LOGGER.info(f"Archivo '{VECTORES_PATH}' no existe...")
             return {}
 
         with open(VECTORES_PATH, mode="r", encoding="utf-8") as vectores_file:
             try:
                 vectores_dict: dict = load(vectores_file, cls=FractionDecoder)
-                LOGGER.info("Vectores cargados!")
+                LOGGER.info("¡Vectores cargados exitosamente!")
                 return {
                     nombre: Vector(componentes)
                     for nombre, componentes in vectores_dict.items()
@@ -328,8 +326,8 @@ class OpsManager:
                 if "(char 0)" in str(j):
                     # si la lectura del archivo fallo en
                     # el primer caracter, es que esta vacio
-                    LOGGER.info("Archivo 'vectores.json' vacío...")
+                    LOGGER.info(f"Archivo '{VECTORES_PATH}' vacío...")
                 else:
                     # si no, es un error de verdad
-                    LOGGER.error("Error al leer archivo 'vectores.json':\n%s", str(j))
+                    LOGGER.error(f"Error al leer archivo '{VECTORES_PATH}':\n{str(j)}")
                 return {}
