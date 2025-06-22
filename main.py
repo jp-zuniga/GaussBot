@@ -14,10 +14,10 @@ def main() -> None:
     app = GaussUI()
     app.update_idletasks()
 
-    if system() == "Linux":
+    if system() == "Windows":
+        app.after(0, lambda: app.state("zoomed"))
+    else:
         app.wm_attributes("-fullscreen", True)
-    elif system() == "Windows":
-        app.state("zoomed")
 
     app.mainloop()
 
