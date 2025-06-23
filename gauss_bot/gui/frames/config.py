@@ -28,12 +28,15 @@ class ConfigFrame(ctkFrame):
         self.msg_frame: Optional[SuccessFrame] = None
 
         self.escalas_dict = {
+            "80%": 0.8,
+            "90%": 0.9,
             "100%": 1.0,
             "110%": 1.1,
             "120%": 1.2,
             "130%": 1.3,
             "140%": 1.4,
             "150%": 1.5,
+            "160%": 1.6,
             "170%": 1.7,
             "180%": 1.8,
         }
