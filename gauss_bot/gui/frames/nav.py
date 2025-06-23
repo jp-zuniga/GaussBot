@@ -5,7 +5,8 @@ Implementación de la clase NavFrame,
 la barra de navegación de la aplicación.
 """
 
-from typing import TYPE_CHECKING
+from tkinter import Event
+from typing import TYPE_CHECKING, Optional
 
 from customtkinter import CTkFont as ctkFont, CTkFrame as ctkFrame, CTkLabel as ctkLabel
 
@@ -336,13 +337,17 @@ class NavFrame(ctkFrame):
 
         self.seleccionar_frame("config")
 
-    def quit_event(self) -> None:
+    def quit_event(self, event: Optional[Event] = None) -> None:
         """
         Evento de cierre de aplicación.
         Se encarga de llamar los métodos para guardar los datos.
         """
 
-        quit_box = CustomMessageBox(
+        if hasattr(self, "_quit_box") and self._quit_box.winfo_exists():
+            self._quit_box.focus()
+            return
+
+        self._quit_box = CustomMessageBox(
             self.app,
             name="Cerrar aplicación",
             msg="¿Está seguro que desea cerrar GaussBot?\n"
@@ -351,7 +356,11 @@ class NavFrame(ctkFrame):
             icon="error",
         )
 
-        if quit_box.get() == "Sí":
+        seleccion: str = self._quit_box.get()
+        self._quit_box.destroy()
+        del self._quit_box
+
+        if seleccion == "Sí":
             self.app.func_manager.save_funciones()  # type: ignore
             self.app.ops_manager.save_sistemas()  # type: ignore
             self.app.ops_manager.save_matrices()  # type: ignore

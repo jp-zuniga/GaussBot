@@ -163,7 +163,7 @@ class ConfigFrame(ctkFrame):
             return
 
         delete_msg_frame(self.msg_frame)
-        # self.app.escala_actual = self.escalas_dict[escala_seleccionada]
+        self.app.escala_actual = self.escalas_dict[escala_seleccionada]
 
         # explicar que se necesita reiniciar la app
         self.msg_frame = place_msg_frame(

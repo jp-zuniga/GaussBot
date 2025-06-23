@@ -39,6 +39,7 @@ class GaussUI(ctk):
         super().__init__()
 
         self.config_options: dict[str, Union[float, str, int]] = {}
+        self.escala_inicial: float
         self.escala_actual: float
         self.modo_actual: str
         self.tema_actual: str
@@ -101,6 +102,9 @@ class GaussUI(ctk):
         # configurar evento de cierre de ventana
         self.protocol("WM_DELETE_WINDOW", self.nav_frame.quit_event)
 
+        self.unbind_all("<Escape>")
+        self.bind("<Escape>", self.nav_frame.quit_event)
+
     def save_config(self) -> None:
         """
         Guarda la configuración actual en config.json.
@@ -146,7 +150,7 @@ class GaussUI(ctk):
             }
 
         # extraer configs individuales del diccionario
-        self.escala_actual = self.config_options["escala"]
+        self.escala_inicial = self.escala_actual = self.config_options["escala"]
         self.modo_actual = self.config_options["modo"]
         self.tema_actual = self.config_options["tema"]
         FRAC_PREC["prec"] = self.frac_prec_actual = self.config_options["frac_prec"]

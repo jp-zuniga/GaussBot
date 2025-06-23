@@ -201,18 +201,12 @@ class CustomNumpad(ctkTop):
             return "break"
 
         if self.hidden:
+            self.update_idletasks()
             self.deiconify()
             self.focus()
             self.lift()
-            self.hidden = False
-
-            if not hasattr(self, "_first_render_done"):
-                self.after(50, self._adjust_position)
-                self._first_render_done = True
-                return "break"
-
             self._adjust_position()
-
+            self.hidden = False
         else:
             self.hide()
             self.hidden = True
@@ -220,13 +214,8 @@ class CustomNumpad(ctkTop):
 
     def _adjust_position(self):
         """
-        Adjust position after initial rendering.
+        Adjust widget position.
         """
-
-        if not self.winfo_viewable():
-            return
-
-        self.update_idletasks()
 
         numpad_width = self.winfo_width()
         numpad_height = self.winfo_height()
@@ -239,4 +228,6 @@ class CustomNumpad(ctkTop):
         x_pos = attach_x + (attach_width - numpad_width) // 2
         y_pos = attach_y + attach_height + 10
 
-        self.geometry(f"{numpad_width}x{numpad_height}+{x_pos}+{y_pos}")
+        self.after(
+            0, lambda: self.geometry(f"{numpad_width}x{numpad_height}+{x_pos}+{y_pos}")
+        )

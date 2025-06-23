@@ -48,15 +48,13 @@ class CustomMessageBox(ctkTop):
 
         super().__init__()
         self.master_window = master
+        self.title(name)
         self.overrideredirect(True)
         self.protocol("WM_DELETE_WINDOW", lambda _: self.button_event(""))  # type: ignore
 
         self.resizable(width=False, height=False)
         self.grid_columnconfigure(0, weight=1)
         self.grid_rowconfigure(0, weight=1)
-
-        self.lift()
-        self.title(name)
 
         self.width = kwargs.pop("width", 400)
         self.height = kwargs.pop("height", 200)
@@ -74,9 +72,11 @@ class CustomMessageBox(ctkTop):
         )
 
         self.after(
-            10,
+            5,
             self.geometry(f"{self.width}x{self.height}+{self.spawn_x}+{self.spawn_y}"),
         )
+
+        self.lift()
 
         self.x = self.winfo_x()
         self.y = self.winfo_y()
@@ -117,7 +117,6 @@ class CustomMessageBox(ctkTop):
         self.frame_top.bind("<ButtonPress-1>", self.set_old_xy)
 
         self.title_label = ctkLabel(self.frame_top, text=self.msgbox_name)
-
         self.title_label.grid(
             row=0, column=0, columnspan=6, padx=(15, 0), pady=(10, 8), sticky="nsw"
         )
@@ -233,11 +232,10 @@ class CustomMessageBox(ctkTop):
             )
 
         self._set_scaling(
-            self.master_window.escala_actual, self.master_window.escala_actual
+            self.master_window.escala_inicial, self.master_window.escala_inicial
         )
 
         self.grab_set()
-        self.bind("<Escape>", lambda _: self.button_event(""))
 
     def button_event(self, selection: str) -> None:
         """
