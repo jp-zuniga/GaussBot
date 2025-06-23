@@ -3,6 +3,7 @@ Implementación de ventana principal, que contiene
 todos los frames y managers necesarios para el GUI.
 """
 
+from decimal import getcontext
 from json import dump, load
 from typing import Union
 
@@ -24,6 +25,7 @@ from .frames import (
     SistemasFrame,
     VectoresFrame,
 )
+from .. import FRAC_PREC
 from ..managers import FuncManager, OpsManager
 from ..utils import CONFIG_PATH, LOGGER, THEMES_PATH, set_icon
 
@@ -36,10 +38,12 @@ class GaussUI(ctk):
     def __init__(self) -> None:
         super().__init__()
 
-        self.config_options: dict[str, Union[float, str]] = {}
+        self.config_options: dict[str, Union[float, str, int]] = {}
         self.escala_actual: float
         self.modo_actual: str
         self.tema_actual: str
+        self.frac_prec_actual: int
+        self.dec_prec_actual: int
 
         self._load_config()
         set_icon(self, self)
@@ -106,6 +110,8 @@ class GaussUI(ctk):
         self.config_options["escala"] = self.escala_actual
         self.config_options["modo"] = self.modo_actual
         self.config_options["tema"] = self.tema_actual
+        self.config_options["frac_prec"] = self.frac_prec_actual
+        self.config_options["dec_prec"] = self.dec_prec_actual
 
         if not CONFIG_PATH.exists():
             CONFIG_PATH.parent.mkdir(parents=True, exist_ok=True)
@@ -135,12 +141,16 @@ class GaussUI(ctk):
                 "escala": 1.0,
                 "modo": "light",
                 "tema": "ceruleo.json",
+                "frac_prec": 100,
+                "dec_prec": 3,
             }
 
         # extraer configs individuales del diccionario
         self.escala_actual = self.config_options["escala"]
         self.modo_actual = self.config_options["modo"]
         self.tema_actual = self.config_options["tema"]
+        FRAC_PREC["prec"] = self.frac_prec_actual = self.config_options["frac_prec"]
+        getcontext().prec = self.dec_prec_actual = self.config_options["dec_prec"]
 
         # aplicar configs
         set_mode(self.modo_actual)

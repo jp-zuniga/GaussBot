@@ -3,18 +3,15 @@ Implementación de ConfigFrame, encargado de mostrar
 y editar las configuraciones de la aplicación.
 """
 
+from decimal import getcontext
 from tkinter import StringVar
 from typing import TYPE_CHECKING, Optional
 
-from customtkinter import (
-    CTkFrame as ctkFrame,
-    CTkLabel as ctkLabel,
-    set_appearance_mode as set_mode,
-    set_widget_scaling as set_scaling,
-)
+from customtkinter import CTkFrame as ctkFrame, CTkLabel as ctkLabel
 
 from ..custom import CustomDropdown, SuccessFrame
-from ...utils import get_dict_key, set_icon
+from ... import FRAC_PREC
+from ...utils import delete_msg_frame, get_dict_key, place_msg_frame
 
 if TYPE_CHECKING:
     from .. import GaussUI
@@ -48,9 +45,19 @@ class ConfigFrame(ctkFrame):
             "Violeta": "violeta.json",
         }
 
+        self.frac_prec_dict = {
+            "Denominador máximo de 100": 100,
+            "Denominador máximo de 500": 500,
+            "Denominador máximo de 1000": 1000,
+        }
+
+        self.dec_prec_dict = {"3 decimales": 3, "6 decimales": 6, "9 decimales": 9}
+
         self.escalas = list(self.escalas_dict.keys())
         self.modos = list(self.modos_dict.keys())
         self.temas = list(self.temas_dict.keys())
+        self.frac_precs = list(self.frac_prec_dict.keys())
+        self.dec_precs = list(self.dec_prec_dict.keys())
 
         self.tema_anterior: Optional[str] = None
 
@@ -58,23 +65,31 @@ class ConfigFrame(ctkFrame):
         escala_actual_key = get_dict_key(self.escalas_dict, self.app.escala_actual)
         modo_actual_key = get_dict_key(self.modos_dict, self.app.modo_actual)
         tema_actual_key = get_dict_key(self.temas_dict, self.app.tema_actual)
+        frac_prec_key = get_dict_key(self.frac_prec_dict, self.app.frac_prec_actual)
+        dec_prec_key = get_dict_key(self.dec_prec_dict, self.app.dec_prec_actual)
 
         try:
             # inicializar variables de config actual
             first_escala = StringVar(value=escala_actual_key)
             first_modo = StringVar(value=modo_actual_key)
             first_tema = StringVar(value=tema_actual_key)
+            first_frac_prec = StringVar(value=frac_prec_key)
+            first_dec_prec = StringVar(value=dec_prec_key)
         except AttributeError:
             # si get_dict_key() retorna None, StringVar va a tirar error,
             # entonces se inicializan con valores por defecto
             first_escala = StringVar(value="100%")
             first_modo = StringVar(value="Claro")
             first_tema = StringVar(value="Sky")
+            first_frac_prec = StringVar(value="Denominador máximo de 100")
+            first_dec_prec = StringVar(value="3 decimales")
 
         # crear labels
         self.escala_label = ctkLabel(self, text="Escala:")
         self.modos_label = ctkLabel(self, text="Modo:")
         self.temas_label = ctkLabel(self, text="Tema:")
+        self.frac_precs_label = ctkLabel(self, text="Precisión fraccional:")
+        self.dec_precs_label = ctkLabel(self, text="Precisión decimal:")
 
         # crear dropdowns
         self.desplegar_escalas = CustomDropdown(
@@ -101,6 +116,22 @@ class ConfigFrame(ctkFrame):
             command=self.cambiar_tema,
         )
 
+        self.desplegar_frac_precs = CustomDropdown(
+            self,
+            width=105,
+            values=self.frac_precs,
+            variable=first_frac_prec,
+            command=self.cambiar_frac_prec,
+        )
+
+        self.desplegar_dec_precs = CustomDropdown(
+            self,
+            width=105,
+            values=self.dec_precs,
+            variable=first_dec_prec,
+            command=self.cambiar_dec_prec,
+        )
+
         # colocar widgets
         self.escala_label.grid(
             row=0, column=0, padx=(30, 10), pady=(20, 10), sticky="nw"
@@ -115,6 +146,11 @@ class ConfigFrame(ctkFrame):
         self.temas_label.grid(row=2, column=0, padx=(30, 10), pady=10, sticky="nw")
         self.desplegar_temas.grid(row=2, column=1, padx=10, pady=10, sticky="nw")
 
+        self.frac_precs_label.grid(row=4, column=0, padx=(30, 10), pady=10, sticky="nw")
+        self.desplegar_frac_precs.grid(row=4, column=1, padx=10, pady=10, sticky="nw")
+        self.dec_precs_label.grid(row=5, column=0, padx=(30, 10), pady=10, sticky="nw")
+        self.desplegar_dec_precs.grid(row=5, column=1, padx=10, pady=10, sticky="nw")
+
     def cambiar_escala(self, escala_seleccionada: str) -> None:
         """
         Cambia la escala actual de la aplicación a la indicado.
@@ -124,20 +160,21 @@ class ConfigFrame(ctkFrame):
             # si selecciono la misma escala, no cambiar nada
             return
 
+        delete_msg_frame(self.msg_frame)
         self.app.escala_actual = self.escalas_dict[escala_seleccionada]
-        set_scaling(self.app.escala_actual)
 
-        if self.app.nav_frame.hidden:
-            self.app.nav_frame.app_name.grid_remove()
-            self.app.nav_frame.hide_button.grid_configure(
-                column=1, columnspan=1, sticky="e"
-            )
-
-        else:
-            self.app.nav_frame.app_name.grid()
-            self.app.nav_frame.hide_button.grid_configure(
-                column=0, columnspan=2, sticky="n"
-            )
+        # explicar que se necesita reiniciar la app
+        self.msg_frame = place_msg_frame(
+            parent_frame=self,
+            msg_frame=self.msg_frame,
+            msg="¡Escala actualizada exitosamente!\n"
+            + "Sus cambios tomarán efecto al reiniciar la aplicación.",
+            tipo="success",
+            row=6,
+            column=1,
+            padx=10,
+            pady=20,
+        )
 
     def cambiar_modo(self, modo_seleccionado: str) -> None:
         """
@@ -148,18 +185,21 @@ class ConfigFrame(ctkFrame):
             # si se selecciono el mismo, no cambiar nada
             return
 
+        delete_msg_frame(self.msg_frame)
         self.app.modo_actual = self.modos_dict[modo_seleccionado]
-        set_mode(self.app.modo_actual)
 
-        # mandar a actualizar todo
-        set_icon(self.app, self.app)
-        self.app.home_frame.update_frame()  # type: ignore
-        self.app.inputs_frame.update_all()  # type: ignore
-        self.app.matrices.update_all()  # type: ignore
-        self.app.vectores.update_all()  # type: ignore
-        self.app.analisis.update_all()  # type: ignore
-        self.app.sistemas.update_all()  # type: ignore
-        self.update_frame()
+        # explicar que se necesita reiniciar la app
+        self.msg_frame = place_msg_frame(
+            parent_frame=self,
+            msg_frame=self.msg_frame,
+            msg="¡Modo actualizado exitosamente!\n"
+            + "Sus cambios tomarán efecto al reiniciar la aplicación.",
+            tipo="success",
+            row=6,
+            column=1,
+            padx=10,
+            pady=20,
+        )
 
     def cambiar_tema(self, tema_seleccionado: str) -> None:
         """
@@ -170,19 +210,77 @@ class ConfigFrame(ctkFrame):
             # si se selecciono el mismo tema, no cambiar nada
             return
 
+        delete_msg_frame(self.msg_frame)
         self.tema_anterior, self.app.tema_actual = (
             self.app.tema_actual,
             self.temas_dict[tema_seleccionado],
         )
 
         # explicar que se necesita reiniciar la app
-        self.msg_frame = SuccessFrame(
-            self,
-            msg="Tema cambiado exitosamente!\n"
-            + "El cambio tomará efecto al reiniciar la aplicación.",
+        self.msg_frame = place_msg_frame(
+            parent_frame=self,
+            msg_frame=self.msg_frame,
+            msg="¡Tema actualizado exitosamente!\n"
+            + "Sus cambios tomarán efecto al reiniciar la aplicación.",
+            tipo="success",
+            row=6,
+            column=1,
+            padx=10,
+            pady=20,
         )
 
-        self.msg_frame.grid(row=3, column=1, padx=10, pady=20)
+        self.msg_frame.grid(row=6, column=1, padx=10, pady=20)
+
+    def cambiar_frac_prec(self, prec_seleccionada: str) -> None:
+        """
+        Cambia la precisión fraccional de la aplicación.
+        """
+
+        if self.frac_prec_dict[prec_seleccionada] == self.app.frac_prec_actual:
+            # si se selecciono la misma precision, no cambiar nada
+            return
+
+        delete_msg_frame(self.msg_frame)
+
+        FRAC_PREC["prec"] = self.app.frac_prec_actual = self.frac_prec_dict[
+            prec_seleccionada
+        ]
+
+        self.msg_frame = place_msg_frame(
+            parent_frame=self,
+            msg_frame=self.msg_frame,
+            msg="¡Precisión fraccional actualizada exitosamente!",
+            tipo="success",
+            row=6,
+            column=1,
+            padx=10,
+            pady=20,
+        )
+
+    def cambiar_dec_prec(self, prec_seleccionada: str) -> None:
+        """
+        Cambia la precisión decimal de la aplicación.
+        """
+
+        if self.dec_prec_dict[prec_seleccionada] == self.app.dec_prec_actual:
+            # si se selecciono la misma precision, no cambiar nada
+            return
+
+        delete_msg_frame(self.msg_frame)
+        getcontext().prec = self.app.dec_prec_actual = self.dec_prec_dict[
+            prec_seleccionada
+        ]
+
+        self.msg_frame = place_msg_frame(
+            parent_frame=self,
+            msg_frame=self.msg_frame,
+            msg="¡Precisión decimal actualizada exitosamente!",
+            tipo="success",
+            row=6,
+            column=1,
+            padx=10,
+            pady=20,
+        )
 
     def update_frame(self) -> None:
         """

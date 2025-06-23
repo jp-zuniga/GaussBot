@@ -9,6 +9,7 @@ from copy import deepcopy
 from fractions import Fraction
 from typing import Optional, Union, overload
 
+from .. import FRAC_PREC
 from ..utils import format_factor
 
 
@@ -256,7 +257,7 @@ class Matriz:
             len(
                 str(
                     format_factor(
-                        self[i, j].limit_denominator(1000),
+                        self[i, j].limit_denominator(FRAC_PREC["prec"]),
                         mult=False,
                         parenth_negs=False,
                         parenth_fracs=False,
@@ -277,7 +278,7 @@ class Matriz:
                 # .center() alinea el valor dentro de max_len
                 valor = str(
                     format_factor(
-                        self[i, j].limit_denominator(1000),
+                        self[i, j].limit_denominator(FRAC_PREC["prec"]),
                         mult=False,
                         parenth_negs=False,
                         parenth_fracs=False,

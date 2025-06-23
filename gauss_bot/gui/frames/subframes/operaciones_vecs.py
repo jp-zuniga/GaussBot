@@ -5,7 +5,7 @@ Implementación de todos los frames
 de operaciones con vectores.
 """
 
-from decimal import Decimal, getcontext
+from decimal import Decimal
 from fractions import Fraction
 from random import choice
 from tkinter import Variable
@@ -38,8 +38,6 @@ from ....utils import (
 if TYPE_CHECKING:
     from .. import VectoresFrame
     from ... import GaussUI
-
-getcontext().prec = 8
 
 
 class MagnitudTab(CustomScrollFrame):

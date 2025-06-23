@@ -13,6 +13,7 @@ Operaciones implementadas:
 
 from fractions import Fraction
 
+from .. import FRAC_PREC
 from ..models import Vector
 from ..utils import format_factor, format_proc_num
 
@@ -117,8 +118,8 @@ class VectoresManager:
                 f"{
                     format_proc_num(  # type: ignore
                         (
-                            vec1[i].limit_denominator(1000),
-                            vec2[i].limit_denominator(1000),
+                            vec1[i].limit_denominator(FRAC_PREC['prec']),
+                            vec2[i].limit_denominator(FRAC_PREC['prec']),
                         ),
                         operador=operador,  # type: ignore
                     )
@@ -159,7 +160,7 @@ class VectoresManager:
             componentes=[
                 f"{
                     format_proc_num(  # type: ignore
-                        (escalar, vec[i].limit_denominator(1000))
+                        (escalar, vec[i].limit_denominator(FRAC_PREC['prec']))
                     )
                 }"
                 for i in range(len(vec))
@@ -198,7 +199,7 @@ class VectoresManager:
             componentes=[
                 f"{
                     format_factor(  # type: ignore
-                        vec1[i].limit_denominator(1000), mult=False
+                        vec1[i].limit_denominator(FRAC_PREC['prec']), mult=False
                     )
                 }"
                 for i in range(len(vec1))
@@ -209,7 +210,7 @@ class VectoresManager:
             componentes=[
                 f"{
                     format_factor(  # type: ignore
-                        vec2[i].limit_denominator(1000), mult=False
+                        vec2[i].limit_denominator(FRAC_PREC['prec']), mult=False
                     )
                 }"
                 for i in range(len(vec2))
@@ -221,8 +222,8 @@ class VectoresManager:
                 f"{
                     format_proc_num(  # type: ignore
                         (
-                            vec1[i].limit_denominator(1000),
-                            vec2[i].limit_denominator(1000),
+                            vec1[i].limit_denominator(FRAC_PREC['prec']),
+                            vec2[i].limit_denominator(FRAC_PREC['prec']),
                         )
                     )
                 }"

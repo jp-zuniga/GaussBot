@@ -4,7 +4,7 @@ un frame que permite encontrar
 las raíces de funciones matemáticas.
 """
 
-from decimal import Decimal, getcontext
+from decimal import Decimal
 from fractions import Fraction
 from random import randint
 from tkinter import Variable
@@ -28,8 +28,6 @@ from ....utils import INFO_ICON, generate_sep, place_msg_frame, set_icon
 if TYPE_CHECKING:
     from .. import AnalisisFrame
     from ... import GaussUI
-
-getcontext().prec = 8  # precision de decimales
 
 
 class RaicesFrame(CustomScrollFrame):

@@ -5,7 +5,7 @@ Se encarga de aplicar diferentes métodos para encontrar
 raíces de las funciones ingresadas, y retorna los resultados.
 """
 
-from decimal import Decimal, getcontext
+from decimal import Decimal
 from json import JSONDecodeError, dump, load
 from typing import Any, Optional, Union
 
@@ -15,8 +15,6 @@ from sympy.sets import Contains
 
 from ..models import Func
 from ..utils import FUNCIONES_PATH, LOGGER
-
-getcontext().prec = 8  # precision de los decimales
 
 MARGEN_ERROR = Decimal(1e-4)
 MAX_ITERACIONES = 100

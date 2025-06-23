@@ -8,6 +8,7 @@ from fractions import Fraction
 from json import JSONDecodeError, dump, load
 
 from . import MatricesManager, VectoresManager
+from .. import FRAC_PREC
 from ..models import FractionDecoder, FractionEncoder, Matriz, Vector
 from ..utils import LOGGER, MATRICES_PATH, SISTEMAS_PATH, VECTORES_PATH, format_proc_num
 
@@ -84,8 +85,8 @@ class OpsManager:
                 [
                     format_proc_num(  # type: ignore
                         (
-                            mat[i, j].limit_denominator(1000),
-                            vec.componentes[j].limit_denominator(1000),
+                            mat[i, j].limit_denominator(FRAC_PREC["prec"]),
+                            vec.componentes[j].limit_denominator(FRAC_PREC["prec"]),
                         )
                     )
                     for j in range(len(vec))

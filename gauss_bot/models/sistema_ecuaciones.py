@@ -9,6 +9,7 @@ from fractions import Fraction
 from typing import Optional
 
 from .matriz import Matriz
+from .. import FRAC_PREC
 from ..utils import LOGGER, format_factor
 
 
@@ -149,7 +150,7 @@ class SistemaEcuaciones:
             self.solucion += f"X{i + 1} = "
             self.solucion += f"{
                 format_factor(
-                    sol.limit_denominator(1000),
+                    sol.limit_denominator(FRAC_PREC['prec']),
                     mult=False,
                     parenth_negs=False,
                     parenth_fracs=False,
@@ -260,7 +261,10 @@ class SistemaEcuaciones:
                 )
 
             # normalizar fila pivote (convertir elemento pivote en 1)
-            pivote: Fraction = self.matriz[fila_actual, j]
+            pivote: Fraction = self.matriz[fila_actual, j].limit_denominator(
+                FRAC_PREC["prec"]
+            )
+
             if pivote not in (1, 0):
                 for k in range(self.matriz.columnas):
                     self.matriz.valores[fila_actual][k] /= pivote
@@ -278,7 +282,10 @@ class SistemaEcuaciones:
 
             # eliminar elementos debajo del pivote
             for f in range(fila_actual + 1, self.matriz.filas):
-                factor: Fraction = self.matriz[f, j]
+                factor: Fraction = self.matriz[f, j].limit_denominator(
+                    FRAC_PREC["prec"]
+                )
+
                 if factor == 0:
                     continue
 
@@ -427,7 +434,7 @@ class SistemaEcuaciones:
                 variable = f"{abs(coeficiente)}X{j + 1}"
             else:
                 variable = (
-                    f"[ ({abs(coeficiente).limit_denominator(1000)}) • X{j + 1} ]"
+                    f"[ ({abs(coeficiente).limit_denominator(FRAC_PREC['prec'])}) • X{j + 1} ]"
                 )
 
             expresion += (
@@ -609,7 +616,7 @@ class SistemaEcuaciones:
 
                 self.solucion += f"X{i + 1} = {
                     format_factor(
-                        self.matriz[i, -1].limit_denominator(1000),
+                        self.matriz[i, -1].limit_denominator(FRAC_PREC['prec']),
                         mult=False,
                         parenth_negs=False,
                         parenth_fracs=False,
