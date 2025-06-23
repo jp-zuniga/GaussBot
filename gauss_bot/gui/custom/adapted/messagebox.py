@@ -56,8 +56,8 @@ class CustomMessageBox(ctkTop):
         self.grid_columnconfigure(0, weight=1)
         self.grid_rowconfigure(0, weight=1)
 
-        self.width = kwargs.pop("width", 400)
-        self.height = kwargs.pop("height", 200)
+        self.width = kwargs.pop("width", 360)
+        self.height = kwargs.pop("height", 180)
 
         self.spawn_x = int(
             self.master_window.winfo_width() * 0.5
@@ -103,6 +103,7 @@ class CustomMessageBox(ctkTop):
         self.frame_top = ctkFrame(
             self,
             width=self.width,
+            corner_radius=24,
             border_width=3,
             bg_color=self.bg_color,
             fg_color=self.fg_color,

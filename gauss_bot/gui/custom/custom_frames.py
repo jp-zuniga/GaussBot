@@ -202,16 +202,40 @@ class CustomScrollFrame(ctkFrame):
     def lower(self, belowThis=None):
         self.parent_frame.lower(belowThis)
 
+    def _set_appearance_mode(self, mode_string):
+        super()._set_appearance_mode(mode_string)
+
+        bg_color = self.parent_frame.cget("bg_color")
+        fg_color = self.parent_frame.cget("fg_color")
+        actual_bg_color = self.parent_frame._apply_appearance_mode(bg_color)
+
+        self.xy_canvas.config(bg=actual_bg_color)
+        self.parent_frame.configure(fg_color=fg_color, bg_color=bg_color)
+        super().configure(fg_color=fg_color, bg_color=bg_color)
+
+        self._update_child_colors(self)
+
+    def _update_child_colors(self, widget):
+        for child in widget.winfo_children():
+            if hasattr(child, "_set_appearance_mode"):
+                child._set_appearance_mode(self._appearance_mode)
+
+            self._update_child_colors(child)
+
     def configure(self, **kwargs):
-        if "fg_color" in kwargs:
-            self.bg_color = kwargs["bg_color"]
-            self.xy_canvas.config(bg=self.bg_color)
-            self.parent_frame.configure(fg_color=self.bg_color, bg_color=self.bg_color)
-            self.configure(fg_color=self.bg_color, bg_color=self.bg_color)
+        if "fg_color" in kwargs or "bg_color" in kwargs:
+            new_fg = kwargs.pop("fg_color", self.cget("fg_color"))
+            new_bg = kwargs.pop("bg_color", self.cget("bg_color"))
+
+            self.xy_canvas.config(bg=new_bg)
+            self.parent_frame.configure(fg_color=new_fg, bg_color=new_bg)
+            super().configure(fg_color=new_fg, bg_color=new_bg)
+            self._update_child_colors(self)
+
         if "width" in kwargs:
-            self.xy_canvas.config(width=kwargs["width"])
+            self.xy_canvas.config(width=kwargs.pop("width"))
         if "height" in kwargs:
-            self.xy_canvas.config(height=kwargs["height"])
+            self.xy_canvas.config(height=kwargs.pop("height"))
         self.parent_frame.configure(**kwargs)
 
 
