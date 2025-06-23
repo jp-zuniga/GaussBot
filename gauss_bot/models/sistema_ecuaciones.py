@@ -121,8 +121,8 @@ class SistemaEcuaciones:
 
             # almacenar los determinantes de las submatrices,
             # y aplicar la formula para encontrar las soluciones
-            sub_dets.append(det_submat)
-            soluciones.append(det_submat / det)  # type: ignore
+            sub_dets.append((det_submat).limit_denominator(FRAC_PREC["prec"]))  # type: ignore
+            soluciones.append((det_submat / det).limit_denominator(FRAC_PREC["prec"]))  # type: ignore
 
         if all(sol == 0 for sol in soluciones):
             tipo_sol: str = "trivial"
@@ -189,7 +189,7 @@ class SistemaEcuaciones:
         if not test_inicial[0]:
             if self._validar_escalonada_reducida():
                 self.procedimiento += (
-                    "\nMatriz ya esta en su forma escalonada reducida!\n\n"
+                    "\nMatriz ya está en su forma escalonada reducida!\n\n"
                 )
 
             self.procedimiento += str(self.matriz)
@@ -198,7 +198,7 @@ class SistemaEcuaciones:
 
         if self._validar_escalonada_reducida():
             self.procedimiento += (
-                f"\nMatriz ya esta en su forma escalonada reducida!\n\n{self.matriz}"
+                f"\nMatriz ya está en su forma escalonada reducida!\n\n{self.matriz}"
             )
         else:
             self._reducir_matriz()
@@ -242,8 +242,8 @@ class SistemaEcuaciones:
             # encontrar la fila pivote de la columna actual
             for i in range(fila_actual, self.matriz.filas):
                 if abs(self.matriz[i, j]) > maximo:
-                    maximo: Fraction = abs(self.matriz[i, j])
                     fila_pivote: Optional[int] = i
+                    maximo: Fraction = abs(self.matriz[i, j])
 
             # si las variables no han cambiado, saltar a la siguiente columna
             if fila_pivote is None or maximo == 0:
@@ -261,9 +261,7 @@ class SistemaEcuaciones:
                 )
 
             # normalizar fila pivote (convertir elemento pivote en 1)
-            pivote: Fraction = self.matriz[fila_actual, j].limit_denominator(
-                FRAC_PREC["prec"]
-            )
+            pivote: Fraction = self.matriz[fila_actual, j]
 
             if pivote not in (1, 0):
                 for k in range(self.matriz.columnas):
@@ -275,29 +273,31 @@ class SistemaEcuaciones:
                     )
                 else:
                     self.procedimiento += f"\n\nF{fila_actual + 1}  =>  "
-                    self.procedimiento += (
-                        f"F{fila_actual + 1} / {format_factor(pivote, False)}:\n"
-                    )
+                    self.procedimiento += f"F{fila_actual + 1} / {
+                        format_factor(
+                            pivote.limit_denominator(FRAC_PREC['prec']), False
+                        )
+                    }:\n"
                 self.procedimiento += str(self.matriz)
 
             # eliminar elementos debajo del pivote
             for f in range(fila_actual + 1, self.matriz.filas):
-                factor: Fraction = self.matriz[f, j].limit_denominator(
-                    FRAC_PREC["prec"]
-                )
-
-                if factor == 0:
+                if self.matriz[f, j] == 0:
                     continue
 
+                factor: Fraction = self.matriz[f, j]
                 for k in range(self.matriz.columnas):
                     self.matriz.valores[f][k] -= factor * self.matriz[fila_actual, k]
 
                 self.procedimiento += (
                     f"\n\nF{fila_actual + 1}  =>  F{fila_actual + 1} − "
                 )
-                self.procedimiento += (
-                    f"[ {format_factor(factor)}F{fila_pivote + 1} ]:\n{self.matriz}"
-                )
+
+                self.procedimiento += f"[ {
+                    format_factor(factor.limit_denominator(FRAC_PREC['prec']))
+                }F{fila_pivote + 1} ]:\n{self.matriz}"
+
+            # ir a proxima fila
             fila_actual += 1
 
     def _eliminar_encima(self) -> None:
@@ -319,16 +319,17 @@ class SistemaEcuaciones:
             # para cada fila encima de la fila actual
             # eliminar elementos empezando desde abajo
             for f in reversed(range(i)):
-                factor: Fraction = self.matriz[f, columna_pivote]
-                if factor == 0:
+                if self.matriz[f, columna_pivote] == 0:
                     continue
 
+                factor: Fraction = self.matriz[f, columna_pivote]
                 for k in range(self.matriz.columnas):
                     self.matriz.valores[f][k] -= factor * self.matriz[i, k]
 
                 self.procedimiento += f"\n\nF{f + 1}  =>  F{f + 1} − "
-                self.procedimiento += f"[ {format_factor(factor)}F{i + 1} ]:\n"
-                self.procedimiento += str(self.matriz)
+                self.procedimiento += f"[ {
+                    format_factor(factor.limit_denominator(FRAC_PREC['prec']))
+                }F{i + 1} ]:\n{self.matriz}"
 
     def _encontrar_variables_libres(self) -> list[int]:
         """
@@ -418,13 +419,18 @@ class SistemaEcuaciones:
         constante: Fraction = self.matriz[fila, -1]
 
         # si la constante es 0, no agregar nada
-        expresion = str(constante) if constante != 0 else ""
+        expresion = (
+            str(constante.limit_denominator(FRAC_PREC["prec"]))
+            if constante != 0
+            else ""
+        )
 
         for j in range(columna + 1, self.matriz.columnas - 1):
-            # invertir el signo para "mover al otro lado"
-            coeficiente = -self.matriz[fila, j]
-            if coeficiente == 0:
+            if self.matriz[fila, j] == 0:
                 continue
+
+            # invertir el signo para "mover al otro lado"
+            coeficiente: Fraction = -self.matriz[fila, j]
 
             signo: str = " + " if coeficiente > 0 else " − "
 
@@ -433,9 +439,9 @@ class SistemaEcuaciones:
             elif coeficiente.is_integer():
                 variable = f"{abs(coeficiente)}X{j + 1}"
             else:
-                variable = (
-                    f"[ ({abs(coeficiente).limit_denominator(FRAC_PREC['prec'])}) • X{j + 1} ]"
-                )
+                variable = f"[ ({
+                    abs(coeficiente).limit_denominator(FRAC_PREC['prec'])
+                }) • X{j + 1} ]"
 
             expresion += (
                 f"{signo}{variable}"

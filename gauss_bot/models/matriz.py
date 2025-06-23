@@ -563,7 +563,7 @@ class Matriz:
 
         if not self.es_cuadrada():
             raise ArithmeticError(
-                "¡El determinante solo esta definido para matrices cuadradas!"
+                "¡El determinante solo está definido para matrices cuadradas!"
             )
 
         # para matrices 1x1, el determinante es el mismo valor
