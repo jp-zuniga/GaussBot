@@ -30,7 +30,6 @@ from ....utils import (
     delete_msg_frame,
     generate_sep,
     place_msg_frame,
-    resize_image,
 )
 
 if TYPE_CHECKING:
@@ -290,10 +289,6 @@ class MostrarFuncs(CustomScrollFrame):
 
         self.funcs_guardadas = self.func_manager.get_funcs()
         self.msg_frame: Optional[ctkFrame] = None
-
-        self.show_frame = ctkFrame(self, fg_color="transparent")
-        self.show_frame.columnconfigure(0, weight=1)
-
         self.setup_frame()
 
     def setup_frame(self) -> None:
@@ -317,10 +312,9 @@ class MostrarFuncs(CustomScrollFrame):
             self.app,
             width=20,
             height=40,
-            corner_radius=16,
             border_width=3,
             border_color=self.app.theme_config["CTkFrame"]["top_fg_color"],
-            image=resize_image(MOSTRAR_ICON, (0.75, 1)),
+            image=MOSTRAR_ICON,
             tooltip_text="Mostrar funciones",
             command=self.show_funcs,
         ).grid(row=0, column=0, padx=5, pady=5, sticky="n")
@@ -331,29 +325,26 @@ class MostrarFuncs(CustomScrollFrame):
         """
 
         delete_msg_frame(self.msg_frame)
-        for widget in self.show_frame.winfo_children():
+        for widget in [
+            x for x in self.winfo_children() if not isinstance(x, IconButton)
+        ]:
             widget.destroy()  # type: ignore
 
-        self.show_frame.grid(row=1, column=0, padx=5, sticky="n")
-        ctkLabel(
-            self.show_frame,
-            text="Funciones ingresadas:",
-            font=ctkFont(size=12, weight="bold", underline=True),
-        ).grid(row=0, column=0, pady=(10, 0), sticky="n")
-
-        ctkLabel(self.show_frame, text="", image=generate_sep(False, (400, 3))).grid(
-            row=1, column=0, sticky="n"
+        ctkLabel(self, text="Funciones ingresadas:", font=ctkFont(weight="bold")).grid(
+            row=1, column=0, pady=5, sticky="n"
         )
 
-        r = 2
+        ctkLabel(self, text="", image=generate_sep(False, (300, 5))).grid(
+            row=2, column=0, sticky="n"
+        )
+
+        r: int = 3
         for func in self.funcs_guardadas:
-            ctkLabel(self.show_frame, text="", image=func).grid(
-                row=r, column=0, sticky="n"
+            ctkLabel(self, text="", image=func).grid(row=r, column=0, sticky="n")
+            ctkLabel(self, text="", image=generate_sep(False, (300, 5))).grid(
+                row=r + 1, column=0, sticky="n"
             )
 
-            ctkLabel(
-                self.show_frame, text="", image=generate_sep(False, (400, 3))
-            ).grid(row=r + 1, column=0, sticky="n")
             r += 2
 
     def update_frame(self) -> None:
@@ -361,8 +352,11 @@ class MostrarFuncs(CustomScrollFrame):
         Elimina self.show_frame y configura los backgrounds.
         """
 
-        for widget in self.show_frame.winfo_children():  # type: ignore
+        for widget in [
+            x for x in self.winfo_children() if not isinstance(x, IconButton)
+        ]:
             widget.destroy()  # type: ignore
+
         for widget in self.winfo_children():  # type: ignore
             widget.configure(bg_color="transparent")  # type: ignore
 
