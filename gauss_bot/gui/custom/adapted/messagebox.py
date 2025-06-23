@@ -103,7 +103,6 @@ class CustomMessageBox(ctkTop):
         self.frame_top = ctkFrame(
             self,
             width=self.width,
-            corner_radius=20,
             border_width=3,
             bg_color=self.bg_color,
             fg_color=self.fg_color,
@@ -154,7 +153,6 @@ class CustomMessageBox(ctkTop):
         self.button_1 = ctkButton(
             self.frame_top,
             height=(self.height // 4) - 20,
-            corner_radius=12,
             text=self.option1,  # type: ignore
             command=lambda: self.button_event(self.option1),  # type: ignore
         )
@@ -163,7 +161,6 @@ class CustomMessageBox(ctkTop):
             self.button_2 = ctkButton(
                 self.frame_top,
                 height=(self.height // 4) - 20,
-                corner_radius=12,
                 text=self.option2,  # type: ignore
                 command=lambda: self.button_event(self.option2),  # type: ignore
             )
@@ -172,7 +169,6 @@ class CustomMessageBox(ctkTop):
             self.button_3 = ctkButton(
                 self.frame_top,
                 height=(self.height // 4) - 20,
-                corner_radius=12,
                 text=self.option3,  # type: ignore
                 command=lambda: self.button_event(self.option3),  # type: ignore
             )

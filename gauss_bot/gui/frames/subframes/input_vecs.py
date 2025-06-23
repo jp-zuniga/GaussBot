@@ -48,8 +48,9 @@ class AgregarVecs(CustomScrollFrame):
         master_tab: ctkFrame,
         master_frame: "ManejarVecs",
         vecs_manager: VectoresManager,
+        **kwargs,
     ) -> None:
-        super().__init__(master_tab, corner_radius=0, fg_color="transparent")
+        super().__init__(master_tab, fg_color="transparent", **kwargs)
         self.master_frame = master_frame
         self.app = app
         self.vecs_manager = vecs_manager
@@ -324,8 +325,9 @@ class MostrarVecs(CustomScrollFrame):
         master_tab: ctkFrame,
         master_frame: "ManejarVecs",
         vecs_manager: VectoresManager,
+        **kwargs,
     ) -> None:
-        super().__init__(master_tab, corner_radius=0, fg_color="transparent")
+        super().__init__(master_tab, fg_color="transparent", **kwargs)
         self.app = app
         self.master_frame = master_frame
         self.vecs_manager = vecs_manager
@@ -451,8 +453,9 @@ class EliminarVecs(CustomScrollFrame):
         master_tab: ctkFrame,
         master_frame: "ManejarVecs",
         vecs_manager: VectoresManager,
+        **kwargs,
     ) -> None:
-        super().__init__(master_tab, corner_radius=0, fg_color="transparent")
+        super().__init__(master_tab, fg_color="transparent", **kwargs)
         self.app = app
         self.master_frame = master_frame
         self.vecs_manager = vecs_manager

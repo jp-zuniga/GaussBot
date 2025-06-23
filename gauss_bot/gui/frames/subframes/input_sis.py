@@ -48,8 +48,9 @@ class AgregarSistemas(CustomScrollFrame):
         master_tab: ctkFrame,
         master_frame: "ManejarSistemas",
         mats_manager: MatricesManager,
+        **kwargs,
     ) -> None:
-        super().__init__(master_tab, corner_radius=0, fg_color="transparent")
+        super().__init__(master_tab, fg_color="transparent", **kwargs)
         self.app = app
         self.master_frame = master_frame
         self.mats_manager = mats_manager
@@ -387,8 +388,9 @@ class MostrarSistemas(CustomScrollFrame):
         master_tab: ctkFrame,
         master_frame: "ManejarSistemas",
         mats_manager: MatricesManager,
+        **kwargs,
     ) -> None:
-        super().__init__(master_tab, corner_radius=0, fg_color="transparent")
+        super().__init__(master_tab, fg_color="transparent", **kwargs)
         self.app = app
         self.master_frame = master_frame
         self.mats_manager = mats_manager
@@ -514,8 +516,9 @@ class EliminarSistemas(CustomScrollFrame):
         master_tab: ctkFrame,
         master_frame: "ManejarSistemas",
         mats_manager: MatricesManager,
+        **kwargs,
     ) -> None:
-        super().__init__(master_tab, corner_radius=0, fg_color="transparent")
+        super().__init__(master_tab, fg_color="transparent", **kwargs)
         self.app = app
         self.master_frame = master_frame
         self.mats_manager = mats_manager

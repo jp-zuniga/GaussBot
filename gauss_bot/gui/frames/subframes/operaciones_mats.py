@@ -47,8 +47,9 @@ class SumaRestaTab(CustomScrollFrame):
         master_tab: ctkFrame,
         master_frame: "MatricesFrame",
         mats_manager: MatricesManager,
+        **kwargs,
     ) -> None:
-        super().__init__(master_tab, corner_radius=0, fg_color="transparent")
+        super().__init__(master_tab, fg_color="transparent", **kwargs)
         self.app = app
         self.master_frame = master_frame
         self.mats_manager = mats_manager
@@ -255,8 +256,9 @@ class MultiplicacionTab(CustomScrollFrame):
         master_tab: ctkFrame,
         master_frame: "MatricesFrame",
         mats_manager: MatricesManager,
+        **kwargs,
     ) -> None:
-        super().__init__(master_tab, corner_radius=0, fg_color="transparent")
+        super().__init__(master_tab, fg_color="transparent", **kwargs)
         self.app = app
         self.master_frame = master_frame
         self.mats_manager = mats_manager
@@ -692,8 +694,9 @@ class DeterminanteTab(CustomScrollFrame):
         master_tab: ctkFrame,
         master_frame: "MatricesFrame",
         mats_manager: MatricesManager,
+        **kwargs,
     ) -> None:
-        super().__init__(master_tab, corner_radius=0, fg_color="transparent")
+        super().__init__(master_tab, fg_color="transparent", **kwargs)
         self.app = app
         self.master_frame = master_frame
         self.mats_manager = mats_manager
@@ -818,8 +821,9 @@ class TransposicionTab(CustomScrollFrame):
         master_tab: ctkFrame,
         master_frame: "MatricesFrame",
         mats_manager: MatricesManager,
+        **kwargs,
     ) -> None:
-        super().__init__(master_tab, corner_radius=0, fg_color="transparent")
+        super().__init__(master_tab, fg_color="transparent", **kwargs)
         self.app = app
         self.master_frame = master_frame
         self.mats_manager = mats_manager
@@ -934,8 +938,9 @@ class InversaTab(CustomScrollFrame):
         master_tab: ctkFrame,
         master_frame: "MatricesFrame",
         mats_manager: MatricesManager,
+        **kwargs,
     ) -> None:
-        super().__init__(master_tab, corner_radius=0, fg_color="transparent")
+        super().__init__(master_tab, fg_color="transparent", **kwargs)
         self.app = app
         self.master_frame = master_frame
         self.mats_manager = mats_manager

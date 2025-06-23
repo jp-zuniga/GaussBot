@@ -77,10 +77,13 @@ class SistemasFrame(ctkFrame):
             self.msg_frame = None
 
         self.resolver_frame = ResolverSisFrame(
-            app=self.app, master_frame=self, mats_manager=self.mats_manager
+            app=self.app,
+            master_frame=self,
+            mats_manager=self.mats_manager,
+            border_width=3,
         )
 
-        self.resolver_frame.pack(expand=True, fill="both", padx=5, pady=5)
+        self.resolver_frame.pack(expand=True, fill="both", padx=30, pady=30)
 
     def update_all(self):
         """

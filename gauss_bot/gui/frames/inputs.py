@@ -60,7 +60,6 @@ class InputsFrame(ctkFrame):
 
         self.tabview = ctkTabview(self, fg_color="transparent")
         self.tabview.pack(expand=True, fill="both")
-        self.instances = []
 
         # crear tabs en tabview
         matrices_tab = self.tabview.add("Matrices")
@@ -68,25 +67,17 @@ class InputsFrame(ctkFrame):
         funcs_tab = self.tabview.add("Funciones")
         sistemas_tab = self.tabview.add("Sistemas de Ecuaciones")
 
-        # inicializar frames y append a lista de instancias:
-        self.instances.append(
-            ManejarMats(self.app, matrices_tab, self, self.mats_manager)
-        )
-
-        self.instances.append(
-            ManejarVecs(self.app, vectores_tab, self, self.vecs_manager)
-        )
-
-        self.instances.append(
-            ManejarFuncs(self.app, funcs_tab, self, self.func_manager)
-        )
-
-        self.instances.append(
-            ManejarSistemas(self.app, sistemas_tab, self, self.mats_manager)
-        )
+        # inicializar frames:
+        self.instances = [
+            ManejarMats(self.app, matrices_tab, self, self.mats_manager),
+            ManejarVecs(self.app, vectores_tab, self, self.vecs_manager),
+            ManejarFuncs(self.app, funcs_tab, self, self.func_manager),
+            ManejarSistemas(self.app, sistemas_tab, self, self.mats_manager),
+        ]
 
         # pack frames para mostrarlos
         for tab in self.instances:
+            tab.configure(border_width=3)
             tab.pack(expand=True, fill="both")
 
     def ir_a_input_mats(self, mostrar: bool):
@@ -163,8 +154,9 @@ class ManejarMats(ctkFrame):
         master_tab: ctkFrame,
         master_frame: InputsFrame,
         mats_manager: MatricesManager,
+        **kwargs,
     ) -> None:
-        super().__init__(master_tab, corner_radius=0, fg_color="transparent")
+        super().__init__(master_tab, fg_color="transparent", **kwargs)
         self.app = app
         self.master_frame = master_frame
         self.mats_manager = mats_manager
@@ -198,7 +190,7 @@ class ManejarMats(ctkFrame):
         for nombre, cls in tabs:
             tab = self.tabview.add(nombre)
             tab_instance: CustomScrollFrame = cls(
-                self.app, tab, self, self.mats_manager
+                self.app, tab, self, self.mats_manager, border_width=3
             )
 
             tab_instance.pack(expand=True, fill="both")
@@ -225,8 +217,9 @@ class ManejarVecs(ctkFrame):
         master_tab: ctkFrame,
         master_frame: InputsFrame,
         vecs_manager: VectoresManager,
+        **kwargs,
     ) -> None:
-        super().__init__(master_tab, corner_radius=0, fg_color="transparent")
+        super().__init__(master_tab, fg_color="transparent", **kwargs)
         self.app = app
         self.master_frame = master_frame
         self.vecs_manager = vecs_manager
@@ -260,7 +253,7 @@ class ManejarVecs(ctkFrame):
         for nombre, cls in tabs:
             tab = self.tabview.add(nombre)
             tab_instance: CustomScrollFrame = cls(
-                self.app, tab, self, self.vecs_manager
+                self.app, tab, self, self.vecs_manager, border_width=3
             )
 
             tab_instance.pack(expand=True, fill="both")
@@ -288,8 +281,9 @@ class ManejarFuncs(ctkFrame):
         master_tab: ctkFrame,
         master_frame: InputsFrame,
         func_manager: FuncManager,
+        **kwargs,
     ) -> None:
-        super().__init__(master_tab, corner_radius=0, fg_color="transparent")
+        super().__init__(master_tab, fg_color="transparent", **kwargs)
         self.app = app
         self.master_frame = master_frame
         self.func_manager = func_manager
@@ -324,7 +318,7 @@ class ManejarFuncs(ctkFrame):
         for nombre, cls in tabs:
             tab = self.tabview.add(nombre)
             tab_instance: CustomScrollFrame = cls(
-                self.app, tab, self, self.func_manager
+                self.app, tab, self, self.func_manager, border_width=3
             )
 
             tab_instance.pack(expand=True, fill="both")
@@ -352,8 +346,9 @@ class ManejarSistemas(ctkFrame):
         master_tab: ctkFrame,
         master_frame: InputsFrame,
         mats_manager: MatricesManager,
+        **kwargs,
     ) -> None:
-        super().__init__(master_tab, corner_radius=0, fg_color="transparent")
+        super().__init__(master_tab, fg_color="transparent", **kwargs)
         self.app = app
         self.master_frame = master_frame
         self.mats_manager = mats_manager
@@ -391,7 +386,7 @@ class ManejarSistemas(ctkFrame):
         for nombre, cls in tabs:
             tab = self.tabview.add(nombre)
             tab_instance: CustomScrollFrame = cls(
-                self.app, tab, self, self.mats_manager
+                self.app, tab, self, self.mats_manager, border_width=3
             )
 
             tab_instance.pack(expand=True, fill="both")

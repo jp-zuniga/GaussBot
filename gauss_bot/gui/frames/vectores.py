@@ -107,7 +107,7 @@ class VectoresFrame(ctkFrame):
         for nombre, cls in self.tabs:
             tab = self.tabview.add(nombre)
             tab_instance: "CustomScrollFrame" = cls(
-                self.app, tab, self, self.vecs_manager
+                self.app, tab, self, self.vecs_manager, border_width=3
             )
 
             tab_instance.pack(expand=True, fill="both")

@@ -67,7 +67,7 @@ class NavFrame(ctkFrame):
         self.hide_button = IconButton(
             self,
             app=self.app,
-            width=30,
+            width=15,
             height=30,
             image=DROPLEFT_ICON,
             command=self.toggle_nav,
@@ -209,7 +209,9 @@ class NavFrame(ctkFrame):
 
         # colocar widgets en la barra de navegacion
         self.app_name.grid(row=0, column=0, padx=0, pady=(20, 10), sticky="nse")
-        self.hide_button.grid(row=0, column=1, padx=10, pady=(20, 10), sticky="nse")
+        self.hide_button.grid(
+            row=0, column=1, padx=(0, 10), pady=(20, 10), sticky="nse"
+        )
 
         i = 1
         for j, widget in enumerate(self.buttons.values()):
@@ -221,7 +223,7 @@ class NavFrame(ctkFrame):
             else:
                 pady = 0  # type: ignore
 
-            widget.grid(row=i, column=0, columnspan=3, padx=10, pady=pady, sticky="ew")
+            widget.grid(row=i, column=0, columnspan=2, padx=15, pady=pady, sticky="ew")
             i += 1
 
     def seleccionar_frame(self, nombre: str) -> None:
@@ -258,10 +260,9 @@ class NavFrame(ctkFrame):
                     widget.grid()
                 elif isinstance(widget, IconButton):
                     widget.configure(
-                        width=140,
                         text=self.button_texts[
                             get_dict_key(self.buttons, widget)  # type: ignore
-                        ],
+                        ]
                     )
 
                     widget._image_label.grid_configure(  # type: ignore
@@ -270,7 +271,7 @@ class NavFrame(ctkFrame):
 
             self.hidden = False
             self.hide_button.configure(image=DROPLEFT_ICON)
-            self.hide_button.grid_configure(column=1, columnspan=1, sticky="e")
+            self.hide_button.grid_configure(column=1, columnspan=1, sticky="nse")
 
         else:
             for widget in self.winfo_children():
@@ -279,14 +280,14 @@ class NavFrame(ctkFrame):
                 if widget is self.app_name:
                     widget.grid_remove()
                 elif isinstance(widget, IconButton):
-                    widget.configure(width=20, text="")
+                    widget.configure(text="")
                     widget._image_label.grid_configure(  # type: ignore
                         columnspan=3, sticky="nsew"
                     )
 
             self.hidden = True
             self.hide_button.configure(image=DROPRIGHT_ICON)
-            self.hide_button.grid_configure(column=0, columnspan=2, sticky="n")
+            self.hide_button.grid_configure(column=0, columnspan=2, sticky="nse")
 
     def home_button_event(self) -> None:
         """

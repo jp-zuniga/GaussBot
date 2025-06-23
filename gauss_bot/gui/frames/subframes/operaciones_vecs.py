@@ -51,8 +51,9 @@ class MagnitudTab(CustomScrollFrame):
         master_tab: ctkFrame,
         master_frame: "VectoresFrame",
         vecs_manager: VectoresManager,
+        **kwargs,
     ) -> None:
-        super().__init__(master_tab, corner_radius=0, fg_color="transparent")
+        super().__init__(master_tab, fg_color="transparent", **kwargs)
         self.master_frame = master_frame
         self.app = app
         self.vecs_manager = vecs_manager
@@ -182,8 +183,9 @@ class SumaRestaTab(CustomScrollFrame):
         master_tab: ctkFrame,
         master_frame: "VectoresFrame",
         vecs_manager: VectoresManager,
+        **kwargs,
     ) -> None:
-        super().__init__(master_tab, corner_radius=0, fg_color="transparent")
+        super().__init__(master_tab, fg_color="transparent", **kwargs)
         self.master_frame = master_frame
         self.app = app
         self.vecs_manager = vecs_manager
@@ -392,8 +394,9 @@ class MultiplicacionTab(CustomScrollFrame):
         master_tab: ctkFrame,
         master_frame: "VectoresFrame",
         vecs_manager: VectoresManager,
+        **kwargs,
     ) -> None:
-        super().__init__(master_tab, corner_radius=0, fg_color="transparent")
+        super().__init__(master_tab, fg_color="transparent", **kwargs)
         self.master_frame = master_frame
         self.app = app
         self.vecs_manager = vecs_manager

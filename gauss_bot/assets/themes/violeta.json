@@ -60,8 +60,8 @@
         ]
     },
     "CTkEntry": {
-        "corner_radius": 8,
-        "border_width": 2,
+        "corner_radius": 10,
+        "border_width": 3,
         "fg_color": [
             "#FFFFFF",
             "#2A1F4D"
@@ -320,6 +320,7 @@
         ]
     },
     "CTkScrollableFrame": {
+        "corner_radius": 16,
         "label_fg_color": [
             "#E3E0FC",
             "gray23"

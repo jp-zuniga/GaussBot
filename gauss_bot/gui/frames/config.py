@@ -174,8 +174,8 @@ class ConfigFrame(ctkFrame):
             tipo="success",
             row=5,
             column=1,
-            padx=8,
-            pady=20,
+            padx=5,
+            pady=10,
         )
 
     def cambiar_modo(self, modo_seleccionado: str) -> None:
@@ -208,8 +208,8 @@ class ConfigFrame(ctkFrame):
             tipo="success",
             row=5,
             column=1,
-            padx=8,
-            pady=20,
+            padx=5,
+            pady=10,
         )
 
     def cambiar_tema(self, tema_seleccionado: str) -> None:
@@ -233,8 +233,8 @@ class ConfigFrame(ctkFrame):
             tipo="success",
             row=5,
             column=1,
-            padx=8,
-            pady=20,
+            padx=5,
+            pady=10,
         )
 
     def cambiar_frac_prec(self, prec_seleccionada: str) -> None:
@@ -259,8 +259,8 @@ class ConfigFrame(ctkFrame):
             tipo="success",
             row=5,
             column=1,
-            padx=8,
-            pady=20,
+            padx=5,
+            pady=10,
         )
 
     def cambiar_dec_prec(self, prec_seleccionada: str) -> None:
@@ -284,8 +284,8 @@ class ConfigFrame(ctkFrame):
             tipo="success",
             row=5,
             column=1,
-            padx=8,
-            pady=20,
+            padx=5,
+            pady=10,
         )
 
     def update_frame(self) -> None:

@@ -43,13 +43,12 @@ class CustomTable(ctkFrame):
         self.top_fg = ThemeManager.theme["CTkFrame"]["top_fg_color"]
         self.fg = ThemeManager.theme["CTkFrame"]["fg_color"]
 
-        ctkLabel(
-            self, text=header, font=ctkFont(size=14, weight="bold", underline=True)
-        ).grid(row=0, column=0, padx=20, pady=20, sticky="new")
+        ctkLabel(self, text=header, font=ctkFont(size=16, weight="bold")).grid(
+            row=0, column=0, padx=20, pady=20, sticky="new"
+        )
 
         self.header_frame = ctkFrame(self, fg_color="transparent", border_width=0)
 
-        self.header_frame.rowconfigure(0, weight=1)
         for j, value in enumerate(self.values[0]):
             self.header_frame.columnconfigure(j, weight=1)
             cell = ctkButton(
@@ -60,7 +59,7 @@ class CustomTable(ctkFrame):
                 border_color=ThemeManager.theme["CTkFrame"]["border_color"],
                 border_width=2,
                 border_spacing=0,
-                corner_radius=6,
+                corner_radius=8,
                 font=ctkFont(size=12, weight="bold"),
                 hover=False,
             )
@@ -69,7 +68,11 @@ class CustomTable(ctkFrame):
             cell.grid(row=0, column=j, padx=6 if j == 0 else (1, 0), sticky="nsew")
 
         self.cells_frame = CustomScrollFrame(
-            self, border_width=0, fg_color="transparent"
+            self,
+            border_width=0,
+            scrollbar_width=14,
+            scrollbar_padding=(0, 0),
+            fg_color="transparent",
         )
 
         self.header_frame.grid(row=1, column=0, padx=20, sticky="nsew")
@@ -102,7 +105,7 @@ class CustomTable(ctkFrame):
                     border_color=ThemeManager.theme["CTkFrame"]["border_color"],
                     border_width=2 if i == len(self.values) - 2 else 1,
                     border_spacing=0,
-                    corner_radius=6,
+                    corner_radius=8,
                     font=ctkFont(
                         size=(12 if j == 0 or i == len(self.values) - 2 else 10),
                         weight=(

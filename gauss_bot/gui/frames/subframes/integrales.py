@@ -34,8 +34,9 @@ class IntegralesFrame(CustomScrollFrame):
         master_tab: ctkFrame,
         master_frame: "AnalisisFrame",
         func_manager: FuncManager,
+        **kwargs,
     ) -> None:
-        super().__init__(master_tab, corner_radius=0, fg_color="transparent")
+        super().__init__(master_tab, fg_color="transparent", **kwargs)
         self.app = app
         self.master_frame = master_frame
         self.func_manager = func_manager

@@ -47,8 +47,9 @@ class AgregarMats(CustomScrollFrame):
         master_tab: ctkFrame,
         master_frame: "ManejarMats",
         mats_manager: MatricesManager,
+        **kwargs,
     ) -> None:
-        super().__init__(master_tab, corner_radius=0, fg_color="transparent")
+        super().__init__(master_tab, fg_color="transparent", **kwargs)
         self.app = app
         self.master_frame = master_frame
         self.mats_manager = mats_manager
@@ -376,8 +377,9 @@ class MostrarMats(CustomScrollFrame):
         master_tab: ctkFrame,
         master_frame: "ManejarMats",
         mats_manager: MatricesManager,
+        **kwargs,
     ) -> None:
-        super().__init__(master_tab, corner_radius=0, fg_color="transparent")
+        super().__init__(master_tab, fg_color="transparent", **kwargs)
         self.app = app
         self.master_frame = master_frame
         self.mats_manager = mats_manager
@@ -507,8 +509,9 @@ class EliminarMats(CustomScrollFrame):
         master_tab: ctkFrame,
         master_frame: "ManejarMats",
         mats_manager: MatricesManager,
+        **kwargs,
     ) -> None:
-        super().__init__(master_tab, corner_radius=0, fg_color="transparent")
+        super().__init__(master_tab, fg_color="transparent", **kwargs)
         self.app = app
         self.master_frame = master_frame
         self.mats_manager = mats_manager
