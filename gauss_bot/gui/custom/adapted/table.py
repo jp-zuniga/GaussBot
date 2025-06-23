@@ -17,7 +17,7 @@ from customtkinter import (
     ThemeManager,
 )
 
-from ..custom_frames import CustomScrollFrame
+from .scrollframe import CustomScrollFrame
 
 
 class CustomTable(ctkFrame):

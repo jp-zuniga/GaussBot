@@ -3,7 +3,7 @@ Funciones de utilidad generales para la aplicación.
 """
 
 from fractions import Fraction
-from logging import DEBUG, FileHandler, Formatter, getLogger, Logger
+from logging import DEBUG, FileHandler, Formatter, Logger, getLogger
 from typing import Any, Literal, Optional
 
 from PIL.Image import Image, Resampling, merge, open as open_img
