@@ -19,7 +19,8 @@ from customtkinter import (
     CTkTabview as ctkTabview,
 )
 
-from ...custom import CustomDropdown, CustomEntry, CustomScrollFrame, IconButton
+from ...custom import CustomDropdown, CustomEntry, IconButton
+from ...custom.adapted import CustomScrollFrame
 from ....managers import VectoresManager
 from ....models import Vector
 from ....utils import (

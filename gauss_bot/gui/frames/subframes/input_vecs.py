@@ -10,14 +10,8 @@ from typing import TYPE_CHECKING, Optional
 
 from customtkinter import CTkFrame as ctkFrame, CTkLabel as ctkLabel
 
-from ...custom import (
-    CustomDropdown,
-    CustomEntry,
-    CustomScrollFrame,
-    ErrorFrame,
-    IconButton,
-    SuccessFrame,
-)
+from ...custom import CustomDropdown, CustomEntry, ErrorFrame, IconButton, SuccessFrame
+from ...custom.adapted import CustomScrollFrame
 from ....managers import KeyBindingManager, VectoresManager
 from ....models import Vector
 from ....utils import (

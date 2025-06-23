@@ -9,7 +9,8 @@ from typing import TYPE_CHECKING, Optional
 from customtkinter import CTkButton as ctkButton, CTkFrame as ctkFrame
 
 from .subframes import ResolverSisFrame
-from ..custom import CustomScrollFrame, ErrorFrame
+from ..custom import ErrorFrame
+from ..custom.adapted import CustomScrollFrame
 from ...managers import MatricesManager
 from ...utils import INPUTS_ICON
 

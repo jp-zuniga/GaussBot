@@ -18,7 +18,8 @@ from .subframes import (
     SumaRestaTab,
     TransposicionTab,
 )
-from ..custom import CustomScrollFrame, ErrorFrame
+from ..custom import ErrorFrame
+from ..custom.adapted import CustomScrollFrame
 from ...managers import MatricesManager, VectoresManager
 from ...utils import INPUTS_ICON
 

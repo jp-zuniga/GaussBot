@@ -13,7 +13,8 @@ from customtkinter import (
     CTkLabel as ctkLabel,
 )
 
-from ...custom import CustomDropdown, CustomScrollFrame
+from ...custom import CustomDropdown
+from ...custom.adapted import CustomScrollFrame
 from ....managers import FuncManager
 from ....models import Func
 from ....utils import delete_msg_frame, generate_sep, place_msg_frame

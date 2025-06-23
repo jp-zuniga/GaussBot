@@ -9,15 +9,8 @@ from typing import TYPE_CHECKING, Optional
 from customtkinter import CTkFont as ctkFont, CTkFrame as ctkFrame, CTkLabel as ctkLabel
 from sympy import SympifyError
 
-from ...custom import (
-    CustomDropdown,
-    CustomEntry,
-    CustomScrollFrame,
-    ErrorFrame,
-    IconButton,
-    SuccessFrame,
-)
-from ...custom.adapted import CustomNumpad
+from ...custom import CustomDropdown, CustomEntry, ErrorFrame, IconButton, SuccessFrame
+from ...custom.adapted import CustomNumpad, CustomScrollFrame
 from ....managers import FuncManager, KeyBindingManager
 from ....models import Func
 from ....utils import (

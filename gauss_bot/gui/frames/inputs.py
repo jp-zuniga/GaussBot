@@ -22,7 +22,7 @@ from .subframes import (
     MostrarSistemas,
     MostrarVecs,
 )
-from ..custom import CustomScrollFrame
+from ..custom.adapted import CustomScrollFrame
 from ...managers import FuncManager, MatricesManager, VectoresManager
 
 if TYPE_CHECKING:

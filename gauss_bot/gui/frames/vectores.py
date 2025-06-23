@@ -17,7 +17,7 @@ from ...utils import INPUTS_ICON
 
 if TYPE_CHECKING:
     from .. import GaussUI
-    from ..custom import CustomScrollFrame
+    from ..custom.adapted import CustomScrollFrame
 
 
 class VectoresFrame(ctkFrame):

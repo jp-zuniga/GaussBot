@@ -12,7 +12,8 @@ from customtkinter import (
     CTkLabel as ctkLabel,
 )
 
-from ...custom import CustomDropdown, CustomScrollFrame
+from ...custom import CustomDropdown
+from ...custom.adapted import CustomScrollFrame
 from ....managers import MatricesManager
 from ....models import SistemaEcuaciones
 from ....utils import (

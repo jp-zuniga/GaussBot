@@ -19,8 +19,8 @@ from customtkinter import (
 )
 from sympy import Contains, I, Interval, zoo
 
-from ...custom import CustomDropdown, CustomEntry, CustomScrollFrame, IconButton
-from ...custom.adapted import CustomTable
+from ...custom import CustomDropdown, CustomEntry, IconButton
+from ...custom.adapted import CustomScrollFrame, CustomTable
 from ....managers import MARGEN_ERROR, MAX_ITERACIONES, FuncManager
 from ....models import Func
 from ....utils import INFO_ICON, generate_sep, place_msg_frame, set_icon

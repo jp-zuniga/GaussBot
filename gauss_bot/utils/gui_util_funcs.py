@@ -19,7 +19,7 @@ from .icons import APP_ICON
 
 if TYPE_CHECKING:
     from ..gui import GaussUI
-    from ..gui.custom import CustomScrollFrame
+    from ..gui.custom.adapted import CustomScrollFrame
 
 
 def delete_msg_frame(msg_frame: Optional[ctkFrame]) -> None:
@@ -153,7 +153,7 @@ def toggle_proc(
     ---
     """
 
-    from ..gui.custom import CustomScrollFrame
+    from ..gui.custom.adapted import CustomScrollFrame
 
     # si no esta escondido el procedimiento, o existe una Toplevel widget
     if not proc_hidden or any(
