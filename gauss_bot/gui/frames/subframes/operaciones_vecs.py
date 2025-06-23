@@ -496,7 +496,7 @@ class MultiplicacionTab(CustomScrollFrame):
         self.escalar_vec = self.select_escalar_vec.get()
         self.escalar_entry = CustomEntry(
             self.tab_escalar,
-            width=60,
+            width=80,
             placeholder_text=str(choice(generate_range(-10, 10))),
         )
 
@@ -582,7 +582,7 @@ class MultiplicacionTab(CustomScrollFrame):
         )
 
         self.dimensiones_entry = CustomEntry(
-            self.tab_prod_cruz, placeholder_text="3", width=40
+            self.tab_prod_cruz, placeholder_text="3", width=60
         )
 
         self.dimensiones_entry.bind(

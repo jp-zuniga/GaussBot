@@ -64,11 +64,11 @@ class AgregarMats(CustomScrollFrame):
         columnas_label = ctkLabel(self.pre_mat_frame, text="Columnas:")
 
         self.filas_entry = CustomEntry(
-            self.pre_mat_frame, width=30, placeholder_text="3"
+            self.pre_mat_frame, width=60, placeholder_text="3"
         )
 
         self.columnas_entry = CustomEntry(
-            self.pre_mat_frame, width=30, placeholder_text="3"
+            self.pre_mat_frame, width=60, placeholder_text="3"
         )
 
         ingresar_button = IconButton(
@@ -155,7 +155,7 @@ class AgregarMats(CustomScrollFrame):
             fila_entries = []
             for j in range(columnas):
                 input_entry = CustomEntry(
-                    self.matriz_frame, width=60, placeholder_text=str(randint(-15, 15))
+                    self.matriz_frame, width=80, placeholder_text=str(randint(-15, 15))
                 )
 
                 input_entry.grid(row=i, column=j, padx=5, pady=5)
@@ -166,7 +166,7 @@ class AgregarMats(CustomScrollFrame):
         nombre_label = ctkLabel(self.post_mat_frame, text="Nombre de la matriz:")
         self.nombre_entry = CustomEntry(
             self.post_mat_frame,
-            width=30,
+            width=60,
             placeholder_text=choice(
                 [
                     x

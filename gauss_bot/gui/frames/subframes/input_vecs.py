@@ -63,7 +63,7 @@ class AgregarVecs(CustomScrollFrame):
         # crear widgets iniciales para ingresar dimensiones
         dimension_label = ctkLabel(self.pre_vec_frame, text="Dimensiones:")
         self.dimension_entry = CustomEntry(
-            self.pre_vec_frame, width=30, placeholder_text="3"
+            self.pre_vec_frame, width=60, placeholder_text="3"
         )
 
         ingresar_button = IconButton(
@@ -125,7 +125,7 @@ class AgregarVecs(CustomScrollFrame):
         self.input_entries.clear()
         for i in range(dimension):
             input_entry = CustomEntry(
-                self.vector_frame, width=60, placeholder_text=str(randint(-15, 15))
+                self.vector_frame, width=80, placeholder_text=str(randint(-15, 15))
             )
 
             input_entry.grid(row=i, column=0, padx=5, pady=5)
@@ -135,7 +135,7 @@ class AgregarVecs(CustomScrollFrame):
         nombre_label = ctkLabel(self.post_vec_frame, text="Nombre del vector:")
         self.nombre_entry = CustomEntry(
             self.post_vec_frame,
-            width=30,
+            width=60,
             placeholder_text=choice(
                 [
                     x

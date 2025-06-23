@@ -355,7 +355,7 @@ class MultiplicacionTab(CustomScrollFrame):
         self.escalar_mat = self.select_escalar_mat.get()
         self.escalar_entry = CustomEntry(
             self.tab_escalar,
-            width=60,
+            width=80,
             placeholder_text=str(choice(generate_range(-10, 10))),
         )
 

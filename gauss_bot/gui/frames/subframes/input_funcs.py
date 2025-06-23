@@ -49,7 +49,6 @@ class AgregarFuncs(CustomScrollFrame):
         self.master_frame = master_frame
         self.func_manager = func_manager
         self.columnconfigure(0, weight=1)
-        self.columnconfigure(1, weight=1)
 
         self.key_binder = KeyBindingManager(es_matriz=False)
 
@@ -63,6 +62,7 @@ class AgregarFuncs(CustomScrollFrame):
         self.instruct_numpad = IconButton(
             self,
             self.app,
+            height=30,
             image=INFO_ICON,
             tooltip_text="\nEl numpad le permite ingresar funciones"
             + "\nmatemáticas de una forma más sencilla.\n"
@@ -75,13 +75,16 @@ class AgregarFuncs(CustomScrollFrame):
         )
 
         self.instruct_nombre = ctkLabel(self, text="Nombre de la función:")
-        self.nombre_entry = CustomEntry(self, width=40, placeholder_text="f(x)")
+        self.nombre_entry = CustomEntry(
+            self, width=60, height=35, placeholder_text="f(x)"
+        )
 
         self.instruct_func = ctkLabel(self, text="Ingrese los términos de la función:")
 
         self.func_entry = CustomEntry(
             self,
-            width=400,
+            width=500,
+            height=35,
             placeholder_text="Presione CTRL+TAB para abrir el numpad de funciones...",
         )
 
@@ -89,6 +92,7 @@ class AgregarFuncs(CustomScrollFrame):
         self.leer_button = IconButton(
             self,
             app=self.app,
+            height=30,
             image=ENTER_ICON,
             tooltip_text="Leer función",
             command=self.leer_func,
@@ -119,7 +123,6 @@ class AgregarFuncs(CustomScrollFrame):
 
         self.func_entry.grid(row=4, column=0, padx=5, pady=(1, 3), sticky="e")
         self.leer_button.grid(row=4, column=1, padx=5, pady=(1, 3), sticky="w")
-        self.func_frame.grid(row=5, column=0, columnspan=2, padx=5, pady=5, sticky="n")
 
     def leer_func(self) -> None:
         """
@@ -131,6 +134,7 @@ class AgregarFuncs(CustomScrollFrame):
         delete_msg_frame(self.msg_frame)
         for widget in self.func_frame.winfo_children():
             widget.destroy()  # type: ignore
+        self.func_frame.grid(row=5, column=0, columnspan=2, padx=5, pady=5, sticky="n")
 
         try:
             input_nombre = self.nombre_entry.get()

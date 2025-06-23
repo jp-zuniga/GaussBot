@@ -65,11 +65,11 @@ class AgregarSistemas(CustomScrollFrame):
         variables_label = ctkLabel(self.pre_sis_frame, text="Variables:")
 
         self.ecuaciones_entry = CustomEntry(
-            self.pre_sis_frame, width=30, placeholder_text="3"
+            self.pre_sis_frame, width=60, placeholder_text="3"
         )
 
         self.variables_entry = CustomEntry(
-            self.pre_sis_frame, width=30, placeholder_text="3"
+            self.pre_sis_frame, width=60, placeholder_text="3"
         )
 
         ingresar_button = IconButton(
@@ -161,7 +161,7 @@ class AgregarSistemas(CustomScrollFrame):
             fila_entries = []
             for j in range(variables):
                 input_entry = CustomEntry(
-                    self.sis_frame, width=60, placeholder_text=str(randint(-15, 15))
+                    self.sis_frame, width=80, placeholder_text=str(randint(-15, 15))
                 )
 
                 if j != variables - 1:
@@ -177,7 +177,7 @@ class AgregarSistemas(CustomScrollFrame):
         nombre_label = ctkLabel(self.post_sis_frame, text="Nombre del sistema:")
         self.nombre_entry = CustomEntry(
             self.post_sis_frame,
-            width=30,
+            width=60,
             placeholder_text=choice(
                 [
                     x
