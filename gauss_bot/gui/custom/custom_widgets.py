@@ -31,7 +31,7 @@ class CustomEntry(ctkEntry):
         super().__init__(
             master,
             width=kwargs.pop("width", 140),
-            height=kwargs.pop("height", 30),
+            height=kwargs.pop("height", 36),
             placeholder_text=placeholder_text,
             **kwargs,
         )
@@ -157,6 +157,8 @@ class IconButton(ctkButton):
             **kwargs,
         )
 
+        if text == "":
+            self._image_label.grid_configure(columnspan=3, sticky="nsew")
         if tooltip_text is not None:
             self.tooltip: Optional[Tooltip] = Tooltip(self, tooltip_text)
         else:
