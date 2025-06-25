@@ -351,10 +351,10 @@ class NavFrame(ctkFrame):
         self._quit_box = CustomMessageBox(
             self.app,
             name="Cerrar aplicación",
-            msg="¿Está seguro que desea cerrar GaussBot?\n"
-            + "(sus cambios serán guardados)",
+            msg="¿Está seguro que desea cerrar GaussBot?"
+            + "\n(sus cambios serán guardados)",
             button_options=("Sí", "No", None),
-            icon="error",
+            icon="warning",
         )
 
         seleccion: str = self._quit_box.get()

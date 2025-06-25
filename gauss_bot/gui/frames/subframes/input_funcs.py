@@ -10,7 +10,7 @@ from customtkinter import CTkFont as ctkFont, CTkFrame as ctkFrame, CTkLabel as 
 from sympy import SympifyError
 
 from ...custom import CustomDropdown, CustomEntry, ErrorFrame, IconButton, SuccessFrame
-from ...custom.adapted import CustomNumpad, CustomScrollFrame
+from ...custom.adapted import CustomNumpad, CustomMessageBox, CustomScrollFrame
 from ....managers import FuncManager, KeyBindingManager
 from ....models import Func
 from ....utils import (
@@ -49,6 +49,7 @@ class AgregarFuncs(CustomScrollFrame):
         self.master_frame = master_frame
         self.func_manager = func_manager
         self.columnconfigure(0, weight=1)
+        self.columnconfigure(1, weight=1)
 
         self.key_binder = KeyBindingManager(es_matriz=False)
 
@@ -66,28 +67,27 @@ class AgregarFuncs(CustomScrollFrame):
             image=INFO_ICON,
             tooltip_text="\nEl numpad le permite ingresar funciones"
             + "\nmatemáticas de una forma más sencilla.\n"
-            + "\nMientras el cursor este en la entrada de términos,"
+            + "\nCon el cursor en la entrada de términos,"
             + "\npresione CTRL+TAB para abrirlo y ESC para cerrarlo.\n"
             + "\nPara mejores resultados,\nasegúrese que los argumentos "
             + "de la función\nestén en paréntesis, y operaciones "
             + "complejas\ncomo multiplicación y división de funciones"
             + "\nestén encerradas en paréntesis también.\n",
+            command=self.mostrar_tutorial,
         )
 
         self.instruct_nombre = ctkLabel(self, text="Nombre de la función:")
-        self.nombre_entry = CustomEntry(
-            self, width=60, height=35, placeholder_text="f(x)"
-        )
+        self.nombre_entry = CustomEntry(self, width=60, placeholder_text="f(x)")
 
         self.instruct_func = ctkLabel(self, text="Ingrese los términos de la función:")
 
         self.func_entry = CustomEntry(
             self,
             width=500,
-            height=35,
             placeholder_text="Presione CTRL+TAB para abrir el numpad de funciones...",
         )
 
+        self.func_entry.unbind("<Tab>")
         self.numpad = CustomNumpad(self.func_entry)
         self.leer_button = IconButton(
             self,
@@ -105,24 +105,24 @@ class AgregarFuncs(CustomScrollFrame):
         self.func_entry.bind("<Down>", lambda _: self.key_binder.focus_first())
         self.func_entry.bind("<Return>", lambda _: self.leer_func())
 
-        self.instruct_numpad.grid(
-            row=0, column=0, columnspan=2, padx=5, pady=5, sticky="n"
-        )
-
         self.instruct_nombre.grid(
-            row=1, column=0, columnspan=2, padx=5, pady=(3, 1), sticky="n"
+            row=0, column=0, columnspan=2, padx=5, pady=(3, 1), sticky="n"
         )
 
         self.nombre_entry.grid(
-            row=2, column=0, columnspan=2, padx=5, pady=(1, 3), sticky="n"
+            row=1, column=0, columnspan=2, padx=5, pady=(1, 3), sticky="n"
         )
 
         self.instruct_func.grid(
-            row=3, column=0, columnspan=2, padx=5, pady=(3, 1), sticky="n"
+            row=2, column=0, columnspan=2, padx=5, pady=(3, 1), sticky="n"
         )
 
-        self.func_entry.grid(row=4, column=0, padx=5, pady=(1, 3), sticky="e")
-        self.leer_button.grid(row=4, column=1, padx=5, pady=(1, 3), sticky="w")
+        self.func_entry.grid(
+            row=3, column=0, columnspan=2, padx=5, pady=(1, 3), sticky="n"
+        )
+
+        self.instruct_numpad.grid(row=4, column=0, padx=2, pady=5, sticky="ne")
+        self.leer_button.grid(row=4, column=1, padx=2, pady=5, sticky="nw")
 
     def leer_func(self) -> None:
         """
@@ -257,6 +257,34 @@ class AgregarFuncs(CustomScrollFrame):
         for widget in self.func_frame.winfo_children():
             widget.destroy()  # type: ignore
         delete_msg_frame(self.msg_frame)
+
+    def mostrar_tutorial(self) -> None:
+        if hasattr(self, "_quit_box") and self._quit_box.winfo_exists():
+            self._quit_box.focus()
+            return
+
+        self._quit_box = CustomMessageBox(
+            self.app,
+            width=500,
+            height=400,
+            name="Detalles sobre Numpad Matemático",
+            msg="\nEl numpad le permite ingresar funciones matemáticas de "
+            + "una forma más sencilla. Con el cursor en la entrada de términos, "
+            + "presione CTRL+TAB para abrirlo y ESC para cerrarlo.\n"
+            + "\nPara mejores resultados, asegúrese que los argumentos de la "
+            + "función estén en paréntesis, y operaciones complejas como "
+            + "multiplicación y división de funciones estén encerradas "
+            + "en paréntesis también.\n\nSe pueden definir funciones en "
+            + "cualquier variable; simplemente  especifique la variable "
+            + "en el nombre de la función, e.g. s(t). Esto se detectará dinámicamente, "
+            + "y se sobreescribirán las 'x' ingresadas con el Numpad.\n",
+            button_options=("Ok", None, None),
+            icon="info",
+        )
+
+        self._quit_box.get()
+        self._quit_box.destroy()
+        del self._quit_box
 
     def update_frame(self) -> None:
         """
