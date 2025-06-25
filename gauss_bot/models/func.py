@@ -78,12 +78,10 @@ class Func:
             expr = expr.replace("sen", "sin")
         if "^" in expr:
             expr = expr.replace("^", "**")
-
-        expr = replace_var(str(parse_expr(expr, transformations=TRANSFORMS)))
-
         if "e**" in expr:
             expr = expr.replace("e**", "exp")
 
+        expr = replace_var(expr)
         self.expr: Expr = parse_expr(expr, transformations=TRANSFORMS)
 
         if self.expr.has(oo, -oo, zoo, nan):
@@ -305,7 +303,7 @@ class Func:
             f"${latex_str}$",
             horizontalalignment="center",
             verticalalignment="center",
-            fontsize=kwargs.get("font_size", 75),
+            fontsize=kwargs.get("font_size", 100),
             transform=temp_ax.transAxes,
         )
 
@@ -328,7 +326,7 @@ class Func:
             f"${latex_str}$",
             horizontalalignment="center",
             verticalalignment="center",
-            fontsize=kwargs.pop("font_size", 75),
+            fontsize=kwargs.pop("font_size", 100),
         )
 
         savefig(output_file, format="png", transparent=True, dpi=200, pad_inches=0.1)
