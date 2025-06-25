@@ -15,7 +15,7 @@ from ...managers import MatricesManager
 from ...utils import INPUTS_ICON
 
 if TYPE_CHECKING:
-    from gauss_bot.gui import GaussUI
+    from ..gui import GaussUI
 
 
 class SistemasFrame(ctkFrame):
