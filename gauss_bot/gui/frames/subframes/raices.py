@@ -193,14 +193,17 @@ class RaicesFrame(CustomScrollFrame):
         self.a_entry.bind("<Down>", lambda _: self.error_entry.focus_set())
         self.a_entry.bind("<Left>", lambda _: self.b_entry.focus_set())
         self.a_entry.bind("<Right>", lambda _: self.b_entry.focus_set())
+        self.a_entry.bind("<Return>", lambda _: self.leer_datos())
 
         self.b_entry.bind("<Up>", lambda _: self.error_entry.focus_set())
         self.b_entry.bind("<Down>", lambda _: self.error_entry.focus_set())
         self.b_entry.bind("<Left>", lambda _: self.a_entry.focus_set())
         self.b_entry.bind("<Right>", lambda _: self.a_entry.focus_set())
+        self.b_entry.bind("<Return>", lambda _: self.leer_datos())
 
         self.error_entry.bind("<Up>", lambda _: self.b_entry.focus_set())
         self.error_entry.bind("<Down>", lambda _: self.a_entry.focus_set())
+        self.error_entry.bind("<Return>", lambda _: self.leer_datos())
 
         ctkButton(
             self.datos_frame, height=30, text="Encontrar raíz", command=self.leer_datos
@@ -260,12 +263,14 @@ class RaicesFrame(CustomScrollFrame):
 
         self.xi_entry.bind("<Up>", lambda _: self.iteraciones_entry.focus_set())
         self.xi_entry.bind("<Down>", lambda _: self.error_entry.focus_set())
+        self.xi_entry.bind("<Return>", lambda _: self.leer_datos())
 
         if not newton:
             self.xn_entry.bind("<Up>", lambda _: self.iteraciones_entry.focus_set())
             self.xn_entry.bind("<Down>", lambda _: self.error_entry.focus_set())
             self.xn_entry.bind("<Left>", lambda _: self.xi_entry.focus_set())
             self.xn_entry.bind("<Right>", lambda _: self.xi_entry.focus_set())
+            self.xn_entry.bind("<Return>", lambda _: self.leer_datos())
             self.xi_entry.bind("<Left>", lambda _: self.xn_entry.focus_set())
             self.xi_entry.bind("<Right>", lambda _: self.xn_entry.focus_set())
             self.error_entry.bind("<Up>", lambda _: self.xn_entry.focus_set())
@@ -273,8 +278,10 @@ class RaicesFrame(CustomScrollFrame):
             self.error_entry.bind("<Up>", lambda _: self.xi_entry.focus_set())
 
         self.error_entry.bind("<Down>", lambda _: self.iteraciones_entry.focus_set())
+        self.error_entry.bind("<Return>", lambda _: self.leer_datos())
         self.iteraciones_entry.bind("<Up>", lambda _: self.error_entry.focus_set())
         self.iteraciones_entry.bind("<Down>", lambda _: self.xi_entry.focus_set())
+        self.iteraciones_entry.bind("<Return>", lambda _: self.leer_datos())
 
         ctkButton(
             self.datos_frame, height=30, text="Encontrar raíz", command=self.leer_datos
@@ -511,7 +518,7 @@ class RaicesFrame(CustomScrollFrame):
             parent_frame=self.resultado,
             msg_frame=self.msg_frame,
             msg=interpretacion if its == -1 else None,
-            img=raiz_img,
+            img=raiz_img if its != -1 else None,
             border_color=border_color,
             tipo="resultado",
             row=1,
