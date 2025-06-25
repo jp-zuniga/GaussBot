@@ -201,38 +201,29 @@ def generate_sep(orientation: bool, size: tuple[int, int]) -> ctkImage:
     )
 
 
-def resize_image(
-    img: ctkImage, divisors: tuple[int | float, int | float] = (4, 8)
-) -> ctkImage:
+def resize_image(img: ctkImage, per: float = 0.75) -> ctkImage:
     """
-    Reducir el tamaño de una CTkImage según los divisores dados.
+    Reducir el tamaño de una CTkImage según el porcentaje especificado.
 
     Args:
-        img:      Imagen a redimensionar.
-        divisors: Divisores para controlar el tamaño de la nueva imagen.
+        img: Imagen a redimensionar.
+        per: Porcentaje a aplicar a la imagen.
 
     Returns:
-        CTkImage: Imagen redimensionar.
+        CTkImage: Imagen redimensionada.
     ---
     """
 
-    div1, div2 = divisors
+    width, height = img.cget("size")
     dark: Image = img.cget("dark_image")
     light: Image = img.cget("light_image")
 
-    size: tuple[int, int] = img.cget("size")
-    width, height = size
-
-    new_width = int(width // div1)
-    new_height = int(height // div1)
+    new_width = int(width * per)
+    new_height = int(height * per)
 
     dark_img: ctkImage = dark.resize((new_width, new_height), Resampling.LANCZOS)
     light_img: ctkImage = light.resize((new_width, new_height), Resampling.LANCZOS)
-    return ctkImage(
-        dark_image=dark_img,
-        light_image=light_img,
-        size=(int(new_width // div2), int(new_height // div2)),
-    )
+    return ctkImage(dark_image=dark_img, light_image=light_img, size=dark_img.size)
 
 
 def transparent_invert(img: Image) -> Image:

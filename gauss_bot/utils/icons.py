@@ -2,6 +2,7 @@
 Definiciones de todos los íconos e imagenes de la aplicación.
 """
 
+from pathlib import Path
 from platform import system
 
 from PIL.Image import open as open_img
@@ -168,11 +169,11 @@ SHUFFLE_ICON = ctkImage(
 NUMPAD_KEYS: dict[str, ctkImage] = {}
 for file in NUMPAD_ICON_PATH.glob("*/*"):
     if file.is_file():
-        name_parts = file.stem.split("_", 1)
+        name_parts: list[str] = file.stem.split("_", 1)
         if len(name_parts) > 1:
-            key = name_parts[1]
-            dark_path = NUMPAD_ICON_PATH / "dark_mode" / f"light_{key}.png"
-            light_path = NUMPAD_ICON_PATH / "light_mode" / f"dark_{key}.png"
+            key: str = name_parts[1]
+            dark_path: Path = NUMPAD_ICON_PATH / "dark_mode" / f"light_{key}.png"
+            light_path: Path = NUMPAD_ICON_PATH / "light_mode" / f"dark_{key}.png"
 
             if dark_path.exists() and light_path.exists():
                 img = open_img(dark_path)
