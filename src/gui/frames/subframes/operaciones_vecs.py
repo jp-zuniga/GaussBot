@@ -11,6 +11,7 @@ from random import choice
 from tkinter import Variable
 from typing import TYPE_CHECKING, Optional
 
+from bidict import bidict
 from customtkinter import (
     CTkButton as ctkButton,
     CTkFont as ctkFont,
@@ -31,7 +32,6 @@ from ....utils import (
     delete_msg_if,
     format_factor,
     generate_range,
-    get_dict_key,
     place_msg_frame,
     toggle_proc,
 )
@@ -195,7 +195,7 @@ class SumaRestaTab(CustomScrollFrame):
         self.msg_frame: Optional[ctkFrame] = None
 
         # para el boton de ejecutar y el dropdown de operadores
-        self.operaciones: dict[str, str] = {"Sumar": "+", "Restar": "−"}
+        self.operaciones: bidict[str, str] = bidict({"Sumar": "+", "Restar": "−"})
 
         # definir atributos, se inicializan en setup_frame()
         self.instruct_sr: ctkLabel
@@ -360,11 +360,10 @@ class SumaRestaTab(CustomScrollFrame):
         seleccionada en el dropdown.
         """
 
-        self.operacion = valor
-        op_text: str = get_dict_key(self.operaciones, valor)  # type: ignore
-
+        op_text: str = self.operaciones.inverse[valor]
         self.ejecutar_button.configure(text=op_text)
         self.instruct_sr.configure(text=f"Seleccione los vectores a {op_text.lower()}:")
+        self.operacion = valor
 
     def update_vec1(self, valor: str) -> None:
         """
@@ -637,8 +636,8 @@ class MultiplicacionTab(CustomScrollFrame):
 
             dropdowns: list[CustomDropdown] = []
             vecs_validos = [
-                get_dict_key(self.vecs_manager.vecs_ingresados, vec)
-                for vec in self.vecs_manager.vecs_ingresados.values()
+                nombre
+                for nombre, vec in self.vecs_manager.vecs_ingresados.items()
                 if len(vec) == dimensiones
             ]
 

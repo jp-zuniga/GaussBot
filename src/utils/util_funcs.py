@@ -4,7 +4,7 @@ Funciones de utilidad generales para la aplicación.
 
 from fractions import Fraction
 from logging import DEBUG, FileHandler, Formatter, Logger, getLogger
-from typing import Any, Literal, Optional
+from typing import Literal
 
 from PIL.Image import Image, Resampling, merge, open as open_img
 from PIL.ImageOps import invert
@@ -122,32 +122,6 @@ def log_setup(logger: Logger = LOGGER) -> None:
     logger.addHandler(handler)
     logger.setLevel(DEBUG)
     logger.info("Logger configurado...")
-
-
-def get_dict_key(dict_lookup: dict, buscando: Any) -> Optional[Any]:
-    """
-    Buscar un valor en un diccionario y retornar su llave.
-
-    Args:
-        dict_lookup: Diccionario a recorrer secuencialmente.
-        buscando:    Valor a buscar en el diccionario.
-
-    Returns:
-        Any:  La llave del valor especificado, si se encuentra.
-        None: Si la llave no se encuentra.
-    ---
-    """
-
-    if buscando not in dict_lookup.values():
-        return None
-
-    for key, value in dict_lookup.items():
-        # comparar igualdad e identidad
-        if value == buscando or value is buscando:
-            return key
-
-    # fallback, la función debería retornar antes de llegar aquí
-    return None
 
 
 def generate_range(start: int, end: int) -> list[int]:

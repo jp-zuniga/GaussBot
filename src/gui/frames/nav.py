@@ -8,6 +8,7 @@ la barra de navegación de la aplicación.
 from tkinter import Event
 from typing import TYPE_CHECKING, Optional
 
+from bidict import bidict
 from customtkinter import CTkFont as ctkFont, CTkFrame as ctkFrame, CTkLabel as ctkLabel
 
 from ..custom import IconButton
@@ -23,7 +24,6 @@ from ...utils import (
     MATRIZ_ICON,
     QUIT_ICON,
     VECTOR_ICON,
-    get_dict_key,
 )
 
 if TYPE_CHECKING:
@@ -187,25 +187,27 @@ class NavFrame(ctkFrame):
         )
 
         self.frames: dict[str, ctkFrame] = {
-            "home": self.app.home_frame,  # type: ignore
-            "inputs": self.app.inputs_frame,  # type: ignore
-            "matrices": self.app.matrices,  # type: ignore
-            "vectores": self.app.vectores,  # type: ignore
-            "analisis": self.app.analisis,  # type: ignore
-            "sistemas": self.app.sistemas,  # type: ignore
-            "config": self.app.config_frame,  # type: ignore
+            "home": self.app.home_frame,
+            "inputs": self.app.inputs_frame,
+            "matrices": self.app.matrices,
+            "vectores": self.app.vectores,
+            "analisis": self.app.analisis,
+            "sistemas": self.app.sistemas,
+            "config": self.app.config_frame,
         }
 
-        self.buttons: dict[str, IconButton] = {
-            "home": self.home_button,
-            "inputs": self.inputs_button,
-            "matrices": self.matrices_button,
-            "vectores": self.vectores_button,
-            "analisis": self.analisis_button,
-            "sistemas": self.sistemas_button,
-            "config": self.config_button,
-            "quit": self.quit_button,
-        }
+        self.buttons: bidict[str, IconButton] = bidict(
+            {
+                "home": self.home_button,
+                "inputs": self.inputs_button,
+                "matrices": self.matrices_button,
+                "vectores": self.vectores_button,
+                "analisis": self.analisis_button,
+                "sistemas": self.sistemas_button,
+                "config": self.config_button,
+                "quit": self.quit_button,
+            }
+        )
 
         # colocar widgets en la barra de navegacion
         self.app_name.grid(row=0, column=0, padx=0, pady=(20, 10), sticky="nse")
@@ -221,7 +223,7 @@ class NavFrame(ctkFrame):
             if j == len(self.buttons.values()) - 1:
                 pady = (0, 10)
             else:
-                pady = 0  # type: ignore
+                pady = 0
 
             widget.grid(row=i, column=0, columnspan=2, padx=15, pady=pady, sticky="ew")
             i += 1
@@ -260,14 +262,10 @@ class NavFrame(ctkFrame):
                     widget.grid()
                 elif isinstance(widget, IconButton):
                     widget.configure(
-                        text=self.button_texts[
-                            get_dict_key(self.buttons, widget)  # type: ignore
-                        ]
+                        text=self.button_texts[self.buttons.inverse[widget]]
                     )
 
-                    widget._image_label.grid_configure(  # type: ignore
-                        columnspan=1, sticky="e"
-                    )
+                    widget._image_label.grid_configure(columnspan=1, sticky="e")
 
             self.hidden = False
             self.hide_button.configure(image=DROPLEFT_ICON)
@@ -281,9 +279,7 @@ class NavFrame(ctkFrame):
                     widget.grid_remove()
                 elif isinstance(widget, IconButton):
                     widget.configure(text="")
-                    widget._image_label.grid_configure(  # type: ignore
-                        columnspan=3, sticky="nsew"
-                    )
+                    widget._image_label.grid_configure(columnspan=3, sticky="nsew")
 
             self.hidden = True
             self.hide_button.configure(image=DROPRIGHT_ICON)
@@ -362,9 +358,9 @@ class NavFrame(ctkFrame):
         del self._quit_box
 
         if seleccion == "Sí":
-            self.app.func_manager.save_funciones()  # type: ignore
-            self.app.ops_manager.save_sistemas()  # type: ignore
-            self.app.ops_manager.save_matrices()  # type: ignore
-            self.app.ops_manager.save_vectores()  # type: ignore
+            self.app.func_manager.save_funciones()
+            self.app.ops_manager.save_sistemas()
+            self.app.ops_manager.save_matrices()
+            self.app.ops_manager.save_vectores()
             self.app.save_config()
             self.app.quit()

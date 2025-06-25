@@ -7,6 +7,7 @@ from decimal import getcontext
 from tkinter import StringVar
 from typing import TYPE_CHECKING, Optional
 
+from bidict import bidict
 from customtkinter import (
     CTkFrame as ctkFrame,
     CTkLabel as ctkLabel,
@@ -15,7 +16,7 @@ from customtkinter import (
 
 from ..custom import CustomDropdown, SuccessFrame
 from ... import FRAC_PREC
-from ...utils import delete_msg_frame, get_dict_key, place_msg_frame, set_icon
+from ...utils import delete_msg_frame, place_msg_frame, set_icon
 
 if TYPE_CHECKING:
     from .. import GaussUI
@@ -31,34 +32,42 @@ class ConfigFrame(ctkFrame):
         self.app = app
         self.msg_frame: Optional[SuccessFrame] = None
 
-        self.escalas_dict = {
-            "80%": 0.8,
-            "90%": 0.9,
-            "100%": 1.0,
-            "110%": 1.1,
-            "120%": 1.2,
-            "130%": 1.3,
-            "140%": 1.4,
-            "150%": 1.5,
-            "160%": 1.6,
-            "170%": 1.7,
-            "180%": 1.8,
-        }
+        self.escalas_dict: bidict[str, float] = bidict(
+            {
+                "80%": 0.8,
+                "90%": 0.9,
+                "100%": 1.0,
+                "110%": 1.1,
+                "120%": 1.2,
+                "130%": 1.3,
+                "140%": 1.4,
+                "150%": 1.5,
+                "160%": 1.6,
+                "170%": 1.7,
+                "180%": 1.8,
+            }
+        )
 
-        self.modos_dict = {"Claro": "light", "Oscuro": "dark"}
-        self.temas_dict = {
-            "Cerúleo": "ceruleo.json",
-            "Otoño": "otono.json",
-            "Violeta": "violeta.json",
-        }
+        self.modos_dict: bidict[str, str] = bidict({"Claro": "light", "Oscuro": "dark"})
+        self.temas_dict: bidict[str, str] = bidict(
+            {
+                "Cerúleo": "ceruleo.json",
+                "Otoño": "otono.json",
+                "Violeta": "violeta.json",
+            }
+        )
 
-        self.frac_prec_dict = {
-            "Denominador máximo de 100": 100,
-            "Denominador máximo de 500": 500,
-            "Denominador máximo de 1000": 1000,
-        }
+        self.frac_prec_dict: bidict[str, int] = bidict(
+            {
+                "Denominador máximo de 100": 100,
+                "Denominador máximo de 500": 500,
+                "Denominador máximo de 1000": 1000,
+            }
+        )
 
-        self.dec_prec_dict = {"3 decimales": 3, "6 decimales": 6, "9 decimales": 9}
+        self.dec_prec_dict: bidict[str, int] = bidict(
+            {"3 decimales": 3, "6 decimales": 6, "9 decimales": 9}
+        )
 
         self.escalas = list(self.escalas_dict.keys())
         self.modos = list(self.modos_dict.keys())
@@ -66,28 +75,19 @@ class ConfigFrame(ctkFrame):
         self.frac_precs = list(self.frac_prec_dict.keys())
         self.dec_precs = list(self.dec_prec_dict.keys())
 
-        # buscar las llaves de la configuracion actual
-        escala_actual_key = get_dict_key(self.escalas_dict, self.app.escala_actual)
-        modo_actual_key = get_dict_key(self.modos_dict, self.app.modo_actual)
-        tema_actual_key = get_dict_key(self.temas_dict, self.app.tema_actual)
-        frac_prec_key = get_dict_key(self.frac_prec_dict, self.app.frac_prec_actual)
-        dec_prec_key = get_dict_key(self.dec_prec_dict, self.app.dec_prec_actual)
+        first_escala = StringVar(
+            value=self.escalas_dict.inverse[self.app.escala_actual]
+        )
 
-        try:
-            # inicializar variables de config actual
-            first_escala = StringVar(value=escala_actual_key)
-            first_modo = StringVar(value=modo_actual_key)
-            first_tema = StringVar(value=tema_actual_key)
-            first_frac_prec = StringVar(value=frac_prec_key)
-            first_dec_prec = StringVar(value=dec_prec_key)
-        except AttributeError:
-            # si get_dict_key() retorna None, StringVar va a tirar error,
-            # entonces se inicializan con valores por defecto
-            first_escala = StringVar(value="100%")
-            first_modo = StringVar(value="Claro")
-            first_tema = StringVar(value="Sky")
-            first_frac_prec = StringVar(value="Denominador máximo de 100")
-            first_dec_prec = StringVar(value="3 decimales")
+        first_modo = StringVar(value=self.modos_dict.inverse[self.app.modo_actual])
+        first_tema = StringVar(value=self.temas_dict.inverse[self.app.tema_actual])
+        first_frac_prec = StringVar(
+            value=self.frac_prec_dict.inverse[self.app.frac_prec_actual]
+        )
+
+        first_dec_prec = StringVar(
+            value=self.dec_prec_dict.inverse[self.app.dec_prec_actual]
+        )
 
         # crear labels
         self.escala_label = ctkLabel(self, text="Escala:")
