@@ -10,7 +10,7 @@ from customtkinter import CTkFont as ctkFont, CTkFrame as ctkFrame, CTkLabel as 
 from sympy import SympifyError
 
 from ...custom import CustomDropdown, CustomEntry, ErrorFrame, IconButton, SuccessFrame
-from ...custom.adapted import CustomNumpad, CustomMessageBox, CustomScrollFrame
+from ...custom.adapted import CustomMessageBox, CustomNumpad, CustomScrollFrame
 from ....managers import FuncManager, KeyBindingManager
 from ....models import Func
 from ....utils import (
