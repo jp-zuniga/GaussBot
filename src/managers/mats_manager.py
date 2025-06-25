@@ -244,7 +244,6 @@ class MatricesManager:
         nombre_mat_mult = f"{escalar_str}{nombre_mat}"
 
         mat_proc = Matriz(
-            aumentada=False,
             filas=mat.filas,
             columnas=mat.columnas,
             valores=[
@@ -287,7 +286,6 @@ class MatricesManager:
         nombre_mat_mult = f"{nombre_mat1} • {nombre_mat2}"
 
         mat_proc = Matriz(
-            aumentada=False,
             filas=mat1.filas,
             columnas=mat2.columnas,
             valores=[

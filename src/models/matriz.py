@@ -20,16 +20,17 @@ class Matriz:
 
     def __init__(
         self,
-        aumentada: bool,
         filas: int,
         columnas: int,
         valores: Optional[list[list[Fraction]]] = None,
+        aumentada: bool = False,
     ) -> None:
         """
         Args:
-            aumentada:      Indica si representa un sistema de ecuaciones.
-            filas/columnas: Dimensiones de la matriz.
-            valores:        Lista de elementos.
+            filas:     Número de filas de la matriz.
+            columnas:  Número de columnas de la matriz.
+            valores:   Lista de elementos.
+            aumentada: Indica si representa un sistema de ecuaciones.
 
         Raises:
             ValueError: si las dimensiones de la matriz no son positivas.
@@ -38,7 +39,6 @@ class Matriz:
         if filas < 1 or columnas < 1:
             raise ValueError("¡Las dimensiones de la matriz deben ser positivas!")
 
-        self._aumentada = aumentada
         self._filas = filas
         self._columnas = columnas
 
@@ -49,6 +49,7 @@ class Matriz:
             ]
         else:
             self._valores = valores
+        self._aumentada = aumentada
 
     @property
     def aumentada(self) -> bool:
@@ -330,7 +331,7 @@ class Matriz:
         ]
 
         # retornar un nuevo objeto Matriz() con los valores sumados
-        return Matriz(self.aumentada, self.filas, self.columnas, mat_sumada)
+        return Matriz(self.filas, self.columnas, valores=mat_sumada)
 
     def __sub__(self, mat2: "Matriz") -> "Matriz":
         """
@@ -354,7 +355,7 @@ class Matriz:
         ]
 
         # retornar un nuevo objeto Matriz() con los valores sumados
-        return Matriz(self.aumentada, self.filas, self.columnas, mat_restada)
+        return Matriz(self.filas, self.columnas, valores=mat_restada)
 
     @overload
     def __mul__(self, mat2: "Matriz") -> "Matriz": ...
@@ -402,9 +403,7 @@ class Matriz:
                     for k in range(self.columnas):
                         mat_multiplicada[i][j] += self[i, k] * multiplicador[k, j]
 
-            return Matriz(
-                self.aumentada, self.filas, multiplicador.columnas, mat_multiplicada
-            )
+            return Matriz(self.filas, multiplicador.columnas, valores=mat_multiplicada)
 
         if isinstance(multiplicador, (int, float, Fraction)):
             # multiplicar todos los valores por el escalar
@@ -413,7 +412,7 @@ class Matriz:
                 for fila in self.valores
             ]
 
-            return Matriz(self.aumentada, self.filas, self.columnas, mat_multiplicada)
+            return Matriz(self.filas, multiplicador.columnas, valores=mat_multiplicada)
 
         raise TypeError("¡Tipo de dato inválido!")
 
@@ -438,7 +437,7 @@ class Matriz:
                 for fila in self.valores
             ]
 
-            return Matriz(self.aumentada, self.filas, self.columnas, mat_multiplicada)
+            return Matriz(self.filas, self.columnas, valores=mat_multiplicada)
         raise TypeError("¡Tipo de dato inválido!")
 
     def es_matriz_cero(self) -> bool:
@@ -526,10 +525,7 @@ class Matriz:
                 for k in range(self.columnas):
                     mat_triangular[j][k] -= factor * mat_triangular[i][k]
 
-        return (
-            Matriz(self.aumentada, self.filas, self.columnas, mat_triangular),
-            intercambio,
-        )
+        return (Matriz(self.filas, self.columnas, valores=mat_triangular), intercambio)
 
     def transponer(self) -> "Matriz":
         """
@@ -544,7 +540,7 @@ class Matriz:
             [self[j, i] for j in range(self.filas)] for i in range(self.columnas)
         ]
 
-        return Matriz(self.aumentada, self.columnas, self.filas, mat_transpuesta)
+        return Matriz(self.columnas, self.filas, valores=mat_transpuesta)
 
     def calcular_det(self) -> Union[Fraction, tuple[Fraction, "Matriz", bool]]:
         """
@@ -556,6 +552,7 @@ class Matriz:
                                       matriz triangular superior;
                                       bandera de intercambio de filas
                                      (para matrices nxn, n >= 3).
+
         Raises:
             ArithmeticError: Si la matriz no es cuadrada.
         ---
@@ -609,10 +606,9 @@ class Matriz:
                 # encontrar un minor de la matriz,
                 # eliminando la fila y columna actual
                 mat_minor = Matriz(
-                    False,
                     self.filas - 1,
                     self.columnas - 1,
-                    [
+                    valores=[
                         [self[m, n] for n in range(self.columnas) if n != j]
                         for m in range(self.filas)
                         if m != i
@@ -630,9 +626,7 @@ class Matriz:
                 fila.append(((-1) ** (i + j)) * det_minor)
             mat_cofactores.append(fila)
 
-        return Matriz(
-            self.aumentada, self.filas, self.columnas, mat_cofactores
-        ).transponer()
+        return Matriz(self.filas, self.columnas, valores=mat_cofactores).transponer()
 
     def invertir(self) -> tuple["Matriz", "Matriz", Fraction]:
         """

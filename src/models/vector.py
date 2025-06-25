@@ -101,7 +101,6 @@ class Vector:
 
         return str(
             Matriz(
-                aumentada=False,
                 filas=len(self),
                 columnas=1,
                 valores=[[c] for c in self.componentes],
@@ -256,7 +255,6 @@ class Vector:
             )
 
         mat_prod_cruz = Matriz(
-            aumentada=False,
             filas=len(vecs),
             columnas=dimensiones,
             valores=[vec.componentes for vec in vecs],

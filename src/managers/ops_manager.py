@@ -74,11 +74,10 @@ class OpsManager:
             for j, componente in enumerate(vec.componentes):
                 multiplicacion[i][j] += mat[i, j] * componente
 
-        mat_resultante = Matriz(False, mat.filas, len(vec), multiplicacion)
+        mat_resultante = Matriz(mat.filas, len(vec), valores=multiplicacion)
         nombre_mat_resultante = f"{nombre_mat}{nombre_vec}"
 
         mat_proc = Matriz(
-            aumentada=False,
             filas=mat.filas,
             columnas=len(vec),
             valores=[
@@ -251,10 +250,10 @@ class OpsManager:
                 LOGGER.info("¡Sistemas de ecuaciones cargados exitosamente!")
                 return {
                     nombre: Matriz(
-                        matriz["aumentada"],
                         matriz["filas"],
                         matriz["columnas"],
                         matriz["valores"],
+                        matriz["aumentada"],
                     )
                     for nombre, matriz in sistemas_dict.items()
                 }
@@ -286,10 +285,10 @@ class OpsManager:
                 LOGGER.info("¡Matrices cargadas exitosamente!")
                 return {
                     nombre: Matriz(
-                        matriz["aumentada"],
                         matriz["filas"],
                         matriz["columnas"],
                         matriz["valores"],
+                        matriz["aumentada"],
                     )
                     for nombre, matriz in matrices_dict.items()
                 }

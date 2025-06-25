@@ -278,9 +278,7 @@ class AgregarMats(CustomScrollFrame):
         delete_msg_frame(self.msg_frame)
 
         nombre_nueva_matriz = self.nombre_entry.get()
-        nueva_matriz = Matriz(
-            aumentada=False, filas=filas, columnas=columnas, valores=valores
-        )
+        nueva_matriz = Matriz(filas, columnas, valores=valores)
 
         # validar nombre de la matriz
         nombre_repetido = nombre_nueva_matriz in self.mats_manager.mats_ingresadas

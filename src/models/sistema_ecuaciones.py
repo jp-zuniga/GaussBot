@@ -71,7 +71,6 @@ class SistemaEcuaciones:
 
         # descomponer la matriz para obtener solo las variables
         mat_variables = Matriz(
-            aumentada=False,
             filas=self.matriz.filas,
             columnas=self.matriz.columnas - 1,
             valores=[self.matriz[i, :-1] for i in range(self.matriz.filas)],
@@ -79,7 +78,6 @@ class SistemaEcuaciones:
 
         # descomponer para obtener solo las constantes
         col_aumentada = Matriz(
-            aumentada=False,
             filas=self.matriz.filas,
             columnas=1,
             valores=[[self.matriz[i, -1]] for i in range(self.matriz.filas)],
@@ -102,10 +100,9 @@ class SistemaEcuaciones:
         for i in range(self.matriz.columnas - 1):
             # encontrar la submatriz de la variable i
             submat = Matriz(
-                False,
                 self.matriz.filas,
                 self.matriz.columnas - 1,
-                [
+                valores=[
                     [
                         self.matriz[j, k] if k != i else col_aumentada[j, 0]
                         for k in range(self.matriz.columnas - 1)
