@@ -50,14 +50,14 @@ class CustomMessageBox(ctkTop):
         self.master_window = master
         self.title(name)
         self.overrideredirect(True)
-        self.protocol("WM_DELETE_WINDOW", lambda _: self.button_event(""))  # type: ignore
+        self.protocol("WM_DELETE_WINDOW", lambda _: self.button_event(""))
 
         self.resizable(width=False, height=False)
         self.grid_columnconfigure(0, weight=1)
         self.grid_rowconfigure(0, weight=1)
 
         self.width = kwargs.pop("width", 360)
-        self.height = kwargs.pop("height", 200)
+        self.height = kwargs.pop("height", 160)
 
         self.spawn_x = int(
             self.master_window.winfo_width() * 0.5
@@ -77,7 +77,6 @@ class CustomMessageBox(ctkTop):
         )
 
         self.lift()
-
         self.x = self.winfo_x()
         self.y = self.winfo_y()
         self.oldx = 0
@@ -86,10 +85,6 @@ class CustomMessageBox(ctkTop):
         self.msgbox_name = name
         self.msg = msg
         self.clicked_button = ""
-
-        self.icon: ctkImage
-        self.load_icon(icon)
-
         self.option1, self.option2, self.option3 = button_options
 
         self.bg_color = self._apply_appearance_mode(
@@ -109,20 +104,17 @@ class CustomMessageBox(ctkTop):
             fg_color=self.fg_color,
         )
 
+        self.icon: ctkImage
         self.frame_top.grid(sticky="nsew")
-        self.frame_top.grid_columnconfigure((1, 2, 3), weight=1)
+        self.frame_top.grid_columnconfigure((0, 1, 2), weight=1)
         self.frame_top.grid_rowconfigure((0, 1, 2), weight=1)
 
-        self.frame_top.bind("<B1-Motion>", self.move_window)
-        self.frame_top.bind("<ButtonPress-1>", self.set_old_xy)
+        self.load_icon(icon)
+        self.icon_label = ctkLabel(self.frame_top, image=self.icon, text="")
+        self.icon_label.grid(row=0, column=0, padx=(20, 5), pady=(10, 8), sticky="nsw")
 
         self.title_label = ctkLabel(self.frame_top, text=self.msgbox_name)
-        self.title_label.grid(
-            row=0, column=0, columnspan=6, padx=(15, 0), pady=(10, 8), sticky="nsw"
-        )
-
-        self.title_label.bind("<B1-Motion>", self.move_window)
-        self.title_label.bind("<ButtonPress-1>", self.set_old_xy)
+        self.title_label.grid(row=0, column=1, pady=(10, 8), sticky="nsw")
 
         self.button_close = IconButton(
             self.frame_top,
@@ -130,103 +122,53 @@ class CustomMessageBox(ctkTop):
             image=QUIT_ICON,
             hover_color=self.bg_color,
             command=lambda: self.button_event(""),
-        )
+            width=30,
+            height=30,
+        ).grid(row=0, column=2, padx=(0, 10), pady=(10, 8), sticky="nse")
 
-        self.button_close.grid(
-            row=0, column=5, padx=(0, 15), pady=(10, 8), sticky="nse"
-        )
+        for widget in (self.icon_label, self.title_label, self.frame_top):
+            widget.bind("<B1-Motion>", self.move_window)
+            widget.bind("<ButtonPress-1>", self.set_old_xy)
 
-        msg_button = ctkButton(
+        ctkLabel(
             self.frame_top,
-            height=self.height // 2,
-            corner_radius=0,
-            text=self.msg,
-            image=self.icon,
             fg_color=self.bg_color,
-            text_color=ThemeManager.theme["CTkLabel"]["text_color"],
-            hover=False,
-        )
-
-        msg_button._image_label.grid_configure(padx=5)  # type: ignore
-        msg_button._text_label.grid_configure(padx=5)  # type: ignore
-        msg_button.grid(row=1, column=0, columnspan=6, ipadx=5, padx=3, sticky="nsew")
+            text=self.msg,
+            justify="center",
+            wraplength=self.width - 30,
+        ).grid(row=1, column=0, columnspan=3, padx=3, sticky="nsew")
 
         self.button_1 = ctkButton(
             self.frame_top,
-            height=(self.height // 4) - 20,
-            text=self.option1,  # type: ignore
-            command=lambda: self.button_event(self.option1),  # type: ignore
+            height=30,
+            text=self.option1,
+            command=lambda: self.button_event(self.option1),
         )
 
         if self.option2:
             self.button_2 = ctkButton(
                 self.frame_top,
-                height=(self.height // 4) - 20,
-                text=self.option2,  # type: ignore
-                command=lambda: self.button_event(self.option2),  # type: ignore
+                height=30,
+                text=self.option2,
+                command=lambda: self.button_event(self.option2),
             )
-
         if self.option3:
             self.button_3 = ctkButton(
                 self.frame_top,
-                height=(self.height // 4) - 20,
-                text=self.option3,  # type: ignore
-                command=lambda: self.button_event(self.option3),  # type: ignore
+                height=30,
+                text=self.option3,
+                command=lambda: self.button_event(self.option3),
             )
-
-        columns = (0, 2, 4)
-        span = 2
 
         if all(button_options):
-            self.frame_top.columnconfigure((0, 1, 2, 3, 4, 5), weight=1)
-            self.button_1.grid(
-                row=2,
-                column=columns[0],
-                columnspan=span,
-                sticky="nsew",
-                padx=(0, 10),
-                pady=10,
-            )
-
-            self.button_2.grid(
-                row=2,
-                column=columns[1],
-                columnspan=span,
-                sticky="nsew",
-                padx=10,
-                pady=10,
-            )
-
-            self.button_3.grid(
-                row=2,
-                column=columns[2],
-                columnspan=span,
-                sticky="nsew",
-                padx=(10, 0),
-                pady=10,
-            )
-
+            self.button_1.grid(row=2, column=0, padx=(10, 0), pady=10, sticky="nsew")
+            self.button_2.grid(row=2, column=1, padx=10, pady=10, sticky="nsew")
+            self.button_3.grid(row=2, column=2, padx=(0, 10), pady=10, sticky="nsew")
         elif self.option2:
-            self.frame_top.columnconfigure((0, 4), weight=1)
-            columns = (4, 5)  # type: ignore
-            self.button_1.grid(
-                row=2, column=columns[0], sticky="nse", padx=(0, 5), pady=10
-            )
-
-            self.button_2.grid(
-                row=2, column=columns[1], sticky="nse", padx=(5, 10), pady=10
-            )
-
+            self.button_1.grid(row=2, column=1, padx=(10, 0), pady=10, sticky="nsew")
+            self.button_2.grid(row=2, column=2, padx=10, pady=10, sticky="nsew")
         else:
-            self.frame_top.columnconfigure((0, 2, 4), weight=2)
-            self.button_1.grid(
-                row=2,
-                column=columns[2],
-                columnspan=span,
-                sticky="nse",
-                padx=(0, 10),
-                pady=10,
-            )
+            self.button_1.grid(row=2, column=2, padx=10, pady=10, sticky="nsew")
 
         self._set_scaling(
             self.master_window.escala_inicial, self.master_window.escala_inicial
