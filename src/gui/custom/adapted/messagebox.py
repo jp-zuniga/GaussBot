@@ -79,8 +79,8 @@ class CustomMessageBox(ctkTop):
         self.lift()
         self.x = self.winfo_x()
         self.y = self.winfo_y()
-        self.oldx = 0
-        self.oldy = 0
+        self.offset_x = 0
+        self.offset_y = 0
 
         self.msgbox_name = name
         self.msg = msg
@@ -104,19 +104,24 @@ class CustomMessageBox(ctkTop):
             fg_color=self.fg_color,
         )
 
-        self.icon: ctkImage
         self.frame_top.grid(sticky="nsew")
         self.frame_top.grid_columnconfigure((0, 1, 2), weight=1)
         self.frame_top.grid_rowconfigure((0, 1, 2), weight=1)
 
+        self.icon: ctkImage
         self.load_icon(icon)
+
         self.icon_label = ctkLabel(self.frame_top, image=self.icon, text="")
         self.icon_label.grid(row=0, column=0, padx=(20, 5), pady=(10, 8), sticky="nsw")
 
         self.title_label = ctkLabel(self.frame_top, text=self.msgbox_name)
         self.title_label.grid(row=0, column=1, pady=(10, 8), sticky="nsw")
 
-        self.button_close = IconButton(
+        for widget in (self.icon_label, self.title_label, self.frame_top):
+            widget.bind("<B1-Motion>", self.move_window)
+            widget.bind("<ButtonPress-1>", self.set_old_xy)
+
+        IconButton(
             self.frame_top,
             app=self.master_window,
             image=QUIT_ICON,
@@ -125,10 +130,6 @@ class CustomMessageBox(ctkTop):
             width=30,
             height=30,
         ).grid(row=0, column=2, padx=(0, 10), pady=(10, 8), sticky="nse")
-
-        for widget in (self.icon_label, self.title_label, self.frame_top):
-            widget.bind("<B1-Motion>", self.move_window)
-            widget.bind("<ButtonPress-1>", self.set_old_xy)
 
         ctkLabel(
             self.frame_top,
@@ -202,17 +203,20 @@ class CustomMessageBox(ctkTop):
         Saves the current x and y coordinates of the window.
         """
 
-        self.oldx = event.x
-        self.oldy = event.y
+        self.win_x = self.winfo_x()
+        self.win_y = self.winfo_y()
+
+        self.offset_x = event.x_root - self.win_x
+        self.offset_y = event.y_root - self.win_y
 
     def move_window(self, event: Event) -> None:
         """
         Moves the window according to the event received.
         """
 
-        self.y = event.y_root - self.oldy
-        self.x = event.x_root - self.oldx
-        self.geometry(f"+{self.x}+{self.y}")
+        new_x = int(event.x_root - self.offset_x)
+        new_y = int(event.y_root - self.offset_y)
+        self.geometry(f"+{new_x}+{new_y}")
 
     def load_icon(self, icon: str) -> None:
         """
