@@ -51,7 +51,7 @@ class KeyBindingManager:
             raise ValueError(
                 "Para una matriz, 'entry_list' debe ser una lista bidimensional."
             )
-        if not self.matriz and any(isinstance(item, list) for item in self.entry_list):
+        if not self.es_matriz and any(isinstance(item, list) for item in self.entry_list):
             raise ValueError(
                 "Para un vector, 'entry_list' debe ser una lista unidimensional."
             )

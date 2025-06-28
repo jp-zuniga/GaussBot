@@ -203,11 +203,8 @@ class CustomMessageBox(ctkTop):
         Saves the current x and y coordinates of the window.
         """
 
-        self.win_x = self.winfo_x()
-        self.win_y = self.winfo_y()
-
-        self.offset_x = event.x_root - self.win_x
-        self.offset_y = event.y_root - self.win_y
+        self.offset_x = event.x_root - self.winfo_x()
+        self.offset_y = event.y_root - self.winfo_y()
 
     def move_window(self, event: Event) -> None:
         """

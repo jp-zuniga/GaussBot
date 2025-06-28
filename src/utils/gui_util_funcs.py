@@ -157,7 +157,7 @@ def toggle_proc(
 
     # si no esta escondido el procedimiento, o existe una Toplevel widget
     if not proc_hidden or any(
-        type(widget) is ctkTop for widget in app.winfo_children()
+        isinstance(widget, ctkTop) for widget in app.winfo_children()
     ):
         return
 

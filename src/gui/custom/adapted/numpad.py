@@ -195,6 +195,7 @@ class CustomNumpad(ctkTop):
         return "break"
 
     def render(self, event: Optional[Event] = None) -> str:
+        del event
         if self.disabled:
             return "break"
 

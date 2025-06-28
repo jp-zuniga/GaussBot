@@ -68,8 +68,8 @@ class CustomScrollFrame(ctkFrame):
         )
 
         self.xy_canvas.configure(
-            yscrollcommand=lambda x, y: self.dynamic_scrollbar_vsb(x, y),
-            xscrollcommand=lambda x, y: self.dynamic_scrollbar_hsb(x, y),
+            yscrollcommand=self.dynamic_scrollbar_vsb,
+            xscrollcommand=self.dynamic_scrollbar_hsb,
         )
 
         self.xy_canvas.grid(row=0, column=0, sticky="nsew", padx=10, pady=10)
@@ -122,16 +122,12 @@ class CustomScrollFrame(ctkFrame):
     def check_if_master_is_canvas(self, widget):
         if widget == self.xy_canvas:
             return True
-        elif widget.master is not None:
+        if widget.master is not None:
             return self.check_if_master_is_canvas(widget.master)
-        else:
-            return False
+        return False
 
     def disable_contentscroll(self, widget):
-        if widget == self.xy_canvas:
-            return True
-        else:
-            return False
+        return widget == self.xy_canvas
 
     def dynamic_scrollbar_vsb(self, x, y):
         if float(x) == 0.0 and float(y) == 1.0:
@@ -151,6 +147,7 @@ class CustomScrollFrame(ctkFrame):
         self.xy_canvas.itemconfig(self.window_id, width=event.width)
 
     def on_inner_frame_configure(self, event=None):
+        del event
         self.xy_canvas.configure(scrollregion=self.xy_canvas.bbox("all"))
         self.xy_canvas.xview_moveto(0)
         self.xy_canvas.yview_moveto(0)
@@ -182,19 +179,19 @@ class CustomScrollFrame(ctkFrame):
         self.parent_frame.pack_forget()
 
     def place_forget(self, **kwargs):
-        self.parent_frame.place_forget()
+        self.parent_frame.place_forget(**kwargs)
 
     def grid_forget(self, **kwargs):
-        self.parent_frame.grid_forget()
+        self.parent_frame.grid_forget(**kwargs)
 
     def grid_remove(self, **kwargs):
-        self.parent_frame.grid_remove()
+        self.parent_frame.grid_remove(**kwargs)
 
     def grid_propagate(self, **kwargs):
-        self.parent_frame.grid_propagate()
+        self.parent_frame.grid_propagate(**kwargs)
 
     def grid_info(self, **kwargs):
-        return self.parent_frame.grid_info()
+        return self.parent_frame.grid_info(**kwargs)
 
     def lift(self, aboveThis=None):
         self.parent_frame.lift(aboveThis)

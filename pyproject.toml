@@ -10,6 +10,11 @@ dependencies = [
     "sympy>=1.14.0",
 ]
 
+[tool.pylint]
+disable = ["C0415", "E0401", "R0801"]
+jobs = 0
+output-format = "colorized"
+
 [tool.ruff.lint.per-file-ignores]
 "src/managers/__init__.py" = ["I001"]
 "src/utils/__init__.py" = ["I001"]

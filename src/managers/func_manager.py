@@ -411,7 +411,7 @@ class FuncManager:
         # crear funciones.json si no existe
         if not FUNCIONES_PATH.exists():
             FUNCIONES_PATH.parent.mkdir(parents=True, exist_ok=True)
-            LOGGER.info(f"Creando archivo '{FUNCIONES_PATH}'...")
+            LOGGER.info("Creando archivo '%s'...", FUNCIONES_PATH)
 
         # si funcs_ingresadas esta vacio, dejar funciones.json vacio y retornar
         if funciones_dict == {}:
@@ -422,7 +422,7 @@ class FuncManager:
         with open(FUNCIONES_PATH, mode="w", encoding="utf-8") as funciones_file:
             dump(funciones_dict, funciones_file, indent=4, sort_keys=True)
 
-        LOGGER.info(f"¡Funciones guardadas en '{FUNCIONES_PATH}' exitosamente!")
+        LOGGER.info("¡Funciones guardadas en '%s' exitosamente!", FUNCIONES_PATH)
 
     def _load_funcs(self) -> dict[str, Func]:
         """
@@ -431,7 +431,7 @@ class FuncManager:
 
         # si no existe funciones.json, retornar un diccionario vacio
         if not FUNCIONES_PATH.exists():
-            LOGGER.info(f"Archivo {FUNCIONES_PATH} no existe...")
+            LOGGER.info("Archivo '%s' no existe...", FUNCIONES_PATH)
             return {}
 
         with open(FUNCIONES_PATH, mode="r", encoding="utf-8") as funciones_file:
@@ -450,10 +450,12 @@ class FuncManager:
                 if "(char 0)" in str(j):
                     # si la lectura del archivo fallo en
                     # el primer caracter, es que esta vacio
-                    LOGGER.info(f"Archivo '{FUNCIONES_PATH}' vacío...")
+                    LOGGER.info("Archivo '%s' vacío...", FUNCIONES_PATH)
                 else:
                     # si no, es un error de verdad
-                    LOGGER.error(f"Error al leer archivo '{FUNCIONES_PATH}':\n{str(j)}")
+                    LOGGER.error(
+                        "Error al leer archivo '%s':\n%s", FUNCIONES_PATH, str(j)
+                    )
                 return {}
 
     def _validar_funcs_ingresadas(self) -> bool:

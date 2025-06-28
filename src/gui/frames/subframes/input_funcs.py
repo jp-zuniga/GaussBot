@@ -259,6 +259,10 @@ class AgregarFuncs(CustomScrollFrame):
         delete_msg_frame(self.msg_frame)
 
     def mostrar_tutorial(self) -> None:
+        """
+        Mostrar CustomMessageBox explicando el uso del Numpad.
+        """
+
         if hasattr(self, "_quit_box") and self._quit_box.winfo_exists():
             self._quit_box.focus()
             return

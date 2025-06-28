@@ -128,7 +128,7 @@ class OpsManager:
         if not SISTEMAS_PATH.exists():
             SISTEMAS_PATH.parent.mkdir(parents=True, exist_ok=True)
             SISTEMAS_PATH.write_text("")
-            LOGGER.info(f"Creando '{SISTEMAS_PATH}'...")
+            LOGGER.info("Creando '%s'...", SISTEMAS_PATH)
 
         # si sis_ingresados esta vacio, dejar sistemas.json vacio y retornar
         if sistemas_dict == {}:
@@ -149,7 +149,7 @@ class OpsManager:
             )
 
             LOGGER.info(
-                f"¡Sistemas de ecuaciones guardados en '{SISTEMAS_PATH}' exitosamente!"
+                "¡Sistemas de ecuaciones guardados en '%s' exitosamente!", SISTEMAS_PATH
             )
 
     def save_matrices(self) -> None:
@@ -175,7 +175,7 @@ class OpsManager:
         if not MATRICES_PATH.exists():
             MATRICES_PATH.parent.mkdir(parents=True, exist_ok=True)
             MATRICES_PATH.write_text("")
-            LOGGER.info(f"Creando '{MATRICES_PATH}'...")
+            LOGGER.info("Creando '%s'...", MATRICES_PATH)
 
         # si mats_ingresadas esta vacio, dejar matrices.json vacio y retornar
         if matrices_dict == {}:
@@ -192,7 +192,7 @@ class OpsManager:
                 cls=FractionEncoder,
             )
 
-            LOGGER.info(f"¡Matrices guardadas en '{MATRICES_PATH}' exitosamente!")
+            LOGGER.info("¡Matrices guardadas en '%s' exitosamente!", MATRICES_PATH)
 
     def save_vectores(self) -> None:
         """
@@ -212,7 +212,7 @@ class OpsManager:
         if not VECTORES_PATH.exists():
             VECTORES_PATH.parent.mkdir(parents=True, exist_ok=True)
             VECTORES_PATH.write_text("")
-            LOGGER.info(f"Creando '{VECTORES_PATH}'...")
+            LOGGER.info("Creando '%s'...", VECTORES_PATH)
 
         # si vecs_ingresados esta vacio, dejar vectores.json vacio y retornar
         if vectores_dict == {}:
@@ -229,7 +229,7 @@ class OpsManager:
                 cls=FractionEncoder,
             )
 
-            LOGGER.info(f"¡Vectores guardados en '{VECTORES_PATH}' exitosamente!")
+            LOGGER.info("¡Vectores guardados en '%s' exitosamente!", VECTORES_PATH)
 
     def _load_sistemas(self) -> dict[str, Matriz]:
         """
@@ -241,7 +241,7 @@ class OpsManager:
 
         # si no existe sistemas.json, retornar un diccionario vacio
         if not SISTEMAS_PATH.exists():
-            LOGGER.info(f"Archivo {SISTEMAS_PATH} no existe...")
+            LOGGER.info("Archivo '%s' no existe...", SISTEMAS_PATH)
             return {}
 
         with open(SISTEMAS_PATH, mode="r", encoding="utf-8") as sistemas_file:
@@ -261,10 +261,12 @@ class OpsManager:
                 if "(char 0)" in str(j):
                     # si la lectura del archivo fallo en
                     # el primer caracter, es que esta vacio
-                    LOGGER.info(f"Archivo {SISTEMAS_PATH} está vacío...")
+                    LOGGER.info("Archivo '%s' está vacío...", SISTEMAS_PATH)
                 else:
                     # si no, es un error de verdad
-                    LOGGER.error(f"Error al leer archivo '{SISTEMAS_PATH}':\n{str(j)}")
+                    LOGGER.error(
+                        "Error al leer archivo '%s':\n%s", SISTEMAS_PATH, str(j)
+                    )
                 return {}
 
     def _load_matrices(self) -> dict[str, Matriz]:
@@ -276,7 +278,7 @@ class OpsManager:
         """
 
         if not MATRICES_PATH.exists():
-            LOGGER.info(f"Archivo '{MATRICES_PATH}' no existe...")
+            LOGGER.info("Archivo '%s' no existe...", MATRICES_PATH)
             return {}
 
         with open(MATRICES_PATH, mode="r", encoding="utf-8") as matrices_file:
@@ -296,10 +298,12 @@ class OpsManager:
                 if "(char 0)" in str(j):
                     # si la lectura del archivo fallo en
                     # el primer caracter, es que esta vacio
-                    LOGGER.info(f"Archivo '{MATRICES_PATH}' vacío...")
+                    LOGGER.info("Archivo '%s' vacío...", MATRICES_PATH)
                 else:
                     # si no, es un error de verdad
-                    LOGGER.error(f"Error al leer archivo '{MATRICES_PATH}':\n{str(j)}")
+                    LOGGER.error(
+                        "Error al leer archivo '%s':\n%s", MATRICES_PATH, str(j)
+                    )
                 return {}
 
     def _load_vectores(self) -> dict[str, Vector]:
@@ -311,7 +315,7 @@ class OpsManager:
         """
 
         if not VECTORES_PATH.exists():
-            LOGGER.info(f"Archivo '{VECTORES_PATH}' no existe...")
+            LOGGER.info("Archivo '%s' no existe...", VECTORES_PATH)
             return {}
 
         with open(VECTORES_PATH, mode="r", encoding="utf-8") as vectores_file:
@@ -326,8 +330,10 @@ class OpsManager:
                 if "(char 0)" in str(j):
                     # si la lectura del archivo fallo en
                     # el primer caracter, es que esta vacio
-                    LOGGER.info(f"Archivo '{VECTORES_PATH}' vacío...")
+                    LOGGER.info("Archivo '%s' vacío...", VECTORES_PATH)
                 else:
                     # si no, es un error de verdad
-                    LOGGER.error(f"Error al leer archivo '{VECTORES_PATH}':\n{str(j)}")
+                    LOGGER.error(
+                        "Error al leer archivo '%s':\n%s", VECTORES_PATH, str(j)
+                    )
                 return {}

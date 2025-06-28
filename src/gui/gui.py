@@ -119,7 +119,7 @@ class GaussUI(ctk):
 
         if not CONFIG_PATH.exists():
             CONFIG_PATH.parent.mkdir(parents=True, exist_ok=True)
-            LOGGER.info(f"Creando archivo '{CONFIG_PATH}'...")
+            LOGGER.info("Creando archivo '%s'...", CONFIG_PATH)
 
         with open(CONFIG_PATH, mode="w", encoding="utf-8") as config_file:
             dump(self.config_options, config_file, indent=4, sort_keys=True)
@@ -137,8 +137,8 @@ class GaussUI(ctk):
                 LOGGER.info("¡Configuración cargada exitosamente!")
         else:
             LOGGER.info(
-                f"Archivo '{CONFIG_PATH}' no existe, "
-                + "inicializando con valores por defecto..."
+                "Archivo '%s' no existe, inicializando con valores por defecto...",
+                CONFIG_PATH,
             )
 
             self.config_options = {
