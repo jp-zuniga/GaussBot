@@ -1,6 +1,5 @@
 """
-Funciones para colocar y eliminar los
-frames de mensaje de la aplicación.
+Funciones de utilidad relacionadas a la interfaz gráfica.
 """
 
 from platform import system
