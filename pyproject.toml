@@ -16,6 +16,7 @@ jobs = 0
 output-format = "colorized"
 
 [tool.ruff.lint.per-file-ignores]
+"src/__init__.py" = ["E402"]
 "src/managers/__init__.py" = ["I001"]
 "src/utils/__init__.py" = ["I001"]
 

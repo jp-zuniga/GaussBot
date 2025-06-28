@@ -6,9 +6,9 @@ operaciones con matrices y vectores, y análisis númerico.
 
 FRAC_PREC: dict[str, int] = {"prec": 100}
 
-from platform import system  # noqa
+from platform import system
 
-from . import gui, managers, models, utils  # noqa
+from . import gui, managers, models, utils
 
 
 def main() -> None:
