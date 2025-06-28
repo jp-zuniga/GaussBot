@@ -1,5 +1,5 @@
 """
-Entry point de ejecución.
+Ejecución de la aplicación.
 """
 
 from . import main

@@ -5,7 +5,6 @@ Implementación de la clase Func.
 from decimal import Decimal
 from logging import WARNING, getLogger
 from re import compile as comp, sub
-from typing import Optional
 
 from PIL.Image import open as open_img
 from customtkinter import CTkImage as ctkImage
@@ -63,7 +62,7 @@ class Func:
         self.var = Symbol(comp(var_pattern).findall(nombre)[0])
 
         self.latexified = latexified
-        self.latex_img: Optional[ctkImage] = None
+        self.latex_img: ctkImage | None = None
 
         def replace_var(expr: str) -> str:
             var_str = str(self.var)
@@ -150,7 +149,7 @@ class Func:
         """
 
         try:
-            match: Optional[list] = list(comp(r"\^\(-\d+\)").finditer(self.nombre))[-1]
+            match: list | None = list(comp(r"\^\(-\d+\)").finditer(self.nombre))[-1]
         except IndexError:
             match = None
 
@@ -251,10 +250,10 @@ class Func:
 
     @staticmethod
     def latex_to_png(
-        output_file: Optional[str] = None,
-        nombre_expr: Optional[str] = None,
-        expr: Optional[str] = None,
-        misc_str: Optional[str] = None,
+        output_file: str | None = None,
+        nombre_expr: str | None = None,
+        expr: str | None = None,
+        misc_str: str | None = None,
         con_nombre: bool = False,
         **kwargs,
     ) -> ctkImage:

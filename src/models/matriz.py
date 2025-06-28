@@ -7,7 +7,7 @@ métodos para transponer, calcular determinante, encontrar inversa, etc.
 
 from copy import deepcopy
 from fractions import Fraction
-from typing import Optional, Union, overload
+from typing import overload
 
 from .. import FRAC_PREC
 from ..utils import format_factor
@@ -22,7 +22,7 @@ class Matriz:
         self,
         filas: int,
         columnas: int,
-        valores: Optional[list[list[Fraction]]] = None,
+        valores: list[list[Fraction]] | None = None,
         aumentada: bool = False,
     ) -> None:
         """
@@ -87,7 +87,7 @@ class Matriz:
     def __getitem__(self, indice: int) -> list[Fraction]: ...
 
     @overload
-    def __getitem__(self, indices: slice) -> list[list[Fraction]]: ...
+    def __getitem__(self, indice: slice) -> list[list[Fraction]]: ...
 
     @overload
     def __getitem__(self, indices: tuple[slice, int]) -> list[Fraction]: ...
@@ -103,15 +103,13 @@ class Matriz:
 
     def __getitem__(
         self,
-        indice: Union[
-            int,
-            slice,
-            tuple[slice, int],
-            tuple[int, slice],
-            tuple[int, int],
-            tuple[slice, slice],
-        ],
-    ) -> Union[Fraction, list[Fraction], list[list[Fraction]]]:
+        indice: int
+        | slice
+        | tuple[slice, int]
+        | tuple[int, slice]
+        | tuple[int, int]
+        | tuple[slice, slice],
+    ) -> Fraction | list[Fraction] | list[list[Fraction]]:
         """
         Acceso flexible a elementos de la matriz mediante índices y slices.
         Soporta todas las variantes de indexación que soportaría una lista 2D.
@@ -361,9 +359,9 @@ class Matriz:
     def __mul__(self, mat2: "Matriz") -> "Matriz": ...
 
     @overload
-    def __mul__(self, escalar: Union[int, float, Fraction]) -> "Matriz": ...
+    def __mul__(self, escalar: int | float | Fraction) -> "Matriz": ...
 
-    def __mul__(self, multiplicador: Union["Matriz", int, float, Fraction]) -> "Matriz":
+    def __mul__(self, multiplicador: "Matriz" | int | float | Fraction) -> "Matriz":
         """
         Overload de operador para realizar multiplicación con matrices.
         Si se multiplica por un número, se realiza multiplicación escalar.
@@ -416,7 +414,7 @@ class Matriz:
 
         raise TypeError("¡Tipo de dato inválido!")
 
-    def __rmul__(self, multiplicador: Union[int, float, Fraction]) -> "Matriz":
+    def __rmul__(self, multiplicador: int | float | Fraction) -> "Matriz":
         """
         Overload de operador para realizar multiplicación entre un escalar y una matriz.
 
@@ -543,7 +541,7 @@ class Matriz:
 
         return Matriz(self.columnas, self.filas, valores=mat_transpuesta)
 
-    def calcular_det(self) -> Union[Fraction, tuple[Fraction, "Matriz", bool]]:
+    def calcular_det(self) -> Fraction | tuple[Fraction, "Matriz", bool]:
         """
         Calcular el determinante de la instancia.
 

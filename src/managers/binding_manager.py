@@ -4,7 +4,6 @@ bindings a las teclas de flecha para navegar entre entries.
 """
 
 from tkinter import Event
-from typing import Optional, Union
 
 from ..gui.custom import CustomEntry
 
@@ -17,8 +16,8 @@ class KeyBindingManager:
     def __init__(
         self,
         es_matriz: bool,
-        entry_list: Optional[Union[list[CustomEntry], list[list[CustomEntry]]]] = None,
-        extra_entries: Optional[tuple[CustomEntry, CustomEntry]] = None,
+        entry_list: list[CustomEntry] | list[list[CustomEntry]] | None = None,
+        extra_entries: tuple[CustomEntry, CustomEntry] | None = None,
     ) -> None:
         """
         Args:
@@ -51,7 +50,9 @@ class KeyBindingManager:
             raise ValueError(
                 "Para una matriz, 'entry_list' debe ser una lista bidimensional."
             )
-        if not self.es_matriz and any(isinstance(item, list) for item in self.entry_list):
+        if not self.es_matriz and any(
+            isinstance(item, list) for item in self.entry_list
+        ):
             raise ValueError(
                 "Para un vector, 'entry_list' debe ser una lista unidimensional."
             )
@@ -224,7 +225,7 @@ class KeyBindingManager:
         except IndexError:
             pass
 
-    def autocomplete_all(self, event: Optional[Event] = None) -> str:
+    def autocomplete_all(self, event: Event | None = None) -> str:
         """
         Llamar autocomplete_placeholder() para todos los entries.
 

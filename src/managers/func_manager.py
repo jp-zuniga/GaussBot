@@ -7,7 +7,6 @@ raíces de las funciones ingresadas, y retorna los resultados.
 
 from decimal import Decimal
 from json import JSONDecodeError, dump, load
-from typing import Optional, Union
 
 from customtkinter import CTkImage as ctkImage
 from sympy import lambdify
@@ -27,7 +26,7 @@ class FuncManager:
     y realiza operaciones sobre ellas.
     """
 
-    def __init__(self, funcs_ingresadas: Optional[dict[str, Func]] = None):
+    def __init__(self, funcs_ingresadas: dict[str, Func] | None = None):
         """
         Args:
             funcs_ingresadas: Diccionario de funciones guardadas.
@@ -69,7 +68,7 @@ class FuncManager:
         intervalo: tuple[Decimal, Decimal],
         error: Decimal = MARGEN_ERROR,
         max_its: int = MAX_ITERACIONES,
-    ) -> Union[bool, tuple[Decimal, Decimal, list[list[str]], int]]:
+    ) -> bool | tuple[Decimal, Decimal, list[list[str]], int]:
         """
         Implementación del método de bisección,
         un método cerrado para encontrar raíces de funciones.
@@ -152,7 +151,7 @@ class FuncManager:
         intervalo: tuple[Decimal, Decimal],
         error: Decimal = MARGEN_ERROR,
         max_its: int = MAX_ITERACIONES,
-    ) -> Union[bool, tuple[Decimal, Decimal, list[list[str]], int]]:
+    ) -> bool | tuple[Decimal, Decimal, list[list[str]], int]:
         """
         Implementación del método de bisección,
         un método cerrado para encontrar raíces de funciones.

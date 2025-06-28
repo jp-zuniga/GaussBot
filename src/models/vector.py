@@ -5,7 +5,7 @@ y multiplicación usando sobrecarga de operadores.
 """
 
 from fractions import Fraction
-from typing import Union, overload
+from typing import overload
 
 from . import Matriz
 
@@ -32,7 +32,7 @@ class Vector:
     @overload
     def __getitem__(self, indice: slice) -> list[Fraction]: ...
 
-    def __getitem__(self, indice: Union[int, slice]) -> Union[Fraction, list[Fraction]]:
+    def __getitem__(self, indice: int | slice) -> Fraction | list[Fraction]:
         """
         Acceso flexible a elementos del vector mediante índices y slices.
         Soporta todas las variantes de indexación que soportaría una lista.
@@ -100,11 +100,7 @@ class Vector:
         """
 
         return str(
-            Matriz(
-                filas=len(self),
-                columnas=1,
-                valores=[[c] for c in self.componentes],
-            )
+            Matriz(filas=len(self), columnas=1, valores=[[c] for c in self.componentes])
         )
 
     def __add__(self, vec2: "Vector") -> "Vector":
@@ -143,11 +139,11 @@ class Vector:
     def __mul__(self, vec2: "Vector") -> Fraction: ...
 
     @overload
-    def __mul__(self, escalar: Union[int, float, Fraction]) -> "Vector": ...
+    def __mul__(self, escalar: int | float | Fraction) -> "Vector": ...
 
     def __mul__(
-        self, multiplicador: Union["Vector", int, float, Fraction]
-    ) -> Union[Fraction, "Vector"]:
+        self, multiplicador: "Vector" | int | float | Fraction
+    ) -> Fraction | "Vector":
         """
         Overload del operador para realizar producto punto o multiplicación escalar.
 
@@ -179,7 +175,7 @@ class Vector:
             return Vector([Fraction(c * multiplicador) for c in self.componentes])
         raise TypeError("¡Tipo de dato inválido!")
 
-    def __rmul__(self, multiplicador: Union[int, float, Fraction]) -> "Vector":
+    def __rmul__(self, multiplicador: int | float | Fraction) -> "Vector":
         """
         Overload del operador para realizar multiplicación escalar por la derecha.
 
@@ -254,10 +250,14 @@ class Vector:
                 [(a2 * b3) - (a3 * b2), (a3 * b1) - (a1 * b3), (a1 * b2) - (a2 * b1)]
             )
 
-        mat_prod_cruz = Matriz(
-            filas=len(vecs),
-            columnas=dimensiones,
-            valores=[vec.componentes for vec in vecs],
-        ).encontrar_adjunta().transponer()
+        mat_prod_cruz = (
+            Matriz(
+                filas=len(vecs),
+                columnas=dimensiones,
+                valores=[vec.componentes for vec in vecs],
+            )
+            .encontrar_adjunta()
+            .transponer()
+        )
 
         return Vector([mat_prod_cruz[0, i] for i in range(mat_prod_cruz.columnas)])

@@ -6,7 +6,6 @@ resolver con la Regla de Cramer y el método Gauss-Jordan.
 
 from copy import deepcopy
 from fractions import Fraction
-from typing import Optional
 
 from .matriz import Matriz
 from .. import FRAC_PREC
@@ -232,13 +231,13 @@ class SistemaEcuaciones:
 
         fila_actual: int = 0
         for j in range(self.matriz.columnas - 1):
-            fila_pivote: Optional[int] = None
+            fila_pivote: int | None = None
             maximo = Fraction(0)
 
             # encontrar la fila pivote de la columna actual
             for i in range(fila_actual, self.matriz.filas):
                 if abs(self.matriz[i, j]) > maximo:
-                    fila_pivote: Optional[int] = i
+                    fila_pivote: int | None = i
                     maximo: Fraction = abs(self.matriz[i, j])
 
             # si las variables no han cambiado, saltar a la siguiente columna

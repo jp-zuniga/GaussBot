@@ -4,7 +4,7 @@ frames de mensaje de la aplicación.
 """
 
 from platform import system
-from typing import TYPE_CHECKING, Literal, Optional, Union
+from typing import TYPE_CHECKING, Literal
 
 from PIL.ImageTk import PhotoImage
 from customtkinter import (
@@ -22,7 +22,7 @@ if TYPE_CHECKING:
     from ..gui.custom.adapted import CustomScrollFrame
 
 
-def delete_msg_frame(msg_frame: Optional[ctkFrame]) -> None:
+def delete_msg_frame(msg_frame: ctkFrame | None) -> None:
     """
     Eliminar un frame de mensaje, si existe.
 
@@ -37,7 +37,7 @@ def delete_msg_frame(msg_frame: Optional[ctkFrame]) -> None:
 
 
 def delete_msg_if(
-    msg_frame: Optional[ctkFrame], masters: tuple[ctkFrame, ctkFrame]
+    msg_frame: ctkFrame | None, masters: tuple[ctkFrame, ctkFrame]
 ) -> None:
     """
     Eliminar un frame si está colocado en uno de los frames indicados.
@@ -57,9 +57,9 @@ def delete_msg_if(
 
 
 def place_msg_frame(
-    parent_frame: Union[ctkFrame, "CustomScrollFrame"],
-    msg_frame: Optional[ctkFrame],
-    msg: Optional[str] = None,
+    parent_frame: ctkFrame | "CustomScrollFrame",
+    msg_frame: ctkFrame | None,
+    msg: str | None = None,
     tipo: Literal["error", "success", "resultado"] = "error",
     **grid_kwargs,
 ) -> ctkFrame:
@@ -89,8 +89,8 @@ def place_msg_frame(
     elif tipo == "success":
         msg_frame = SuccessFrame(parent_frame, msg)
     elif tipo == "resultado":
-        bc: Optional[str] = grid_kwargs.pop("border_color", None)
-        img: Optional[ctkImage] = grid_kwargs.pop("img", None)
+        bc: str | None = grid_kwargs.pop("border_color", None)
+        img: ctkImage | None = grid_kwargs.pop("img", None)
         msg_frame = ResultadoFrame(parent_frame, msg, img, bc)
 
     else:
@@ -112,7 +112,7 @@ def place_msg_frame(
     return msg_frame
 
 
-def set_icon(app: "GaussUI", window: Union["GaussUI", ctkTop]) -> None:
+def set_icon(app: "GaussUI", window: "GaussUI" | ctkTop) -> None:
     """
     Establecer el ícono de una ventana según
     la plataforma y el modo actual de la aplicación.
@@ -136,7 +136,7 @@ def toggle_proc(
     app: "GaussUI",
     parent_frame: "CustomScrollFrame",
     window_title: str,
-    proc_label: Optional[ctkLabel],
+    proc_label: ctkLabel | None,
     label_txt: str,
     proc_hidden: bool,
 ) -> None:
