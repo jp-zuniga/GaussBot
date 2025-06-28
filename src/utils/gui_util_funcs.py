@@ -2,6 +2,8 @@
 Funciones de utilidad relacionadas a la interfaz gráfica.
 """
 
+from __future__ import annotations
+
 from platform import system
 from typing import TYPE_CHECKING, Literal
 
@@ -56,7 +58,7 @@ def delete_msg_if(
 
 
 def place_msg_frame(
-    parent_frame: ctkFrame | "CustomScrollFrame",
+    parent_frame: ctkFrame | CustomScrollFrame,
     msg_frame: ctkFrame | None,
     msg: str | None = None,
     tipo: Literal["error", "success", "resultado"] = "error",
@@ -91,7 +93,6 @@ def place_msg_frame(
         bc: str | None = grid_kwargs.pop("border_color", None)
         img: ctkImage | None = grid_kwargs.pop("img", None)
         msg_frame = ResultadoFrame(parent_frame, msg, img, bc)
-
     else:
         raise ValueError("¡Valor inválido para argumento 'tipo'!")
 

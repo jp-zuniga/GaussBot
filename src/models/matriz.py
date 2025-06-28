@@ -5,6 +5,8 @@ usando sobrecarga de operadores, y operaciónes más complejas con
 métodos para transponer, calcular determinante, encontrar inversa, etc.
 """
 
+from __future__ import annotations
+
 from copy import deepcopy
 from fractions import Fraction
 from typing import overload
@@ -307,7 +309,7 @@ class Matriz:
             matriz += "\n"
         return matriz.rstrip()
 
-    def __add__(self, mat2: "Matriz") -> "Matriz":
+    def __add__(self, mat2: Matriz) -> Matriz:
         """
         Overload de operador para sumar matrices.
 
@@ -331,7 +333,7 @@ class Matriz:
         # retornar un nuevo objeto Matriz() con los valores sumados
         return Matriz(self.filas, self.columnas, valores=mat_sumada)
 
-    def __sub__(self, mat2: "Matriz") -> "Matriz":
+    def __sub__(self, mat2: Matriz) -> Matriz:
         """
         Overload de operador para restar matrices.
 
@@ -356,12 +358,12 @@ class Matriz:
         return Matriz(self.filas, self.columnas, valores=mat_restada)
 
     @overload
-    def __mul__(self, mat2: "Matriz") -> "Matriz": ...
+    def __mul__(self, mat2: Matriz) -> Matriz: ...
 
     @overload
-    def __mul__(self, escalar: int | float | Fraction) -> "Matriz": ...
+    def __mul__(self, escalar: int | float | Fraction) -> Matriz: ...
 
-    def __mul__(self, multiplicador: "Matriz" | int | float | Fraction) -> "Matriz":
+    def __mul__(self, multiplicador: Matriz | int | float | Fraction) -> Matriz:
         """
         Overload de operador para realizar multiplicación con matrices.
         Si se multiplica por un número, se realiza multiplicación escalar.
@@ -414,7 +416,7 @@ class Matriz:
 
         raise TypeError("¡Tipo de dato inválido!")
 
-    def __rmul__(self, multiplicador: int | float | Fraction) -> "Matriz":
+    def __rmul__(self, multiplicador: int | float | Fraction) -> Matriz:
         """
         Overload de operador para realizar multiplicación entre un escalar y una matriz.
 
@@ -480,7 +482,7 @@ class Matriz:
 
         return self.es_cuadrada() and diagonales_son_1 and resto_son_cero
 
-    def hacer_triangular_superior(self) -> tuple["Matriz", bool]:
+    def hacer_triangular_superior(self) -> tuple[Matriz, bool]:
         """
         Realizar operaciones de fila para convertir
         la matriz en una matriz triangular superior.
@@ -526,7 +528,7 @@ class Matriz:
 
         return (Matriz(self.filas, self.columnas, valores=mat_triangular), intercambio)
 
-    def transponer(self) -> "Matriz":
+    def transponer(self) -> Matriz:
         """
         Encontrar la transposición de self.
 
@@ -541,7 +543,7 @@ class Matriz:
 
         return Matriz(self.columnas, self.filas, valores=mat_transpuesta)
 
-    def calcular_det(self) -> Fraction | tuple[Fraction, "Matriz", bool]:
+    def calcular_det(self) -> Fraction | tuple[Fraction, Matriz, bool]:
         """
         Calcular el determinante de la instancia.
 
@@ -585,7 +587,7 @@ class Matriz:
             det *= -1
         return (det, mat_triangular, intercambio)
 
-    def encontrar_adjunta(self) -> "Matriz":
+    def encontrar_adjunta(self) -> Matriz:
         """
         Calcular la adjunta de self.
         La adjunta es la transposición de la matriz de cofactores de una matriz.
@@ -628,7 +630,7 @@ class Matriz:
 
         return Matriz(self.filas, self.columnas, valores=mat_cofactores).transponer()
 
-    def invertir(self) -> tuple["Matriz", "Matriz", Fraction]:
+    def invertir(self) -> tuple[Matriz, Matriz, Fraction]:
         """
         Calcular la inversa de self.
 
@@ -652,6 +654,6 @@ class Matriz:
                 + "por lo tanto, no se puede encontrar su inversa."
             )
 
-        adjunta: "Matriz" = self.encontrar_adjunta()
-        inversa: "Matriz" = adjunta * Fraction(1 / det)
+        adjunta: Matriz = self.encontrar_adjunta()
+        inversa: Matriz = adjunta * Fraction(1 / det)
         return (inversa, adjunta, det)

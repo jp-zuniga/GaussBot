@@ -4,6 +4,8 @@ Se pueden realizar operaciones básicas como suma, resta,
 y multiplicación usando sobrecarga de operadores.
 """
 
+from __future__ import annotations
+
 from fractions import Fraction
 from typing import overload
 
@@ -103,7 +105,7 @@ class Vector:
             Matriz(filas=len(self), columnas=1, valores=[[c] for c in self.componentes])
         )
 
-    def __add__(self, vec2: "Vector") -> "Vector":
+    def __add__(self, vec2: Vector) -> Vector:
         """
         Overload de operador para sumar vectores.
 
@@ -119,7 +121,7 @@ class Vector:
             raise ArithmeticError("¡Los vectores deben tener la misma longitud!")
         return Vector([a + b for a, b in zip(self.componentes, vec2.componentes)])
 
-    def __sub__(self, vec2: "Vector") -> "Vector":
+    def __sub__(self, vec2: Vector) -> Vector:
         """
         Overload de operador para restar vectores.
 
@@ -136,14 +138,14 @@ class Vector:
         return Vector([a - b for a, b in zip(self.componentes, vec2.componentes)])
 
     @overload
-    def __mul__(self, vec2: "Vector") -> Fraction: ...
+    def __mul__(self, vec2: Vector) -> Fraction: ...
 
     @overload
-    def __mul__(self, escalar: int | float | Fraction) -> "Vector": ...
+    def __mul__(self, escalar: int | float | Fraction) -> Vector: ...
 
     def __mul__(
-        self, multiplicador: "Vector" | int | float | Fraction
-    ) -> Fraction | "Vector":
+        self, multiplicador: Vector | int | float | Fraction
+    ) -> Fraction | Vector:
         """
         Overload del operador para realizar producto punto o multiplicación escalar.
 
@@ -175,7 +177,7 @@ class Vector:
             return Vector([Fraction(c * multiplicador) for c in self.componentes])
         raise TypeError("¡Tipo de dato inválido!")
 
-    def __rmul__(self, multiplicador: int | float | Fraction) -> "Vector":
+    def __rmul__(self, multiplicador: int | float | Fraction) -> Vector:
         """
         Overload del operador para realizar multiplicación escalar por la derecha.
 
@@ -212,7 +214,7 @@ class Vector:
         return Fraction(sum(c**2 for c in self.componentes) ** Fraction(1, 2))
 
     @staticmethod
-    def prod_cruz(dimensiones: int, vecs: list["Vector"]) -> "Vector":
+    def prod_cruz(dimensiones: int, vecs: list[Vector]) -> Vector:
         """
         Calcula el producto cruz de (n - 1) vectores en R^n.
 
