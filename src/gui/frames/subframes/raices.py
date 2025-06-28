@@ -17,7 +17,7 @@ from customtkinter import (
     CTkLabel as ctkLabel,
     CTkToplevel as ctkTop,
 )
-from sympy import Contains, I, Interval, zoo
+from sympy import Contains, Interval
 
 from ...custom import CustomDropdown, CustomEntry, IconButton
 from ...custom.adapted import CustomScrollFrame, CustomTable
@@ -532,7 +532,7 @@ class RaicesFrame(CustomScrollFrame):
         ).grid(row=2, column=0, ipadx=5, pady=5, sticky="n")
 
     def mostrar_r_abierto(
-        self, resultado: tuple[Decimal, Decimal, list, int, bool]
+        self, resultado: tuple[Decimal, Decimal, list[list[str]], int, int]
     ) -> None:
         """
         Se encarga de mostrar los resultados de métodos abiertos.
@@ -544,21 +544,14 @@ class RaicesFrame(CustomScrollFrame):
         x_igual = rf"{self.func.var} = {format(x.normalize(), 'f')}"
         fx_igual = rf"{self.func.nombre} = {format(fx.normalize(), 'f')}"
 
-        if flag != I:
+        if flag != 0:
             raiz_img = None
             border_color = "#ff3131"
 
-            if flag == -I:
+            if flag == -1:
                 interpretacion = (
-                    f"En la iteración {its}:\n"
-                    + "La derivada de la función es igual a 0 en "
-                    + f"{format(x.normalize(), 'f')}!"
-                )
-            elif flag == -1:
-                interpretacion = (
-                    f"En la iteración {its}:\n"
-                    + f"{format(x.normalize(), 'f')} no es parte del "
-                    + f"dominio de {self.func.nombre}"
+                    f"El método de {tipo_metodo} no converge "
+                    + f"después de {its} iteraciones!"
                 )
             elif flag == 1:
                 interpretacion = (
@@ -566,16 +559,17 @@ class RaicesFrame(CustomScrollFrame):
                     + f"{format(x.normalize(), 'f')} no es parte del "
                     + f"dominio de {self.func.nombre[0]}′(x)!"
                 )
-            elif flag == zoo:
+            elif flag == 2:
                 interpretacion = (
-                    f"El método de {tipo_metodo} no converge "
-                    + f"después de {its} iteraciones!"
+                    f"En la iteración {its}:\n"
+                    + f"{format(x.normalize(), 'f')} no es parte del "
+                    + f"dominio de {self.func.nombre}"
                 )
         else:
             border_color = None
             interpretacion = (
                 f"El método de {tipo_metodo} converge después de {its} iteraciones!\n"
-                + f"Raíz{' ' if fx == 0 else ' aproximada '}encontrada: "
+                + f"Raíz{'' if fx == 0 else ' aproximada'} encontrada: "
             )
 
             raiz_img = Func.latex_to_png(
@@ -593,8 +587,8 @@ class RaicesFrame(CustomScrollFrame):
         self.msg_frame = place_msg_frame(
             parent_frame=self.resultado,
             msg_frame=self.msg_frame,
-            msg=interpretacion if flag != I else None,
-            img=raiz_img,
+            msg=interpretacion if flag != 0 else None,
+            img=raiz_img if flag == 0 else None,
             border_color=border_color,
             tipo="resultado",
             row=1,

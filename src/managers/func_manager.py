@@ -7,47 +7,52 @@ raíces de las funciones ingresadas, y retorna los resultados.
 
 from decimal import Decimal
 from json import JSONDecodeError, dump, load
-from typing import Any, Optional, Union
+from typing import Optional, Union
 
 from customtkinter import CTkImage as ctkImage
-from sympy import I, diff, lambdify, zoo
+from sympy import lambdify
 from sympy.sets import Contains
 
 from ..models import Func
 from ..utils import FUNCIONES_PATH, LOGGER
 
 MARGEN_ERROR = Decimal(1e-4)
-MAX_ITERACIONES = 100
+MAX_ITERACIONES: int = 100
 
 
 class FuncManager:
     """
-    Se encarga de almacenar, validar y realizar
-    operaciones con las funciones ingresadas por el usuario,
-    para su uso en los módulos de análisis numérico.
+    Manager de las funciones de la aplicación.
+    Valida y almacena las funciones ingresadas por el usuario,
+    y realiza operaciones sobre ellas.
     """
 
     def __init__(self, funcs_ingresadas: Optional[dict[str, Func]] = None):
         """
-        * TypeError: Si funcs_ingresadas no es un dict[str, Func]
+        Args:
+            funcs_ingresadas: Diccionario de funciones guardadas.
+
+        Raises:
+            TypeError: Si funcs_ingresadas no es un dict[str, Func].
+        ---
         """
 
         if funcs_ingresadas is None:
             self.funcs_ingresadas: dict[str, Func] = self._load_funcs()
-
         elif isinstance(funcs_ingresadas, dict) and all(
             isinstance(k, str) and isinstance(v, Func)
             for k, v in funcs_ingresadas.items()
         ):
             self.funcs_ingresadas = funcs_ingresadas
-
         else:
-            raise TypeError("Argumento inválido para 'funcs_ingresadas'!")
+            raise TypeError("¡Argumento inválido para 'funcs_ingresadas'!")
 
     def get_funcs(self) -> list[ctkImage]:
         """
-        Obtiene las funciones guardadas en
-        self.funcs_ingresadas y retorna sus imagenes.
+        Obtener las imagenes de las funciones en 'self.funcs_ingresadas'.
+
+        Returns:
+            list[CTkImage]: Las imagenes de todas las funciones guardadas.
         """
 
         if not self._validar_funcs_ingresadas():
@@ -60,11 +65,32 @@ class FuncManager:
 
     @staticmethod
     def biseccion(
-        func: Func, intervalo: tuple[Decimal, Decimal], error: Decimal = MARGEN_ERROR
-    ) -> Union[bool, tuple[Decimal, Decimal, list, int]]:
+        func: Func,
+        intervalo: tuple[Decimal, Decimal],
+        error: Decimal = MARGEN_ERROR,
+        max_its: int = MAX_ITERACIONES,
+    ) -> Union[bool, tuple[Decimal, Decimal, list[list[str]], int]]:
         """
         Implementación del método de bisección,
         un método cerrado para encontrar raíces de funciones.
+
+        Args:
+            func:      Función que se trabajará.
+            intervalo: Dominio sobre cual se buscará la raíz.
+            error:     Margen de error aceptable para terminar búsqueda.
+            max_its:   Número máximo de iteraciones aceptable para terminar búsqueda.
+
+        Returns:
+            bool:
+                Si el método de bisección no es aplicable a la función:
+                True si la función no cambia de signo,
+                False si no es continua en el intervalo.
+            (Decimal, Decimal, list[list[str]], int):
+                Valor x de raíz,
+                valor y de raíz,
+                registro de iteraciones e
+                iteración final.
+        ---
         """
 
         if not func.es_continua(intervalo):
@@ -86,19 +112,19 @@ class FuncManager:
         a, b = float(intervalo[0]), float(intervalo[1])
         f = lambdify(func.var, func.expr)
 
-        fa: float = f(a)
-        fb: float = f(b)
+        fa = float(f(a))
+        fb = float(f(b))
         if fa * fb > 0:
             return True
 
-        i = 0
+        i: int = 0
         while i < MAX_ITERACIONES:
             i += 1
 
-            c = (a + b) / 2
-            fc: float = f(c)
-            fa = f(a)
-            fb = f(b)
+            c = float((a + b) / 2)
+            fc = float(f(c))
+            fa = float(f(a))
+            fb = float(f(b))
             registro.append(
                 [
                     str(i),
@@ -115,18 +141,39 @@ class FuncManager:
             if abs(fc) < error:
                 return (Decimal(c), Decimal(fc), registro, i)
             if fa * fc < 0:
-                b = c
+                b: float = c
             elif fb * fc < 0:
-                a = c
+                a: float = c
         return (Decimal(c), Decimal(fc), registro, -1)
 
     @staticmethod
     def falsa_posicion(
-        func: Func, intervalo: tuple[Decimal, Decimal], error: Decimal = MARGEN_ERROR
-    ) -> Union[bool, tuple[Decimal, Decimal, list, int]]:
+        func: Func,
+        intervalo: tuple[Decimal, Decimal],
+        error: Decimal = MARGEN_ERROR,
+        max_its: int = MAX_ITERACIONES,
+    ) -> Union[bool, tuple[Decimal, Decimal, list[list[str]], int]]:
         """
         Implementación del método de bisección,
         un método cerrado para encontrar raíces de funciones.
+
+        Args:
+            func:      Función que se trabajará.
+            intervalo: Dominio sobre cual se buscará la raíz.
+            error:     Margen de error aceptable para terminar búsqueda.
+            max_its:   Número máximo de iteraciones aceptable para terminar búsqueda.
+
+        Returns:
+            bool:
+                Si el método de bisección no es aplicable a la función:
+                True si la función no cambia de signo,
+                False si no es continua en el intervalo.
+            (Decimal, Decimal, list[list[str]], int):
+                Valor x de raíz,
+                valor y de raíz,
+                registro de iteraciones e
+                iteración final.
+        ---
         """
 
         if not func.es_continua(intervalo):
@@ -148,19 +195,19 @@ class FuncManager:
         a, b = float(intervalo[0]), float(intervalo[1])
         f = lambdify(func.var, func.expr)
 
-        fa: float = f(a)
-        fb: float = f(b)
+        fa = float(f(a))
+        fb = float(f(b))
         if fa * fb > 0:
             return True
 
-        i = 0
+        i: int = 0
         while i < MAX_ITERACIONES:
             i += 1
-            fa = f(a)
-            fb = f(b)
+            fa = float(f(a))
+            fb = float(f(b))
 
-            xr = b - (fb * (a - b)) / (fa - fb)
-            fxr: float = f(xr)
+            xr = float(b - (fb * (a - b)) / (fa - fb))
+            fxr = float(f(xr))
             registro.append(
                 [
                     str(i),
@@ -177,9 +224,9 @@ class FuncManager:
             if abs(fxr) < error:
                 return (Decimal(xr), Decimal(fxr), registro, i)
             if fa * fxr < 0:
-                b = xr
+                b: float = xr
             elif fb * fxr < 0:
-                a = xr
+                a: float = xr
         return (Decimal(xr), Decimal(fxr), registro, -1)
 
     @staticmethod
@@ -188,15 +235,35 @@ class FuncManager:
         inicial: Decimal,
         error: Decimal = MARGEN_ERROR,
         max_its: int = MAX_ITERACIONES,
-    ) -> tuple[Decimal, Decimal, list, int, Any]:
+    ) -> tuple[Decimal, Decimal, list[list[str]], int, int]:
         """
         Implementación del método de Newton,
         un método abierto para encontrar raíces de funciones.
-        """
 
-        derivada = Func(
-            f"{func.nombre[0]}′({func.var})", str(diff(func.expr, func.var))
-        )
+        Args:
+            func:    Función que se trabajará.
+            inicial: Valor inicial de búsqueda.
+            error:   Margen de error aceptable para terminar búsqueda.
+            max_its: Número máximo de iteraciones aceptable para terminar búsqueda.
+
+        Returns:
+            bool:
+                Si el método de bisección no es aplicable a la función:
+                True si la función no cambia de signo,
+                False si no es continua en el intervalo.
+            (Decimal, Decimal, list[list[str]], int, int):
+                Valor x de raíz,
+                valor y de raíz,
+                registro de iteraciones,
+                iteración final y
+                bandera de resultado (
+                    -1: no se encontró raíz;
+                     0: se encontró raíz dentro del margen de error;
+                     1: se llegó a un valor fuera del dominio de la derivada;
+                     2: se llegó a un valor fuera del dominio de la función.
+                )
+        ---
+        """
 
         registro: list[list[str]] = [
             [
@@ -209,8 +276,10 @@ class FuncManager:
             ]
         ]
 
+        derivada = func.derivar()
         dominio_derivada = derivada.get_dominio()
         dominio_func = func.get_dominio()
+
         f = lambdify(func.var, func.expr)
         f_prima = lambdify(func.var, derivada.expr)
 
@@ -222,21 +291,21 @@ class FuncManager:
             if not Contains(xi, dominio_derivada):
                 return (Decimal(xi), Decimal(float(f(xi))), registro, 0, 1)
 
-        i = 0
+        i: int = 0
         while i < max_its:
             i += 1
-            fxi: float = f(xi)
-            fxi_prima: float = f_prima(xi)
+            fxi = float(f(xi))
+            fxi_prima = float(f_prima(xi))
 
             temp_xi = xi
             try:
                 if temp_xi not in dominio_func:
-                    return (Decimal(temp_xi), Decimal(fxi), registro, i, -1)
+                    return (Decimal(temp_xi), Decimal(fxi), registro, i, 2)
                 if temp_xi not in dominio_derivada:
                     return (Decimal(temp_xi), Decimal(fxi), registro, i, 1)
             except TypeError:
                 if not Contains(temp_xi, dominio_func):
-                    return (Decimal(temp_xi), Decimal(fxi), registro, i, 1)
+                    return (Decimal(temp_xi), Decimal(fxi), registro, i, 2)
                 if not Contains(temp_xi, dominio_derivada):
                     return (Decimal(temp_xi), Decimal(fxi), registro, i, 1)
 
@@ -252,12 +321,10 @@ class FuncManager:
                 ]
             )
 
-            if abs(fxi) < error:
-                return (Decimal(xi), Decimal(fxi), registro, i, I)
-            if fxi_prima == 0:
-                return (Decimal(xi), Decimal(fxi), registro, i, -I)
+            if abs(fxi) < error or fxi_prima == 0:
+                return (Decimal(xi), Decimal(fxi), registro, i, 0)
 
-        return (Decimal(xi), Decimal(fxi), registro, max_its, zoo)
+        return (Decimal(xi), Decimal(fxi), registro, max_its, -1)
 
     @staticmethod
     def secante(
@@ -265,10 +332,34 @@ class FuncManager:
         iniciales: tuple[Decimal, Decimal],
         error: Decimal = MARGEN_ERROR,
         max_its: int = MAX_ITERACIONES,
-    ) -> tuple[Decimal, Decimal, list[str], int, Any]:
+    ) -> tuple[Decimal, Decimal, list[list[str]], int, int]:
         """
         Implementación del método de la secante,
         un método abierto para encontrar raíces de funciones.
+
+        Args:
+            func:      Función que se trabajará.
+            iniciales: Par de valores iniciales de búsqueda.
+            error:     Margen de error aceptable para terminar búsqueda.
+            max_its:   Número máximo de iteraciones aceptable para terminar búsqueda.
+
+        Returns:
+            bool:
+                Si el método de bisección no es aplicable a la función:
+                True si la función no cambia de signo,
+                False si no es continua en el intervalo.
+            (Decimal, Decimal, list[list[str]], int, int):
+                Valor x de raíz,
+                valor y de raíz,
+                registro de iteraciones,
+                iteración final y
+                bandera de resultado (
+                    -1: no se encontró raíz;
+                     0: se encontró raíz dentro del margen de error;
+                     1: se llegó a un valor fuera del dominio de la derivada;
+                     2: se llegó a un valor fuera del dominio de la función.
+                )
+        ---
         """
 
         registro: list[list[str]] = [["Iteración", "x_i − 1", "x_i", "x_i + 1"]]
@@ -277,11 +368,11 @@ class FuncManager:
         f = lambdify(func.var, func.expr)
         f_dominio = func.get_dominio()
 
-        i = 0
+        i: int = 0
         while i < max_its:
             i += 1
-            fxi, fxn = f(xi), f(xn)
-            new_xn = xn - (fxn * (xi - xn)) / (fxi - fxn)
+            fxi, fxn = float(f(xi)), float(f(xn))
+            new_xn = float(xn - (fxn * (xi - xn)) / (fxi - fxn))
 
             registro.append(
                 [
@@ -293,23 +384,22 @@ class FuncManager:
             )
 
             if abs(fxn) < error:
-                return (Decimal(xn), Decimal(fxn), registro, i, I)
+                return (Decimal(xn), Decimal(fxn), registro, i, 0)
 
             xi, xn = xn, new_xn
             if xn not in f_dominio:
-                return (Decimal(xn), Decimal(fxn), registro, i, -1)
-        return (Decimal(xn), Decimal(fxn), registro, max_its, zoo)
+                return (Decimal(xn), Decimal(fxn), registro, i, 2)
+        return (Decimal(xn), Decimal(fxn), registro, max_its, -1)
 
     def save_funciones(self) -> None:
         """
-        Escribe el diccionario de funciones ingresados al archivo funciones.json,
-        utilizando FractionEncoder() para escribir objetos ).
+        Guardar las funciones ingresadas en el archivo de datos de funciones.
         """
 
         # descomponer los objetos Func() en self.funcs_ingresadas
         # para que se guarden los atributos individuales del objeto,
         # en lugar de una referencia al objeto Func() completo
-        funciones_dict = {
+        funciones_dict: dict[str, dict[str, str | bool]] = {
             nombre: {
                 "nombre": func.nombre,
                 "expr": str(func.expr),
@@ -336,7 +426,7 @@ class FuncManager:
 
     def _load_funcs(self) -> dict[str, Func]:
         """
-        Carga las funciones almacenadas en 'funciones.json'.
+        Cargar las funciones almacenadas en el archivo de datos de funciones.
         """
 
         # si no existe funciones.json, retornar un diccionario vacio
@@ -368,7 +458,7 @@ class FuncManager:
 
     def _validar_funcs_ingresadas(self) -> bool:
         """
-        Valida si el diccionario de funciones ingresadas esta vacío o no.
+        Validar si el diccionario de funciones ingresadas esta vacío o no.
         """
 
         if self.funcs_ingresadas == {}:

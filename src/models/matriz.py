@@ -488,8 +488,9 @@ class Matriz:
         la matriz en una matriz triangular superior.
 
         Returns:
-            (Matriz, bool): Los valores modificados;
-                            una bandera indicando si hubo intercambio de filas.
+            (Matriz, bool):
+                Los valores modificados y
+                una bandera indicando si hubo intercambio de filas.
         ---
         """
 
@@ -548,10 +549,11 @@ class Matriz:
 
         Returns:
             Fraction:                 Determinante (para matrices 1x1 y 2x2).
-            (Fraction, Matriz, bool): Determinante;
-                                      matriz triangular superior;
-                                      bandera de intercambio de filas
-                                     (para matrices nxn, n >= 3).
+            (Fraction, Matriz, bool):
+                Determinante,
+                matriz triangular superior y
+                bandera de intercambio de filas
+               (para matrices nxn, n >= 3).
 
         Raises:
             ArithmeticError: Si la matriz no es cuadrada.
@@ -633,7 +635,7 @@ class Matriz:
         Calcular la inversa de self.
 
         Returns:
-            (Matriz, Matriz, Fraction): Inversa; adjunta; determinante.
+            (Matriz, Matriz, Fraction): Inversa, adjunta, determinante.
 
         Raises:
             ArithmeticError:   Si la matriz no es cuadrada.

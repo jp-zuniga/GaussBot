@@ -228,7 +228,6 @@ class SistemaEcuaciones:
         - Encontrar entradas pivotes maximas.
         - Normalizar fila pivote.
         - Eliminar elementos debajo del pivote.
-        ---
         """
 
         fila_actual: int = 0
@@ -453,8 +452,9 @@ class SistemaEcuaciones:
         Validar si self es consistente o inconsistente.
 
         Returns:
-            (bool, int): Si la matriz es consistente;
-                         el número de fila donde se encontró la inconsistencia.
+            (bool, int):
+                Si la matriz es consistente y
+                el número de fila donde se encontró la inconsistencia.
         ---
         """
 
@@ -590,7 +590,7 @@ class SistemaEcuaciones:
         Args:
             unica:      Si el sistema tiene una solución única.
             libres:     Lista de indices de las variables libres.
-            validacion: Tupla retornada por self._validar_consistencia().
+            validacion: Return de self._validar_consistencia().
         ---
         """
 
