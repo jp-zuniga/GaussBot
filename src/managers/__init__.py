@@ -10,7 +10,7 @@ from .vecs_manager import VectoresManager
 from .ops_manager import OpsManager
 from .func_manager import MARGEN_ERROR, MAX_ITERACIONES, FuncManager
 
-__all__ = [
+__all__: list[str] = [
     "MARGEN_ERROR",
     "MAX_ITERACIONES",
     "FuncManager",

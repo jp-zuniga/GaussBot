@@ -1,15 +1,6 @@
 """
 Implementación de MatricesManager.
-Almacena matrices, realiza operaciones, retorna resultados.
-
-Operaciones implementadas:
-* suma
-* resta
-* multiplicación por escalar
-* multiplicación matricial
-* transposiciones
-* calcular determinante
-* encontrar inversas
+Almacena matrices, realiza operaciones y retorna resultados.
 """
 
 from fractions import Fraction
@@ -20,51 +11,59 @@ from ..utils import format_factor, format_proc_num
 
 class MatricesManager:
     """
-    Se encarga de almacenar las matrices ingresadas por el usuario,
-    realizar operaciones con ellas, y retornar los resultados.
+    Manager de las matrices de la aplicación.
+    Valida y almacena las matrices ingresadas por el usuario,
+    realiza operaciones con ellas, y retorna sus resultados.
     """
 
-    def __init__(self, mats_ingresadas=None, sis_ingresados=None) -> None:
+    def __init__(
+        self,
+        mats_ingresadas: dict[str, Matriz] | None = None,
+        sis_ingresados: dict[str, Matriz] | None = None,
+    ) -> None:
         """
-        * TypeError: si mats_ingresadas/sis_ingresados no son un dict[str, Matriz]
+        Args:
+            mats_ingresadas: Diccionario de matrices.
+            sis_ingresados:  Diccionario de sistemas de ecuaciones.
+
+        Raises:
+            TypeError: Si mats_ingresadas o sis_ingresados no son un dict[str, Matriz].
+        ---
         """
 
         if mats_ingresadas is None:
             self.mats_ingresadas: dict[str, Matriz] = {}
-
         elif isinstance(mats_ingresadas, dict) and all(
             isinstance(k, str) and isinstance(v, Matriz)
             for k, v in mats_ingresadas.items()
         ):
             self.mats_ingresadas = mats_ingresadas
-
         else:
             raise TypeError("Argumento inválido para 'mats_ingresadas'!")
 
         if sis_ingresados is None:
             self.sis_ingresados: dict[str, Matriz] = {}
-
         elif isinstance(sis_ingresados, dict) and all(
             isinstance(k, str) and isinstance(v, Matriz)
             for k, v in sis_ingresados.items()
         ):
             self.sis_ingresados = sis_ingresados
-
         else:
             raise TypeError("Argumento inválido para 'sis_ingresados'!")
 
     def get_matrices(self, calculada: int) -> str:
         """
-        Obtiene las matrices guardadas en self.mats_ingresadas
-        y las retorna como string.
+        Formatear las matrices guardadas como un solo string.
 
-        - calculada: 0 para no mostrar matrices calculadas,
-                     1 para mostrar solo matrices calculadas,
-                    -1 para mostrar todas las matrices guardadas
+        Args:
+            calculada: Bandera para indicar cuales matrices mostrar.
 
-        * ValueError: si calculada no esta en (-1, 0, 1)
+        Raises:
+            ValueError: Si calculada no -1, 0 o 1.
 
-        Retorna un string con todas las matrices.
+        Returns:
+            str: String que contiene todas las matrices.
+        ---
         """
 
         if calculada not in (-1, 0, 1):
@@ -73,13 +72,13 @@ class MatricesManager:
             return "No se ha guardado ninguna matriz!"
 
         if calculada == 1:
-            header = "Matrices calculadas:"
+            header: str = "Matrices calculadas:"
         elif calculada == 0:
-            header = "Matrices ingresadas:"
-        elif calculada == -1:
-            header = "Matrices guardadas:"
+            header: str = "Matrices ingresadas:"
+        else:
+            header: str = "Matrices guardadas:"
 
-        matrices = f"\n{header}\n"  # pylint: disable=E0606
+        matrices = f"\n{header}\n"
         matrices += "---------------------------------------------"
         for nombre, mat in self.mats_ingresadas.items():
             if (
@@ -102,16 +101,17 @@ class MatricesManager:
 
     def get_sistemas(self, calculado: int) -> str:
         """
-        Obtiene las sistemas guardados en self.sis_ingresados
-        y las retorna como string.
+        Formatear los sistemas guardados como un solo string.
 
-        - calculado: 0 para no mostrar sistemas calculados,
-                     1 para mostrar solo sistemas calculados,
-                    -1 para mostrar todas las sistemas guardados
+        Args:
+            calculada: Bandera para indicar cuales sistemas mostrar.
 
-        * ValueError: si calculado no esta en (-1, 0, 1)
+        Raises:
+            ValueError: Si calculada no -1, 0 o 1.
 
-        Retorna un string con todos las sistemas.
+        Returns:
+            str: String que contiene todos los sistemas.
+        ---
         """
 
         if calculado not in (-1, 0, 1):
@@ -119,14 +119,14 @@ class MatricesManager:
         if not self._validar_sis_ingresados():
             return "No se ha guardado ningún sistema de ecuaciones!"
 
-        if calculado == 1:
-            header = "Sistemas calculados:"
-        elif calculado == 0:
-            header = "Sistemas ingresados:"
-        elif calculado == -1:
-            header = "Sistemas guardados:"
+        if calculado == 0:
+            header: str = "Sistemas ingresados:"
+        elif calculado == 1:
+            header: str = "Sistemas calculados:"
+        else:
+            header: str = "Sistemas guardados:"
 
-        sistemas = f"\n{header}\n"  # pylint: disable=E0606
+        sistemas = f"\n{header}\n"
         sistemas += "---------------------------------------------"
         for nombre, sis in self.sis_ingresados.items():
             if (
@@ -149,12 +149,18 @@ class MatricesManager:
 
     def resolver_sistema(self, nombre_sis: str, metodo: str) -> SistemaEcuaciones:
         """
-        Resuelve un sistema de ecuaciones representado por la matriz ingresada.
-        * nombre_sis: nombre de la matriz que representa el sistema de ecuaciones
-        * metodo: método a utilizar para resolver el sistema ("gj" o "c")
+        Resolver un sistema con el método indicado.
 
-        Retorna:
-        * SistemaEcuaciones: objeto SistemaEcuaciones después de resolver el sistema
+        Args:
+            nombre_sis: Nombre de la matriz que representa el sistema de ecuaciones.
+            metodo:     Método a utilizar para resolver el sistema ("gj" o "c").
+
+        Raises:
+            ValueError: Si método no es "gj" o "c".
+
+        Returns:
+            SistemaEcuaciones: objeto con el sistema resuelto.
+        ---
         """
 
         sistema = SistemaEcuaciones(self.sis_ingresados[nombre_sis])
@@ -172,25 +178,32 @@ class MatricesManager:
         self, operacion: bool, nombre_mat1: str, nombre_mat2: str
     ) -> tuple[str, str, Matriz]:
         """
-        Suma o resta las dos matrices indicadas, dependiendo del
-        argumento 'operacion'. True para sumar, False para restar.
-        * ArithmeticError: si las matrices no tienen las mismas dimensiones
+        Sumar o restar las dos matrices indicadas.
 
-        Retorna una tupla con:
-        * str: procedimiento de la operación realizada
-        * str: nombre de la matriz resultante (e.g. 'A + B')
-        * Matriz(): objeto matriz resultante de la operación
+        Args:
+            operación:   True para sumar, False para restar.
+            nombre_mat1: Nombre de la primer matriz.
+            nombre_mat2: Nombre de la segunda matriz.
+
+        Raises:
+            ArithmeticError: Si las matrices no tienen las mismas dimensiones.
+
+        Returns:
+            (str, str, Matriz): Procedimiento de la operación realizada,
+                                nombre de la matriz resultante (e.g. 'A + B') y
+                                matriz resultante de la operación.
+        ---
         """
 
-        mat1 = self.mats_ingresadas[nombre_mat1]
-        mat2 = self.mats_ingresadas[nombre_mat2]
+        mat1: Matriz = self.mats_ingresadas[nombre_mat1]
+        mat2: Matriz = self.mats_ingresadas[nombre_mat2]
 
         if operacion:
-            mat_resultado = mat1 + mat2
-            operador = "+"
+            mat_resultado: Matriz = mat1 + mat2
+            operador: str = "+"
         else:
-            mat_resultado = mat1 - mat2
-            operador = "−"
+            mat_resultado: Matriz = mat1 - mat2
+            operador: str = "−"
         nombre_mat_resultado = f"{nombre_mat1} {operador} {nombre_mat2}"
 
         mat_proc = Matriz(
@@ -200,12 +213,12 @@ class MatricesManager:
             valores=[
                 [
                     f"{
-                        format_proc_num(  # type: ignore
+                        format_proc_num(
                             (
                                 mat1[f, c].limit_denominator(1000),
                                 mat2[f, c].limit_denominator(1000),
                             ),
-                            operador=operador,  # type: ignore
+                            operador=operador,
                         )
                     }"
                     for c in range(mat1.columnas)
@@ -214,7 +227,7 @@ class MatricesManager:
             ],
         )
 
-        proc = "---------------------------------------------\n"
+        proc: str = "---------------------------------------------\n"
         proc += f"{nombre_mat1}:\n{mat1}\n\n"
         proc += f"{nombre_mat2}:\n{mat2}\n"
         proc += "---------------------------------------------\n"
@@ -228,17 +241,21 @@ class MatricesManager:
         self, escalar: Fraction, nombre_mat: str
     ) -> tuple[str, str, Matriz]:
         """
-        Realiza multiplicación escalar con
-        la matriz y el escalar indicados.
+        Multiplicar la matriz indicada por el escalar especificado.
 
-        Retorna una tupla con:
-        * str: procedimiento de la operación realizada
-        * str: nombre de la matriz resultante (e.g. 'kA')
-        * Matriz(): objeto matriz resultante de la operación
+        Args:
+            escalar:    Número por el cual multiplicar la matriz.
+            nombre_mat: Nombre de la matriz a multiplicar.
+
+        Returns:
+            (str, str, Matriz): Procedimiento de la operación realizada,
+                                nombre de la matriz resultante (e.g. 'kA') y
+                                matriz resultante de la operación.
+        ---
         """
 
-        mat = self.mats_ingresadas[nombre_mat]
-        mat_mult = mat * escalar
+        mat: Matriz = self.mats_ingresadas[nombre_mat]
+        mat_mult: Matriz = mat * escalar
 
         escalar_str = format_factor(escalar)
         nombre_mat_mult = f"{escalar_str}{nombre_mat}"
@@ -248,18 +265,14 @@ class MatricesManager:
             columnas=mat.columnas,
             valores=[
                 [
-                    f"{
-                        format_proc_num(  # type: ignore
-                            (escalar, mat[f, c].limit_denominator(1000))
-                        )
-                    }"
+                    f"{format_proc_num((escalar, mat[f, c].limit_denominator(1000)))}"
                     for c in range(mat.columnas)
                 ]
                 for f in range(mat.filas)
             ],
         )
 
-        proc = "---------------------------------------------\n"
+        proc: str = "---------------------------------------------\n"
         proc += f"{nombre_mat}:\n{mat}\n"
         proc += "---------------------------------------------\n"
         proc += f"{nombre_mat_mult}:\n{mat_proc}\n"
@@ -270,29 +283,35 @@ class MatricesManager:
 
     def mult_mats(self, nombre_mat1: str, nombre_mat2: str) -> tuple[str, str, Matriz]:
         """
-        Multiplica las matrices indicadas.
-        * ArithmeticError: si las matrices no son compatibles para multiplicación
+        Multiplicar las matrices indicadas.
 
-        Retorna una tupla con:
-        * str: procedimiento de la operación realizada
-        * str: nombre de la matriz resultante (e.g. 'A • B')
-        * Matriz(): objeto matriz resultante de la operación
+        Args:
+            nombre_mat1: Nombre de la primer matriz.
+            nombre_mat2: Nombre de la segunda matriz.
+
+        Raises:
+            ArithmeticError: Si las matrices no son compatibles para multiplicación.
+
+        Returns:
+            (str, str, Matriz): Procedimiento de la operación realizada,
+                                nombre de la matriz resultante (e.g. 'A • B') y
+                                matriz resultante de la operación.
+        ---
         """
 
-        mat1 = self.mats_ingresadas[nombre_mat1]
-        mat2 = self.mats_ingresadas[nombre_mat2]
-
-        mat_mult = mat1 * mat2
         nombre_mat_mult = f"{nombre_mat1} • {nombre_mat2}"
+        mat1: Matriz = self.mats_ingresadas[nombre_mat1]
+        mat2: Matriz = self.mats_ingresadas[nombre_mat2]
+        mat_mult: Matriz = mat1 * mat2
 
         mat_proc = Matriz(
             filas=mat1.filas,
             columnas=mat2.columnas,
             valores=[
                 [
-                    " + ".join(  # type: ignore
+                    " + ".join(
                         f"{
-                            format_proc_num(  # type: ignore
+                            format_proc_num(
                                 (
                                     mat1[i, k].limit_denominator(1000),
                                     mat2[k, j].limit_denominator(1000),
@@ -307,7 +326,7 @@ class MatricesManager:
             ],
         )
 
-        proc = "---------------------------------------------\n"
+        proc: str = "---------------------------------------------\n"
         proc += f"{nombre_mat1}:\n{mat1}\n\n"
         proc += f"{nombre_mat2}:\n{mat2}\n"
         proc += "---------------------------------------------\n"
@@ -319,31 +338,39 @@ class MatricesManager:
 
     def calcular_determinante(self, nombre_mat: str) -> tuple[str, str, Fraction]:
         """
-        Calcula el determinante de la matriz indicada.
-        * ArithmeticError: si la matriz no es cuadrada
+        Calcular el determinante de la matriz indicada.
 
-        Retorna una tupla con:
-        * str: procedimiento de la operación realizada
-        * str: header de la operacion (e.g. '|  A  |')
-        * Fraction: determinante de la matriz
+        Args:
+            nombre_mat: Nombre de la matriz.
+
+        Raises:
+            ArithmeticError: Si la matriz no es cuadrada.
+
+        Returns:
+            (str, str, Fraction): Procedimiento de la operación realizada,
+                                  nombre de la matriz resultante (e.g. '| A |') y
+                                  determinante de la matriz.
+        ---
         """
 
-        mat = self.mats_ingresadas[nombre_mat]
+        nombre_det = f"| {nombre_mat} |"
+        mat: Matriz = self.mats_ingresadas[nombre_mat]
 
-        used_det_formula = mat.filas <= 2 and mat.columnas <= 2
+        used_det_formula: bool = mat.filas <= 2 and mat.columnas <= 2
         if used_det_formula:
-            det: Fraction = mat.calcular_det()  # type: ignore
+            det: Fraction = mat.calcular_det()
+            intercambio: bool = False
         else:
-            det, mat_triangular, intercambio = mat.calcular_det()  # type: ignore
+            det, mat_triangular, intercambio = mat.calcular_det()
 
-        proc = "---------------------------------------------\n"
+        proc: str = "---------------------------------------------\n"
         proc += f"{nombre_mat}:\n{mat}\n"
         proc += "---------------------------------------------\n"
 
         if used_det_formula:
             proc += "El determinante de una matriz 2x2 se calcula con la fórmula:\n"
             proc += "ad - bc\n\n"
-            proc += f"|  {nombre_mat}  |  =  "
+            proc += f"{nombre_det}  =  "
             proc += f"{
                 format_proc_num(
                     (
@@ -366,9 +393,9 @@ class MatricesManager:
             proc += "y multiplicando todos elementos de la diagonal principal.\n\n"
 
             proc += f"Matriz triangular superior:\n{mat_triangular}\n\n"
-            proc += f"|  {nombre_mat}  |  =  "
+            proc += f"{nombre_det}  =  "
 
-            diagonales = " • ".join(
+            diagonales: str = " • ".join(
                 format_factor(
                     mat_triangular[i, i].limit_denominator(1000),
                     mult=False,
@@ -381,29 +408,37 @@ class MatricesManager:
             proc += f"[ {diagonales} ]\n"
 
         proc += "---------------------------------------------\n"
-        proc += f"|  {nombre_mat}  |  =  "
-        proc += f"{det if not used_det_formula and not intercambio else -det}"  # pylint: disable=E0606
+        proc += f"{nombre_det}  =  "
+        proc += f"{det if not used_det_formula and not intercambio else -det}"
 
         if not used_det_formula and intercambio:
             proc += "\n\n"
             proc += "Como hubo un intercambio de filas al "
             proc += "crear la matriz triangular superior,\n"
             proc += "se debe cambiar el signo del determinante:\n\n"
-            proc += f"|  {nombre_mat}  |  =  {det}"
+            proc += f"{nombre_det}  =  {det}"
 
-        return (proc, f"|  {nombre_mat}  |", det)
+        return (proc, nombre_det, det)
 
     def transponer_mat(self, nombre_mat: str) -> tuple[str, str, Matriz]:
         """
-        Retorna una tupla con el procedimiento de transposición,
-        nombre de la matriz transpuesta y el objeto Matriz() transpuesto.
+        Transponer la matriz especificada.
+
+        Args:
+            nombre_mat: Nombre de la matriz.
+
+        Returns:
+            (str, str, Matriz): Procedimiento de la operación realizada,
+                                nombre de la matriz resultante (e.g. 'A_t') y
+                                matriz resultante de la operación.
+        ---
         """
 
-        mat = self.mats_ingresadas[nombre_mat]
         nombre_mat_transpuesta = f"{nombre_mat}_t"
-        mat_transpuesta = mat.transponer()
+        mat: Matriz = self.mats_ingresadas[nombre_mat]
+        mat_transpuesta: Matriz = mat.transponer()
 
-        proc = "---------------------------------------------\n"
+        proc: str = "---------------------------------------------\n"
         proc += f"{nombre_mat}:\n{mat}\n"
         proc += "---------------------------------------------\n"
         proc += "Proceso de transposición:\n\n"
@@ -429,25 +464,27 @@ class MatricesManager:
 
     def invertir_mat(self, nombre_mat: str) -> tuple[str, str, "Matriz"]:
         """
-        Encuentra la inversa de la matriz indicada.
-        * ArithmeticError: si la matriz no es cuadrada
-        * ZeroDivisionError: si el determinante es 0
+        Calcular la inversa de la matriz indicada.
 
-        Retorna una tupla con:
-        * str: procedimiento de la operación realizada
-        * str: nombre de la matriz inversa (e.g. 'A_i')
-        * Matriz(): objeto de la matriz inversa
+        Args:
+            nombre_mat: Nombre de la matriz.
 
-        Cuando se necesita el procedimiento, se utiliza toda la tupla,
-        pero si solo se desea la inversa, se pueden descartar los otros elementos:
-        * _, inversa, _, _ = MatricesManager().invertir_matriz(nombre_mat)
+        Raises:
+            ArithmeticError:   Si la matriz no es cuadrada.
+            ZeroDivisionError: Si el determinante es 0.
+
+        Returns:
+            (str, str, Matriz): Procedimiento de la operación realizada,
+                                nombre de la matriz resultante (e.g. 'A_i') y
+                                matriz resultante de la operación.
+        ---
         """
 
-        mat = self.mats_ingresadas[nombre_mat]
         nombre_mat_invertida = f"{nombre_mat}_i"
+        mat: Matriz = self.mats_ingresadas[nombre_mat]
         inversa, adjunta, det = mat.invertir()
 
-        proc = "---------------------------------------------\n"
+        proc: str = "---------------------------------------------\n"
         proc += f"{nombre_mat}:\n{mat}\n"
         proc += "---------------------------------------------\n"
         proc += f"Matriz de cofactores de {nombre_mat}:\n{adjunta.transponer()}\n\n"
@@ -461,18 +498,22 @@ class MatricesManager:
 
     def _validar_mats_ingresadas(self) -> bool:
         """
-        Valida si el diccionario de matrices ingresadas esta vacío o no.
+        Validar el diccionario de matrices.
+
+        Returns:
+            bool: Si el diccionario está vacío o no.
+        ---
         """
 
-        if self.mats_ingresadas == {}:
-            return False
-        return True
+        return self.mats_ingresadas == {}
 
     def _validar_sis_ingresados(self) -> bool:
         """
-        Valida si el diccionario de sistemas de ecuaciones ingresados esta vacío o no.
+        Validar el diccionario de sistemas.
+
+        Returns:
+            bool: Si el diccionario está vacío o no.
+        ---
         """
 
-        if self.sis_ingresados == {}:
-            return False
-        return True
+        return self.sis_ingresados == {}
