@@ -3,6 +3,7 @@ Funciones de utilidad generales para la aplicación.
 """
 
 from fractions import Fraction
+from importlib.resources import as_file, files
 from logging import DEBUG, FileHandler, Formatter, Logger, getLogger
 from typing import Literal
 
@@ -10,7 +11,7 @@ from PIL.Image import Image, Resampling, merge, open as open_img
 from PIL.ImageOps import invert
 from customtkinter import CTkImage as ctkImage
 
-from .paths import ASSET_PATH, DATA_PATH, LOG_PATH
+from .paths import DARK_NUMPAD_ICONS, DATA_PATH, LIGHT_NUMPAD_ICONS, LOG_PATH, PKG
 
 # objeto logger global para la aplicacion
 # configurado en la funcion log_setup()
@@ -96,6 +97,65 @@ def format_proc_num(
     return f"[ {combine_nums} ]"
 
 
+def load_mode_icon(path: str, size: tuple[int, int] = (20, 20)) -> ctkImage:
+    """
+    Cargar íconos de modo claro/oscuro.
+
+    Args:
+        dark_path: Dirección del ícono dentro del directorio de assets.
+        size:      Tamaño a pasar a CTkImage.
+
+    Returns:
+        CTkImage: Objeto de imagen conteniendo los íconos.
+    ---
+    """
+
+    with (
+        as_file(files(PKG) / f"assets/icons/dark/{path}") as d_path,
+        as_file(files(PKG) / f"assets/icons/light/{path}") as l_path,
+    ):
+        return ctkImage(
+            size=size, dark_image=open_img(l_path), light_image=open_img(d_path)
+        )
+
+
+def load_numpad_icons() -> dict[str, ctkImage]:
+    """
+    Cargar los íconos utilizados en CustomNumpad y almacernalos en un diccionario.
+    """
+
+    icons: dict[str, ctkImage] = {}
+
+    for item in DARK_NUMPAD_ICONS.iterdir():
+        if item.name.endswith(".png"):
+            with (
+                as_file(DARK_NUMPAD_ICONS / item.name) as d_path,
+                as_file(LIGHT_NUMPAD_ICONS / item.name) as l_path,
+            ):
+                img = open_img(d_path)
+                icons[item.name[:-4]] = ctkImage(
+                    size=img.size, dark_image=img, light_image=open_img(l_path)
+                )
+
+    return icons
+
+
+def load_single_icon(path: str) -> ctkImage:
+    """
+    Cargar íconos independientes de modo.
+
+    Args:
+        path: Dirección del ícono dentro del directorio de assets.
+
+    Returns:
+        CTkImage: Objeto de imagen conteniendo el ícono.
+    ---
+    """
+
+    with as_file(files(PKG) / f"assets/icons/{path}") as icon_path:
+        return ctkImage(open_img(icon_path))
+
+
 def log_setup(logger: Logger = LOGGER) -> None:
     """
     Configurar el logger de la aplicación y
@@ -159,20 +219,9 @@ def generate_sep(orientation: bool, size: tuple[int, int]) -> ctkImage:
     ---
     """
 
-    seps: dict[bool, tuple[Image, Image]] = {
-        True: (
-            open_img(ASSET_PATH / "light_mode" / "dark_vseparator.png"),
-            open_img(ASSET_PATH / "dark_mode" / "light_vseparator.png"),
-        ),
-        False: (
-            open_img(ASSET_PATH / "light_mode" / "dark_hseparator.png"),
-            open_img(ASSET_PATH / "dark_mode" / "light_hseparator.png"),
-        ),
-    }
-
-    return ctkImage(
-        size=size, dark_image=seps[orientation][1], light_image=seps[orientation][0]
-    )
+    if orientation:
+        return load_mode_icon("v_separator.png", size)
+    return load_mode_icon("h_separator.png", size)
 
 
 def resize_image(img: ctkImage, per: float = 0.75) -> ctkImage:

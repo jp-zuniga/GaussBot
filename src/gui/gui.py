@@ -4,7 +4,9 @@ todos los frames y managers necesarios para el GUI.
 """
 
 from decimal import getcontext
+from importlib.resources import as_file
 from json import dump, load
+from pathlib import Path
 from typing import Union
 
 from customtkinter import (
@@ -27,7 +29,7 @@ from .frames import (
 )
 from .. import FRAC_PREC
 from ..managers import FuncManager, OpsManager
-from ..utils import CONFIG_PATH, LOGGER, THEMES_PATH, set_icon
+from ..utils import CONFIG_PATH, LOGGER, THEMES, set_icon
 
 
 class GaussUI(ctk):
@@ -159,5 +161,8 @@ class GaussUI(ctk):
         # aplicar configs
         set_mode(self.modo_actual)
         set_scaling(self.escala_actual)
-        set_theme(THEMES_PATH / self.tema_actual)
+
+        with as_file(THEMES) as themes_path:
+            set_theme(str(Path(str(themes_path), self.tema_actual)))
+
         LOGGER.info("Configuración aplicada!")
