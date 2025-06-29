@@ -412,7 +412,7 @@ class Matriz:
                 for fila in self.valores
             ]
 
-            return Matriz(self.filas, multiplicador.columnas, valores=mat_multiplicada)
+            return Matriz(self.filas, self.columnas, valores=mat_multiplicada)
 
         raise TypeError("¡Tipo de dato inválido!")
 
