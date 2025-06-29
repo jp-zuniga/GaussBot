@@ -618,7 +618,7 @@ class RaicesFrame(CustomScrollFrame):
 
         new_window.protocol("WM_DELETE_WINDOW", lambda: delete_window(new_window))
 
-        self.tabla_its = CustomTable(new_window, registro)
+        self.tabla_its = CustomTable(self.app, new_window, registro)
         self.tabla_its.pack(expand=True, fill="both", padx=20, pady=20)
         self.table_hidden = False
 

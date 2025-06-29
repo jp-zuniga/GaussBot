@@ -8,6 +8,11 @@ Heavily modified and simplified the original
 for the purposes of this project.
 """
 
+from csv import writer
+from datetime import datetime
+from pathlib import Path
+from typing import TYPE_CHECKING
+
 from customtkinter import (
     CTkButton as ctkButton,
     CTkFont as ctkFont,
@@ -19,14 +24,18 @@ from customtkinter import (
 
 from .scrollframe import CustomScrollFrame
 
+if TYPE_CHECKING:
+    from ...gui import GaussUI
 
-class CustomTable(ctkFrame):
+
+class CustomTable(CustomScrollFrame):
     """
     Table widget to display data as a grid.
     """
 
     def __init__(
         self,
+        app: "GaussUI",
         master: ctkTop,
         values: list[list[str]],
         header: str = "Registro de Iteraciones:",
@@ -37,24 +46,25 @@ class CustomTable(ctkFrame):
 
         self.parent = master
         self.values = values
-        self.columnconfigure(0, weight=1)
         self.rowconfigure(1, weight=1)
 
         self.top_fg = ThemeManager.theme["CTkFrame"]["top_fg_color"]
         self.fg = ThemeManager.theme["CTkFrame"]["fg_color"]
 
-        ctkLabel(self, text=header, font=ctkFont(size=16, weight="bold")).grid(
-            row=0, column=0, padx=20, pady=20, sticky="nsew"
-        )
+        self.header_frame = ctkFrame(self)
 
-        self.dummy_frame = CustomScrollFrame(
-            self,
-            border_width=0,
-            scrollbar_width=14,
-            scrollbar_padding=(0, 0),
-            fg_color="transparent",
-        )
+        ctkLabel(
+            self.header_frame, text=header, font=ctkFont(size=16, weight="bold")
+        ).grid(row=0, column=0, padx=20, pady=20, sticky="nsew")
 
+        ctkButton(
+            self.header_frame,
+            text="Exportar a CSV",
+            font=ctkFont(size=12, weight="bold"),
+            command=self.export_to_csv,
+        ).grid(row=0, column=1, padx=20, pady=20, sticky="ne")
+
+        self.header_frame.grid(row=0, column=0, columnspan=len(self.values[0]))
         self.init_table()
 
     def init_table(self):
@@ -64,10 +74,10 @@ class CustomTable(ctkFrame):
 
         for i, row in enumerate(self.values):
             for j, value in enumerate(row):
-                self.dummy_frame.rowconfigure(i, weight=1)
-                self.dummy_frame.columnconfigure(j, weight=1)
+                self.rowconfigure(i + 1, weight=1)
+                self.columnconfigure(j, weight=1)
                 cell = ctkButton(
-                    self.dummy_frame,
+                    self,
                     text=value,
                     fg_color=(
                         ThemeManager.theme["CTkButton"]["fg_color"]
@@ -98,10 +108,44 @@ class CustomTable(ctkFrame):
 
                 cell._text_label.configure(justify="center")  # type: ignore
                 cell.grid(
-                    row=i,
+                    row=i + 1,
                     column=j,
                     padx=(0, 6) if j == 0 else (1, 0),
                     pady=3 if i == 0 or i == len(self.values) - 1 else (0, 1),
                     sticky="nsew",
                 )
-        self.dummy_frame.grid(row=1, column=0, padx=20, pady=(0, 20), sticky="nsew")
+
+    def export_to_csv(self):
+        """
+        Export table data to a CSV file.
+        """
+
+        from .messagebox import CustomMessageBox
+
+        if hasattr(self, "_quit_box") and self._quit_box.winfo_exists():
+            self._quit_box.focus()
+            return
+
+        csv_path: Path = (
+            Path.home()
+            / "Desktop"
+            / f"registro_iteraciones_{datetime.now().strftime('%Y-%m-%d_%H:%M:%S')}.csv"
+        )
+
+        with open(csv_path, mode="w", encoding="utf-8", newline="") as file:
+            csv_writer = writer(file)
+            csv_writer.writerows(self.values)
+
+        self._quit_box = CustomMessageBox(
+            self.app,
+            width=400,
+            height=200,
+            name="¡Exportación exitosa!",
+            msg=f"La tabla ha sido exportada exitosamente al archivo '{csv_path}'.",
+            button_options=("Ok", None, None),
+            icon="check",
+        )
+
+        self._quit_box.get()
+        self._quit_box.destroy()
+        del self._quit_box
