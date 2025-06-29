@@ -108,11 +108,10 @@ class HomeFrame(ctkFrame):
             app=self.app,
             height=30,
             image=ABOUT_US_ICON,
-            tooltip_text="\n− Desarrollado por: Joaquín Zúñiga"
-            + "\n− Versión: 1.0"
-            + "\n− Licencia: MIT License"
-            + "\n(puede hacer click para ir al repositorio de Github)\n",
-            command=lambda: open_link("https://github.com/jp-zuniga/GaussBot"),
+            tooltip_text="\n− Desarrollado por: Joaquín Zúñiga\n− Versión: 1.0",
+            command=lambda: open_link(
+                "https://github.com/jp-zuniga/GaussBot", autoraise=True
+            ),
         ).grid(row=5, column=0, padx=(10, 5), pady=(3, 10), sticky="ne")
 
         IconButton(

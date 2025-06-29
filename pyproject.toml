@@ -11,8 +11,7 @@ dependencies = [
 ]
 
 [tool.pylint]
-disable = ["C0415", "E0401", "R0801"]
-jobs = 0
+disable = ["C0415", "E0401", "R0401", "R0801"]
 output-format = "colorized"
 
 [tool.ruff.lint.per-file-ignores]
