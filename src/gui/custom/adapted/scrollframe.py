@@ -50,8 +50,8 @@ class CustomScrollFrame(ctkFrame):
             bg_color=self.parent_frame.cget("fg_color"),
         )
 
-        self.window_id = self.xy_canvas.create_window((0, 0), window=self, anchor="nw")
         self.padx, self.pady = scrollbar_padding
+        self.window_id = self.xy_canvas.create_window((0, 0), window=self, anchor="nw")
 
         self.vsb = ctkScrollbar(
             self.parent_frame,
@@ -144,13 +144,37 @@ class CustomScrollFrame(ctkFrame):
         self.hsb.set(x, y)
 
     def on_canvas_resize(self, event):
-        self.xy_canvas.itemconfig(self.window_id, width=event.width)
+        # Update canvas and scrollbar state when canvas size changes
+        self.update_scrollregion()
+        self.dynamic_scrollbar_vsb(*self.xy_canvas.yview())
+        self.dynamic_scrollbar_hsb(*self.xy_canvas.xview())
 
     def on_inner_frame_configure(self, event=None):
-        del event
-        self.xy_canvas.configure(scrollregion=self.xy_canvas.bbox("all"))
-        self.xy_canvas.xview_moveto(0)
-        self.xy_canvas.yview_moveto(0)
+        # Update scrollregion whenever inner frame changes size
+        self.update_scrollregion()
+
+    def update_scrollregion(self):
+        inner_width = self.winfo_reqwidth()
+        inner_height = self.winfo_reqheight()
+
+        canvas_width = self.xy_canvas.winfo_width()
+        canvas_height = self.xy_canvas.winfo_height()
+
+        if inner_width < canvas_width:
+            self.xy_canvas.itemconfig(self.window_id, width=canvas_width)
+        else:
+            self.xy_canvas.itemconfig(self.window_id, width=0)  # Use natural width
+
+        self.xy_canvas.configure(
+            scrollregion=(
+                0,
+                0,
+                max(inner_width, canvas_width),
+                max(inner_height, canvas_height),
+            )
+        )
+        self.dynamic_scrollbar_vsb(*self.xy_canvas.yview())
+        self.dynamic_scrollbar_hsb(*self.xy_canvas.xview())
 
     def _on_mousewheel(self, event, widget):
         if self.check_if_master_is_canvas(widget):
