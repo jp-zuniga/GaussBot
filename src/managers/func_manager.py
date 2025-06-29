@@ -52,6 +52,7 @@ class FuncManager:
 
         Returns:
             list[CTkImage]: Las imagenes de todas las funciones guardadas.
+        ---
         """
 
         if not self._validar_funcs_ingresadas():
@@ -459,9 +460,11 @@ class FuncManager:
 
     def _validar_funcs_ingresadas(self) -> bool:
         """
-        Validar si el diccionario de funciones ingresadas esta vacío o no.
+        Validar el diccionario de funciones.
+
+        Returns:
+            bool: Si el diccionario está vacío o no.
+        ---
         """
 
-        if self.funcs_ingresadas == {}:
-            return False
-        return True
+        return self.funcs_ingresadas == {}

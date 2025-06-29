@@ -96,7 +96,6 @@ __all__: list[str] = [
     "MATRIZ_ICON",
     "MOSTRAR_ICON",
     "MSGBOX_ICONS",
-    "NUMPAD_ICON_PATH",
     "NUMPAD_KEYS",
     "PKG",
     "SAVE_ICON",
