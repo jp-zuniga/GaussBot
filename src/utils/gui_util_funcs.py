@@ -134,7 +134,7 @@ def set_icon(app: "GaussUI", window: "GaussUI" | ctkTop) -> None:
 
 def toggle_proc(
     app: "GaussUI",
-    parent_frame: "CustomScrollFrame",
+    parent_frame: CustomScrollFrame,
     window_title: str,
     proc_label: ctkLabel | None,
     label_txt: str,
@@ -153,11 +153,11 @@ def toggle_proc(
     ---
     """
 
-    from ..gui.custom.adapted import CustomScrollFrame
+    from ..gui.custom.adapted import CustomScrollFrame, CustomNumpad
 
-    # si no esta escondido el procedimiento, o existe una Toplevel widget
     if not proc_hidden or any(
-        isinstance(widget, ctkTop) for widget in app.winfo_children()
+        isinstance(widget, ctkTop) and not isinstance(widget, CustomNumpad)
+        for widget in app.winfo_children()
     ):
         return
 
