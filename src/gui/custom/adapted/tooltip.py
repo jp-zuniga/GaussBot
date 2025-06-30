@@ -33,13 +33,13 @@ class Tooltip(Toplevel):
         delay: float = 0.1,
         x_offset: int = 20,
         y_offset: int = 30,
-        **message_kwargs,
+        **kwargs,
     ) -> None:
         super().__init__()
         self.widget = widget
         self.transient()
         self.withdraw()
-        self.overrideredirect(True)  # disable title bar
+        self.overrideredirect(True)
         self.resizable(width=True, height=True)
 
         self.message = message
@@ -48,7 +48,11 @@ class Tooltip(Toplevel):
         self.delay = delay
         self.x_offset = x_offset
         self.y_offset = y_offset
-        self.bg_color = ThemeManager.theme["CTkFrame"]["fg_color"]
+
+        bg_color: str = kwargs.pop("bg_color", ThemeManager.theme["CTkFrame"]["fg_color"])
+        fg_color: str = kwargs.pop(
+            "fg_color", ThemeManager.theme["CTkFrame"]["top_fg_color"]
+        )
 
         self.last_moved: float = 0.0
         self.status = "outside"
@@ -57,32 +61,23 @@ class Tooltip(Toplevel):
         self.transparent_frame = Frame(self)
         self.transparent_frame.pack(expand=True, fill="both")
 
-        self.frame: ctkFrame = ctkFrame(  # type: ignore
-            self.transparent_frame,
-            border_width=2,
-            bg_color=self.bg_color,
-            fg_color=self.bg_color,
+        self.frame: ctkFrame = ctkFrame(
+            self.transparent_frame, border_width=2, bg_color=bg_color, fg_color=bg_color
+        )
+
+        if (
+            self.widget.winfo_name() != "tk"
+            and self.frame.cget("fg_color") == self.widget.cget("bg_color")
+            and fg_color != self.frame._fg_color
+        ):
+            self.frame.configure(fg_color=fg_color)
+
+        self.message_label = ctkLabel(
+            self.frame, font=ctkFont(size=10), textvariable=self.msg_var, **kwargs
         )
 
         self.frame.pack(expand=True, fill="both")
-        self.message_label = ctkLabel(
-            self.frame,
-            font=ctkFont(size=10),
-            textvariable=self.msg_var,
-            **message_kwargs,
-        )
-
         self.message_label.pack(fill="both", padx=10, pady=5, expand=True)
-
-        if self.widget.winfo_name() != "tk" and self.frame.cget(
-            "fg_color"
-        ) == self.widget.cget("bg_color"):
-            self._top_fg_color = self.frame._apply_appearance_mode(
-                ThemeManager.theme["CTkFrame"]["fg_color"]
-            )
-
-            if self._top_fg_color != self.frame._fg_color:
-                self.frame.configure(fg_color=self._top_fg_color)
 
         self.widget.bind("<Enter>", self.on_enter, add="+")
         self.widget.bind("<Leave>", lambda _: self.on_leave(), add="+")
@@ -99,30 +94,19 @@ class Tooltip(Toplevel):
             return
         self.last_moved = time()
 
-        # Set the status as inside for the very first time
         if self.status == "outside":
             self.status = "inside"
 
-        # Calculate available space on the right side
-        # of the widget relative to the screen
         root_width = self.winfo_screenwidth()
         widget_x = event.x_root
         space_on_right = root_width - widget_x
 
-        # Calculate the width of the tooltip's text
-        # based on the length of the message string
         text_width = self.message_label.winfo_reqwidth()
-
-        # Calculate the offset based on available space and
-        # text width to avoid going off-screen on the right side
         offset_x = self.x_offset
-        if space_on_right < text_width + 20:  # Adjust the threshold as needed
-            offset_x = (
-                -text_width
-                - 20  # Negative offset when space is limited on the right side
-            )
 
-        # Offsets the Tooltip using the coordinates of an event as an origin
+        if space_on_right < text_width + 20:
+            offset_x = -text_width - 20
+
         self.geometry(f"+{event.x_root + offset_x}+{event.y_root + self.y_offset}")
         self.after(int(self.delay * 1000), self._show)
 

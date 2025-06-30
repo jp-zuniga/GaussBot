@@ -82,17 +82,13 @@ class CustomMessageBox(ctkTop):
         self.offset_x = 0
         self.offset_y = 0
 
-        self.msgbox_name = name
-        self.msg = msg
-        self.clicked_button = ""
         self.option1, self.option2, self.option3 = button_options
+        self.msg = msg
+        self.msgbox_name = name
+        self.clicked_button = ""
 
-        self.bg_color = self._apply_appearance_mode(
-            ThemeManager.theme["CTkFrame"]["fg_color"]
-        )
-
-        self.fg_color = self._apply_appearance_mode(
-            ThemeManager.theme["CTkFrame"]["top_fg_color"]
+        bg_color: str = kwargs.pop(
+            "bg_color", ThemeManager.theme["CTkFrame"]["fg_color"]
         )
 
         self.frame_top = ctkFrame(
@@ -100,8 +96,10 @@ class CustomMessageBox(ctkTop):
             width=self.width,
             corner_radius=24,
             border_width=3,
-            bg_color=self.bg_color,
-            fg_color=self.fg_color,
+            bg_color=bg_color,
+            fg_color=kwargs.pop(
+                "fg_color", ThemeManager.theme["CTkFrame"]["top_fg_color"]
+            ),
         )
 
         self.frame_top.grid(sticky="nsew")
@@ -125,7 +123,7 @@ class CustomMessageBox(ctkTop):
             self.frame_top,
             app=self.master_window,
             image=QUIT_ICON,
-            hover_color=self.bg_color,
+            hover_color=bg_color,
             command=lambda: self.button_event(""),
             width=30,
             height=30,
@@ -133,7 +131,7 @@ class CustomMessageBox(ctkTop):
 
         ctkLabel(
             self.frame_top,
-            fg_color=self.bg_color,
+            fg_color=bg_color,
             text=self.msg,
             justify="center",
             wraplength=self.width - 30,

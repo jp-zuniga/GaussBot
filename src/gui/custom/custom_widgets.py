@@ -10,6 +10,7 @@ from customtkinter import (
     CTkImage as ctkImage,
     CTkLabel as ctkLabel,
     CTkOptionMenu as ctkOptionMenu,
+    ThemeManager,
 )
 
 from .adapted.tooltip import Tooltip
@@ -144,6 +145,8 @@ class IconButton(ctkButton):
             "hover_color", self.app.theme_config["CTkFrame"]["top_fg_color"]
         )
 
+        swap_tt_colors: bool = kwargs.pop("swap_tooltip_colors", False)
+
         super().__init__(
             master,
             width=width,
@@ -159,10 +162,19 @@ class IconButton(ctkButton):
 
         if text == "":
             self._image_label.grid_configure(columnspan=3, sticky="nsew")
-        if tooltip_text is not None:
-            self.tooltip: Optional[Tooltip] = Tooltip(self, tooltip_text)
-        else:
+
+        if tooltip_text is None:
             self.tooltip = None
+        else:
+            if swap_tt_colors:
+                self.tooltip: Optional[Tooltip] = Tooltip(
+                    self,
+                    tooltip_text,
+                    bg_color=ThemeManager.theme["CTk"]["fg_color"],
+                    fg_color=ThemeManager.theme["CTkFrame"]["top_fg_color"],
+                )
+            else:
+                self.tooltip: Optional[Tooltip] = Tooltip(self, tooltip_text)
 
     def destroy(self):
         if self.tooltip is not None:

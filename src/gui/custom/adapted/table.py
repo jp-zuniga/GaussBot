@@ -16,8 +16,7 @@ from typing import TYPE_CHECKING
 from customtkinter import (
     CTkButton as ctkButton,
     CTkFont as ctkFont,
-    CTkFrame as ctkFrame,
-    CTkLabel as ctkLabel,
+    # CTkLabel as ctkLabel,
     CTkToplevel as ctkTop,
     ThemeManager,
 )
@@ -40,51 +39,71 @@ class CustomTable(CustomScrollFrame):
         values: list[list[str]],
         header: str = "Registro de Iteraciones:",
     ):
-        super().__init__(
-            master, corner_radius=20, border_width=3, fg_color="transparent"
-        )
+        from .. import IconButton
 
-        self.parent = master
-        self.values = values
+        super().__init__(master, border_width=3, fg_color="transparent")
+
         self.rowconfigure(1, weight=1)
-
-        self.top_fg = ThemeManager.theme["CTkFrame"]["top_fg_color"]
-        self.fg = ThemeManager.theme["CTkFrame"]["fg_color"]
-
-        self.header_frame = ctkFrame(self)
-
-        ctkLabel(
-            self.header_frame, text=header, font=ctkFont(size=16, weight="bold")
-        ).grid(row=0, column=0, padx=20, pady=20, sticky="nsew")
+        self.app = app
+        self.values = values
 
         ctkButton(
-            self.header_frame,
-            text="Exportar a CSV",
-            font=ctkFont(size=12, weight="bold"),
-            command=self.export_to_csv,
-        ).grid(row=0, column=1, padx=20, pady=20, sticky="ne")
+            self,
+            text=header,
+            font=ctkFont(size=16, weight="bold"),
+            fg_color="transparent",
+            hover=False,
+        ).grid(
+            row=0,
+            column=0,
+            columnspan=len(self.values[0]) - 1,
+            padx=20,
+            pady=20,
+            sticky="nw",
+        )
 
-        self.header_frame.grid(row=0, column=0, columnspan=len(self.values[0]))
         self.init_table()
+        IconButton(
+            self,
+            self.app,
+            height=30,
+            text="Exportar tabla a CSV",
+            tooltip_text="Exportar los valores de la tabla a\n "
+            + "un archivo .csv en su escritorio.",
+            font=ctkFont(weight="bold"),
+            fg_color=ThemeManager.theme["CTkButton"]["fg_color"],
+            command=self.export_to_csv,
+            swap_tooltip_colors=True,
+        ).grid(
+            row=len(self.values) + 2,
+            column=0,
+            columnspan=len(self.values[0]) - 1,
+            padx=20,
+            pady=20,
+            sticky="nw",
+        )
 
     def init_table(self):
         """
         Initialize the table.
         """
 
+        top_fg: str = ThemeManager.theme["CTkFrame"]["top_fg_color"]
+        fg: str = ThemeManager.theme["CTkFrame"]["fg_color"]
+
         for i, row in enumerate(self.values):
             for j, value in enumerate(row):
                 self.rowconfigure(i + 1, weight=1)
-                self.columnconfigure(j, weight=1)
+                # self.columnconfigure(j, weight=1)
                 cell = ctkButton(
                     self,
                     text=value,
                     fg_color=(
                         ThemeManager.theme["CTkButton"]["fg_color"]
                         if i == len(self.values) - 1
-                        else self.top_fg
+                        else top_fg
                         if i % 2 == 0
-                        else self.fg
+                        else fg
                         if i != 0
                         else "transparent"
                     ),
@@ -110,9 +129,13 @@ class CustomTable(CustomScrollFrame):
                 cell.grid(
                     row=i + 1,
                     column=j,
-                    padx=(0, 6) if j == 0 else (1, 0),
-                    pady=3 if i == 0 or i == len(self.values) - 1 else (0, 1),
-                    sticky="nsew",
+                    padx=(20, 3)
+                    if j == 0
+                    else (2, 0)
+                    if j != len(self.values[0]) - 1
+                    else (2, 20),
+                    pady=3 if i == 0 or i == len(self.values) - 1 else (0, 2),
+                    sticky="nsw",
                 )
 
     def export_to_csv(self):
@@ -138,12 +161,13 @@ class CustomTable(CustomScrollFrame):
 
         self._quit_box = CustomMessageBox(
             self.app,
-            width=400,
-            height=200,
+            width=480,
             name="¡Exportación exitosa!",
-            msg=f"La tabla ha sido exportada exitosamente al archivo '{csv_path}'.",
+            msg=f"La tabla ha sido exportada exitosamente al archivo\n'{csv_path}'.",
             button_options=("Ok", None, None),
             icon="check",
+            bg_color=ThemeManager.theme["CTk"]["fg_color"],
+            fg_color=ThemeManager.theme["CTkFrame"]["fg_color"],
         )
 
         self._quit_box.get()
