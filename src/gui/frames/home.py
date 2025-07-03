@@ -9,7 +9,6 @@ from customtkinter import CTkFont as ctkFont, CTkFrame as ctkFrame, CTkLabel as 
 
 from ..custom import IconButton
 from ...utils import (
-    ABOUT_US_ICON,
     ANALISIS_ICON,
     ECUACIONES_ICON,
     INFO_ICON,
@@ -28,6 +27,8 @@ class HomeFrame(ctkFrame):
     """
 
     def __init__(self, app: "GaussUI", master: "GaussUI") -> None:
+        from ... import __version__
+
         super().__init__(master, corner_radius=0)
         self.app = app
 
@@ -107,23 +108,13 @@ class HomeFrame(ctkFrame):
             self,
             app=self.app,
             height=30,
-            image=ABOUT_US_ICON,
-            tooltip_text="− Desarrollado por: Joaquín Zúñiga\n− Versión: 1.0.0",
-            command=lambda: open_link(
-                "https://github.com/jp-zuniga/GaussBot", autoraise=True
-            ),
-        ).grid(row=5, column=0, padx=(10, 5), pady=(3, 10), sticky="ne")
-
-        IconButton(
-            self,
-            app=self.app,
-            height=30,
             image=INFO_ICON,
-            tooltip_text="Todos los datos ingresados y resultados calculados"
-            + "\n(excepto determinantes, magnitudes de vectores, "
-            + "   y raíces de funciones)".strip()
-            + "\npueden ser guardados para uso futuro.",
-        ).grid(row=5, column=1, padx=(5, 10), pady=(3, 10), sticky="nw")
+            tooltip_text="− Desarrollado y diseñado por: Joaquín Zúñiga\n"
+            + f"− Versión: {__version__}",
+            command=lambda: open_link(
+                "https://github.com/jp-zuniga/GaussBot", autoraise=False
+            ),
+        ).grid(row=5, column=0, columnspan=2, padx=10, pady=(3, 10), sticky="n")
 
     def ir_a_frame(self, frame: str) -> None:
         """

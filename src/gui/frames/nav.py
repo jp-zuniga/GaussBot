@@ -69,8 +69,10 @@ class NavFrame(ctkFrame):
             app=self.app,
             width=15,
             height=30,
+            corner_radius=10,
             image=DROPLEFT_ICON,
             tooltip_text="Esconder barra de navegación",
+            tooltip_x_offset=40,
             command=self.toggle_nav,
         )
 
@@ -269,7 +271,10 @@ class NavFrame(ctkFrame):
                     widget._image_label.grid_configure(columnspan=1, sticky="e")
 
             self.hidden = False
-            self.hide_button.configure(image=DROPLEFT_ICON)
+            self.hide_button.configure(
+                image=DROPRIGHT_ICON, tooltip_text="Esconder barra de navegación"
+            )
+
             self.hide_button.grid_configure(column=1, columnspan=1, sticky="nse")
 
         else:
@@ -283,7 +288,10 @@ class NavFrame(ctkFrame):
                     widget._image_label.grid_configure(columnspan=3, sticky="nsew")
 
             self.hidden = True
-            self.hide_button.configure(image=DROPRIGHT_ICON)
+            self.hide_button.configure(
+                image=DROPRIGHT_ICON, tooltip_text="Mostrar barra de navegación"
+            )
+
             self.hide_button.grid_configure(column=0, columnspan=2, sticky="nse")
 
     def home_button_event(self) -> None:
