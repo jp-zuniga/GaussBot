@@ -128,13 +128,13 @@ class FuncManager:
             registro.append(
                 [
                     str(i),
-                    format(Decimal(a).normalize(), "f"),
-                    format(Decimal(b).normalize(), "f"),
-                    format(Decimal(c).normalize(), "f"),
-                    format(Decimal(fc).normalize(), "f"),
-                    format(Decimal(fa).normalize(), "f"),
-                    format(Decimal(fb).normalize(), "f"),
-                    format(Decimal(fc).normalize(), "f"),
+                    FuncManager._format_decimal(a),
+                    FuncManager._format_decimal(b),
+                    FuncManager._format_decimal(c),
+                    FuncManager._format_decimal(fc),
+                    FuncManager._format_decimal(fa),
+                    FuncManager._format_decimal(fb),
+                    FuncManager._format_decimal(fc),
                 ]
             )
 
@@ -184,11 +184,11 @@ class FuncManager:
                 "Iteración",
                 "a",
                 "b",
-                "x_r",
+                "xᵣ",
                 "E",
                 f"{func.nombre[0]}(a)",
                 f"{func.nombre[0]}(b)",
-                f"{func.nombre[0]}(x_r)",
+                f"{func.nombre[0]}(xᵣ)",
             ]
         ]
 
@@ -211,13 +211,13 @@ class FuncManager:
             registro.append(
                 [
                     str(i),
-                    format(Decimal(a).normalize(), "f"),
-                    format(Decimal(b).normalize(), "f"),
-                    format(Decimal(xr).normalize(), "f"),
-                    format(Decimal(fxr).normalize(), "f"),
-                    format(Decimal(fa).normalize(), "f"),
-                    format(Decimal(fb).normalize(), "f"),
-                    format(Decimal(fxr).normalize(), "f"),
+                    FuncManager._format_decimal(a),
+                    FuncManager._format_decimal(b),
+                    FuncManager._format_decimal(xr),
+                    FuncManager._format_decimal(fxr),
+                    FuncManager._format_decimal(fa),
+                    FuncManager._format_decimal(fb),
+                    FuncManager._format_decimal(fxr),
                 ]
             )
 
@@ -268,11 +268,11 @@ class FuncManager:
         registro: list[list[str]] = [
             [
                 "Iteración",
-                "x_i",
-                "x_i + 1",
+                "xᵢ",
+                "xᵢ + 1",
                 "E",
-                f"{func.nombre[0]}(x_i)",
-                f"{func.nombre[0]}′(x_i)",
+                f"{func.nombre[0]}(xᵢ)",
+                f"{func.nombre[0]}'(xᵢ)",
             ]
         ]
 
@@ -313,11 +313,11 @@ class FuncManager:
             registro.append(
                 [
                     str(i),
-                    format(Decimal(temp_xi).normalize(), "f"),
-                    format(Decimal(xi).normalize(), "f"),
-                    format(Decimal(fxi).normalize(), "f"),
-                    format(Decimal(fxi).normalize(), "f"),
-                    format(Decimal(fxi_prima).normalize(), "f"),
+                    FuncManager._format_decimal(temp_xi),
+                    FuncManager._format_decimal(xi),
+                    FuncManager._format_decimal(fxi),
+                    FuncManager._format_decimal(fxi),
+                    FuncManager._format_decimal(fxi_prima),
                 ]
             )
 
@@ -362,7 +362,7 @@ class FuncManager:
         ---
         """
 
-        registro: list[list[str]] = [["Iteración", "x_i − 1", "x_i", "x_i + 1"]]
+        registro: list[list[str]] = [["Iteración", "xᵢ − 1", "xᵢ", "xᵢ + 1"]]
 
         xi, xn = float(iniciales[0]), float(iniciales[1])
         f = lambdify(func.var, func.expr)
@@ -377,9 +377,9 @@ class FuncManager:
             registro.append(
                 [
                     str(i),
-                    format(Decimal(xi).normalize(), "f"),
-                    format(Decimal(xn).normalize(), "f"),
-                    format(Decimal(new_xn).normalize(), "f"),
+                    FuncManager._format_decimal(xi),
+                    FuncManager._format_decimal(xn),
+                    FuncManager._format_decimal(new_xn),
                 ]
             )
 
@@ -390,6 +390,14 @@ class FuncManager:
             if xn not in f_dominio:
                 return (Decimal(xn), Decimal(fxn), registro, i, 2)
         return (Decimal(xn), Decimal(fxn), registro, max_its, -1)
+
+    @staticmethod
+    def _format_decimal(num: int | float) -> str:
+        """
+        Formatear número para uso en registro de iteraciones.
+        """
+
+        return format(Decimal(num).normalize(), "f").replace("-", "−")
 
     def save_funciones(self) -> None:
         """

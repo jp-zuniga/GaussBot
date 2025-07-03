@@ -127,14 +127,14 @@ class Func:
         ---
         """
 
-        if "′" not in self.nombre:
-            d_nombre = f"{self.nombre[0]}′{self.nombre[1:]}"
+        if "'" not in self.nombre:
+            d_nombre = f"{self.nombre[0]}'{self.nombre[1:]}"
 
         else:
-            num_diff: int = self.nombre.count("′")
+            num_diff: int = self.nombre.count("'")
             d_nombre: str = self.nombre.replace(
-                "".join("′" for _ in range(num_diff)),
-                "".join("′" for _ in range(num_diff + 1)),
+                "".join("'" for _ in range(num_diff)),
+                "".join("'" for _ in range(num_diff + 1)),
             )
 
         return Func(d_nombre, str(diff(self.expr, self.var)))
@@ -182,7 +182,7 @@ class Func:
         """
 
         if diffr:
-            return self.get_derivada_nombre(self.nombre.count("′"))
+            return self.get_derivada_nombre(self.nombre.count("'"))
         if integ:
             return self.get_integral_nombre(
                 int(next((x for x in self.nombre if x.isdigit()), 0))
@@ -238,7 +238,7 @@ class Func:
             self.latex_img = Func.latex_to_png(
                 nombre_expr=(
                     self.nombre
-                    if (self.nombre.count("′") == 0 and self.nombre.count("∫") == 0)
+                    if (self.nombre.count("'") == 0 and self.nombre.count("∫") == 0)
                     else self.get_di_nombre()
                 ),
                 expr=str(self.expr),
