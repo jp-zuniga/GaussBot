@@ -49,7 +49,9 @@ class Tooltip(Toplevel):
         self.x_offset = x_offset
         self.y_offset = y_offset
 
-        bg_color: str = kwargs.pop("bg_color", ThemeManager.theme["CTkFrame"]["fg_color"])
+        bg_color: str = kwargs.pop(
+            "bg_color", ThemeManager.theme["CTkFrame"]["fg_color"]
+        )
         fg_color: str = kwargs.pop(
             "fg_color", ThemeManager.theme["CTkFrame"]["top_fg_color"]
         )
@@ -77,7 +79,7 @@ class Tooltip(Toplevel):
         )
 
         self.frame.pack(expand=True, fill="both")
-        self.message_label.pack(fill="both", padx=10, pady=5, expand=True)
+        self.message_label.pack(fill="both", padx=15, pady=10, expand=True)
 
         self.widget.bind("<Enter>", self.on_enter, add="+")
         self.widget.bind("<Leave>", lambda _: self.on_leave(), add="+")
