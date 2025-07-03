@@ -16,14 +16,22 @@ from ..utils import LOGGER, MATRICES_PATH, SISTEMAS_PATH, VECTORES_PATH, format_
 class OpsManager:
     """
     Manager principal, encargado de gestionar todas las operaciones matemáticas.
-    Esencialmente un wrapper para contener los datos de matrices y vectores.
-    Se encarga de leer y escribir los datos a archivos .json,
-    y de realizar la multiplicación de matrices por vectores.
     """
 
-    def __init__(self, mats_manager=None, vecs_manager=None) -> None:
+    def __init__(
+        self,
+        mats_manager: MatricesManager | None = None,
+        vecs_manager: VectoresManager | None = None,
+    ) -> None:
         """
-        * TypeError: si mats_manager/vecs_manager no son MatricesManager/VectoresManager
+        Args:
+            mats_manager: Manejador de matrices a utilizar para el sistema.
+            mats_manager: Manejador de vectores a utilizar para el sistema.
+
+        Raises:
+            TypeError: Si los argumentos dados no son
+                       de tipo MatricesManager | VectoresManager.
+        ---
         """
 
         if mats_manager is not None and not isinstance(mats_manager, MatricesManager):
@@ -46,18 +54,25 @@ class OpsManager:
 
     def mat_por_vec(self, nombre_mat: str, nombre_vec: str) -> tuple[str, str, Matriz]:
         """
-        Realiza la multiplicación de una matriz por un vector.
-        - ArithmeticError: si la matriz y el vector no son compatibles
-                           para la multiplicación.
+        Multiplicar una matriz por un vector.
 
-        Retorna una tupla con:
-        * str: procedimiento de la operación
-        * str: nombre de la matriz resultante
-        * Matriz(): objeto de la matriz resultante de la multiplicación.
+        Args:
+            nombre_mat: Nombre de la matriz a multiplicar.
+            nombre_vec: Nombre del vector a multiplicar.
+
+        Raises:
+            ArithmeticError: si la matriz y el vector no son
+                             compatibles para la multiplicación.
+
+        Returns:
+            (str, str, Matriz): Procedimiento de la operación,
+                                nombre de la matriz resultante y
+                                la matriz resultante de la multiplicación.
+        ---
         """
 
-        mat = self.mats_manager.mats_ingresadas[nombre_mat]
-        vec = self.vecs_manager.vecs_ingresados[nombre_vec]
+        mat: Matriz = self.mats_manager.mats_ingresadas[nombre_mat]
+        vec: Vector = self.vecs_manager.vecs_ingresados[nombre_vec]
         if mat.columnas != len(vec):
             raise ArithmeticError(
                 "El número de columnas de la matriz debe ser "
@@ -65,7 +80,7 @@ class OpsManager:
             )
 
         # inicializar la lista 2D de la matriz resultante
-        multiplicacion = [
+        multiplicacion: list[list[Fraction]] = [
             [Fraction(0) for _ in range(len(vec))] for _ in range(mat.filas)
         ]
 
@@ -82,7 +97,7 @@ class OpsManager:
             columnas=len(vec),
             valores=[
                 [
-                    format_proc_num(  # type: ignore
+                    format_proc_num(
                         (
                             mat[i, j].limit_denominator(FRAC_PREC["prec"]),
                             vec.componentes[j].limit_denominator(FRAC_PREC["prec"]),
@@ -107,19 +122,18 @@ class OpsManager:
 
     def save_sistemas(self) -> None:
         """
-        Escribe el diccionario de sistemas ingresados al archivo sistemas.json,
-        utilizando FractionEncoder() para escribir objetos Fraction().
+        Escribir el diccionario de sistemas ingresados al archivo 'sistemas.json'.
         """
 
         # descomponer los objetos Matriz() en mats_manager.sis_ingresados
         # para que se guarden los atributos individuales del objeto,
         # en lugar de una referencia al objeto Matriz() completo
-        sistemas_dict = {
+        sistemas_dict: dict[str, dict[str, bool | int | list[list[Fraction]]]] = {
             nombre: {
-                "aumentada": mat.aumentada,
                 "filas": mat.filas,
                 "columnas": mat.columnas,
                 "valores": mat.valores,
+                "aumentada": mat.aumentada,
             }
             for nombre, mat in self.mats_manager.sis_ingresados.items()
         }
@@ -154,19 +168,18 @@ class OpsManager:
 
     def save_matrices(self) -> None:
         """
-        Escribe el diccionario de matrices ingresadas al archivo matrices.json,
-        utilizando FractionEncoder() para escribir objetos Fraction().
+        Escribir el diccionario de matrices ingresadas al archivo 'matrices.json'.
         """
 
         # descomponer los objetos Matriz() en mats_manager.mats_ingresadas
         # para que se guarden los atributos individuales del objeto,
         # en lugar de una referencia al objeto Matriz() completo
-        matrices_dict = {
+        matrices_dict: dict[str, dict[str, bool | int | list[list[Fraction]]]] = {
             nombre: {
-                "aumentada": mat.aumentada,
                 "filas": mat.filas,
                 "columnas": mat.columnas,
                 "valores": mat.valores,
+                "aumentada": mat.aumentada,
             }
             for nombre, mat in self.mats_manager.mats_ingresadas.items()
         }
@@ -196,14 +209,13 @@ class OpsManager:
 
     def save_vectores(self) -> None:
         """
-        Escribe el diccionario de vectores ingresados al archivo vectores.json,
-        utilizando FractionEncoder() para escribir objetos Fraction().
+        Escribir el diccionario de vectores ingresados al archivo 'vectores.json'.
         """
 
         # descomponer los objetos Vector() en vecs_manager.vecs_ingresados
         # para que se guarden la lista de componentes directamente,
         # en lugar de una referencia al objeto Vector() completo
-        vectores_dict = {
+        vectores_dict: dict[str, list[Fraction]] = {
             nombre: vec.componentes
             for nombre, vec in self.vecs_manager.vecs_ingresados.items()
         }
@@ -233,10 +245,11 @@ class OpsManager:
 
     def _load_sistemas(self) -> dict[str, Matriz]:
         """
-        Carga los sistemas guardados en el archivo sistemas.json,
-        utilizando FractionDecoder() para leer objetos Fraction().
+        Cargar los sistemas guardados en el archivo 'sistemas.json'.
 
-        Retorna un diccionario con los sistemas cargados y sus nombres.
+        Returns:
+            dict[str, Matriz]: Diccionario con los sistemas cargados.
+        ---
         """
 
         # si no existe sistemas.json, retornar un diccionario vacio
@@ -271,10 +284,11 @@ class OpsManager:
 
     def _load_matrices(self) -> dict[str, Matriz]:
         """
-        Carga las matrices guardadas en el archivo matrices.json,
-        utilizando FractionDecoder para leer objetos Fraction().
+        Carga las matrices guardadas en el archivo 'matrices.json'.
 
-        Retorna un diccionario con las matrices cargadas y sus nombres.
+        Returns:
+            dict[str, Matriz]: Diccionario con las matrices cargadas.
+        ---
         """
 
         if not MATRICES_PATH.exists():
@@ -308,10 +322,11 @@ class OpsManager:
 
     def _load_vectores(self) -> dict[str, Vector]:
         """
-        Carga los vectores guardados en el archivo vectores.json,
-        utilizando FractionDecoder para leer objetos Fraction().
+        Carga los vectores guardados en el archivo 'vectores.json'.
 
-        Retorna un diccionario con los vectores cargados y sus nombres.
+        Returns:
+            dict[str, Vector]: Diccionario con los vectores cargados.
+        ---
         """
 
         if not VECTORES_PATH.exists():
