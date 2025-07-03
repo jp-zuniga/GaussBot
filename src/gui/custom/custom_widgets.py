@@ -145,7 +145,9 @@ class IconButton(ctkButton):
             "hover_color", self.app.theme_config["CTkFrame"]["top_fg_color"]
         )
 
-        swap_tt_colors: bool = kwargs.pop("swap_tooltip_colors", False)
+        tt_x_offset = kwargs.pop("tooltip_x_offset", 20)
+        tt_y_offset = kwargs.pop("tooltip_y_offset", 30)
+        swap_tt_colors = kwargs.pop("swap_tooltip_colors", False)
 
         super().__init__(
             master,
@@ -170,6 +172,8 @@ class IconButton(ctkButton):
                 self.tooltip: Optional[Tooltip] = Tooltip(
                     self,
                     tooltip_text,
+                    x_offset=tt_x_offset,
+                    y_offset=tt_y_offset,
                     bg_color=ThemeManager.theme["CTk"]["fg_color"],
                     fg_color=ThemeManager.theme["CTkFrame"]["top_fg_color"],
                 )
