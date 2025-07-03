@@ -50,7 +50,6 @@ MSGBOX_ICONS: dict[str, ctkImage] = {
 ############################   Íconos de botones   #############################
 ################################################################################
 
-ABOUT_US_ICON = load_mode_icon("about_us_icon.png")
 ACEPTAR_ICON = load_mode_icon("aceptar_icon.png")
 DROPDOWN_ICON = load_mode_icon("dropdown_icon.png")
 DROPLEFT_ICON = load_mode_icon("dropleft_icon.png")
@@ -67,5 +66,4 @@ SHUFFLE_ICON = load_mode_icon("shuffle_icon.png")
 ##########################   Íconos de CustomNumpad   ##########################
 ################################################################################
 
-# Numpad icons loaded through dedicated function
 NUMPAD_KEYS: dict[str, ctkImage] = load_numpad_icons()

@@ -18,7 +18,6 @@ from .paths import (
     VECTORES_PATH,
 )
 from .icons import (
-    ABOUT_US_ICON,
     ACEPTAR_ICON,
     ANALISIS_ICON,
     APP_ICON,
@@ -66,7 +65,6 @@ from .gui_util_funcs import (
 )
 
 __all__: list[str] = [
-    "ABOUT_US_ICON",
     "ACEPTAR_ICON",
     "ANALISIS_ICON",
     "APP_ICON",

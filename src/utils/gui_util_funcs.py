@@ -153,7 +153,7 @@ def toggle_proc(
     ---
     """
 
-    from ..gui.custom.adapted import CustomScrollFrame, CustomNumpad
+    from ..gui.custom.adapted import CustomNumpad, CustomScrollFrame
 
     if not proc_hidden or any(
         isinstance(widget, ctkTop) and not isinstance(widget, CustomNumpad)
