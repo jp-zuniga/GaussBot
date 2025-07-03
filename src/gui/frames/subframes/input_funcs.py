@@ -65,14 +65,10 @@ class AgregarFuncs(CustomScrollFrame):
             self.app,
             height=30,
             image=INFO_ICON,
-            tooltip_text="\nEl numpad le permite ingresar funciones"
+            tooltip_text="El numpad le permite ingresar funciones"
             + "\nmatemáticas de una forma más sencilla.\n"
             + "\nCon el cursor en la entrada de términos,"
-            + "\npresione CTRL+TAB para abrirlo y ESC para cerrarlo.\n"
-            + "\nPara mejores resultados,\nasegúrese que los argumentos "
-            + "de la función\nestén en paréntesis, y operaciones "
-            + "complejas\ncomo multiplicación y división de funciones"
-            + "\nestén encerradas en paréntesis también.\n",
+            + "\npresione CTRL+TAB para abrirlo y ESC para cerrarlo.",
             command=self.mostrar_tutorial,
         )
 

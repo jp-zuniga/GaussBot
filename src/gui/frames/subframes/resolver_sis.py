@@ -50,7 +50,7 @@ class ResolverSisFrame(CustomScrollFrame):
         self.columnconfigure(0, weight=1)
 
         self.msg_frame: Optional[ctkFrame] = None
-        self.metodos: dict[str, str] = {"Gauss−Jordan": "gj", "Regla de Cramer": "c"}
+        self.metodos: dict[str, str] = {"Gauss-Jordan": "gj", "Regla de Cramer": "c"}
 
         # definir atributos, se inicializan en setup_frame
         self.select_sis_mat: CustomDropdown

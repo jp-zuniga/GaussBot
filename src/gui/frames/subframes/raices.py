@@ -140,8 +140,8 @@ class RaicesFrame(CustomScrollFrame):
                 self.metodo_frame,
                 app=self.app,
                 image=INFO_ICON,
-                tooltip_text="\nNota: las funciones trigonométricas"
-                + "\ndeben recibir argumentos en radianes.\n",
+                tooltip_text="Nota: las funciones trigonométricas"
+                + "\ndeben recibir argumentos en radianes.",
             ).grid(row=3, column=0, pady=(5, 0), sticky="n")
 
         self.met_actual = self.metodos[metodo]
@@ -611,7 +611,7 @@ class RaicesFrame(CustomScrollFrame):
 
         new_window = ctkTop(self.app)
         new_window.title("GaussBot: Registro de Iteraciones")
-        new_window.geometry("1000x500")
+        new_window.geometry("1200x600")
 
         self.after(100, new_window.focus)
         self.after(250, lambda: set_icon(self.app, new_window))
