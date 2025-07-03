@@ -70,6 +70,7 @@ class NavFrame(ctkFrame):
             width=15,
             height=30,
             image=DROPLEFT_ICON,
+            tooltip_text="Esconder barra de navegación",
             command=self.toggle_nav,
         )
 
