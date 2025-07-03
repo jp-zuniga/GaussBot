@@ -31,7 +31,7 @@ class HomeFrame(ctkFrame):
         super().__init__(master, corner_radius=0)
         self.app = app
 
-        # para centrar widgets
+        # centrar widgets
         self.columnconfigure(0, weight=1)
         self.columnconfigure(1, weight=1)
         self.rowconfigure(0, weight=1)
@@ -60,10 +60,10 @@ class HomeFrame(ctkFrame):
             image=MATRIZ_ICON,
             text="Operaciones de Matrices",
             text_color=self.app.theme_config["CTkLabel"]["text_color"],
-            tooltip_text="\nSuma, resta, multiplicación,"
+            tooltip_text="Suma, resta, multiplicación,"
             + "\ntransposición, calcular determinante,"
-            + "\nencontrar inversa.\n",
-            command=self.ir_a_mats,
+            + "\nencontrar inversa.",
+            command=lambda: self.ir_a_frame("matrices"),
         ).grid(row=3, column=0, padx=(10, 5), pady=(10, 3), sticky="se")
 
         IconButton(
@@ -73,10 +73,10 @@ class HomeFrame(ctkFrame):
             image=VECTOR_ICON,
             text="Operaciones de Vectores",
             text_color=self.app.theme_config["CTkLabel"]["text_color"],
-            tooltip_text="\nMagnitud, suma, resta,"
+            tooltip_text="Magnitud, suma, resta,"
             + "\nmultiplicación escalar,"
-            + "\nproducto punto, producto cruz.\n",
-            command=self.ir_a_vecs,
+            + "\nproducto punto, producto cruz.",
+            command=lambda: self.ir_a_frame("vectores"),
         ).grid(row=3, column=1, padx=(5, 10), pady=(10, 3), sticky="sw")
 
         IconButton(
@@ -86,8 +86,8 @@ class HomeFrame(ctkFrame):
             image=ANALISIS_ICON,
             text="Análisis Númerico",
             text_color=self.app.theme_config["CTkLabel"]["text_color"],
-            tooltip_text="\nRaíces de funciones, derivadas, integrales.\n",
-            command=self.ir_a_funcs,
+            tooltip_text="Raíces de funciones, derivadas, integrales.",
+            command=lambda: self.ir_a_frame("analisis"),
         ).grid(row=4, column=0, padx=(10, 5), pady=3, sticky="ne")
 
         IconButton(
@@ -97,10 +97,10 @@ class HomeFrame(ctkFrame):
             image=ECUACIONES_ICON,
             text="Sistemas de Ecuaciones",
             text_color=self.app.theme_config["CTkLabel"]["text_color"],
-            tooltip_text="\nResolver sistemas de ecuaciones por los métodos de:"
-            + "\n− Gauss−Jordan"
-            + "\n− Regla de Cramer\n",
-            command=self.ir_a_sis,
+            tooltip_text="Resolver sistemas de ecuaciones por los métodos de:"
+            + "\n− Gauss-Jordan"
+            + "\n− Regla de Cramer",
+            command=lambda: self.ir_a_frame("sistemas"),
         ).grid(row=4, column=1, padx=(5, 10), pady=3, sticky="nw")
 
         IconButton(
@@ -108,7 +108,7 @@ class HomeFrame(ctkFrame):
             app=self.app,
             height=30,
             image=ABOUT_US_ICON,
-            tooltip_text="\n− Desarrollado por: Joaquín Zúñiga\n− Versión: 1.0",
+            tooltip_text="− Desarrollado por: Joaquín Zúñiga\n− Versión: 1.0.0",
             command=lambda: open_link(
                 "https://github.com/jp-zuniga/GaussBot", autoraise=True
             ),
@@ -119,39 +119,18 @@ class HomeFrame(ctkFrame):
             app=self.app,
             height=30,
             image=INFO_ICON,
-            tooltip_text="\nTodos los datos ingresados y resultados calculados"
+            tooltip_text="Todos los datos ingresados y resultados calculados"
             + "\n(excepto determinantes, magnitudes de vectores, "
             + "   y raíces de funciones)".strip()
-            + "\npueden ser guardados para uso futuro.\n",
+            + "\npueden ser guardados para uso futuro.",
         ).grid(row=5, column=1, padx=(5, 10), pady=(3, 10), sticky="nw")
 
-    def ir_a_mats(self) -> None:
+    def ir_a_frame(self, frame: str) -> None:
         """
-        Selecciona el menú de matrices.
-        """
-
-        self.app.nav_frame.seleccionar_frame("matrices")
-
-    def ir_a_vecs(self) -> None:
-        """
-        Selecciona el menú de vectores.
+        Selecciona un frame de la aplicación.
         """
 
-        self.app.nav_frame.seleccionar_frame("vectores")
-
-    def ir_a_funcs(self) -> None:
-        """
-        Selecciona el frame de análisis númerico.
-        """
-
-        self.app.nav_frame.seleccionar_frame("analisis")
-
-    def ir_a_sis(self) -> None:
-        """
-        Selecciona el frame de sistemas de ecuaciones.
-        """
-
-        self.app.nav_frame.seleccionar_frame("sistemas")
+        self.app.nav_frame.seleccionar_frame(frame)
 
     def update_frame(self) -> None:
         """
