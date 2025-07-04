@@ -150,8 +150,8 @@ class Vector:
         Overload del operador para realizar producto punto o multiplicación escalar.
 
         Formatos soportados:
-        - Producto Punto:         Vector() * Vector()                    -> Fraction
-        - Multiplicación Escalar: Vector() * Union[int, float, Fraction] -> Vector
+        - Producto Punto:         Vector() * Vector()               -> Fraction
+        - Multiplicación Escalar: Vector() * int | float | Fraction -> Vector
 
         Args:
             multiplicador: Vector o escalar a multiplicar.
@@ -182,7 +182,7 @@ class Vector:
         Overload del operador para realizar multiplicación escalar por la derecha.
 
         Utilizado cuando el escalar está a la izquierda del operador:
-        - Union[int, float, Fraction] * Vector() -> Vector()
+        - int | float | Fraction * Vector() -> Vector()
 
         Args:
             multiplicador: Escalar a multiplicar por cada componente del vector.

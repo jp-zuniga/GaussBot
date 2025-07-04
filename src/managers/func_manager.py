@@ -475,4 +475,4 @@ class FuncManager:
         ---
         """
 
-        return self.funcs_ingresadas == {}
+        return self.funcs_ingresadas != {}

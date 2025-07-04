@@ -421,7 +421,7 @@ class Matriz:
         Overload de operador para realizar multiplicación entre un escalar y una matriz.
 
         Utilizado cuando el escalar está a la izquierda del operador:
-        - Union[int, float, Fraction] * Matriz() -> Matriz()
+        - int | float | Fraction * Matriz() -> Matriz()
 
         Args:
             multiplicador: Escalar a multiplicar.

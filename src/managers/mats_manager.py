@@ -505,7 +505,7 @@ class MatricesManager:
         ---
         """
 
-        return self.mats_ingresadas == {}
+        return self.mats_ingresadas != {}
 
     def _validar_sis_ingresados(self) -> bool:
         """
@@ -516,4 +516,4 @@ class MatricesManager:
         ---
         """
 
-        return self.sis_ingresados == {}
+        return self.sis_ingresados != {}
