@@ -8,7 +8,7 @@ Formatted file and added type annotations for personal use.
 """
 
 from time import time
-from tkinter import Event, Toplevel
+from tkinter import Event, Frame, Toplevel
 
 from customtkinter import (
     CTkBaseClass as ctkBase,
@@ -37,12 +37,12 @@ class Tooltip(Toplevel):
         **kwargs,
     ) -> None:
         super().__init__()
-        self.widget = widget
+        self.resizable(width=True, height=True)
+        self.overrideredirect(True)
         self.transient()
         self.withdraw()
-        self.overrideredirect(True)
-        self.resizable(width=True, height=True)
 
+        self.widget = widget
         self.disable = False
         self.status = "outside"
         self.delay = delay
@@ -50,24 +50,14 @@ class Tooltip(Toplevel):
         self.x_offset = x_offset
         self.y_offset = y_offset
 
-        bg_color: str = kwargs.pop(
-            "bg_color", ThemeManager.theme["CTkFrame"]["fg_color"]
-        )
+        self.transparent_frame = Frame(self)
+        self.transparent_frame.pack(expand=True, fill="both")
 
-        fg_color: str = kwargs.pop(
-            "fg_color", ThemeManager.theme["CTkFrame"]["top_fg_color"]
-        )
+        bg: str = kwargs.pop("bg_color", ThemeManager.theme["CTkFrame"]["fg_color"])
 
         self.frame: ctkFrame = ctkFrame(
-            self, border_width=2, bg_color=bg_color, fg_color=bg_color
+            self.transparent_frame, border_width=2, bg_color=bg, fg_color=bg
         )
-
-        if (
-            self.widget.winfo_name() != "tk"
-            and self.frame.cget("fg_color") == self.widget.cget("bg_color")
-            and fg_color != self.frame._fg_color
-        ):
-            self.frame.configure(fg_color=fg_color)
 
         self.message_label = ctkLabel(
             self.frame, font=ctkFont(size=10), text=message, **kwargs
@@ -105,7 +95,7 @@ class Tooltip(Toplevel):
             offset_x = -text_width - 20
 
         self.geometry(f"+{event.x_root + offset_x}+{event.y_root + self.y_offset}")
-        self.after(int(self.delay * 1000), self._show)
+        self.after(int(self.delay * 1000), self.show)
 
     def on_leave(self) -> None:
         """
@@ -117,7 +107,7 @@ class Tooltip(Toplevel):
         self.status = "outside"
         self.withdraw()
 
-    def _show(self) -> None:
+    def show(self) -> None:
         if not self.widget.winfo_exists():
             self.hide()
             self.destroy()
