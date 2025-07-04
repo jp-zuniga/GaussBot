@@ -10,17 +10,8 @@ dependencies = [
     "sympy>=1.14.0",
 ]
 
-[tool.pylint]
-disable = ["C0415", "E0401", "R0401", "R0801"]
-output-format = "colorized"
-
-[tool.ruff.lint.per-file-ignores]
-"src/__init__.py" = ["E402"]
-"src/managers/__init__.py" = ["I001"]
-"src/utils/__init__.py" = ["I001"]
-
-[tool.ruff.format]
-skip-magic-trailing-comma = true
+# [tool.ruff.lint]
+# select = ["ALL"]
 
 [tool.ruff.lint.isort]
 case-sensitive = true
@@ -29,3 +20,8 @@ force-sort-within-sections = true
 order-by-type = true
 relative-imports-order = "closest-to-furthest"
 split-on-trailing-comma = false
+
+[tool.ruff.lint.per-file-ignores]
+"src/__init__.py" = ["E402"]
+"src/managers/__init__.py" = ["I001"]
+"src/utils/__init__.py" = ["I001"]
