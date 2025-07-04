@@ -145,7 +145,6 @@ class NavFrame(ctkFrame):
             border_spacing=10,
             image=CONFIG_ICON,
             text="Configuración",
-            text_color=self.app.them_config["CTkLabel"]["text_color"],
             anchor="w",
             command=lambda: self.seleccionar_frame("config"),
         )
