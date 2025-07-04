@@ -132,9 +132,9 @@ def load_numpad_icons() -> dict[str, ctkImage]:
                 as_file(DARK_NUMPAD_ICONS / item.name) as d_path,
                 as_file(LIGHT_NUMPAD_ICONS / item.name) as l_path,
             ):
-                img = open_img(d_path)
+                img = open_img(l_path)
                 icons[item.name[:-4]] = ctkImage(
-                    size=img.size, dark_image=img, light_image=open_img(l_path)
+                    size=img.size, dark_image=img, light_image=open_img(d_path)
                 )
 
     return icons
