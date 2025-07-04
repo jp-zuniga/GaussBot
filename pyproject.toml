@@ -1,7 +1,7 @@
 [project]
 name = "GaussBot"
 version = "1.0.0"
-description = "Aplicación para resolver sistemas de ecuaciones, realizar cálculos con matrices y vectores, y más."
+description = "Aplicación para resolver cálculos de álgebra lineal."
 requires-python = ">=3.12"
 dependencies = [
     "bidict>=0.23.1",
