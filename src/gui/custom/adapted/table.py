@@ -87,6 +87,7 @@ class CustomTable(CustomScrollFrame):
                 cell = ctkButton(
                     self,
                     text=value,
+                    text_color=ThemeManager.theme["CTkLabel"]["text_color"],
                     fg_color=(
                         ThemeManager.theme["CTkButton"]["fg_color"]
                         if i == len(self.values) - 1

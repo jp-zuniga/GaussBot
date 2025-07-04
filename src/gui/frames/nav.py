@@ -7,7 +7,7 @@ from tkinter import Event
 from typing import TYPE_CHECKING, Optional
 
 from bidict import bidict
-from customtkinter import CTkFont as ctkFont, CTkFrame as ctkFrame, CTkLabel as ctkLabel
+from customtkinter import CTkFont as ctkFont, CTkFrame as ctkFrame, CTkLabel as ctkLabel, ThemeManager
 
 from ..custom import IconButton
 from ..custom.adapted import CustomMessageBox
@@ -80,6 +80,7 @@ class NavFrame(ctkFrame):
             anchor="w",
             text="Inicio",
             image=LOGO,
+            text_color=ThemeManager.theme["CTkLabel"]["text_color"],
             command=lambda: self.seleccionar_frame("home"),
         )
 
@@ -90,6 +91,7 @@ class NavFrame(ctkFrame):
             border_spacing=10,
             anchor="w",
             text="Datos",
+            text_color=ThemeManager.theme["CTkLabel"]["text_color"],
             image=INPUTS_ICON,
             command=lambda: self.seleccionar_frame("inputs"),
         )
@@ -101,6 +103,7 @@ class NavFrame(ctkFrame):
             border_spacing=10,
             anchor="w",
             text="Matrices",
+            text_color=ThemeManager.theme["CTkLabel"]["text_color"],
             image=MATRIZ_ICON,
             command=lambda: self.seleccionar_frame("matrices"),
         )
@@ -112,6 +115,7 @@ class NavFrame(ctkFrame):
             border_spacing=10,
             anchor="w",
             text="Vectores",
+            text_color=ThemeManager.theme["CTkLabel"]["text_color"],
             image=VECTOR_ICON,
             command=lambda: self.seleccionar_frame("vectores"),
         )
@@ -123,6 +127,7 @@ class NavFrame(ctkFrame):
             border_spacing=10,
             anchor="w",
             text="Análisis Númerico",
+            text_color=ThemeManager.theme["CTkLabel"]["text_color"],
             image=ANALISIS_ICON,
             command=lambda: self.seleccionar_frame("analisis"),
         )
@@ -134,6 +139,7 @@ class NavFrame(ctkFrame):
             border_spacing=10,
             anchor="w",
             text="Sistemas de Ecuaciones",
+            text_color=ThemeManager.theme["CTkLabel"]["text_color"],
             image=ECUACIONES_ICON,
             command=lambda: self.seleccionar_frame("sistemas"),
         )
@@ -143,9 +149,10 @@ class NavFrame(ctkFrame):
             app=self.app,
             corner_radius=0,
             border_spacing=10,
-            image=CONFIG_ICON,
-            text="Configuración",
             anchor="w",
+            text="Configuración",
+            text_color=ThemeManager.theme["CTkLabel"]["text_color"],
+            image=CONFIG_ICON,
             command=lambda: self.seleccionar_frame("config"),
         )
 
@@ -156,6 +163,7 @@ class NavFrame(ctkFrame):
             border_spacing=10,
             anchor="w",
             text="Cerrar",
+            text_color=ThemeManager.theme["CTkLabel"]["text_color"],
             image=QUIT_ICON,
             command=self.quit_event,
         )
