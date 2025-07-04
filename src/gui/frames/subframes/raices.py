@@ -142,6 +142,7 @@ class RaicesFrame(CustomScrollFrame):
                 image=INFO_ICON,
                 tooltip_text="Nota: las funciones trigonométricas"
                 + "\ndeben recibir argumentos en radianes.",
+                tooltip_pady=10,
             ).grid(row=3, column=0, pady=(5, 0), sticky="n")
 
         self.met_actual = self.metodos[metodo]
