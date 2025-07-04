@@ -1,5 +1,3 @@
-# pylint: disable=protected-access
-
 """
 Implementación de la clase NavFrame,
 la barra de navegación de la aplicación.
@@ -67,12 +65,9 @@ class NavFrame(ctkFrame):
         self.hide_button = IconButton(
             self,
             app=self.app,
-            width=15,
-            height=30,
-            corner_radius=10,
-            image=DROPLEFT_ICON,
+            tooltip_x_offset=50,
             tooltip_text="Esconder barra de navegación",
-            tooltip_x_offset=40,
+            image=DROPLEFT_ICON,
             command=self.toggle_nav,
         )
 
@@ -80,112 +75,89 @@ class NavFrame(ctkFrame):
         self.home_button = IconButton(
             self,
             app=self.app,
-            height=30,
             corner_radius=0,
-            border_width=0,
             border_spacing=10,
-            image=LOGO,
-            text="Inicio",
-            text_color=self.app.theme_config["CTkLabel"]["text_color"],
             anchor="w",
-            command=self.home_button_event,
+            text="Inicio",
+            image=LOGO,
+            command=lambda: self.seleccionar_frame("home"),
         )
 
         self.inputs_button = IconButton(
             self,
             app=self.app,
-            height=30,
             corner_radius=0,
-            border_width=0,
             border_spacing=10,
-            image=INPUTS_ICON,
-            text="Datos",
-            text_color=self.app.theme_config["CTkLabel"]["text_color"],
             anchor="w",
-            command=self.inputs_button_event,
+            text="Datos",
+            image=INPUTS_ICON,
+            command=lambda: self.seleccionar_frame("inputs"),
         )
 
         self.matrices_button = IconButton(
             self,
             app=self.app,
-            height=30,
             corner_radius=0,
-            border_width=0,
             border_spacing=10,
-            image=MATRIZ_ICON,
-            text="Matrices",
-            text_color=self.app.theme_config["CTkLabel"]["text_color"],
             anchor="w",
-            command=self.matrices_button_event,
+            text="Matrices",
+            image=MATRIZ_ICON,
+            command=lambda: self.seleccionar_frame("matrices"),
         )
 
         self.vectores_button = IconButton(
             self,
             app=self.app,
-            height=30,
             corner_radius=0,
-            border_width=0,
             border_spacing=10,
-            image=VECTOR_ICON,
-            text="Vectores",
-            text_color=self.app.theme_config["CTkLabel"]["text_color"],
             anchor="w",
-            command=self.vectores_button_event,
+            text="Vectores",
+            image=VECTOR_ICON,
+            command=lambda: self.seleccionar_frame("vectores"),
         )
 
         self.analisis_button = IconButton(
             self,
             app=self.app,
-            height=30,
             corner_radius=0,
-            border_width=0,
             border_spacing=10,
-            image=ANALISIS_ICON,
-            text="Análisis Númerico",
-            text_color=self.app.theme_config["CTkLabel"]["text_color"],
             anchor="w",
-            command=self.analisis_button_event,
+            text="Análisis Númerico",
+            image=ANALISIS_ICON,
+            command=lambda: self.seleccionar_frame("analisis"),
         )
 
         self.sistemas_button = IconButton(
             self,
             app=self.app,
-            height=30,
             corner_radius=0,
-            border_width=0,
             border_spacing=10,
-            image=ECUACIONES_ICON,
-            text="Sistemas de Ecuaciones",
-            text_color=self.app.theme_config["CTkLabel"]["text_color"],
             anchor="w",
-            command=self.sistemas_button_event,
+            text="Sistemas de Ecuaciones",
+            image=ECUACIONES_ICON,
+            command=lambda: self.seleccionar_frame("sistemas"),
         )
 
         self.config_button = IconButton(
             self,
             app=self.app,
-            height=30,
             corner_radius=0,
-            border_width=0,
             border_spacing=10,
             image=CONFIG_ICON,
             text="Configuración",
-            text_color=self.app.theme_config["CTkLabel"]["text_color"],
+            text_color=self.app.them_config["CTkLabel"]["text_color"],
             anchor="w",
-            command=self.config_button_event,
+            command=lambda: self.seleccionar_frame("config"),
         )
 
         self.quit_button = IconButton(
             self,
             app=self.app,
-            height=30,
             corner_radius=0,
-            border_width=0,
             border_spacing=10,
-            image=QUIT_ICON,
-            text="Cerrar",
-            text_color=self.app.theme_config["CTkLabel"]["text_color"],
             anchor="w",
+            text="Cerrar",
+            image=QUIT_ICON,
             command=self.quit_event,
         )
 
@@ -272,7 +244,7 @@ class NavFrame(ctkFrame):
 
             self.hidden = False
             self.hide_button.configure(
-                image=DROPRIGHT_ICON, tooltip_text="Esconder barra de navegación"
+                image=DROPLEFT_ICON, tooltip_text="Esconder barra de navegación"
             )
 
             self.hide_button.grid_configure(column=1, columnspan=1, sticky="nse")
@@ -293,55 +265,6 @@ class NavFrame(ctkFrame):
             )
 
             self.hide_button.grid_configure(column=0, columnspan=2, sticky="nse")
-
-    def home_button_event(self) -> None:
-        """
-        Muestra HomeFrame cuando el evento de su botón ocurre.
-        """
-
-        self.seleccionar_frame("home")
-
-    def inputs_button_event(self) -> None:
-        """
-        Muestra InputsFrame cuando el evento de su botón ocurre.
-        """
-
-        self.seleccionar_frame("inputs")
-
-    def matrices_button_event(self) -> None:
-        """
-        Muestra MatricesFrame cuando el evento de su botón ocurre.
-        """
-
-        self.seleccionar_frame("matrices")
-
-    def vectores_button_event(self) -> None:
-        """
-        Muestra VectoresFrame cuando el evento de su botón ocurre.
-        """
-
-        self.seleccionar_frame("vectores")
-
-    def analisis_button_event(self) -> None:
-        """
-        Muestra AnalisisFrame cuando el evento de su botón ocurre.
-        """
-
-        self.seleccionar_frame("analisis")
-
-    def sistemas_button_event(self) -> None:
-        """
-        Muestra EcuacionesFrame cuando el evento de su botón ocurre.
-        """
-
-        self.seleccionar_frame("sistemas")
-
-    def config_button_event(self) -> None:
-        """
-        Muestra ConfigFrame cuando el evento de su botón ocurre.
-        """
-
-        self.seleccionar_frame("config")
 
     def quit_event(self, event: Optional[Event] = None) -> None:
         """

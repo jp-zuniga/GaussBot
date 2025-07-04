@@ -63,12 +63,12 @@ class AgregarFuncs(CustomScrollFrame):
         self.instruct_numpad = IconButton(
             self,
             self.app,
-            height=30,
             image=INFO_ICON,
             tooltip_text="El numpad le permite ingresar funciones"
             + "\nmatemáticas de una forma más sencilla.\n"
             + "\nCon el cursor en la entrada de términos,"
             + "\npresione CTRL+TAB para abrirlo y ESC para cerrarlo.",
+            tooltip_pady=10,
             command=self.mostrar_tutorial,
         )
 
@@ -88,7 +88,6 @@ class AgregarFuncs(CustomScrollFrame):
         self.leer_button = IconButton(
             self,
             app=self.app,
-            height=30,
             image=ENTER_ICON,
             tooltip_text="Leer función",
             command=self.leer_func,
@@ -337,8 +336,6 @@ class MostrarFuncs(CustomScrollFrame):
         IconButton(
             self,
             self.app,
-            width=20,
-            height=40,
             border_width=3,
             border_color=self.app.theme_config["CTkFrame"]["top_fg_color"],
             image=MOSTRAR_ICON,

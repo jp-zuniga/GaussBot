@@ -64,6 +64,7 @@ class HomeFrame(ctkFrame):
             tooltip_text="Suma, resta, multiplicación,"
             + "\ntransposición, calcular determinante,"
             + "\nencontrar inversa.",
+            tooltip_pady=10,
             command=lambda: self.ir_a_frame("matrices"),
         ).grid(row=3, column=0, padx=(10, 5), pady=(10, 3), sticky="se")
 
@@ -77,6 +78,7 @@ class HomeFrame(ctkFrame):
             tooltip_text="Magnitud, suma, resta,"
             + "\nmultiplicación escalar,"
             + "\nproducto punto, producto cruz.",
+            tooltip_pady=10,
             command=lambda: self.ir_a_frame("vectores"),
         ).grid(row=3, column=1, padx=(5, 10), pady=(10, 3), sticky="sw")
 
@@ -101,16 +103,17 @@ class HomeFrame(ctkFrame):
             tooltip_text="Resolver sistemas de ecuaciones por los métodos de:"
             + "\n− Gauss-Jordan"
             + "\n− Regla de Cramer",
+            tooltip_pady=10,
             command=lambda: self.ir_a_frame("sistemas"),
         ).grid(row=4, column=1, padx=(5, 10), pady=3, sticky="nw")
 
         IconButton(
             self,
             app=self.app,
-            height=30,
             image=INFO_ICON,
             tooltip_text="− Desarrollado y diseñado por: Joaquín Zúñiga\n"
             + f"− Versión: {__version__}",
+            tooltip_pady=10,
             command=lambda: open_link(
                 "https://github.com/jp-zuniga/GaussBot", autoraise=False
             ),

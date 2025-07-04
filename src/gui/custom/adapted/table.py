@@ -68,7 +68,6 @@ class CustomTable(CustomScrollFrame):
         IconButton(
             self,
             self.app,
-            height=30,
             corner_radius=10,
             border_width=2,
             text="Exportar a CSV",

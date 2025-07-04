@@ -136,8 +136,8 @@ class IconButton(ctkButton):
         self.app = app
 
         text = kwargs.pop("text", "")
-        width = kwargs.pop("width", 20)
-        height = kwargs.pop("height", 20)
+        width = kwargs.pop("width", 30)
+        height = kwargs.pop("height", 30)
         border_width = kwargs.pop("border_width", 0)
         border_spacing = kwargs.pop("border_spacing", 0)
         fg_color = kwargs.pop("fg_color", "transparent")
@@ -145,8 +145,10 @@ class IconButton(ctkButton):
             "hover_color", self.app.theme_config["CTkFrame"]["top_fg_color"]
         )
 
+        tt_padx = kwargs.pop("tooltip_padx", 15)
+        tt_pady = kwargs.pop("tooltip_pady", 5)
         tt_x_offset = kwargs.pop("tooltip_x_offset", 20)
-        tt_y_offset = kwargs.pop("tooltip_y_offset", 30)
+        tt_y_offset = kwargs.pop("tooltip_y_offset", 20)
         swap_tt_colors = kwargs.pop("swap_tooltip_colors", False)
 
         super().__init__(
@@ -172,13 +174,22 @@ class IconButton(ctkButton):
                 self.tooltip: Optional[Tooltip] = Tooltip(
                     self,
                     tooltip_text,
+                    padx=tt_padx,
+                    pady=tt_pady,
                     x_offset=tt_x_offset,
                     y_offset=tt_y_offset,
                     bg_color=ThemeManager.theme["CTk"]["fg_color"],
                     fg_color=ThemeManager.theme["CTkFrame"]["top_fg_color"],
                 )
             else:
-                self.tooltip: Optional[Tooltip] = Tooltip(self, tooltip_text)
+                self.tooltip: Optional[Tooltip] = Tooltip(
+                    self,
+                    tooltip_text,
+                    padx=tt_padx,
+                    pady=tt_pady,
+                    x_offset=tt_x_offset,
+                    y_offset=tt_y_offset,
+                )
 
     def destroy(self):
         if self.tooltip is not None:

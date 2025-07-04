@@ -8,14 +8,13 @@ Formatted file and added type annotations for personal use.
 """
 
 from time import time
-from tkinter import Event, Frame, Toplevel
+from tkinter import Event, Toplevel
 
 from customtkinter import (
     CTkBaseClass as ctkBase,
     CTkFont as ctkFont,
     CTkFrame as ctkFrame,
     CTkLabel as ctkLabel,
-    StringVar,
     ThemeManager,
 )
 
@@ -30,9 +29,11 @@ class Tooltip(Toplevel):
         self,
         widget: ctkBase,
         message: str,
-        delay: float = 0.1,
+        delay: float = 0.05,
+        padx: int = 15,
+        pady: int = 5,
         x_offset: int = 20,
-        y_offset: int = 30,
+        y_offset: int = 20,
         **kwargs,
     ) -> None:
         super().__init__()
@@ -42,29 +43,23 @@ class Tooltip(Toplevel):
         self.overrideredirect(True)
         self.resizable(width=True, height=True)
 
-        self.message = message
-        self.msg_var = StringVar(value=self.message)
-
+        self.disable = False
+        self.status = "outside"
         self.delay = delay
+        self.last_moved = 0.0
         self.x_offset = x_offset
         self.y_offset = y_offset
 
         bg_color: str = kwargs.pop(
             "bg_color", ThemeManager.theme["CTkFrame"]["fg_color"]
         )
+
         fg_color: str = kwargs.pop(
             "fg_color", ThemeManager.theme["CTkFrame"]["top_fg_color"]
         )
 
-        self.last_moved: float = 0.0
-        self.status = "outside"
-        self.disable = False
-
-        self.transparent_frame = Frame(self)
-        self.transparent_frame.pack(expand=True, fill="both")
-
         self.frame: ctkFrame = ctkFrame(
-            self.transparent_frame, border_width=2, bg_color=bg_color, fg_color=bg_color
+            self, border_width=2, bg_color=bg_color, fg_color=bg_color
         )
 
         if (
@@ -75,11 +70,11 @@ class Tooltip(Toplevel):
             self.frame.configure(fg_color=fg_color)
 
         self.message_label = ctkLabel(
-            self.frame, font=ctkFont(size=10), textvariable=self.msg_var, **kwargs
+            self.frame, font=ctkFont(size=10), text=message, **kwargs
         )
 
         self.frame.pack(expand=True, fill="both")
-        self.message_label.pack(fill="both", padx=15, pady=10, expand=True)
+        self.message_label.pack(fill="both", padx=padx, pady=pady, expand=True)
 
         self.widget.bind("<Enter>", self.on_enter, add="+")
         self.widget.bind("<Leave>", lambda _: self.on_leave(), add="+")
@@ -101,7 +96,7 @@ class Tooltip(Toplevel):
 
         root_width = self.winfo_screenwidth()
         widget_x = event.x_root
-        space_on_right = root_width - widget_x
+        space_on_right = root_width - widget_x - (self.frame.winfo_width() // 2)
 
         text_width = self.message_label.winfo_reqwidth()
         offset_x = self.x_offset
@@ -155,7 +150,6 @@ class Tooltip(Toplevel):
         if "bg_color" in kwargs:
             self.frame.configure(fg_color=kwargs.pop("bg_color"))
         if "message" in kwargs:
-            self.msg_var.set(kwargs.pop("message"))
-            self.message_label.configure(textvariable=self.msg_var)
+            self.message_label.configure(text=kwargs.pop("message"))
 
         self.message_label.configure(**kwargs)

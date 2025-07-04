@@ -125,8 +125,6 @@ class CustomMessageBox(ctkTop):
             image=QUIT_ICON,
             hover_color=bg_color,
             command=lambda: self.button_event(""),
-            width=30,
-            height=30,
         ).grid(row=0, column=2, padx=(0, 10), pady=(10, 8), sticky="nse")
 
         ctkLabel(
