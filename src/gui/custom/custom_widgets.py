@@ -170,26 +170,28 @@ class IconButton(ctkButton):
         if tooltip_text is None:
             self.tooltip = None
         else:
-            if swap_tt_colors:
-                self.tooltip: Optional[Tooltip] = Tooltip(
-                    self,
-                    tooltip_text,
-                    padx=tt_padx,
-                    pady=tt_pady,
-                    x_offset=tt_x_offset,
-                    y_offset=tt_y_offset,
-                    bg_color=ThemeManager.theme["CTk"]["fg_color"],
-                    fg_color=ThemeManager.theme["CTkFrame"]["top_fg_color"],
-                )
-            else:
-                self.tooltip: Optional[Tooltip] = Tooltip(
-                    self,
-                    tooltip_text,
-                    padx=tt_padx,
-                    pady=tt_pady,
-                    x_offset=tt_x_offset,
-                    y_offset=tt_y_offset,
-                )
+            bg: list[str] = (
+                ThemeManager.theme["CTk"]["fg_color"]
+                if swap_tt_colors
+                else ThemeManager.theme["CTkFrame"]["top_fg_color"]
+            )
+
+            fg: list[str] = (
+                ThemeManager.theme["CTkFrame"]["top_fg_color"]
+                if swap_tt_colors
+                else ThemeManager.theme["CTk"]["fg_color"]
+            )
+
+            self.tooltip: Optional[Tooltip] = Tooltip(
+                self,
+                tooltip_text,
+                padx=tt_padx,
+                pady=tt_pady,
+                x_offset=tt_x_offset,
+                y_offset=tt_y_offset,
+                bg_color=bg,
+                fg_color=fg,
+            )
 
     def destroy(self):
         if self.tooltip is not None:
