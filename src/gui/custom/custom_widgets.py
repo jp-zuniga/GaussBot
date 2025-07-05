@@ -171,7 +171,7 @@ class IconButton(ctkButton):
             self.tooltip = None
         else:
             bg: list[str] = (
-                ThemeManager.theme["CTkFrame"]["top_fg_color"]
+                ThemeManager.theme["CTk"]["fg_color"]
                 if swap_tt_colors
                 else ThemeManager.theme["CTkFrame"]["fg_color"]
             )
