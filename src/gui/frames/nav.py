@@ -7,7 +7,12 @@ from tkinter import Event
 from typing import TYPE_CHECKING, Optional
 
 from bidict import bidict
-from customtkinter import CTkFont as ctkFont, CTkFrame as ctkFrame, CTkLabel as ctkLabel, ThemeManager
+from customtkinter import (
+    CTkFont as ctkFont,
+    CTkFrame as ctkFrame,
+    CTkLabel as ctkLabel,
+    ThemeManager,
+)
 
 from ..custom import IconButton
 from ..custom.adapted import CustomMessageBox
@@ -65,7 +70,8 @@ class NavFrame(ctkFrame):
         self.hide_button = IconButton(
             self,
             app=self.app,
-            tooltip_x_offset=50,
+            tooltip_x_offset=75,
+            tooltip_y_offset=-15,
             tooltip_text="Esconder barra de navegación",
             image=DROPLEFT_ICON,
             command=self.toggle_nav,
