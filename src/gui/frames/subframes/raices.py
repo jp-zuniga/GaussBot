@@ -612,7 +612,7 @@ class RaicesFrame(CustomScrollFrame):
 
         new_window = ctkTop(self.app)
         new_window.title("GaussBot: Registro de Iteraciones")
-        new_window.geometry("1150x550")
+        new_window.geometry("1130x500")
 
         self.after(100, new_window.focus)
         self.after(250, lambda: set_icon(self.app, new_window))

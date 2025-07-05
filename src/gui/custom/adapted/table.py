@@ -61,7 +61,7 @@ class CustomTable(CustomScrollFrame):
             column=0,
             columnspan=len(self.values[0]) - 2,
             ipadx=5,
-            padx=20,
+            padx=10,
             pady=10,
             sticky="nw",
         )
@@ -78,7 +78,7 @@ class CustomTable(CustomScrollFrame):
             text="Exportar a CSV",
             font=ctkFont(size=12, slant="italic"),
             command=self.export_to_csv,
-        ).grid(row=0, column=len(self.values[0]) - 1, padx=20, pady=10, sticky="ne")
+        ).grid(row=0, column=len(self.values[0]) - 1, padx=10, pady=10, sticky="ne")
 
     def init_table(self):
         """
@@ -122,11 +122,11 @@ class CustomTable(CustomScrollFrame):
                 cell.grid(
                     row=i + 1,
                     column=j,
-                    padx=(20, 5)
+                    padx=(10, 5)
                     if j == 0
                     else (3, 0)
                     if j != len(self.values[0]) - 1
-                    else (3, 20),
+                    else (3, 10),
                     pady=5
                     if i == 0
                     else (0, 2)
