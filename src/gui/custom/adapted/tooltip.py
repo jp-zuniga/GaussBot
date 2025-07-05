@@ -84,15 +84,12 @@ class Tooltip(Toplevel):
         if self.status == "outside":
             self.status = "inside"
 
-        root_width = self.winfo_screenwidth()
-        widget_x = event.x_root
-        space_on_right = root_width - widget_x - (self.frame.winfo_width() // 2)
-
-        text_width = self.message_label.winfo_reqwidth()
-        offset_x = self.x_offset
+        offset_x: int = self.x_offset
+        text_width: int = self.message_label.winfo_reqwidth()
+        space_on_right: int = self.winfo_screenwidth() - event.x_root - text_width
 
         if space_on_right < text_width + 20:
-            offset_x = -text_width - 20
+            offset_x: int = -text_width - 20
 
         self.geometry(f"+{event.x_root + offset_x}+{event.y_root + self.y_offset}")
         self.after(int(self.delay * 1000), self.show)
