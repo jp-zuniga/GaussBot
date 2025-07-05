@@ -47,11 +47,13 @@ class CustomTable(CustomScrollFrame):
 
         ctkButton(
             self,
-            height=30,
+            height=40,
             corner_radius=10,
             border_width=2,
+            border_color=ThemeManager.theme["CTkFrame"]["border_color"],
+            text_color=ThemeManager.theme["CTkLabel"]["text_color"],
             text=header,
-            font=ctkFont(size=14, weight="bold"),
+            font=ctkFont(size=16, weight="bold"),
             fg_color="transparent",
             hover=False,
         ).grid(
@@ -60,7 +62,7 @@ class CustomTable(CustomScrollFrame):
             columnspan=len(self.values[0]) - 2,
             ipadx=5,
             padx=20,
-            pady=20,
+            pady=10,
             sticky="nw",
         )
 
@@ -68,13 +70,15 @@ class CustomTable(CustomScrollFrame):
         IconButton(
             self,
             self.app,
+            height=40,
             corner_radius=10,
             border_width=2,
+            border_color=ThemeManager.theme["CTkFrame"]["border_color"],
+            text_color=ThemeManager.theme["CTkLabel"]["text_color"],
             text="Exportar a CSV",
-            tooltip_text="Exportar la tabla a un archivo .csv.",
+            font=ctkFont(size=12, slant="italic"),
             command=self.export_to_csv,
-            swap_tooltip_colors=True,
-        ).grid(row=0, column=len(self.values[0]) - 1, padx=20, pady=20, sticky="ne")
+        ).grid(row=0, column=len(self.values[0]) - 1, padx=20, pady=10, sticky="ne")
 
     def init_table(self):
         """
@@ -97,6 +101,7 @@ class CustomTable(CustomScrollFrame):
                         if i != 0
                         else "transparent"
                     ),
+                    border_color=ThemeManager.theme["CTkFrame"]["border_color"],
                     border_width=2 if i == 0 or i == len(self.values) - 1 else 1,
                     border_spacing=1,
                     corner_radius=10,
@@ -137,8 +142,8 @@ class CustomTable(CustomScrollFrame):
 
         from .messagebox import CustomMessageBox
 
-        if hasattr(self, "_quit_box") and self._quit_box.winfo_exists():
-            self._quit_box.focus()
+        if hasattr(self, "_success_box") and self._success_box.winfo_exists():
+            self._success_box.focus()
             return
 
         csv_path: Path = (
@@ -151,7 +156,7 @@ class CustomTable(CustomScrollFrame):
             csv_writer = writer(file)
             csv_writer.writerows(self.values)
 
-        self._quit_box = CustomMessageBox(
+        self._success_box = CustomMessageBox(
             self.app,
             width=480,
             name="¡Exportación exitosa!",
@@ -162,6 +167,6 @@ class CustomTable(CustomScrollFrame):
             fg_color=ThemeManager.theme["CTkFrame"]["fg_color"],
         )
 
-        self._quit_box.get()
-        self._quit_box.destroy()
-        del self._quit_box
+        self._success_box.get()
+        self._success_box.destroy()
+        del self._success_box
