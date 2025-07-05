@@ -35,10 +35,10 @@ class OpsManager:
         """
 
         if mats_manager is not None and not isinstance(mats_manager, MatricesManager):
-            raise TypeError("¡Argumento inválido para 'mats_manager'!")
+            raise TypeError("Argumento inválido para 'mats_manager'.")
 
         if vecs_manager is not None and not isinstance(vecs_manager, VectoresManager):
-            raise TypeError("¡Argumento inválido para 'vecs_manager'!")
+            raise TypeError("Argumento inválido para 'vecs_manager'.")
 
         self.mats_manager = (
             MatricesManager(self._load_matrices(), self._load_sistemas())
@@ -163,7 +163,7 @@ class OpsManager:
             )
 
             LOGGER.info(
-                "¡Sistemas de ecuaciones guardados en '%s' exitosamente!", SISTEMAS_PATH
+                "Sistemas de ecuaciones guardados en '%s' exitosamente.", SISTEMAS_PATH
             )
 
     def save_matrices(self) -> None:
@@ -205,7 +205,7 @@ class OpsManager:
                 cls=FractionEncoder,
             )
 
-            LOGGER.info("¡Matrices guardadas en '%s' exitosamente!", MATRICES_PATH)
+            LOGGER.info("Matrices guardadas en '%s' exitosamente.", MATRICES_PATH)
 
     def save_vectores(self) -> None:
         """
@@ -241,7 +241,7 @@ class OpsManager:
                 cls=FractionEncoder,
             )
 
-            LOGGER.info("¡Vectores guardados en '%s' exitosamente!", VECTORES_PATH)
+            LOGGER.info("Vectores guardados en '%s' exitosamente.", VECTORES_PATH)
 
     def _load_sistemas(self) -> dict[str, Matriz]:
         """
@@ -260,7 +260,7 @@ class OpsManager:
         with open(SISTEMAS_PATH, mode="r", encoding="utf-8") as sistemas_file:
             try:
                 sistemas_dict: dict = load(sistemas_file, cls=FractionDecoder)
-                LOGGER.info("¡Sistemas de ecuaciones cargados exitosamente!")
+                LOGGER.info("Sistemas de ecuaciones cargados exitosamente.")
                 return {
                     nombre: Matriz(
                         matriz["filas"],
@@ -298,7 +298,7 @@ class OpsManager:
         with open(MATRICES_PATH, mode="r", encoding="utf-8") as matrices_file:
             try:
                 matrices_dict: dict = load(matrices_file, cls=FractionDecoder)
-                LOGGER.info("¡Matrices cargadas exitosamente!")
+                LOGGER.info("Matrices cargadas exitosamente.")
                 return {
                     nombre: Matriz(
                         matriz["filas"],
@@ -336,7 +336,7 @@ class OpsManager:
         with open(VECTORES_PATH, mode="r", encoding="utf-8") as vectores_file:
             try:
                 vectores_dict: dict = load(vectores_file, cls=FractionDecoder)
-                LOGGER.info("¡Vectores cargados exitosamente!")
+                LOGGER.info("Vectores cargados exitosamente.")
                 return {
                     nombre: Vector(componentes)
                     for nombre, componentes in vectores_dict.items()

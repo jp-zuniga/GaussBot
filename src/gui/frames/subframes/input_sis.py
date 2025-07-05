@@ -258,7 +258,7 @@ class AgregarSistemas(CustomScrollFrame):
                 parent_frame=self,
                 msg_frame=self.msg_frame,
                 msg="Las dimensiones del sistema ingresado "
-                + "no coinciden con las dimensiones indicadas!",
+                + "no coinciden con las dimensiones indicadas.",
                 tipo="error",
                 row=3,
             )
@@ -274,9 +274,9 @@ class AgregarSistemas(CustomScrollFrame):
                     valor = Fraction(entry.get())
                 except (ValueError, ZeroDivisionError) as e:
                     if isinstance(e, ValueError):
-                        msg = "Todos los valores deben ser números racionales!"
+                        msg = "Todos los valores deben ser números racionales."
                     else:
-                        msg = "El denominador no puede ser 0!"
+                        msg = "El denominador de una fracción no puede ser 0."
                     self.msg_frame = place_msg_frame(
                         parent_frame=self,
                         msg_frame=self.msg_frame,
@@ -304,9 +304,9 @@ class AgregarSistemas(CustomScrollFrame):
 
         if not nombre_valido or nombre_repetido:
             msg = (
-                "El nombre del sistema debe ser una letra mayúscula!"
+                "El nombre del sistema debe ser una letra mayúscula."
                 if not nombre_valido
-                else f"Ya existe un sistema nombrado {nombre_nuevo_sis}!"
+                else f"¡Ya existe un sistema nombrado {nombre_nuevo_sis}!"
             )
 
             self.msg_frame = place_msg_frame(
@@ -323,7 +323,7 @@ class AgregarSistemas(CustomScrollFrame):
         self.msg_frame = place_msg_frame(
             parent_frame=self,
             msg_frame=self.msg_frame,
-            msg=f"El sistema {nombre_nuevo_sis} se ha agregado exitosamente!",
+            msg=f"¡El sistema {nombre_nuevo_sis} se ha agregado exitosamente!",
             tipo="success",
             row=3,
         )
@@ -351,7 +351,7 @@ class AgregarSistemas(CustomScrollFrame):
                 parent_frame=self,
                 msg_frame=self.msg_frame,
                 msg="Debe ingresar números enteros "
-                + "positivos como ecuaciones y variables!",
+                + "positivos como ecuaciones y variables.",
                 tipo="error",
                 row=1,
             )
@@ -416,7 +416,7 @@ class MostrarSistemas(CustomScrollFrame):
             self.show_frame = place_msg_frame(
                 parent_frame=self,
                 msg_frame=self.show_frame,
-                msg="No se ha guardado ningún sistema de ecuaciones!",
+                msg="¡No se ha guardado ningún sistema de ecuaciones!",
                 tipo="error",
                 columnspan=2,
             )
@@ -453,7 +453,7 @@ class MostrarSistemas(CustomScrollFrame):
             self.show_frame = place_msg_frame(
                 parent_frame=self,
                 msg_frame=self.show_frame,
-                msg="Debe seleccionar un filtro!",
+                msg="Debe seleccionar un filtro.",
                 tipo="error",
                 row=1,
                 columnspan=2,
@@ -537,7 +537,7 @@ class EliminarSistemas(CustomScrollFrame):
             self.msg_frame = place_msg_frame(
                 parent_frame=self,
                 msg_frame=self.msg_frame,
-                msg="No se ha guardado ningún sistema de ecuaciones!",
+                msg="¡No se ha guardado ningún sistema de ecuaciones!",
                 tipo="error",
                 columnspan=2,
             )
@@ -586,7 +586,7 @@ class EliminarSistemas(CustomScrollFrame):
         self.msg_frame = place_msg_frame(
             parent_frame=self,
             msg_frame=self.msg_frame,
-            msg=f"Sistema {self.sis_seleccionado} eliminado!",
+            msg=f"¡Sistema {self.sis_seleccionado} eliminado!",
             tipo="success",
             row=2,
             columnspan=2,
@@ -609,7 +609,7 @@ class EliminarSistemas(CustomScrollFrame):
                 self.msg_frame = place_msg_frame(
                     parent_frame=self,
                     msg_frame=self.msg_frame,
-                    msg="No se ha guardado ningún sistema de ecuaciones!",
+                    msg="¡No se ha guardado ningún sistema de ecuaciones!",
                     tipo="error",
                     columnspan=2,
                 )

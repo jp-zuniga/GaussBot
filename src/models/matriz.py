@@ -39,7 +39,7 @@ class Matriz:
         """
 
         if filas < 1 or columnas < 1:
-            raise ValueError("¡Las dimensiones de la matriz deben ser positivas!")
+            raise ValueError("Las dimensiones de la matriz deben ser positivas.")
 
         self._filas = filas
         self._columnas = columnas
@@ -201,7 +201,7 @@ class Matriz:
 
         # si no se ha retornado, no se cumplieron las
         # condiciones y el indice que se recibio es invalido
-        raise IndexError("¡Índice inválido para una matriz!")
+        raise IndexError("Índice inválido para una matriz.")
 
     def __len__(self) -> int:
         """
@@ -322,7 +322,7 @@ class Matriz:
         """
 
         if self.filas != mat2.filas or self.columnas != mat2.columnas:
-            raise ArithmeticError("¡Las matrices deben tener las mismas dimensiones!")
+            raise ArithmeticError("Las matrices deben tener las mismas dimensiones.")
 
         # sumar todos los valores correspondientes de las matrices
         mat_sumada: list[list[Fraction]] = [
@@ -346,7 +346,7 @@ class Matriz:
         """
 
         if self.filas != mat2.filas or self.columnas != mat2.columnas:
-            raise ArithmeticError("¡Las matrices deben tener las mismas dimensiones!")
+            raise ArithmeticError("Las matrices deben tener las mismas dimensiones.")
 
         # restar todos los valores correspondientes de las matrices
         mat_restada: list[list[Fraction]] = [
@@ -414,7 +414,7 @@ class Matriz:
 
             return Matriz(self.filas, self.columnas, valores=mat_multiplicada)
 
-        raise TypeError("¡Tipo de dato inválido!")
+        raise TypeError("Tipo de dato inválido.")
 
     def __rmul__(self, multiplicador: int | float | Fraction) -> Matriz:
         """
@@ -438,7 +438,7 @@ class Matriz:
             ]
 
             return Matriz(self.filas, self.columnas, valores=mat_multiplicada)
-        raise TypeError("¡Tipo de dato inválido!")
+        raise TypeError("Tipo de dato inválido.")
 
     def es_matriz_cero(self) -> bool:
         """
@@ -562,7 +562,7 @@ class Matriz:
 
         if not self.es_cuadrada():
             raise ArithmeticError(
-                "¡El determinante solo está definido para matrices cuadradas!"
+                "El determinante solo está definido para matrices cuadradas."
             )
 
         # para matrices 1x1, el determinante es el mismo valor

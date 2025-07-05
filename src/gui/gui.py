@@ -125,7 +125,7 @@ class GaussUI(ctk):
 
         with open(CONFIG_PATH, mode="w", encoding="utf-8") as config_file:
             dump(self.config_options, config_file, indent=4, sort_keys=True)
-            LOGGER.info("¡Configuración guardada exitosamente!")
+            LOGGER.info("Configuración guardada exitosamente")
 
     def load_config(self) -> None:
         """
@@ -136,7 +136,7 @@ class GaussUI(ctk):
         if CONFIG_PATH.exists():
             with open(CONFIG_PATH, mode="r", encoding="utf-8") as config_file:
                 self.config_options = load(config_file)
-                LOGGER.info("¡Configuración cargada exitosamente!")
+                LOGGER.info("Configuración cargada exitosamente")
         else:
             LOGGER.info(
                 "Archivo '%s' no existe, inicializando con valores por defecto...",
@@ -165,4 +165,4 @@ class GaussUI(ctk):
         with as_file(THEMES) as themes_path:
             set_theme(str(Path(str(themes_path), self.tema_actual)))
 
-        LOGGER.info("Configuración aplicada!")
+        LOGGER.info("Configuración aplicada")

@@ -44,7 +44,7 @@ class FuncManager:
         ):
             self.funcs_ingresadas = funcs_ingresadas
         else:
-            raise TypeError("¡Argumento inválido para 'funcs_ingresadas'!")
+            raise TypeError("Argumento inválido para 'funcs_ingresadas'.")
 
     def get_funcs(self) -> list[ctkImage]:
         """
@@ -430,7 +430,7 @@ class FuncManager:
         with open(FUNCIONES_PATH, mode="w", encoding="utf-8") as funciones_file:
             dump(funciones_dict, funciones_file, indent=4, sort_keys=True)
 
-        LOGGER.info("¡Funciones guardadas en '%s' exitosamente!", FUNCIONES_PATH)
+        LOGGER.info("Funciones guardadas en '%s' exitosamente.", FUNCIONES_PATH)
 
     def _load_funcs(self) -> dict[str, Func]:
         """
@@ -445,7 +445,7 @@ class FuncManager:
         with open(FUNCIONES_PATH, mode="r", encoding="utf-8") as funciones_file:
             try:
                 funciones_dict: dict = load(funciones_file)
-                LOGGER.info("¡Funciones cargadas exitosamente!")
+                LOGGER.info("Funciones cargadas exitosamente.")
                 return {
                     nombre: Func(
                         nombre=func["nombre"],

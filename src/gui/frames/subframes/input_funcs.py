@@ -136,16 +136,16 @@ class AgregarFuncs(CustomScrollFrame):
             input_terms = self.func_entry.get()
 
             if input_nombre == "":
-                raise ValueError("Debe ingresar el nombre de la función!")
+                raise ValueError("Debe ingresar el nombre de la función.")
             if input_terms == "":
-                raise ValueError("Debe ingresar los términos de la función!")
+                raise ValueError("Debe ingresar los términos de la función.")
 
             new_func = Func(input_nombre, input_terms)
         except (SyntaxError, SympifyError, ValueError) as v:
             if isinstance(v, ValueError):
                 msg_error = str(v)
             else:
-                msg_error = "Debe ingresar una expresión matemática válida!"
+                msg_error = "Debe ingresar una expresión matemática válida."
 
             self.msg_frame = place_msg_frame(
                 parent_frame=self.func_frame,
@@ -196,13 +196,13 @@ class AgregarFuncs(CustomScrollFrame):
             or not self.validar_nombre(new_func.nombre)
         ):
             if not self.validar_nombre(new_func.nombre):
-                error_msg = "El nombre de la función debe tener la forma 'f(x)'!"
+                error_msg = "El nombre de la función debe tener la forma 'f(x)'."
             elif str(new_func.var) not in str(new_func.expr):
                 error_msg = (
-                    f"La función ingresada no contiene la variable {new_func.var}!"
+                    f"La función ingresada no contiene la variable {new_func.var}."
                 )
             else:
-                error_msg = f"Ya existe una función llamada {new_func.nombre}!"
+                error_msg = f"¡Ya existe una función llamada {new_func.nombre}!"
 
             self.msg_frame = place_msg_frame(
                 parent_frame=self.func_frame,
@@ -220,7 +220,7 @@ class AgregarFuncs(CustomScrollFrame):
         self.msg_frame = place_msg_frame(
             parent_frame=self.func_frame,
             msg_frame=self.msg_frame,
-            msg=f"La función {new_func.nombre} ha sido agregada exitosamente!",
+            msg=f"¡La función {new_func.nombre} ha sido agregada exitosamente!",
             tipo="success",
             row=2,
             columnspan=2,
@@ -327,7 +327,7 @@ class MostrarFuncs(CustomScrollFrame):
             self.msg_frame = place_msg_frame(
                 parent_frame=self,
                 msg_frame=self.msg_frame,
-                msg="No se ha guardado ninguna función!",
+                msg="¡No se ha guardado ninguna función!",
                 tipo="error",
             )
 
@@ -425,7 +425,7 @@ class EliminarFuncs(CustomScrollFrame):
             self.msg_frame = place_msg_frame(
                 parent_frame=self,
                 msg_frame=self.msg_frame,
-                msg="No se ha guardado ninguna función!",
+                msg="¡No se ha guardado ninguna función!",
                 tipo="error",
                 columnspan=2,
             )
@@ -474,7 +474,7 @@ class EliminarFuncs(CustomScrollFrame):
         self.msg_frame = place_msg_frame(
             parent_frame=self,
             msg_frame=self.msg_frame,
-            msg=f"Función {self.func_seleccionada} eliminada!",
+            msg=f"¡Función {self.func_seleccionada} eliminada!",
             tipo="success",
             row=2,
             columnspan=2,
@@ -498,7 +498,7 @@ class EliminarFuncs(CustomScrollFrame):
                 self.msg_frame = place_msg_frame(
                     parent_frame=self,
                     msg_frame=self.msg_frame,
-                    msg="No se ha guardado ninguna función!",
+                    msg="¡No se ha guardado ninguna función!",
                     tipo="error",
                     columnspan=2,
                 )

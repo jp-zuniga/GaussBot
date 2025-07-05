@@ -39,7 +39,7 @@ class VectoresManager:
             self.vecs_ingresados = vecs_ingresados
 
         else:
-            raise TypeError("Argumento inválido para 'vecs_ingresados'!")
+            raise TypeError("Argumento inválido para 'vecs_ingresados'.")
 
     def get_vectores(self, calculado: int) -> str:
         """
@@ -56,9 +56,9 @@ class VectoresManager:
         """
 
         if calculado not in (-1, 0, 1):
-            raise ValueError("Argumento inválido para 'calculado'!")
+            raise ValueError("Argumento inválido para 'calculado'.")
         if not self._validar_vecs_ingresados():
-            return "No se ha ingresado ningún vector!"
+            return "¡No se ha ingresado ningún vector!"
 
         if calculado == 1:
             header = "Vectores calculados:"
@@ -83,9 +83,9 @@ class VectoresManager:
 
         if "[" not in vectores:
             if calculado == 1:
-                return "No se ha calculado ningún vector!"
+                return "¡No se ha calculado ningún vector!"
             if calculado == 0:
-                return "No se ha ingresado ningún vector!"
+                return "¡No se ha ingresado ningún vector!"
         return vectores
 
     def suma_resta_vecs(

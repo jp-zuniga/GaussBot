@@ -317,14 +317,14 @@ class RaicesFrame(CustomScrollFrame):
 
             if a > b:
                 raise ArithmeticError(
-                    "En un intervalo, el número menor debe ir primero!"
+                    "En un intervalo, el número menor debe ir primero."
                 )
             if a == b:
-                raise ArithmeticError("Los extremos del intervalo deben ser distintos!")
+                raise ArithmeticError("Los extremos del intervalo deben ser distintos.")
             if a not in dominio or b not in dominio:
                 raise ArithmeticError(
                     "Los extremos del intervalo no son parte del "
-                    + f"dominio de {self.func.nombre}!"
+                    + f"dominio de {self.func.nombre}."
                 )
 
             self.calc_raiz(vals_iniciales=(a, b), error=error)
@@ -350,7 +350,7 @@ class RaicesFrame(CustomScrollFrame):
             if max_its <= 0:
                 raise ValueError(
                     "Debe ingresar un número entero positivo "
-                    + "para el máximo de iteraciones!"
+                    + "para el máximo de iteraciones."
                 )
 
             try:
@@ -358,7 +358,7 @@ class RaicesFrame(CustomScrollFrame):
                     adj = "primer " if self.met_actual == 3 else ""
                     raise ArithmeticError(
                         f"El {adj}valor inicial no es parte del "
-                        + f"dominio de {self.func.nombre}!"
+                        + f"dominio de {self.func.nombre}."
                     )
             except TypeError as t:
                 if not Contains(xi, dominio):
@@ -372,14 +372,14 @@ class RaicesFrame(CustomScrollFrame):
                     if xn not in dominio:
                         raise ArithmeticError(
                             "El segundo valor inicial no es parte del "
-                            + f"dominio de {self.func.nombre}!"
+                            + f"dominio de {self.func.nombre}."
                         )
                 except TypeError as t:
                     if not Contains(xn, dominio):
                         raise ArithmeticError(str(t)) from t
 
                 if xi == xn:
-                    raise ArithmeticError("Los valores iniciales deben ser distintos!")
+                    raise ArithmeticError("Los valores iniciales deben ser distintos.")
 
             else:
                 vals = xi  # type: ignore
@@ -400,15 +400,15 @@ class RaicesFrame(CustomScrollFrame):
 
                 error_msg = (
                     "Debe ingresar números racionales para "
-                    + f"{error_substr} y margen de error!"
+                    + f"{error_substr} y margen de error."
                 )
             elif isinstance(e, ValueError) and "int" in str(e):
                 error_msg = (
                     "Debe ingresar números enteros positivos "
-                    + "para el máximo de iteraciones!"
+                    + "para el máximo de iteraciones."
                 )
             elif isinstance(e, ZeroDivisionError):
-                error_msg = "El denominador no puede ser 0!"
+                error_msg = "El denominador de una fracción no puede ser 0."
             else:
                 error_msg = str(e)
 
@@ -475,9 +475,9 @@ class RaicesFrame(CustomScrollFrame):
         tipo_metodo = "bisección" if self.met_actual == 0 else "falsa posición"
         if isinstance(resultado, bool):
             if resultado:
-                error_msg = "La función no cambia de signo en el intervalo indicado!"
+                error_msg = "La función no cambia de signo en el intervalo indicado."
             else:
-                error_msg = "La función no es continua en el intervalo indicado!"
+                error_msg = "La función no es continua en el intervalo indicado."
             self.msg_frame = place_msg_frame(
                 parent_frame=self.resultado,
                 msg_frame=self.msg_frame,
@@ -502,12 +502,12 @@ class RaicesFrame(CustomScrollFrame):
             border_color = "#ff3131"
             interpretacion = (
                 f"El método de {tipo_metodo} no converge "
-                + f"después de {MAX_ITERACIONES} iteraciones!"
+                + f"después de {MAX_ITERACIONES} iteraciones."
             )
         else:
             border_color = None
             interpretacion = (
-                f"El método de {tipo_metodo} converge después de {its} iteraciones!\n"
+                f"El método de {tipo_metodo} converge después de {its} iteraciones.\n"
                 + f"Raíz{' ' if fx == 0 else ' aproximada '}encontrada: "
             )
 
@@ -552,24 +552,24 @@ class RaicesFrame(CustomScrollFrame):
             if flag == -1:
                 interpretacion = (
                     f"El método de {tipo_metodo} no converge "
-                    + f"después de {its} iteraciones!"
+                    + f"después de {its} iteraciones."
                 )
             elif flag == 1:
                 interpretacion = (
                     f"En la iteración {its}:\n"
                     + f"{format(x.normalize(), 'f')} no es parte del "
-                    + f"dominio de {self.func.nombre[0]}′(x)!"
+                    + f"dominio de {self.func.nombre[0]}'(x)."
                 )
             elif flag == 2:
                 interpretacion = (
                     f"En la iteración {its}:\n"
                     + f"{format(x.normalize(), 'f')} no es parte del "
-                    + f"dominio de {self.func.nombre}"
+                    + f"dominio de {self.func.nombre}."
                 )
         else:
             border_color = None
             interpretacion = (
-                f"El método de {tipo_metodo} converge después de {its} iteraciones!\n"
+                f"El método de {tipo_metodo} converge después de {its} iteraciones.\n"
                 + f"Raíz{'' if fx == 0 else ' aproximada'} encontrada: "
             )
 

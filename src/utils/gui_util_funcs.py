@@ -94,7 +94,7 @@ def place_msg_frame(
         img: ctkImage | None = grid_kwargs.pop("img", None)
         msg_frame = ResultadoFrame(parent_frame, msg, img, bc)
     else:
-        raise ValueError("¡Valor inválido para argumento 'tipo'!")
+        raise ValueError("Valor inválido para argumento 'tipo'.")
 
     # inicializar kwargs por defecto
     if "row" not in grid_kwargs:

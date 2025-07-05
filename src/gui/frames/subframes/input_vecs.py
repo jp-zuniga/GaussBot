@@ -204,7 +204,7 @@ class AgregarVecs(CustomScrollFrame):
                 parent_frame=self,
                 msg_frame=self.msg_frame,
                 msg="Las dimensiones del vector ingresado "
-                + "no coinciden con las dimensiones indicadas!",
+                + "no coinciden con las dimensiones indicadas.",
                 tipo="error",
                 row=3,
             )
@@ -218,9 +218,9 @@ class AgregarVecs(CustomScrollFrame):
                 valor = Fraction(entry.get())
             except (ValueError, ZeroDivisionError) as e:
                 if isinstance(e, ValueError):
-                    msg = "Todos los valores deben ser números racionales!"
+                    msg = "Todos los valores deben ser números racionales."
                 else:
-                    msg = "El denominador no puede ser 0!"
+                    msg = "El denominador de una fracción no puede ser 0."
                 self.msg_frame = place_msg_frame(
                     parent_frame=self,
                     msg_frame=self.msg_frame,
@@ -245,9 +245,9 @@ class AgregarVecs(CustomScrollFrame):
 
         if not nombre_valido or nombre_repetido:
             msg = (
-                "El nombre del vector debe ser una letra minúscula!"
+                "El nombre del vector debe ser una letra minúscula."
                 if not nombre_valido
-                else f"Ya existe un vector nombrado {nombre_nuevo_vector}!"
+                else f"¡Ya existe un vector nombrado {nombre_nuevo_vector}!"
             )
 
             self.msg_frame = place_msg_frame(
@@ -264,7 +264,7 @@ class AgregarVecs(CustomScrollFrame):
         self.msg_frame = place_msg_frame(
             parent_frame=self,
             msg_frame=self.msg_frame,
-            msg=f"El vector {nombre_nuevo_vector} se ha agregado exitosamente!",
+            msg=f"¡El vector {nombre_nuevo_vector} se ha agregado exitosamente!",
             tipo="success",
             row=3,
         )
@@ -288,7 +288,7 @@ class AgregarVecs(CustomScrollFrame):
             self.msg_frame = place_msg_frame(
                 parent_frame=self,
                 msg_frame=self.msg_frame,
-                msg="Debe ingresar un número entero " + "positivo como dimensión!",
+                msg="Debe ingresar un número entero positivo como dimensión.",
                 tipo="error",
                 row=1,
             )
@@ -353,7 +353,7 @@ class MostrarVecs(CustomScrollFrame):
             self.show_frame = place_msg_frame(
                 parent_frame=self,
                 msg_frame=self.show_frame,
-                msg="No se ha guardado ningún vector!",
+                msg="¡No se ha guardado ningún vector!",
                 tipo="error",
                 columnspan=2,
             )
@@ -390,7 +390,7 @@ class MostrarVecs(CustomScrollFrame):
             self.show_frame = place_msg_frame(
                 parent_frame=self,
                 msg_frame=self.show_frame,
-                msg="Debe seleccionar un filtro!",
+                msg="Debe seleccionar un filtro.",
                 tipo="error",
                 row=1,
                 columnspan=2,
@@ -474,7 +474,7 @@ class EliminarVecs(CustomScrollFrame):
             self.msg_frame = place_msg_frame(
                 parent_frame=self,
                 msg_frame=self.msg_frame,
-                msg="No se ha guardado ningún vector!",
+                msg="¡No se ha guardado ningún vector!",
                 tipo="error",
                 columnspan=2,
             )
@@ -523,7 +523,7 @@ class EliminarVecs(CustomScrollFrame):
         self.msg_frame = place_msg_frame(
             parent_frame=self,
             msg_frame=self.msg_frame,
-            msg=f"Vector {self.vec_seleccionado} eliminado!",
+            msg=f"¡Vector {self.vec_seleccionado} eliminado!",
             tipo="success",
             row=2,
             columnspan=2,
@@ -548,7 +548,7 @@ class EliminarVecs(CustomScrollFrame):
                 self.msg_frame = place_msg_frame(
                     parent_frame=self,
                     msg_frame=self.msg_frame,
-                    msg="No se ha guardado ningún vector!",
+                    msg="¡No se ha guardado ningún vector!",
                     tipo="error",
                     columnspan=2,
                 )

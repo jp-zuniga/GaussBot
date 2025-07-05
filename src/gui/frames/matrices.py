@@ -91,7 +91,7 @@ class MatricesFrame(ctkFrame):
             # agregar boton para dirigir al usuario adonde se agregan
             self.dummy_frame = ctkFrame(self, fg_color="transparent")
             self.msg_frame = ErrorFrame(
-                self.dummy_frame, msg="No se ha guardado ninguna matriz!"
+                self.dummy_frame, msg="¡No se ha guardado ninguna matriz!"
             )
 
             agregar_button = ctkButton(

@@ -318,7 +318,7 @@ class MultiplicacionTab(CustomScrollFrame):
             self.msg_frame = place_msg_frame(
                 parent_frame=self.tab_mat_vec,
                 msg_frame=self.msg_frame,
-                msg="No hay vectores guardados!",
+                msg="¡No hay vectores guardados!",
                 tipo="error",
                 columnspan=3,
             )
@@ -497,9 +497,9 @@ class MultiplicacionTab(CustomScrollFrame):
             )
         except (ValueError, ZeroDivisionError) as e:
             if isinstance(e, ValueError):
-                msg = "El escalar debe ser un número racional!"
+                msg = "El escalar debe ser un número racional."
             else:
-                msg = "El denominador no puede ser 0!"
+                msg = "El denominador de una fracción no puede ser 0."
             self.msg_frame = place_msg_frame(
                 parent_frame=self.resultado_escalar,
                 msg_frame=self.msg_frame,

@@ -101,7 +101,7 @@ class IntegralesFrame(CustomScrollFrame):
             )
         except RuntimeError:
             integ_img = None
-            msg = "No se pudo generar la imagen del integral!"
+            msg = "No se pudo generar la imagen del integral."
 
         self.msg_frame = place_msg_frame(
             parent_frame=self,

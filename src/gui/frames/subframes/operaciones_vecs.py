@@ -458,7 +458,7 @@ class MultiplicacionTab(CustomScrollFrame):
             self.msg_frame = place_msg_frame(
                 parent_frame=self.tab_mat_vec,
                 msg_frame=self.msg_frame,
-                msg="No hay matrices guardadas!",
+                msg="¡No hay matrices guardadas!",
                 tipo="error",
                 columnspan=3,
             )
@@ -614,12 +614,12 @@ class MultiplicacionTab(CustomScrollFrame):
                 if dimensiones - 1 > len(self.master_frame.nombres_vectores):
                     raise ValueError(
                         f"No hay suficientes vectores en R{dimensiones} "
-                        + "para calcular un producto cruz!"
+                        + "para calcular un producto cruz."
                     )
             except ValueError as e:
                 str_e = str(e)
                 if "!" not in str_e:
-                    msg = "Debe ingresar un número entero mayor a 1!"
+                    msg = "Debe ingresar un número entero mayor a 1."
                 else:
                     msg = str_e
 
@@ -645,7 +645,7 @@ class MultiplicacionTab(CustomScrollFrame):
                 self.msg_frame = place_msg_frame(
                     parent_frame=self.tab_prod_cruz,
                     msg_frame=self.msg_frame,
-                    msg=f"No hay vectores en R{dimensiones} guardados!",
+                    msg=f"¡No se han guardado vectores en R{dimensiones}!",
                     tipo="error",
                     row=1,
                     columnspan=3,
@@ -757,9 +757,9 @@ class MultiplicacionTab(CustomScrollFrame):
             )
         except (ValueError, ZeroDivisionError) as e:
             if isinstance(e, ValueError):
-                msg = "El escalar debe ser un número racional!"
+                msg = "El escalar debe ser un número racional."
             else:
-                msg = "El denominador no puede ser 0!"
+                msg = "El denominador de una fracción no puede ser 0."
 
             self.msg_frame = place_msg_frame(
                 parent_frame=self.resultado_escalar,

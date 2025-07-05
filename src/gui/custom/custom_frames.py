@@ -107,7 +107,9 @@ class ResultadoFrame(ctkFrame):
         self.img_label: Optional[ctkLabel] = None
 
         if msg is not None and img is not None:
-            raise ValueError("No se pueden mostrar mensaje e imagen al mismo tiempo!")
+            raise ValueError(
+                "No se puede mostrar un mensaje e una imagen al mismo tiempo."
+            )
 
         if msg is not None:
             self.msg_label = ctkLabel(self, text=msg)
@@ -117,7 +119,7 @@ class ResultadoFrame(ctkFrame):
             self.img_label.grid(row=0, column=0, padx=10, pady=10)  # type: ignore
         else:
             raise ValueError(
-                "Se necesita un mensaje o una imagen para mostrar en el frame!"
+                "Se necesita un mensaje o una imagen para mostrar en el frame."
             )
 
     def destroy(self) -> None:

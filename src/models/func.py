@@ -84,7 +84,7 @@ class Func:
         self.expr: Expr = parse_expr(expr, transformations=TRANSFORMS)
 
         if self.expr.has(oo, -oo, zoo, nan):
-            raise ValueError("¡La función tiene un dominio complejo!")
+            raise ValueError("La función tiene un dominio complejo.")
 
     def __str__(self) -> str:
         return f"{self.nombre} = {self.expr}"
@@ -287,7 +287,7 @@ class Func:
         elif misc_str is not None:
             latex_str = misc_str.replace("log", "ln")
         else:
-            raise ValueError("¡No se recibió un string a convertir en PNG!")
+            raise ValueError("No se recibió un string a convertir en PNG.")
 
         if con_nombre and nombre_expr is not None:
             latex_str = rf"{nombre_expr} = {latex_str}"

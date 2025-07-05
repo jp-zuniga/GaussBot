@@ -39,7 +39,7 @@ class MatricesManager:
         ):
             self.mats_ingresadas = mats_ingresadas
         else:
-            raise TypeError("Argumento inválido para 'mats_ingresadas'!")
+            raise TypeError("Argumento inválido para 'mats_ingresadas'.")
 
         if sis_ingresados is None:
             self.sis_ingresados: dict[str, Matriz] = {}
@@ -49,7 +49,7 @@ class MatricesManager:
         ):
             self.sis_ingresados = sis_ingresados
         else:
-            raise TypeError("Argumento inválido para 'sis_ingresados'!")
+            raise TypeError("Argumento inválido para 'sis_ingresados'.")
 
     def get_matrices(self, calculada: int) -> str:
         """
@@ -67,9 +67,9 @@ class MatricesManager:
         """
 
         if calculada not in (-1, 0, 1):
-            raise ValueError("Argumento inválido para 'calculada'!")
+            raise ValueError("Argumento inválido para 'calculada'.")
         if not self._validar_mats_ingresadas():
-            return "No se ha guardado ninguna matriz!"
+            return "¡No se ha guardado ninguna matriz!"
 
         if calculada == 1:
             header: str = "Matrices calculadas:"
@@ -94,9 +94,9 @@ class MatricesManager:
 
         if "(" not in matrices:
             if calculada == 1:
-                return "No se ha calculado ninguna matriz!"
+                return "¡No se ha calculado ninguna matriz!"
             if calculada == 0:
-                return "No se ha ingresado ninguna matriz!"
+                return "¡No se ha ingresado ninguna matriz!"
         return matrices
 
     def get_sistemas(self, calculado: int) -> str:
@@ -115,9 +115,9 @@ class MatricesManager:
         """
 
         if calculado not in (-1, 0, 1):
-            raise ValueError("Argumento inválido para 'calculado'!")
+            raise ValueError("Argumento inválido para 'calculado'.")
         if not self._validar_sis_ingresados():
-            return "No se ha guardado ningún sistema de ecuaciones!"
+            return "¡No se ha guardado ningún sistema de ecuaciones!"
 
         if calculado == 0:
             header: str = "Sistemas ingresados:"
@@ -142,9 +142,9 @@ class MatricesManager:
 
         if "(" not in sistemas:
             if calculado == 1:
-                return "No se ha resuelto ningún sistema de ecuaciones!"
+                return "¡No se ha resuelto ningún sistema de ecuaciones!"
             if calculado == 0:
-                return "No se ha ingresado ningún sistema de ecuaciones!"
+                return "¡No se ha ingresado ningún sistema de ecuaciones!"
         return sistemas
 
     def resolver_sistema(self, nombre_sis: str, metodo: str) -> SistemaEcuaciones:
@@ -170,7 +170,7 @@ class MatricesManager:
         elif metodo == "c":
             sistema.cramer(nombre_sis)
         else:
-            raise ValueError("Argumento inválido para 'metodo'!")
+            raise ValueError("Argumento inválido para 'metodo'.")
 
         return sistema
 

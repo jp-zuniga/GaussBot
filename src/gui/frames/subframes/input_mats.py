@@ -247,7 +247,7 @@ class AgregarMats(CustomScrollFrame):
                 parent_frame=self,
                 msg_frame=self.msg_frame,
                 msg="Las dimensiones de la matriz ingresada "
-                + "no coinciden con las dimensiones indicadas!",
+                + "no coinciden con las dimensiones indicadas.",
                 tipo="error",
                 row=3,
             )
@@ -262,9 +262,9 @@ class AgregarMats(CustomScrollFrame):
                     valor = Fraction(entry.get())
                 except (ValueError, ZeroDivisionError) as e:
                     if isinstance(e, ValueError):
-                        msg = "Todos los valores deben ser números racionales!"
+                        msg = "Todos los valores deben ser números racionales."
                     else:
-                        msg = "El denominador no puede ser 0!"
+                        msg = "El denominador de una fracción no puede ser 0."
                     self.msg_frame = place_msg_frame(
                         parent_frame=self,
                         msg_frame=self.msg_frame,
@@ -290,9 +290,9 @@ class AgregarMats(CustomScrollFrame):
 
         if not nombre_valido or nombre_repetido:
             msg = (
-                "El nombre de la matriz debe ser una letra mayúscula!"
+                "El nombre de la matriz debe ser una letra mayúscula."
                 if not nombre_valido
-                else f"Ya existe una matriz nombrada {nombre_nueva_matriz}!"
+                else f"¡Ya existe una matriz nombrada {nombre_nueva_matriz}!"
             )
 
             self.msg_frame = place_msg_frame(
@@ -309,7 +309,7 @@ class AgregarMats(CustomScrollFrame):
         self.msg_frame = place_msg_frame(
             parent_frame=self,
             msg_frame=self.msg_frame,
-            msg=f"La matriz {nombre_nueva_matriz} se ha agregado exitosamente!",
+            msg=f"¡La matriz {nombre_nueva_matriz} se ha agregado exitosamente!",
             tipo="success",
             row=3,
         )
@@ -338,7 +338,7 @@ class AgregarMats(CustomScrollFrame):
                 parent_frame=self,
                 msg_frame=self.msg_frame,
                 msg="Debe ingresar números enteros "
-                + "positivos como filas y columnas!",
+                + "positivos como filas y columnas.",
                 tipo="error",
                 row=1,
             )
@@ -405,7 +405,7 @@ class MostrarMats(CustomScrollFrame):
             self.show_frame = place_msg_frame(
                 parent_frame=self,
                 msg_frame=self.show_frame,
-                msg="No se ha guardado ninguna matriz!",
+                msg="¡No se ha guardado ninguna matriz!",
                 tipo="error",
                 columnspan=2,
             )
@@ -439,7 +439,7 @@ class MostrarMats(CustomScrollFrame):
             self.show_frame = place_msg_frame(
                 parent_frame=self,
                 msg_frame=self.show_frame,
-                msg="Debe seleccionar un filtro!",
+                msg="Debe seleccionar un filtro.",
                 tipo="error",
                 row=1,
                 columnspan=2,
@@ -528,7 +528,7 @@ class EliminarMats(CustomScrollFrame):
             self.msg_frame = place_msg_frame(
                 parent_frame=self,
                 msg_frame=self.msg_frame,
-                msg="No se ha guardado ninguna matriz!",
+                msg="¡No se ha guardado ninguna matriz!",
                 tipo="error",
                 columnspan=2,
             )
@@ -577,7 +577,7 @@ class EliminarMats(CustomScrollFrame):
         self.msg_frame = place_msg_frame(
             parent_frame=self,
             msg_frame=self.msg_frame,
-            msg=f"Matriz {self.mat_seleccionada} eliminada!",
+            msg=f"¡Matriz {self.mat_seleccionada} eliminada!",
             tipo="success",
             row=2,
             columnspan=2,
@@ -602,7 +602,7 @@ class EliminarMats(CustomScrollFrame):
                 self.msg_frame = place_msg_frame(
                     parent_frame=self,
                     msg_frame=self.msg_frame,
-                    msg="No se ha guardado ninguna matriz!",
+                    msg="¡No se ha guardado ninguna matriz!",
                     tipo="error",
                     columnspan=2,
                 )

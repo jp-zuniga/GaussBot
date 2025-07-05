@@ -30,8 +30,8 @@ class SistemaEcuaciones:
 
         if not matriz.aumentada:
             raise TypeError(
-                "¡La matriz debe ser aumentada para "
-                + "representar un sistema de ecuaciones!"
+                "La matriz debe ser aumentada para "
+                + "representar un sistema de ecuaciones."
             )
 
         # se ocupa una deepcopy del objeto Matriz() recibido
@@ -175,7 +175,7 @@ class SistemaEcuaciones:
         self.procedimiento += str(self.matriz) + "\n"
 
         if self.matriz.es_matriz_cero():
-            self.solucion += "\nSistema tiene soluciones infinitas!\n"
+            self.solucion += "\n¡Sistema tiene soluciones infinitas!\n"
             self.procedimiento += "\nTodas las ecuaciones tienen la forma 0 = 0, "
             self.procedimiento += "lo cual siempre es verdadero.\n"
             self.procedimiento += "Por lo tanto, existen soluciones infinitas.\n"
@@ -185,7 +185,7 @@ class SistemaEcuaciones:
         if not test_inicial[0]:
             if self._validar_escalonada_reducida():
                 self.procedimiento += (
-                    "\nMatriz ya está en su forma escalonada reducida!\n\n"
+                    "\nMatriz ya está en su forma escalonada reducida.\n\n"
                 )
 
             self.procedimiento += str(self.matriz)
@@ -194,7 +194,7 @@ class SistemaEcuaciones:
 
         if self._validar_escalonada_reducida():
             self.procedimiento += (
-                f"\nMatriz ya está en su forma escalonada reducida!\n\n{self.matriz}"
+                f"\nMatriz ya está en su forma escalonada reducida.\n\n{self.matriz}"
             )
         else:
             self._reducir_matriz()
@@ -597,7 +597,7 @@ class SistemaEcuaciones:
         solucion, fila_inconsistente = validacion
 
         if not solucion and fila_inconsistente != -1:
-            self.solucion += "\nSistema es inconsistente!"
+            self.solucion += "\n¡Sistema es inconsistente!"
             self.solucion += f"\nEn la ecuación #{fila_inconsistente + 1}:"
             self.solucion += f"\n0 != {self.matriz[fila_inconsistente, -1]}\n"
             self.procedimiento += f"\n{self.solucion}"
@@ -613,7 +613,7 @@ class SistemaEcuaciones:
             self.solucion += f"\nSolución {tipo_solucion} encontrada:\n"
             for i in range(self.matriz.filas):
                 if all(x == 0 for x in self.matriz[i]):
-                    LOGGER.warning("Saltando fila cero!")
+                    LOGGER.warning("Saltando fila cero.")
                     continue
 
                 self.solucion += f"X{i + 1} = {
@@ -630,7 +630,7 @@ class SistemaEcuaciones:
 
         ecuaciones: list[str] = self._despejar_variables(libres)
 
-        self.solucion += "\nSistema no tiene solución única!\n"
+        self.solucion += "\n¡Sistema no tiene solución única!\n"
         self.solucion += "\nSolución general encontrada:\n"
         for linea in ecuaciones:
             self.solucion += linea

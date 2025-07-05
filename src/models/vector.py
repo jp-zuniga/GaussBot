@@ -68,7 +68,7 @@ class Vector:
                     start, stop = stop + 1, start + 1
                 return self.componentes[indice]
 
-        raise IndexError("¡Índice inválido!")
+        raise IndexError("Índice inválido.")
 
     def __len__(self) -> int:
         """
@@ -118,7 +118,7 @@ class Vector:
         """
 
         if len(self) != len(vec2):
-            raise ArithmeticError("¡Los vectores deben tener la misma longitud!")
+            raise ArithmeticError("Los vectores deben tener la misma longitud.")
         return Vector([a + b for a, b in zip(self.componentes, vec2.componentes)])
 
     def __sub__(self, vec2: Vector) -> Vector:
@@ -134,7 +134,7 @@ class Vector:
         """
 
         if len(self) != len(vec2):
-            raise ArithmeticError("¡Los vectores deben tener la misma longitud!")
+            raise ArithmeticError("Los vectores deben tener la misma longitud.")
         return Vector([a - b for a, b in zip(self.componentes, vec2.componentes)])
 
     @overload
@@ -168,14 +168,14 @@ class Vector:
 
         if isinstance(multiplicador, Vector):
             if len(self) != len(multiplicador):
-                raise ArithmeticError("¡Los vectores deben tener la misma longitud!")
+                raise ArithmeticError("Los vectores deben tener la misma longitud.")
             return Fraction(
                 sum(a * b for a, b in zip(self.componentes, multiplicador.componentes))
             )
 
         if isinstance(multiplicador, (int, float, Fraction)):
             return Vector([Fraction(c * multiplicador) for c in self.componentes])
-        raise TypeError("¡Tipo de dato inválido!")
+        raise TypeError("Tipo de dato inválido.")
 
     def __rmul__(self, multiplicador: int | float | Fraction) -> Vector:
         """
@@ -197,7 +197,7 @@ class Vector:
 
         if isinstance(multiplicador, (int, float, Fraction)):
             return Vector([Fraction(c * multiplicador) for c in self.componentes])
-        raise TypeError("Tipo de dato inválido!")
+        raise TypeError("Tipo de dato inválido.")
 
     def magnitud(self) -> Fraction:
         """
