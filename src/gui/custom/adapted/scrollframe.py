@@ -26,7 +26,7 @@ class CustomScrollFrame(ctkFrame):
         width: int = 100,
         height: int = 100,
         scrollbar_width: int = 16,
-        scrollbar_padding: tuple[int, int] = (5, 8),
+        scrollbar_padding: tuple[tuple[int, int], int] = ((0, 5), 8),
         **kwargs,
     ):
         self.parent_frame = ctkFrame(master=master, **kwargs)
@@ -140,17 +140,15 @@ class CustomScrollFrame(ctkFrame):
         if float(x) == 0.0 and float(y) == 1.0:
             self.hsb.grid_forget()
         else:
-            self.hsb.grid(row=1, column=0, sticky="swe", padx=self.padx, pady=self.pady)
+            self.hsb.grid(row=1, column=0, sticky="swe", padx=self.pady, pady=self.padx)
         self.hsb.set(x, y)
 
     def on_canvas_resize(self, event):
-        # Update canvas and scrollbar state when canvas size changes
         self.update_scrollregion()
         self.dynamic_scrollbar_vsb(*self.xy_canvas.yview())
         self.dynamic_scrollbar_hsb(*self.xy_canvas.xview())
 
     def on_inner_frame_configure(self, event=None):
-        # Update scrollregion whenever inner frame changes size
         self.update_scrollregion()
 
     def update_scrollregion(self):
@@ -163,7 +161,7 @@ class CustomScrollFrame(ctkFrame):
         if inner_width < canvas_width:
             self.xy_canvas.itemconfig(self.window_id, width=canvas_width)
         else:
-            self.xy_canvas.itemconfig(self.window_id, width=0)  # Use natural width
+            self.xy_canvas.itemconfig(self.window_id, width=0)
 
         self.xy_canvas.configure(
             scrollregion=(
