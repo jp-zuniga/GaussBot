@@ -69,13 +69,12 @@ class CustomTable(CustomScrollFrame):
         self.init_table()
         IconButton(
             self,
-            self.app,
             height=40,
             corner_radius=10,
             border_width=2,
             border_color=ThemeManager.theme["CTkFrame"]["border_color"],
             text_color=ThemeManager.theme["CTkLabel"]["text_color"],
-            text="Exportar a CSV",
+            text="Exportar tabla",
             font=ctkFont(size=12, slant="italic"),
             command=self.export_to_csv,
         ).grid(row=0, column=len(self.values[0]) - 1, padx=10, pady=10, sticky="ne")

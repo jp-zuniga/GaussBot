@@ -51,13 +51,11 @@ class GaussUI(ctk):
         self.load_config()
         set_icon(self, self)
 
-        self.theme_config = ThemeManager.theme
-        self.configure(fg_color=self.theme_config["CTkFrame"]["fg_color"])
-
         self.geometry("1200x600")
         self.title("GaussBot")
         self.rowconfigure(0, weight=1)
         self.columnconfigure(1, weight=1)
+        self.configure(fg_color=ThemeManager.theme["CTkFrame"]["fg_color"])
 
         # inicializar managers
         self.func_manager = FuncManager()

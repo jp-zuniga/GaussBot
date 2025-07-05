@@ -68,7 +68,6 @@ class AgregarVecs(CustomScrollFrame):
 
         ingresar_button = IconButton(
             self.pre_vec_frame,
-            self.app,
             image=ENTER_ICON,
             tooltip_text="Ingresar datos del vector",
             command=self.generar_casillas,
@@ -76,7 +75,6 @@ class AgregarVecs(CustomScrollFrame):
 
         aleatorio_button = IconButton(
             self.pre_vec_frame,
-            self.app,
             image=SHUFFLE_ICON,
             tooltip_text="Generar vector con valores aleatorios",
             command=self.generar_aleatorio,
@@ -147,7 +145,6 @@ class AgregarVecs(CustomScrollFrame):
 
         agregar_button = IconButton(
             self.post_vec_frame,
-            self.app,
             image=ACEPTAR_ICON,
             tooltip_text="Agregar vector",
             command=self.agregar_vector,
@@ -155,7 +152,6 @@ class AgregarVecs(CustomScrollFrame):
 
         limpiar_button = IconButton(
             self.post_vec_frame,
-            self.app,
             image=LIMPIAR_ICON,
             tooltip_text="Limpiar casillas",
             command=self.limpiar_casillas,
@@ -374,7 +370,6 @@ class MostrarVecs(CustomScrollFrame):
         self.select_opcion.grid(row=0, column=0, ipadx=10, padx=5, pady=5, sticky="e")
         IconButton(
             self,
-            self.app,
             image=MOSTRAR_ICON,
             tooltip_text="Mostrar",
             command=self.show_vecs,
@@ -496,7 +491,6 @@ class EliminarVecs(CustomScrollFrame):
 
         button = IconButton(
             self,
-            self.app,
             image=ELIMINAR_ICON,
             tooltip_text="Eliminar vector",
             command=self.eliminar_vector,

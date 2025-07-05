@@ -119,7 +119,6 @@ class CustomNumpad(ctkTop):
             for i, k in enumerate(keys):
                 IconButton(
                     master,
-                    app=self.attach.winfo_toplevel(),
                     image=self.images[k],
                     width=50,
                     height=50,

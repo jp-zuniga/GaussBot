@@ -73,7 +73,6 @@ class AgregarMats(CustomScrollFrame):
 
         ingresar_button = IconButton(
             self.pre_mat_frame,
-            self.app,
             image=ENTER_ICON,
             tooltip_text="Ingresar datos de la matriz",
             command=self.generar_casillas,
@@ -81,7 +80,6 @@ class AgregarMats(CustomScrollFrame):
 
         aleatoria_button = IconButton(
             self.pre_mat_frame,
-            self.app,
             image=SHUFFLE_ICON,
             tooltip_text="Generar matriz con datos aleatorios",
             command=self.generar_aleatoria,
@@ -178,7 +176,6 @@ class AgregarMats(CustomScrollFrame):
 
         agregar_button = IconButton(
             self.post_mat_frame,
-            self.app,
             image=ACEPTAR_ICON,
             tooltip_text="Agregar matriz",
             command=self.agregar_matriz,
@@ -186,7 +183,6 @@ class AgregarMats(CustomScrollFrame):
 
         limpiar_button = IconButton(
             self.post_mat_frame,
-            self.app,
             image=LIMPIAR_ICON,
             tooltip_text="Limpiar casillas",
             command=self.limpiar_casillas,
@@ -423,7 +419,6 @@ class MostrarMats(CustomScrollFrame):
         self.select_opcion.grid(row=0, column=0, ipadx=10, padx=5, pady=5, sticky="e")
         IconButton(
             self,
-            self.app,
             image=MOSTRAR_ICON,
             tooltip_text="Mostrar",
             command=self.show_mats,
@@ -550,7 +545,6 @@ class EliminarMats(CustomScrollFrame):
 
         button = IconButton(
             self,
-            self.app,
             image=ELIMINAR_ICON,
             tooltip_text="Eliminar matriz",
             command=self.eliminar_matriz,

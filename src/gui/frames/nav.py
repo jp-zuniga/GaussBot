@@ -43,7 +43,7 @@ class NavFrame(ctkFrame):
         super().__init__(master, corner_radius=0)
         self.app = app
 
-        self.configure(fg_color=self.app.theme_config["CTk"]["fg_color"])
+        self.configure(fg_color=ThemeManager.theme["CTk"]["fg_color"])
         self.grid(row=0, column=0, sticky="nsew")
 
         self.rowconfigure(7, weight=1)  # para tener un espacio entre los botones
@@ -69,7 +69,6 @@ class NavFrame(ctkFrame):
 
         self.hide_button = IconButton(
             self,
-            app=self.app,
             tooltip_x_offset=75,
             tooltip_y_offset=-15,
             tooltip_text="Esconder barra de navegación",
@@ -80,7 +79,6 @@ class NavFrame(ctkFrame):
         # crear botones de navegacion
         self.home_button = IconButton(
             self,
-            app=self.app,
             corner_radius=0,
             border_spacing=10,
             anchor="w",
@@ -92,7 +90,6 @@ class NavFrame(ctkFrame):
 
         self.inputs_button = IconButton(
             self,
-            app=self.app,
             corner_radius=0,
             border_spacing=10,
             anchor="w",
@@ -104,7 +101,6 @@ class NavFrame(ctkFrame):
 
         self.matrices_button = IconButton(
             self,
-            app=self.app,
             corner_radius=0,
             border_spacing=10,
             anchor="w",
@@ -116,7 +112,6 @@ class NavFrame(ctkFrame):
 
         self.vectores_button = IconButton(
             self,
-            app=self.app,
             corner_radius=0,
             border_spacing=10,
             anchor="w",
@@ -128,7 +123,6 @@ class NavFrame(ctkFrame):
 
         self.analisis_button = IconButton(
             self,
-            app=self.app,
             corner_radius=0,
             border_spacing=10,
             anchor="w",
@@ -140,7 +134,6 @@ class NavFrame(ctkFrame):
 
         self.sistemas_button = IconButton(
             self,
-            app=self.app,
             corner_radius=0,
             border_spacing=10,
             anchor="w",
@@ -152,7 +145,6 @@ class NavFrame(ctkFrame):
 
         self.config_button = IconButton(
             self,
-            app=self.app,
             corner_radius=0,
             border_spacing=10,
             anchor="w",
@@ -164,7 +156,6 @@ class NavFrame(ctkFrame):
 
         self.quit_button = IconButton(
             self,
-            app=self.app,
             corner_radius=0,
             border_spacing=10,
             anchor="w",
@@ -225,7 +216,7 @@ class NavFrame(ctkFrame):
         # resaltar el boton seleccionado
         for nombre_frame, button in self.buttons.items():
             button.configure(
-                fg_color=self.app.theme_config["CTkFrame"]["top_fg_color"]
+                fg_color=ThemeManager.theme["CTkFrame"]["top_fg_color"]
                 if nombre == nombre_frame
                 else "transparent"
             )

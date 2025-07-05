@@ -74,7 +74,6 @@ class AgregarSistemas(CustomScrollFrame):
 
         ingresar_button = IconButton(
             self.pre_sis_frame,
-            self.app,
             image=ENTER_ICON,
             tooltip_text="Ingresar datos del sistema",
             command=self.generar_casillas,
@@ -82,7 +81,6 @@ class AgregarSistemas(CustomScrollFrame):
 
         aleatorio_button = IconButton(
             self.pre_sis_frame,
-            self.app,
             image=SHUFFLE_ICON,
             tooltip_text="Generar ecuaciones con coeficientes aleatorios",
             command=self.generar_aleatoria,
@@ -189,7 +187,6 @@ class AgregarSistemas(CustomScrollFrame):
 
         agregar_button = IconButton(
             self.post_sis_frame,
-            self.app,
             image=ACEPTAR_ICON,
             tooltip_text="Agregar sistema",
             command=self.agregar_sis,
@@ -197,7 +194,6 @@ class AgregarSistemas(CustomScrollFrame):
 
         limpiar_button = IconButton(
             self.post_sis_frame,
-            self.app,
             image=LIMPIAR_ICON,
             tooltip_text="Limpiar casillas",
             command=self.limpiar_casillas,
@@ -437,7 +433,6 @@ class MostrarSistemas(CustomScrollFrame):
         self.select_opcion.grid(row=0, column=0, ipadx=10, padx=5, pady=5, sticky="e")
         IconButton(
             self,
-            self.app,
             image=MOSTRAR_ICON,
             tooltip_text="Mostrar",
             command=self.mostrar_sis,
@@ -559,7 +554,6 @@ class EliminarSistemas(CustomScrollFrame):
 
         button = IconButton(
             self,
-            self.app,
             image=ELIMINAR_ICON,
             tooltip_text="Eliminar sistema",
             command=self.eliminar_sis,

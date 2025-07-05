@@ -5,7 +5,12 @@ Home frame de la interfaz.
 from typing import TYPE_CHECKING
 from webbrowser import open as open_link
 
-from customtkinter import CTkFont as ctkFont, CTkFrame as ctkFrame, CTkLabel as ctkLabel
+from customtkinter import (
+    CTkFont as ctkFont,
+    CTkFrame as ctkFrame,
+    CTkLabel as ctkLabel,
+    ThemeManager,
+)
 
 from ..custom import IconButton
 from ...utils import (
@@ -56,11 +61,10 @@ class HomeFrame(ctkFrame):
 
         IconButton(
             self,
-            app=self.app,
             height=40,
             image=MATRIZ_ICON,
             text="Operaciones de Matrices",
-            text_color=self.app.theme_config["CTkLabel"]["text_color"],
+            text_color=ThemeManager.theme["CTkLabel"]["text_color"],
             tooltip_text="Suma, resta, multiplicación,"
             + "\ntransposición, calcular determinante,"
             + "\nencontrar inversa.",
@@ -70,11 +74,10 @@ class HomeFrame(ctkFrame):
 
         IconButton(
             self,
-            app=self.app,
             height=40,
             image=VECTOR_ICON,
             text="Operaciones de Vectores",
-            text_color=self.app.theme_config["CTkLabel"]["text_color"],
+            text_color=ThemeManager.theme["CTkLabel"]["text_color"],
             tooltip_text="Magnitud, suma, resta,"
             + "\nmultiplicación escalar,"
             + "\nproducto punto, producto cruz.",
@@ -84,22 +87,20 @@ class HomeFrame(ctkFrame):
 
         IconButton(
             self,
-            app=self.app,
             height=40,
             image=ANALISIS_ICON,
             text="Análisis Númerico",
-            text_color=self.app.theme_config["CTkLabel"]["text_color"],
+            text_color=ThemeManager.theme["CTkLabel"]["text_color"],
             tooltip_text="Raíces de funciones, derivadas, integrales.",
             command=lambda: self.ir_a_frame("analisis"),
         ).grid(row=4, column=0, padx=(10, 5), pady=3, sticky="ne")
 
         IconButton(
             self,
-            app=self.app,
             height=40,
             image=ECUACIONES_ICON,
             text="Sistemas de Ecuaciones",
-            text_color=self.app.theme_config["CTkLabel"]["text_color"],
+            text_color=ThemeManager.theme["CTkLabel"]["text_color"],
             tooltip_text="Resolver sistemas de ecuaciones por los métodos de:"
             + "\n− Gauss-Jordan"
             + "\n− Regla de Cramer",
@@ -109,7 +110,6 @@ class HomeFrame(ctkFrame):
 
         IconButton(
             self,
-            app=self.app,
             image=INFO_ICON,
             tooltip_text="− Desarrollado y diseñado por: Joaquín Zúñiga\n"
             + f"− Versión: {__version__}",
@@ -136,5 +136,5 @@ class HomeFrame(ctkFrame):
             widget.configure(bg_color="transparent")
             if isinstance(widget, IconButton) and widget.tooltip is not None:
                 widget.tooltip.configure_tooltip(
-                    bg_color=self.app.theme_config["CTkFrame"]["fg_color"]
+                    bg_color=ThemeManager.theme["CTkFrame"]["fg_color"]
                 )

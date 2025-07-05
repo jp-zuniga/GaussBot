@@ -2,7 +2,7 @@
 Implementaciones de widgets personalizadas.
 """
 
-from typing import TYPE_CHECKING, Any, Optional
+from typing import Any, Optional
 
 from customtkinter import (
     CTkButton as ctkButton,
@@ -15,9 +15,6 @@ from customtkinter import (
 
 from .adapted.tooltip import Tooltip
 from ...utils import DROPDOWN_ICON
-
-if TYPE_CHECKING:
-    from ..gui import GaussUI
 
 
 class CustomEntry(ctkEntry):
@@ -128,13 +125,10 @@ class IconButton(ctkButton):
     def __init__(
         self,
         master: Any,
-        app: "GaussUI",
         image: Optional[ctkImage] = None,
         tooltip_text: Optional[str] = None,
         **kwargs,
     ) -> None:
-        self.app = app
-
         text = kwargs.pop("text", "")
         width = kwargs.pop("width", 30)
         height = kwargs.pop("height", 30)
@@ -142,7 +136,7 @@ class IconButton(ctkButton):
         border_spacing = kwargs.pop("border_spacing", 0)
         fg_color = kwargs.pop("fg_color", "transparent")
         hover_color = kwargs.pop(
-            "hover_color", self.app.theme_config["CTkFrame"]["top_fg_color"]
+            "hover_color", ThemeManager.theme["CTkFrame"]["top_fg_color"]
         )
 
         tt_padx = kwargs.pop("tooltip_padx", 15)

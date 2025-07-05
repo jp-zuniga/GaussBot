@@ -592,7 +592,6 @@ class MultiplicacionTab(CustomScrollFrame):
 
         IconButton(
             self.tab_prod_cruz,
-            app=self.app,
             image=ENTER_ICON,
             tooltip_text="Ingresar dimensiones",
             command=lambda: setup_selections(self.dimensiones_entry.get()),
@@ -655,7 +654,6 @@ class MultiplicacionTab(CustomScrollFrame):
 
             IconButton(
                 self.tab_prod_cruz,
-                app=self.app,
                 image=INFO_ICON,
                 tooltip_text="Solamente se están mostrando "
                 + f"los vectores guardados en R{dimensiones}.",

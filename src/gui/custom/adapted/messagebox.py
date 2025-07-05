@@ -121,7 +121,6 @@ class CustomMessageBox(ctkTop):
 
         IconButton(
             self.frame_top,
-            app=self.master_window,
             image=QUIT_ICON,
             hover_color=bg_color,
             command=lambda: self.button_event(""),

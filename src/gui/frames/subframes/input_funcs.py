@@ -6,7 +6,12 @@ from re import match
 from tkinter import Variable
 from typing import TYPE_CHECKING, Optional
 
-from customtkinter import CTkFont as ctkFont, CTkFrame as ctkFrame, CTkLabel as ctkLabel
+from customtkinter import (
+    CTkFont as ctkFont,
+    CTkFrame as ctkFrame,
+    CTkLabel as ctkLabel,
+    ThemeManager,
+)
 from sympy import SympifyError
 
 from ...custom import CustomDropdown, CustomEntry, ErrorFrame, IconButton, SuccessFrame
@@ -62,7 +67,6 @@ class AgregarFuncs(CustomScrollFrame):
 
         self.instruct_numpad = IconButton(
             self,
-            self.app,
             image=INFO_ICON,
             tooltip_text="El numpad le permite ingresar funciones"
             + "\nmatemáticas de una forma más sencilla.\n"
@@ -87,7 +91,6 @@ class AgregarFuncs(CustomScrollFrame):
         self.numpad = CustomNumpad(self.func_entry)
         self.leer_button = IconButton(
             self,
-            app=self.app,
             image=ENTER_ICON,
             tooltip_text="Leer función",
             command=self.leer_func,
@@ -167,7 +170,6 @@ class AgregarFuncs(CustomScrollFrame):
 
         IconButton(
             self.func_frame,
-            app=self.app,
             image=ACEPTAR_ICON,
             tooltip_text="Agregar función",
             command=lambda: self.agregar_func(new_func),
@@ -175,7 +177,6 @@ class AgregarFuncs(CustomScrollFrame):
 
         IconButton(
             self.func_frame,
-            app=self.app,
             image=LIMPIAR_ICON,
             tooltip_text="Eliminar función leída",
             command=self.limpiar_input,
@@ -335,9 +336,8 @@ class MostrarFuncs(CustomScrollFrame):
 
         IconButton(
             self,
-            self.app,
             border_width=3,
-            border_color=self.app.theme_config["CTkFrame"]["top_fg_color"],
+            border_color=ThemeManager.theme["CTkFrame"]["top_fg_color"],
             image=MOSTRAR_ICON,
             tooltip_text="Mostrar funciones",
             command=self.show_funcs,
@@ -447,7 +447,6 @@ class EliminarFuncs(CustomScrollFrame):
 
         button = IconButton(
             self,
-            self.app,
             image=ELIMINAR_ICON,
             tooltip_text="Eliminar función",
             command=self.eliminar_func,

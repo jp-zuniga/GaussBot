@@ -138,7 +138,6 @@ class RaicesFrame(CustomScrollFrame):
         if any(term in str(self.func.expr) for term in ("sin", "cos", "tan")):
             IconButton(
                 self.metodo_frame,
-                app=self.app,
                 image=INFO_ICON,
                 tooltip_text="Nota: las funciones trigonométricas"
                 + "\ndeben recibir argumentos en radianes.",
