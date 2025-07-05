@@ -51,9 +51,10 @@ class ConfigFrame(ctkFrame):
         self.modos_dict: bidict[str, str] = bidict({"Claro": "light", "Oscuro": "dark"})
         self.temas_dict: bidict[str, str] = bidict(
             {
-                "Cerúleo": "ceruleo.json",
+                "Primavera": "primavera.json",
+                "Verano": "verano.json",
                 "Otoño": "otono.json",
-                "Violeta": "violeta.json",
+                "Invierno": "invierno.json",
             }
         )
 

@@ -48,7 +48,7 @@ class GaussUI(ctk):
         self.frac_prec_actual: int
         self.dec_prec_actual: int
 
-        self._load_config()
+        self.load_config()
         set_icon(self, self)
 
         self.theme_config = ThemeManager.theme
@@ -127,7 +127,7 @@ class GaussUI(ctk):
             dump(self.config_options, config_file, indent=4, sort_keys=True)
             LOGGER.info("¡Configuración guardada exitosamente!")
 
-    def _load_config(self) -> None:
+    def load_config(self) -> None:
         """
         Carga la configuración guardada en config.json.
         Si config.json no existe, utiliza valores por defecto.
@@ -146,7 +146,7 @@ class GaussUI(ctk):
             self.config_options = {
                 "escala": 1.0,
                 "modo": "light",
-                "tema": "ceruleo.json",
+                "tema": "primavera.json",
                 "frac_prec": 100,
                 "dec_prec": 3,
             }
