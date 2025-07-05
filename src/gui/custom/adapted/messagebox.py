@@ -133,7 +133,7 @@ class CustomMessageBox(ctkTop):
             text=self.msg,
             justify="center",
             wraplength=self.width - 30,
-        ).grid(row=1, column=0, columnspan=3, padx=3, sticky="nsew")
+        ).grid(row=1, column=0, columnspan=3, padx=3, ipady=10, sticky="nsew")
 
         self.button_1 = ctkButton(
             self.frame_top,
