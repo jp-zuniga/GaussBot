@@ -70,8 +70,8 @@ was rotated to obtain up, left, and right-pointing versions.
 ## Themes
 
 GaussBot's [themes and color palettes](https://github.com/jp-zuniga/GaussBot/tree/main/src/assets/themes)
-are based on the work of [a13xe](https://github.com/a13xe), who generously dedicated their CustomTkinter
-theme designs to the public domain.
+are based on the work of [a13xe](https://github.com/a13xe), who generously dedicated their
+[CustomTkinter theme designs](https://github.com/a13xe/CTkThemesPack) to the public domain.
 
 | Personalized Theme |                                   Original Theme                                    | Licensed Under |
 | :----------------: | :---------------------------------------------------------------------------------: | :------------: |
