@@ -7,10 +7,18 @@ los datos de MatricesManager y VectoresManager.
 from fractions import Fraction
 from json import JSONDecodeError, dump, load
 
-from . import MatricesManager, VectoresManager
-from .. import FRAC_PREC
-from ..models import FractionDecoder, FractionEncoder, Matriz, Vector
-from ..utils import LOGGER, MATRICES_PATH, SISTEMAS_PATH, VECTORES_PATH, format_proc_num
+from src import FRAC_PREC
+from src.models import FractionDecoder, FractionEncoder, Matriz, Vector
+from src.utils import (
+    LOGGER,
+    MATRICES_PATH,
+    SISTEMAS_PATH,
+    VECTORES_PATH,
+    format_proc_num,
+)
+
+from .mats_manager import MatricesManager
+from .vecs_manager import VectoresManager
 
 
 class OpsManager:
@@ -26,12 +34,12 @@ class OpsManager:
         """
         Args:
             mats_manager: Manejador de matrices a utilizar para el sistema.
-            mats_manager: Manejador de vectores a utilizar para el sistema.
+            vecs_manager: Manejador de vectores a utilizar para el sistema.
 
         Raises:
             TypeError: Si los argumentos dados no son
                        de tipo MatricesManager | VectoresManager.
-        ---
+
         """
 
         if mats_manager is not None and not isinstance(mats_manager, MatricesManager):
@@ -68,7 +76,7 @@ class OpsManager:
             (str, str, Matriz): Procedimiento de la operación,
                                 nombre de la matriz resultante y
                                 la matriz resultante de la multiplicación.
-        ---
+
         """
 
         mat: Matriz = self.mats_manager.mats_ingresadas[nombre_mat]
@@ -76,7 +84,7 @@ class OpsManager:
         if mat.columnas != len(vec):
             raise ArithmeticError(
                 "El número de columnas de la matriz debe ser "
-                + "igual al número de componentes del vector."
+                 "igual al número de componentes del vector.",
             )
 
         # inicializar la lista 2D de la matriz resultante
@@ -95,13 +103,13 @@ class OpsManager:
         mat_proc = Matriz(
             filas=mat.filas,
             columnas=len(vec),
-            valores=[
+            valores=[  # type: ignore[reportArgumentType]
                 [
                     format_proc_num(
                         (
                             mat[i, j].limit_denominator(FRAC_PREC["prec"]),
                             vec.componentes[j].limit_denominator(FRAC_PREC["prec"]),
-                        )
+                        ),
                     )
                     for j in range(len(vec))
                 ]
@@ -148,12 +156,12 @@ class OpsManager:
         if sistemas_dict == {}:
             SISTEMAS_PATH.write_text("")
             LOGGER.info(
-                "No hay sistemas de ecuaciones para guardar, dejando archivo vacío..."
+                "No hay sistemas de ecuaciones para guardar, dejando archivo vacío...",
             )
 
             return
 
-        with open(SISTEMAS_PATH, mode="w", encoding="utf-8") as sistemas_file:
+        with SISTEMAS_PATH.open(mode="w") as sistemas_file:
             dump(
                 sistemas_dict,
                 sistemas_file,
@@ -163,7 +171,7 @@ class OpsManager:
             )
 
             LOGGER.info(
-                "Sistemas de ecuaciones guardados en '%s' exitosamente.", SISTEMAS_PATH
+                "Sistemas de ecuaciones guardados en '%s' exitosamente.", SISTEMAS_PATH,
             )
 
     def save_matrices(self) -> None:
@@ -196,7 +204,7 @@ class OpsManager:
             LOGGER.info("No hay matrices para guardar, dejando archivo vacío...")
             return
 
-        with open(MATRICES_PATH, mode="w", encoding="utf-8") as matrices_file:
+        with MATRICES_PATH.open(mode="w") as matrices_file:
             dump(
                 matrices_dict,
                 matrices_file,
@@ -232,7 +240,7 @@ class OpsManager:
             LOGGER.info("No hay vectores para guardar, dejando archivo vacío...")
             return
 
-        with open(VECTORES_PATH, "w", encoding="utf-8") as vectores_file:
+        with VECTORES_PATH.open(mode="w") as vectores_file:
             dump(
                 vectores_dict,
                 vectores_file,
@@ -249,7 +257,7 @@ class OpsManager:
 
         Returns:
             dict[str, Matriz]: Diccionario con los sistemas cargados.
-        ---
+
         """
 
         # si no existe sistemas.json, retornar un diccionario vacio
@@ -257,7 +265,7 @@ class OpsManager:
             LOGGER.info("Archivo '%s' no existe...", SISTEMAS_PATH)
             return {}
 
-        with open(SISTEMAS_PATH, mode="r", encoding="utf-8") as sistemas_file:
+        with SISTEMAS_PATH.open() as sistemas_file:
             try:
                 sistemas_dict: dict = load(sistemas_file, cls=FractionDecoder)
                 LOGGER.info("Sistemas de ecuaciones cargados exitosamente.")
@@ -278,7 +286,7 @@ class OpsManager:
                 else:
                     # si no, es un error de verdad
                     LOGGER.error(
-                        "Error al leer archivo '%s':\n%s", SISTEMAS_PATH, str(j)
+                        "Error al leer archivo '%s':\n%s", SISTEMAS_PATH, str(j),
                     )
                 return {}
 
@@ -288,14 +296,14 @@ class OpsManager:
 
         Returns:
             dict[str, Matriz]: Diccionario con las matrices cargadas.
-        ---
+
         """
 
         if not MATRICES_PATH.exists():
             LOGGER.info("Archivo '%s' no existe...", MATRICES_PATH)
             return {}
 
-        with open(MATRICES_PATH, mode="r", encoding="utf-8") as matrices_file:
+        with MATRICES_PATH.open() as matrices_file:
             try:
                 matrices_dict: dict = load(matrices_file, cls=FractionDecoder)
                 LOGGER.info("Matrices cargadas exitosamente.")
@@ -316,7 +324,7 @@ class OpsManager:
                 else:
                     # si no, es un error de verdad
                     LOGGER.error(
-                        "Error al leer archivo '%s':\n%s", MATRICES_PATH, str(j)
+                        "Error al leer archivo '%s':\n%s", MATRICES_PATH, str(j),
                     )
                 return {}
 
@@ -326,14 +334,14 @@ class OpsManager:
 
         Returns:
             dict[str, Vector]: Diccionario con los vectores cargados.
-        ---
+
         """
 
         if not VECTORES_PATH.exists():
             LOGGER.info("Archivo '%s' no existe...", VECTORES_PATH)
             return {}
 
-        with open(VECTORES_PATH, mode="r", encoding="utf-8") as vectores_file:
+        with VECTORES_PATH.open() as vectores_file:
             try:
                 vectores_dict: dict = load(vectores_file, cls=FractionDecoder)
                 LOGGER.info("Vectores cargados exitosamente.")
@@ -349,6 +357,6 @@ class OpsManager:
                 else:
                     # si no, es un error de verdad
                     LOGGER.error(
-                        "Error al leer archivo '%s':\n%s", VECTORES_PATH, str(j)
+                        "Error al leer archivo '%s':\n%s", VECTORES_PATH, str(j),
                     )
                 return {}

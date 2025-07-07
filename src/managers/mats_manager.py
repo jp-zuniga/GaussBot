@@ -5,8 +5,8 @@ Almacena matrices, realiza operaciones y retorna resultados.
 
 from fractions import Fraction
 
-from ..models import Matriz, SistemaEcuaciones
-from ..utils import format_factor, format_proc_num
+from src.models import Matriz, SistemaEcuaciones
+from src.utils import format_factor, format_proc_num
 
 
 class MatricesManager:
@@ -28,7 +28,7 @@ class MatricesManager:
 
         Raises:
             TypeError: Si mats_ingresadas o sis_ingresados no son un dict[str, Matriz].
-        ---
+
         """
 
         if mats_ingresadas is None:
@@ -63,7 +63,7 @@ class MatricesManager:
 
         Returns:
             str: String que contiene todas las matrices.
-        ---
+
         """
 
         if calculada not in (-1, 0, 1):
@@ -82,10 +82,10 @@ class MatricesManager:
         matrices += "---------------------------------------------"
         for nombre, mat in self.mats_ingresadas.items():
             if (
-                calculada == 0
-                and len(nombre) > 1
-                or calculada == 1
-                and len(nombre) == 1
+                (calculada == 0
+                and len(nombre) > 1)
+                or (calculada == 1
+                and len(nombre) == 1)
             ):
                 continue
             matrices += f"\n{nombre}:\n"
@@ -104,14 +104,14 @@ class MatricesManager:
         Formatear los sistemas guardados como un solo string.
 
         Args:
-            calculada: Bandera para indicar cuales sistemas mostrar.
+            calculado: Bandera para indicar cuales sistemas mostrar.
 
         Raises:
             ValueError: Si calculada no -1, 0 o 1.
 
         Returns:
             str: String que contiene todos los sistemas.
-        ---
+
         """
 
         if calculado not in (-1, 0, 1):
@@ -130,10 +130,10 @@ class MatricesManager:
         sistemas += "---------------------------------------------"
         for nombre, sis in self.sis_ingresados.items():
             if (
-                calculado == 0
-                and len(nombre) > 1
-                or calculado == 1
-                and len(nombre) == 1
+                (calculado == 0
+                and len(nombre) > 1)
+                or (calculado == 1
+                and len(nombre) == 1)
             ):
                 continue
             sistemas += f"\n{nombre}:\n"
@@ -160,7 +160,7 @@ class MatricesManager:
 
         Returns:
             SistemaEcuaciones: objeto con el sistema resuelto.
-        ---
+
         """
 
         sistema = SistemaEcuaciones(self.sis_ingresados[nombre_sis])
@@ -175,13 +175,13 @@ class MatricesManager:
         return sistema
 
     def suma_resta_mats(
-        self, operacion: bool, nombre_mat1: str, nombre_mat2: str
+        self, operacion: bool, nombre_mat1: str, nombre_mat2: str,
     ) -> tuple[str, str, Matriz]:
         """
         Sumar o restar las dos matrices indicadas.
 
         Args:
-            operación:   True para sumar, False para restar.
+            operacion:   True para sumar, False para restar.
             nombre_mat1: Nombre de la primer matriz.
             nombre_mat2: Nombre de la segunda matriz.
 
@@ -192,7 +192,7 @@ class MatricesManager:
             (str, str, Matriz): Procedimiento de la operación realizada,
                                 nombre de la matriz resultante (e.g. 'A + B') y
                                 matriz resultante de la operación.
-        ---
+
         """
 
         mat1: Matriz = self.mats_ingresadas[nombre_mat1]
@@ -210,7 +210,7 @@ class MatricesManager:
             aumentada=False,
             filas=mat1.filas,
             columnas=mat1.columnas,
-            valores=[
+            valores=[  # type: ignore[reportArgumentType]
                 [
                     f"{
                         format_proc_num(
@@ -238,7 +238,7 @@ class MatricesManager:
         return (proc, nombre_mat_resultado, mat_resultado)
 
     def escalar_por_mat(
-        self, escalar: Fraction, nombre_mat: str
+        self, escalar: Fraction, nombre_mat: str,
     ) -> tuple[str, str, Matriz]:
         """
         Multiplicar la matriz indicada por el escalar especificado.
@@ -251,7 +251,7 @@ class MatricesManager:
             (str, str, Matriz): Procedimiento de la operación realizada,
                                 nombre de la matriz resultante (e.g. 'kA') y
                                 matriz resultante de la operación.
-        ---
+
         """
 
         mat: Matriz = self.mats_ingresadas[nombre_mat]
@@ -263,7 +263,7 @@ class MatricesManager:
         mat_proc = Matriz(
             filas=mat.filas,
             columnas=mat.columnas,
-            valores=[
+            valores=[  # type: ignore[reportArgumentType]
                 [
                     f"{format_proc_num((escalar, mat[f, c].limit_denominator(1000)))}"
                     for c in range(mat.columnas)
@@ -296,7 +296,7 @@ class MatricesManager:
             (str, str, Matriz): Procedimiento de la operación realizada,
                                 nombre de la matriz resultante (e.g. 'A • B') y
                                 matriz resultante de la operación.
-        ---
+
         """
 
         nombre_mat_mult = f"{nombre_mat1} • {nombre_mat2}"
@@ -307,7 +307,7 @@ class MatricesManager:
         mat_proc = Matriz(
             filas=mat1.filas,
             columnas=mat2.columnas,
-            valores=[
+            valores=[  # type: ignore[reportArgumentType]
                 [
                     " + ".join(
                         f"{
@@ -350,7 +350,7 @@ class MatricesManager:
             (str, str, Fraction): Procedimiento de la operación realizada,
                                   nombre de la matriz resultante (e.g. '| A |') y
                                   determinante de la matriz.
-        ---
+
         """
 
         nombre_det = f"| {nombre_mat} |"
@@ -358,10 +358,10 @@ class MatricesManager:
 
         used_det_formula: bool = mat.filas <= 2 and mat.columnas <= 2
         if used_det_formula:
-            det: Fraction = mat.calcular_det()
+            det: Fraction = mat.calcular_det()  # type: ignore[reportAssignmentType]
             intercambio: bool = False
         else:
-            det, mat_triangular, intercambio = mat.calcular_det()
+            det, mat_triangular, intercambio = mat.calcular_det()  # type: ignore[reportGeneralTypeIssues]
 
         proc: str = "---------------------------------------------\n"
         proc += f"{nombre_mat}:\n{mat}\n"
@@ -392,17 +392,17 @@ class MatricesManager:
             proc += "transformando la matriz en una matriz triangular superior,\n"
             proc += "y multiplicando todos elementos de la diagonal principal.\n\n"
 
-            proc += f"Matriz triangular superior:\n{mat_triangular}\n\n"
+            proc += f"Matriz triangular superior:\n{mat_triangular}\n\n"  # type: ignore[reportPossiblyUnboundVariable]
             proc += f"{nombre_det}  =  "
 
             diagonales: str = " • ".join(
                 format_factor(
-                    mat_triangular[i, i].limit_denominator(1000),
+                    mat_triangular[i, i].limit_denominator(1000),  # type: ignore[reportPossiblyUnboundVariable]
                     mult=False,
                     parenth_negs=True,
                     skip_ones=False,
                 )
-                for i in range(mat_triangular.filas)
+                for i in range(mat_triangular.filas)  # type: ignore[reportPossiblyUnboundVariable]
             )
 
             proc += f"[ {diagonales} ]\n"
@@ -431,7 +431,7 @@ class MatricesManager:
             (str, str, Matriz): Procedimiento de la operación realizada,
                                 nombre de la matriz resultante (e.g. 'A_t') y
                                 matriz resultante de la operación.
-        ---
+
         """
 
         nombre_mat_transpuesta = f"{nombre_mat}_t"
@@ -477,7 +477,7 @@ class MatricesManager:
             (str, str, Matriz): Procedimiento de la operación realizada,
                                 nombre de la matriz resultante (e.g. 'A_i') y
                                 matriz resultante de la operación.
-        ---
+
         """
 
         nombre_mat_invertida = f"{nombre_mat}_i"
@@ -502,7 +502,7 @@ class MatricesManager:
 
         Returns:
             bool: Si el diccionario está vacío o no.
-        ---
+
         """
 
         return self.mats_ingresadas != {}
@@ -513,7 +513,7 @@ class MatricesManager:
 
         Returns:
             bool: Si el diccionario está vacío o no.
-        ---
+
         """
 
         return self.sis_ingresados != {}

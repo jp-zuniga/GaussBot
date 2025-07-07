@@ -11,8 +11,8 @@ from copy import deepcopy
 from fractions import Fraction
 from typing import overload
 
-from .. import FRAC_PREC
-from ..utils import format_factor
+from src import FRAC_PREC
+from src.utils import format_factor
 
 
 class Matriz:
@@ -36,6 +36,7 @@ class Matriz:
 
         Raises:
             ValueError: si las dimensiones de la matriz no son positivas.
+
         """
 
         if filas < 1 or columnas < 1:
@@ -92,16 +93,16 @@ class Matriz:
     def __getitem__(self, indice: slice) -> list[list[Fraction]]: ...
 
     @overload
-    def __getitem__(self, indices: tuple[slice, int]) -> list[Fraction]: ...
+    def __getitem__(self, indice: tuple[slice, int]) -> list[Fraction]: ...
 
     @overload
-    def __getitem__(self, indices: tuple[int, slice]) -> list[Fraction]: ...
+    def __getitem__(self, indice: tuple[int, slice]) -> list[Fraction]: ...
 
     @overload
-    def __getitem__(self, indices: tuple[int, int]) -> Fraction: ...
+    def __getitem__(self, indice: tuple[int, int]) -> Fraction: ...
 
     @overload
-    def __getitem__(self, indices: tuple[slice, slice]) -> list[list[Fraction]]: ...
+    def __getitem__(self, indice: tuple[slice, slice]) -> list[list[Fraction]]: ...
 
     def __getitem__(
         self,
@@ -134,7 +135,7 @@ class Matriz:
         Raises:
             IndexError: Si los índices están fuera de rango.
             TypeError:  Si los índices son de tipo inválido.
-        ---
+
         """
 
         if isinstance(indice, int) and -self.filas <= indice < self.filas:
@@ -210,9 +211,21 @@ class Matriz:
 
         Returns:
             int: Número de filas de self.
+
         """
 
         return len(self.valores)
+
+    def __hash__(self) -> int:
+        """
+        Hashear la lista 2D de elementos de la matriz.
+
+        Returns:
+            int: Hash de 'self.valores'.
+
+        """
+
+        return hash(self.valores)
 
     def __eq__(self, other: object) -> bool:
         """
@@ -223,7 +236,7 @@ class Matriz:
 
         Returns:
             bool: Si self es igual a other.
-        ---
+
         """
 
         # si no se recibe otra matriz, no son iguales
@@ -237,8 +250,8 @@ class Matriz:
         # todos los valores deben ser iguales
         return all(
             a == b
-            for fila1, fila2 in zip(self.valores, other.valores)
-            for a, b in zip(fila1, fila2)
+            for fila1, fila2 in zip(self.valores, other.valores, strict=False)
+            for a, b in zip(fila1, fila2, strict=False)
         )
 
     def __str__(self) -> str:
@@ -248,7 +261,7 @@ class Matriz:
 
         Returns:
             str: self representado en texto formateado y legible.
-        ---
+
         """
 
         bounds: tuple[str, str] = ("[ ", " ]") if self.columnas == 1 else ("(", ")")
@@ -265,8 +278,8 @@ class Matriz:
                         skip_ones=False,
                     )
                     if isinstance(self[i, j], Fraction)
-                    else self[i, j]
-                )
+                    else self[i, j],
+                ),
             )
             for i in range(self.filas)
             for j in range(self.columnas)
@@ -286,7 +299,7 @@ class Matriz:
                         skip_ones=False,
                     )
                     if isinstance(self[i, j], Fraction)
-                    else self[i, j]
+                    else self[i, j],
                 ).center(max_len)
 
                 # para matrices nx1, cerrar parentesis immediatamente
@@ -318,7 +331,7 @@ class Matriz:
 
         Raises:
             ArithmeticError: Si las matrices no tienen las mismas dimensiones.
-        ---
+
         """
 
         if self.filas != mat2.filas or self.columnas != mat2.columnas:
@@ -326,8 +339,8 @@ class Matriz:
 
         # sumar todos los valores correspondientes de las matrices
         mat_sumada: list[list[Fraction]] = [
-            [a + b for a, b in zip(filas1, filas2)]
-            for filas1, filas2 in zip(self.valores, mat2.valores)
+            [a + b for a, b in zip(filas1, filas2, strict=False)]
+            for filas1, filas2 in zip(self.valores, mat2.valores, strict=False)
         ]
 
         # retornar un nuevo objeto Matriz() con los valores sumados
@@ -342,7 +355,7 @@ class Matriz:
 
         Raises:
             ArithmeticError: Si las matrices no tienen las mismas dimensiones.
-        ---
+
         """
 
         if self.filas != mat2.filas or self.columnas != mat2.columnas:
@@ -350,20 +363,20 @@ class Matriz:
 
         # restar todos los valores correspondientes de las matrices
         mat_restada: list[list[Fraction]] = [
-            [a - b for a, b in zip(filas1, filas2)]
-            for filas1, filas2 in zip(self.valores, mat2.valores)
+            [a - b for a, b in zip(filas1, filas2, strict=False)]
+            for filas1, filas2 in zip(self.valores, mat2.valores, strict=False)
         ]
 
         # retornar un nuevo objeto Matriz() con los valores sumados
         return Matriz(self.filas, self.columnas, valores=mat_restada)
 
     @overload
-    def __mul__(self, mat2: Matriz) -> Matriz: ...
+    def __mul__(self, multiplicador: Matriz) -> Matriz: ...
 
     @overload
-    def __mul__(self, escalar: int | float | Fraction) -> Matriz: ...
+    def __mul__(self, multiplicador: float | Fraction) -> Matriz: ...
 
-    def __mul__(self, multiplicador: Matriz | int | float | Fraction) -> Matriz:
+    def __mul__(self, multiplicador: Matriz | float | Fraction) -> Matriz:
         """
         Overload de operador para realizar multiplicación con matrices.
         Si se multiplica por un número, se realiza multiplicación escalar.
@@ -379,7 +392,7 @@ class Matriz:
         Raises:
             ArithmeticError: Si las dimensiones de las matrices son inválidas.
             TypeError:       Si el tipo de dato del argumento es inválido.
-        ---
+
         """
 
         if isinstance(multiplicador, Matriz):
@@ -387,8 +400,8 @@ class Matriz:
             if self.columnas != multiplicador.filas:
                 raise ArithmeticError(
                     "Las matrices no son compatibles para multiplicación.\n"
-                    + "El número de columnas de la primera matriz debe ser\n"
-                    + "igual al número de filas de la segunda matriz."
+                    "El número de columnas de la primera matriz debe ser\n"
+                    "igual al número de filas de la segunda matriz.",
                 )
 
             # inicializar una matriz cero con las dimensiones correctas
@@ -416,7 +429,7 @@ class Matriz:
 
         raise TypeError("Tipo de dato inválido.")
 
-    def __rmul__(self, multiplicador: int | float | Fraction) -> Matriz:
+    def __rmul__(self, multiplicador: float | Fraction) -> Matriz:
         """
         Overload de operador para realizar multiplicación entre un escalar y una matriz.
 
@@ -428,7 +441,7 @@ class Matriz:
 
         Raises:
             TypeError: Si el tipo de dato del argumento es inválido.
-        ---
+
         """
 
         if isinstance(multiplicador, (int, float, Fraction)):
@@ -446,7 +459,7 @@ class Matriz:
 
         Returns:
             bool: Si todos los elementos de self son cero.
-        ---
+
         """
 
         return all(all(x == Fraction(0) for x in fila) for fila in self.valores)
@@ -457,7 +470,7 @@ class Matriz:
 
         Returns:
             bool: Si la matriz es cuadrada.
-        ---
+
         """
 
         return self.filas == self.columnas
@@ -468,7 +481,7 @@ class Matriz:
 
         Returns:
             bool: Si self es una matriz identidad.
-        ---
+
         """
 
         diagonales_son_1 = all(self[i, i] == Fraction(1) for i in range(self.filas))
@@ -491,7 +504,7 @@ class Matriz:
             (Matriz, bool):
                 Los valores modificados y
                 una bandera indicando si hubo intercambio de filas.
-        ---
+
         """
 
         # deepcopy() para no afectar los valores de self
@@ -519,10 +532,11 @@ class Matriz:
 
             # hacer 0 los valores debajo de la diagonal principal
             for j in range(i + 1, self.filas):
-                try:
-                    factor = mat_triangular[j][i] / mat_triangular[i][i]
-                except ZeroDivisionError:
-                    pass
+                if mat_triangular[i][i] == 0:
+                    continue
+
+                factor = mat_triangular[j][i] / mat_triangular[i][i]
+
                 for k in range(self.columnas):
                     mat_triangular[j][k] -= factor * mat_triangular[i][k]
 
@@ -534,7 +548,7 @@ class Matriz:
 
         Returns:
             Matriz: Transposición encontrada.
-        ---
+
         """
 
         mat_transpuesta: list[list[Fraction]] = [
@@ -557,12 +571,12 @@ class Matriz:
 
         Raises:
             ArithmeticError: Si la matriz no es cuadrada.
-        ---
+
         """
 
         if not self.es_cuadrada():
             raise ArithmeticError(
-                "El determinante solo está definido para matrices cuadradas."
+                "El determinante solo está definido para matrices cuadradas.",
             )
 
         # para matrices 1x1, el determinante es el mismo valor
@@ -597,7 +611,7 @@ class Matriz:
 
         Raises:
             ArithmeticError: Si la matriz no es cuadrada.
-        ---
+
         """
 
         # construir matriz de cofactores
@@ -621,7 +635,7 @@ class Matriz:
                 if len(mat_minor) <= 2 and len(mat_minor[0]) <= 2:
                     det_minor = mat_minor.calcular_det()
                 else:
-                    det_minor, _, _ = mat_minor.calcular_det()  # type: ignore
+                    det_minor, _, _ = mat_minor.calcular_det()  # type: ignore[reportGeneralTypeIssues]
 
                 # calcular y agregar el cofactor correspondiente
                 # a la fila, columna, y minor actual:
@@ -640,20 +654,20 @@ class Matriz:
         Raises:
             ArithmeticError:   Si la matriz no es cuadrada.
             ZeroDivisionError: Si el determinante de la matriz es 0.
-        ---
+
         """
 
         if self.filas <= 2 and self.columnas <= 2:
             det = self.calcular_det()
         else:
-            det, _, _ = self.calcular_det()
+            det, _, _ = self.calcular_det()  # type: ignore[reportGeneralTypeIssues]
 
         if det == 0:
             raise ZeroDivisionError(
                 "El determinante de la matriz es 0; "
-                + "por lo tanto, no se puede encontrar su inversa."
+                "por lo tanto, no se puede encontrar su inversa.",
             )
 
         adjunta: Matriz = self.encontrar_adjunta()
-        inversa: Matriz = adjunta * Fraction(1 / det)
-        return (inversa, adjunta, det)
+        inversa: Matriz = adjunta * Fraction(1 / det)  # type: ignore[reportOperatorIssue]
+        return (inversa, adjunta, det)  # type: ignore[reportReturnType]

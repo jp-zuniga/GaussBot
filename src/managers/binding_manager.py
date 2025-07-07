@@ -5,7 +5,7 @@ bindings a las teclas de flecha para navegar entre entries.
 
 from tkinter import Event
 
-from ..gui.custom import CustomEntry
+from src.gui.custom import CustomEntry
 
 
 class KeyBindingManager:
@@ -30,7 +30,7 @@ class KeyBindingManager:
             ValueError: Si 'entry_list' o 'extra_entries' son listas vacías;
                         si 'es_matriz' es True y 'entry_list' no es una lista 2D;
                         si 'es_matriz' es False y 'entry_list' no es una lista 1D.
-        ---
+
         """
 
         self.es_matriz = es_matriz
@@ -46,15 +46,19 @@ class KeyBindingManager:
         if self.extra_entries == []:
             raise ValueError("Argumento 'extra_entries' no puede ser una lista vacía.")
 
-        if self.es_matriz and not all(isinstance(row, list) for row in self.entry_list):
-            raise ValueError(
-                "Para una matriz, 'entry_list' debe ser una lista bidimensional."
-            )
-        if not self.es_matriz and any(
-            isinstance(item, list) for item in self.entry_list
+        if self.es_matriz and not all(
+            isinstance(row, list)
+            for row in self.entry_list  # type: ignore[reportOptionalIterable]
         ):
             raise ValueError(
-                "Para un vector, 'entry_list' debe ser una lista unidimensional."
+                "Para una matriz, 'entry_list' debe ser una lista bidimensional.",
+            )
+        if not self.es_matriz and any(
+            isinstance(item, list)
+            for item in self.entry_list  # type: ignore[reportOptionalIterable]
+        ):
+            raise ValueError(
+                "Para un vector, 'entry_list' debe ser una lista unidimensional.",
             )
 
     def create_key_bindings(self) -> None:
@@ -64,6 +68,7 @@ class KeyBindingManager:
         Raises:
             ValueError: Si 'entry_list' o 'extra_entries' son None.
         ---
+
         """
 
         if self.entry_list is None:
@@ -73,11 +78,11 @@ class KeyBindingManager:
 
         if self.es_matriz:
             for i, row in enumerate(self.entry_list):
-                for j, entry in enumerate(row):
+                for j, entry in enumerate(row):  # type: ignore[reportArgumentType]
                     self._bind_mat_entry(i, j, entry)
         else:
             for i, entry in enumerate(self.entry_list):
-                self._bind_vec_entry(i, entry)
+                self._bind_vec_entry(i, entry)  # type: ignore[reportArgumentType]
 
     def _bind_mat_entry(self, row: int, column: int, entry: CustomEntry) -> None:
         """
@@ -88,9 +93,10 @@ class KeyBindingManager:
             column: Columna del entry.
             entry:  CustomEntry a configurar.
         ---
+
         """
 
-        nombre_entry, filas_entry = self.extra_entries
+        nombre_entry, filas_entry = self.extra_entries  # type: ignore[reportGeneralTypeIssues]
         entry.bind("<Up>", lambda _: self._entry_move_up(row, column, filas_entry))
         entry.bind("<Down>", lambda _: self._entry_move_down(row, column, nombre_entry))
         entry.bind("<Left>", lambda _: self._entry_move_left(row, column))
@@ -105,9 +111,10 @@ class KeyBindingManager:
             row:    Fila del entry.
             entry:  CustomEntry a configurar.
         ---
+
         """
 
-        nombre_entry, dimensiones_entry = self.extra_entries
+        nombre_entry, dimensiones_entry = self.extra_entries  # type: ignore[reportGeneralTypeIssues]
         entry.bind("<Up>", lambda _: self._entry_move_up(row, -1, dimensiones_entry))
         entry.bind("<Down>", lambda _: self._entry_move_down(row, -1, nombre_entry))
         entry.bind("<Control-Tab>", self.autocomplete_all)
@@ -122,13 +129,14 @@ class KeyBindingManager:
             column:     Columna del entry.
             data_entry: CustomEntry a configurar.
         ---
+
         """
 
         if row > 0:
             if self.es_matriz:
-                self.entry_list[row - 1][column].focus_set()
+                self.entry_list[row - 1][column].focus_set()  # type: ignore[reportOptionalSubscript]
             else:
-                self.entry_list[row - 1].focus_set()
+                self.entry_list[row - 1].focus_set()  # type: ignore[reportOptionalSubscript]
         elif row == 0:
             if self.es_matriz:
                 KeyBindingManager.focus_filas(data_entry)
@@ -136,7 +144,10 @@ class KeyBindingManager:
                 KeyBindingManager.focus_dimensiones(data_entry)
 
     def _entry_move_down(
-        self, row: int, column: int, nombre_entry: CustomEntry
+        self,
+        row: int,
+        column: int,
+        nombre_entry: CustomEntry,
     ) -> None:
         """
         Cambiar focus al entry debajo del actual,
@@ -147,14 +158,15 @@ class KeyBindingManager:
             column:       Columna del entry.
             nombre_entry: CustomEntry a configurar.
         ---
+
         """
 
-        if row < len(self.entry_list) - 1:
+        if row < len(self.entry_list) - 1:  # type: ignore[reportArgumentType]
             if self.es_matriz:
-                self.entry_list[row + 1][column].focus_set()
+                self.entry_list[row + 1][column].focus_set()  # type: ignore[reportOptionalSubscript]
             else:
-                self.entry_list[row + 1].focus_set()
-        elif row == len(self.entry_list) - 1:
+                self.entry_list[row + 1].focus_set()  # type: ignore[reportOptionalSubscript]
+        elif row == len(self.entry_list) - 1:  # type: ignore[reportArgumentType]
             nombre_entry.focus_set()
 
     def _entry_move_left(self, row: int, column: int) -> None:
@@ -168,13 +180,14 @@ class KeyBindingManager:
             row:    Fila del entry.
             column: Columna del entry.
         ---
+
         """
 
         if column > 0:
-            self.entry_list[row][column - 1].focus_set()
+            self.entry_list[row][column - 1].focus_set()  # type: ignore[reportOptionalSubscript]
         elif column == 0:
             if row > 0:
-                self.entry_list[row - 1][-1].focus_set()
+                self.entry_list[row - 1][-1].focus_set()  # type: ignore[reportOptionalSubscript]
             elif row == 0:
                 self.focus_last()
 
@@ -189,14 +202,15 @@ class KeyBindingManager:
             row:    Fila del entry.
             column: Columna del entry.
         ---
+
         """
 
-        if column < len(self.entry_list[row]) - 1:
-            self.entry_list[row][column + 1].focus_set()
-        elif column == len(self.entry_list[row]) - 1:
-            if row < len(self.entry_list) - 1:
-                self.entry_list[row + 1][0].focus_set()
-            elif row == len(self.entry_list) - 1:
+        if column < len(self.entry_list[row]) - 1:  # type: ignore[reportOptionalSubscript]
+            self.entry_list[row][column + 1].focus_set()  # type: ignore[reportOptionalSubscript]
+        elif column == len(self.entry_list[row]) - 1:  # type: ignore[reportOptionalSubscript]
+            if row < len(self.entry_list) - 1:  # type: ignore[reportArgumentType]
+                self.entry_list[row + 1][0].focus_set()  # type: ignore[reportOptionalSubscript]
+            elif row == len(self.entry_list) - 1:  # type: ignore[reportArgumentType]
                 self.focus_first()
 
     def focus_first(self) -> None:
@@ -206,9 +220,9 @@ class KeyBindingManager:
 
         try:
             if self.es_matriz:
-                self.entry_list[0][0].focus_set()
+                self.entry_list[0][0].focus_set()  # type: ignore[reportOptionalSubscript]
             else:
-                self.entry_list[0].focus_set()
+                self.entry_list[0].focus_set()  # type: ignore[reportOptionalSubscript]
         except IndexError:
             pass
 
@@ -219,9 +233,9 @@ class KeyBindingManager:
 
         try:
             if self.es_matriz:
-                self.entry_list[-1][-1].focus_set()
+                self.entry_list[-1][-1].focus_set()  # type: ignore[reportOptionalSubscript]
             else:
-                self.entry_list[-1].focus_set()
+                self.entry_list[-1].focus_set()  # type: ignore[reportOptionalSubscript]
         except IndexError:
             pass
 
@@ -231,16 +245,17 @@ class KeyBindingManager:
 
         Args:
             event: Evento de tkinter que desencadenó este método.
+
         """
 
         del event
         if self.es_matriz:
-            for row in self.entry_list:
-                for entry in row:
+            for row in self.entry_list:  # type: ignore[reportOptionalIterable]
+                for entry in row:  # type: ignore[reportGeneralTypeIssues]
                     entry.autocomplete_placeholder(event=None)
         else:
-            for entry in self.entry_list:
-                entry.autocomplete_placeholder(event=None)
+            for entry in self.entry_list:  # type: ignore[reportOptionalIterable]
+                entry.autocomplete_placeholder(event=None)  # type: ignore[reportAttributeAccessIssue]
         return "break"
 
     @staticmethod
@@ -251,6 +266,7 @@ class KeyBindingManager:
         Args:
             dimensiones_entry: Entry a enfocar.
         ---
+
         """
 
         dimensiones_entry.focus_set()
@@ -263,6 +279,7 @@ class KeyBindingManager:
         Args:
             filas_entry: Entry a enfocar.
         ---
+
         """
 
         filas_entry.focus_set()
@@ -275,6 +292,7 @@ class KeyBindingManager:
         Args:
             columnas_entry: Entry a enfocar.
         ---
+
         """
 
         columnas_entry.focus_set()

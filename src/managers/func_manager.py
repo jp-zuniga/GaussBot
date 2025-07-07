@@ -12,10 +12,10 @@ from customtkinter import CTkImage as ctkImage
 from sympy import lambdify
 from sympy.sets import Contains
 
-from ..models import Func
-from ..utils import FUNCIONES_PATH, LOGGER
+from src.models import Func
+from src.utils import FUNCIONES_PATH, LOGGER
 
-MARGEN_ERROR = Decimal(1e-4)
+MARGEN_ERROR = Decimal("1e-4")
 MAX_ITERACIONES: int = 100
 
 
@@ -26,14 +26,14 @@ class FuncManager:
     y realiza operaciones sobre ellas.
     """
 
-    def __init__(self, funcs_ingresadas: dict[str, Func] | None = None):
+    def __init__(self, funcs_ingresadas: dict[str, Func] | None = None) -> None:
         """
         Args:
             funcs_ingresadas: Diccionario de funciones guardadas.
 
         Raises:
             TypeError: Si funcs_ingresadas no es un dict[str, Func].
-        ---
+
         """
 
         if funcs_ingresadas is None:
@@ -52,23 +52,19 @@ class FuncManager:
 
         Returns:
             list[CTkImage]: Las imagenes de todas las funciones guardadas.
-        ---
+
         """
 
         if not self._validar_funcs_ingresadas():
             return []
-
-        funcs: list[ctkImage] = []
-        for func in self.funcs_ingresadas.values():
-            funcs.append(func.get_png())
-        return funcs
+        return [func.get_png() for func in self.funcs_ingresadas.values()]
 
     @staticmethod
     def biseccion(
         func: Func,
         intervalo: tuple[Decimal, Decimal],
         error: Decimal = MARGEN_ERROR,
-        max_its: int = MAX_ITERACIONES,
+        max_its: int = MAX_ITERACIONES,  # noqa: ARG004
     ) -> bool | tuple[Decimal, Decimal, list[list[str]], int]:
         """
         Implementación del método de bisección,
@@ -90,7 +86,7 @@ class FuncManager:
                 valor y de raíz,
                 registro de iteraciones e
                 iteración final.
-        ---
+
         """
 
         if not func.es_continua(intervalo):
@@ -106,7 +102,7 @@ class FuncManager:
                 f"{func.nombre[0]}(a)",
                 f"{func.nombre[0]}(b)",
                 f"{func.nombre[0]}(c)",
-            ]
+            ],
         ]
 
         a, b = float(intervalo[0]), float(intervalo[1])
@@ -135,7 +131,7 @@ class FuncManager:
                     FuncManager._format_decimal(fa),
                     FuncManager._format_decimal(fb),
                     FuncManager._format_decimal(fc),
-                ]
+                ],
             )
 
             if abs(fc) < error:
@@ -144,14 +140,14 @@ class FuncManager:
                 b: float = c
             elif fb * fc < 0:
                 a: float = c
-        return (Decimal(c), Decimal(fc), registro, -1)
+        return (Decimal(c), Decimal(fc), registro, -1)  # type: ignore[reportPossiblyUnboundVariable]
 
     @staticmethod
     def falsa_posicion(
         func: Func,
         intervalo: tuple[Decimal, Decimal],
         error: Decimal = MARGEN_ERROR,
-        max_its: int = MAX_ITERACIONES,
+        max_its: int = MAX_ITERACIONES,  # noqa: ARG004
     ) -> bool | tuple[Decimal, Decimal, list[list[str]], int]:
         """
         Implementación del método de bisección,
@@ -173,7 +169,7 @@ class FuncManager:
                 valor y de raíz,
                 registro de iteraciones e
                 iteración final.
-        ---
+
         """
 
         if not func.es_continua(intervalo):
@@ -189,7 +185,7 @@ class FuncManager:
                 f"{func.nombre[0]}(a)",
                 f"{func.nombre[0]}(b)",
                 f"{func.nombre[0]}(xᵣ)",
-            ]
+            ],
         ]
 
         a, b = float(intervalo[0]), float(intervalo[1])
@@ -218,7 +214,7 @@ class FuncManager:
                     FuncManager._format_decimal(fa),
                     FuncManager._format_decimal(fb),
                     FuncManager._format_decimal(fxr),
-                ]
+                ],
             )
 
             if abs(fxr) < error:
@@ -227,7 +223,7 @@ class FuncManager:
                 b: float = xr
             elif fb * fxr < 0:
                 a: float = xr
-        return (Decimal(xr), Decimal(fxr), registro, -1)
+        return (Decimal(xr), Decimal(fxr), registro, -1)  # type: ignore[reportPossiblyUnboundVariable]
 
     @staticmethod
     def newton(
@@ -262,7 +258,7 @@ class FuncManager:
                      1: se llegó a un valor fuera del dominio de la derivada;
                      2: se llegó a un valor fuera del dominio de la función.
                 )
-        ---
+
         """
 
         registro: list[list[str]] = [
@@ -273,7 +269,7 @@ class FuncManager:
                 "E",
                 f"{func.nombre[0]}(xᵢ)",
                 f"{func.nombre[0]}'(xᵢ)",
-            ]
+            ],
         ]
 
         derivada = func.derivar()
@@ -318,13 +314,13 @@ class FuncManager:
                     FuncManager._format_decimal(fxi),
                     FuncManager._format_decimal(fxi),
                     FuncManager._format_decimal(fxi_prima),
-                ]
+                ],
             )
 
             if abs(fxi) < error or fxi_prima == 0:
                 return (Decimal(xi), Decimal(fxi), registro, i, 0)
 
-        return (Decimal(xi), Decimal(fxi), registro, max_its, -1)
+        return (Decimal(xi), Decimal(fxi), registro, max_its, -1)  # type: ignore[reportPossiblyUnboundVariable]
 
     @staticmethod
     def secante(
@@ -359,7 +355,7 @@ class FuncManager:
                      1: se llegó a un valor fuera del dominio de la derivada;
                      2: se llegó a un valor fuera del dominio de la función.
                 )
-        ---
+
         """
 
         registro: list[list[str]] = [["Iteración", "xᵢ − 1", "xᵢ", "xᵢ + 1"]]
@@ -380,7 +376,7 @@ class FuncManager:
                     FuncManager._format_decimal(xi),
                     FuncManager._format_decimal(xn),
                     FuncManager._format_decimal(new_xn),
-                ]
+                ],
             )
 
             if abs(fxn) < error:
@@ -389,10 +385,10 @@ class FuncManager:
             xi, xn = xn, new_xn
             if xn not in f_dominio:
                 return (Decimal(xn), Decimal(fxn), registro, i, 2)
-        return (Decimal(xn), Decimal(fxn), registro, max_its, -1)
+        return (Decimal(xn), Decimal(fxn), registro, max_its, -1)  # type: ignore[reportPossiblyUnboundVariable]
 
     @staticmethod
-    def _format_decimal(num: int | float) -> str:
+    def _format_decimal(num: float) -> str:
         """
         Formatear número para uso en registro de iteraciones.
         """
@@ -427,7 +423,7 @@ class FuncManager:
             LOGGER.info("No hay funciones para guardar, dejando archivo vacío...")
             return
 
-        with open(FUNCIONES_PATH, mode="w", encoding="utf-8") as funciones_file:
+        with FUNCIONES_PATH.open(mode="w") as funciones_file:
             dump(funciones_dict, funciones_file, indent=4, sort_keys=True)
 
         LOGGER.info("Funciones guardadas en '%s' exitosamente.", FUNCIONES_PATH)
@@ -442,7 +438,7 @@ class FuncManager:
             LOGGER.info("Archivo '%s' no existe...", FUNCIONES_PATH)
             return {}
 
-        with open(FUNCIONES_PATH, mode="r", encoding="utf-8") as funciones_file:
+        with FUNCIONES_PATH.open() as funciones_file:
             try:
                 funciones_dict: dict = load(funciones_file)
                 LOGGER.info("Funciones cargadas exitosamente.")
@@ -462,7 +458,7 @@ class FuncManager:
                 else:
                     # si no, es un error de verdad
                     LOGGER.error(
-                        "Error al leer archivo '%s':\n%s", FUNCIONES_PATH, str(j)
+                        "Error al leer archivo '%s':\n%s", FUNCIONES_PATH, str(j),
                     )
                 return {}
 
@@ -473,6 +469,7 @@ class FuncManager:
         Returns:
             bool: Si el diccionario está vacío o no.
         ---
+
         """
 
         return self.funcs_ingresadas != {}

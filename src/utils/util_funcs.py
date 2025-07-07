@@ -37,7 +37,7 @@ def format_factor(
 
     Returns:
         str: El factor formateado según los parámetros.
-    ---
+
     """
 
     if factor == 1:
@@ -65,7 +65,8 @@ def format_factor(
 
 
 def format_proc_num(
-    nums: tuple[Fraction, Fraction], operador: Literal["•", "+", "−"] = "•"
+    nums: tuple[Fraction, Fraction],
+    operador: Literal["•", "+", "−"] = "•",  # type: ignore[reportRedeclaration]
 ) -> str:
     """
     Formatear un par de números para mostrarlos
@@ -77,7 +78,7 @@ def format_proc_num(
 
     Returns:
         str: La operación entre los números formateada.
-    ---
+
     """
 
     num1, num2 = nums
@@ -90,8 +91,8 @@ def format_proc_num(
 
     combine_nums = (
         f"{format_factor(num1, mult=False, parenth_negs=False)}"
-        + f" {operador} "
-        + f"{format_factor(num2, mult=False, parenth_negs=True)}"
+        f" {operador} "
+        f"{format_factor(num2, mult=False, parenth_negs=True)}"
     )
 
     return f"[ {combine_nums} ]"
@@ -102,12 +103,12 @@ def load_mode_icon(path: str, size: tuple[int, int] = (20, 20)) -> ctkImage:
     Cargar íconos de modo claro/oscuro.
 
     Args:
-        dark_path: Dirección del ícono dentro del directorio de assets.
-        size:      Tamaño a pasar a CTkImage.
+        path: Dirección del ícono dentro del directorio de assets.
+        size: Tamaño a pasar a CTkImage.
 
     Returns:
         CTkImage: Objeto de imagen conteniendo los íconos.
-    ---
+
     """
 
     with (
@@ -115,7 +116,9 @@ def load_mode_icon(path: str, size: tuple[int, int] = (20, 20)) -> ctkImage:
         as_file(files(PKG) / f"assets/icons/light/{path}") as l_path,
     ):
         return ctkImage(
-            size=size, dark_image=open_img(l_path), light_image=open_img(d_path)
+            size=size,
+            dark_image=open_img(l_path),
+            light_image=open_img(d_path),
         )
 
 
@@ -134,7 +137,9 @@ def load_numpad_icons() -> dict[str, ctkImage]:
             ):
                 img = open_img(l_path)
                 icons[item.name[:-4]] = ctkImage(
-                    size=img.size, dark_image=img, light_image=open_img(d_path)
+                    size=img.size,
+                    dark_image=img,
+                    light_image=open_img(d_path),
                 )
 
     return icons
@@ -149,7 +154,7 @@ def load_single_icon(path: str) -> ctkImage:
 
     Returns:
         CTkImage: Objeto de imagen conteniendo el ícono.
-    ---
+
     """
 
     with as_file(files(PKG) / f"assets/icons/{path}") as icon_path:
@@ -158,12 +163,11 @@ def load_single_icon(path: str) -> ctkImage:
 
 def log_setup(logger: Logger = LOGGER) -> None:
     """
-    Configurar el logger de la aplicación y
-    crear el archivo 'log.txt' si no existe.
+    Configurar el logger de la aplicación y crear el archivo 'log.txt' si no existe.
 
     Args:
         logger: Objeto Logger a configurar.
-    ---
+
     """
 
     if not LOG_PATH.exists():
@@ -171,7 +175,7 @@ def log_setup(logger: Logger = LOGGER) -> None:
         LOG_PATH.touch()
 
     # si hay mas de 500 lineas en el log, limpiarlo
-    with open(LOG_PATH, mode="r", encoding="utf-8") as log_file:
+    with LOG_PATH.open() as log_file:
         if len(log_file.readlines()) > 500:
             LOG_PATH.write_text("")
 
@@ -194,7 +198,7 @@ def generate_range(start: int, end: int) -> list[int]:
 
     Returns:
         list[int]: Números aleatorios generados.
-    ---
+
     """
 
     valid = list(range(start + 1, end))
@@ -216,7 +220,7 @@ def generate_sep(orientation: bool, size: tuple[int, int]) -> ctkImage:
 
     Returns:
         CTkImage: Imagen del separador creada.
-    ---
+
     """
 
     if orientation:
@@ -234,7 +238,7 @@ def resize_image(img: ctkImage, per: float = 0.75) -> ctkImage:
 
     Returns:
         CTkImage: Imagen redimensionada.
-    ---
+
     """
 
     width, height = img.cget("size")
@@ -244,8 +248,8 @@ def resize_image(img: ctkImage, per: float = 0.75) -> ctkImage:
     new_width = int(width * per)
     new_height = int(height * per)
 
-    dark_img: ctkImage = dark.resize((new_width, new_height), Resampling.LANCZOS)
-    light_img: ctkImage = light.resize((new_width, new_height), Resampling.LANCZOS)
+    dark_img: Image = dark.resize((new_width, new_height), Resampling.LANCZOS)
+    light_img: Image = light.resize((new_width, new_height), Resampling.LANCZOS)
     return ctkImage(dark_image=dark_img, light_image=light_img, size=dark_img.size)
 
 
@@ -258,7 +262,7 @@ def transparent_invert(img: Image) -> Image:
 
     Returns:
         Image: Imagen transparente invertida.
-    ---
+
     """
 
     r, g, b, a = img.split()

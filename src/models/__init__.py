@@ -10,8 +10,8 @@ from .sistema_ecuaciones import SistemaEcuaciones
 from .vector import Vector
 
 __all__: list[str] = [
-    "FractionEncoder",
     "FractionDecoder",
+    "FractionEncoder",
     "Func",
     "Matriz",
     "SistemaEcuaciones",
