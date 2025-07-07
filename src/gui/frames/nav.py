@@ -1,22 +1,16 @@
 """
-Implementación de la clase NavFrame,
-la barra de navegación de la aplicación.
+Implementación de barra de navegación.
 """
 
 from tkinter import Event
-from typing import TYPE_CHECKING, Optional
+from typing import TYPE_CHECKING
 
 from bidict import bidict
-from customtkinter import (
-    CTkFont as ctkFont,
-    CTkFrame as ctkFrame,
-    CTkLabel as ctkLabel,
-    ThemeManager,
-)
+from customtkinter import CTkFont, CTkFrame, CTkLabel, ThemeManager
 
-from ..custom import IconButton
-from ..custom.adapted import CustomMessageBox
-from ...utils import (
+from src.gui.custom import IconButton
+from src.gui.custom.adapted import CustomMessageBox
+from src.utils import (
     ANALISIS_ICON,
     CONFIG_ICON,
     DROPLEFT_ICON,
@@ -30,16 +24,20 @@ from ...utils import (
 )
 
 if TYPE_CHECKING:
-    from .. import GaussUI
+    from src.gui import GaussUI
 
 
-class NavFrame(ctkFrame):
+class NavFrame(CTkFrame):
     """
     Barra de navigación que contiene botones
     para navegar entre los distintos frames de la aplicación.
     """
 
     def __init__(self, app: "GaussUI", master: "GaussUI") -> None:
+        """
+        Inicializar diseño de barra de navegación.
+        """
+
         super().__init__(master, corner_radius=0)
         self.app = app
 
@@ -63,8 +61,10 @@ class NavFrame(ctkFrame):
         }
 
         # label y logo de la barra de navegacion
-        self.app_name = ctkLabel(
-            self, text="GaussBot", font=ctkFont(size=16, weight="bold")
+        self.app_name = CTkLabel(
+            self,
+            text="GaussBot",
+            font=CTkFont(size=16, weight="bold"),
         )
 
         self.hide_button = IconButton(
@@ -165,7 +165,7 @@ class NavFrame(ctkFrame):
             command=self.quit_event,
         )
 
-        self.frames: dict[str, ctkFrame] = {
+        self.frames: dict[str, CTkFrame] = {
             "home": self.app.home_frame,
             "inputs": self.app.inputs_frame,
             "matrices": self.app.matrices,
@@ -185,13 +185,17 @@ class NavFrame(ctkFrame):
                 "sistemas": self.sistemas_button,
                 "config": self.config_button,
                 "quit": self.quit_button,
-            }
+            },
         )
 
         # colocar widgets en la barra de navegacion
         self.app_name.grid(row=0, column=0, padx=0, pady=(20, 10), sticky="nse")
         self.hide_button.grid(
-            row=0, column=1, padx=(0, 10), pady=(20, 10), sticky="nse"
+            row=0,
+            column=1,
+            padx=(0, 10),
+            pady=(20, 10),
+            sticky="nse",
         )
 
         i = 1
@@ -199,18 +203,20 @@ class NavFrame(ctkFrame):
             if i == 7:
                 i += 1
 
-            if j == len(self.buttons.values()) - 1:
-                pady = (0, 10)
-            else:
-                pady = 0
+            widget.grid(
+                row=i,
+                column=0,
+                columnspan=2,
+                padx=15,
+                pady=(0, 10) if j == len(self.buttons.values()) - 1 else 0,
+                sticky="ew",
+            )
 
-            widget.grid(row=i, column=0, columnspan=2, padx=15, pady=pady, sticky="ew")
             i += 1
 
     def seleccionar_frame(self, nombre: str) -> None:
         """
-        Muestra el frame correspondiente al nombre ingresado,
-        y oculta los demás. Cambia el color del botón presionado.
+        Mostrar el frame seleccionado por el usuario.
         """
 
         # resaltar el boton seleccionado
@@ -218,7 +224,7 @@ class NavFrame(ctkFrame):
             button.configure(
                 fg_color=ThemeManager.theme["CTkFrame"]["top_fg_color"]
                 if nombre == nombre_frame
-                else "transparent"
+                else "transparent",
             )
 
         # mostrar el frame seleccionado y ocultar el resto
@@ -230,7 +236,7 @@ class NavFrame(ctkFrame):
 
     def toggle_nav(self) -> None:
         """
-        Muestra u oculta la barra de navegación.
+        Mostrar/ocultar la barra de navegación.
         """
 
         if self.hidden:
@@ -241,14 +247,15 @@ class NavFrame(ctkFrame):
                     widget.grid()
                 elif isinstance(widget, IconButton):
                     widget.configure(
-                        text=self.button_texts[self.buttons.inverse[widget]]
+                        text=self.button_texts[self.buttons.inverse[widget]],
                     )
 
-                    widget._image_label.grid_configure(columnspan=1, sticky="e")
+                    widget._image_label.grid_configure(columnspan=1, sticky="e")  # type: ignore[reportOptionalMemberAccess]  # noqa: SLF001
 
             self.hidden = False
             self.hide_button.configure(
-                image=DROPLEFT_ICON, tooltip_text="Esconder barra de navegación"
+                image=DROPLEFT_ICON,
+                tooltip_text="Esconder barra de navegación",
             )
 
             self.hide_button.grid_configure(column=1, columnspan=1, sticky="nse")
@@ -261,20 +268,22 @@ class NavFrame(ctkFrame):
                     widget.grid_remove()
                 elif isinstance(widget, IconButton):
                     widget.configure(text="")
-                    widget._image_label.grid_configure(columnspan=3, sticky="nsew")
+                    widget._image_label.grid_configure(columnspan=3, sticky="nsew")  # type: ignore[reportOptionalMemberAccess]  # noqa: SLF001
 
             self.hidden = True
             self.hide_button.configure(
-                image=DROPRIGHT_ICON, tooltip_text="Mostrar barra de navegación"
+                image=DROPRIGHT_ICON,
+                tooltip_text="Mostrar barra de navegación",
             )
 
             self.hide_button.grid_configure(column=0, columnspan=2, sticky="nse")
 
-    def quit_event(self, event: Optional[Event] = None) -> None:
+    def quit_event(self, event: Event | None = None) -> None:
         """
-        Evento de cierre de aplicación.
-        Se encarga de llamar los métodos para guardar los datos.
+        Guardar datos y cerrar aplicación.
         """
+
+        del event
 
         if hasattr(self, "_quit_box") and self._quit_box.winfo_exists():
             self._quit_box.focus()
@@ -284,7 +293,7 @@ class NavFrame(ctkFrame):
             self.app,
             name="Cerrar aplicación",
             msg="¿Está seguro que desea cerrar GaussBot?"
-            + "\n(sus cambios serán guardados)",
+            "\n(sus cambios serán guardados)",
             button_options=("Sí", "No", None),
             icon="warning",
         )

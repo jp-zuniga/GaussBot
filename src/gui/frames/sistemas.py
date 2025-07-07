@@ -1,48 +1,52 @@
 """
-Implementación de EcuacionesFrame,
-el frame que contiene todos los
-subframes relacionados a ecuaciones.
+Implementación de frame principal de operaciones de sistemas de ecuaciones.
 """
 
-from typing import TYPE_CHECKING, Optional
+from typing import TYPE_CHECKING
 
-from customtkinter import CTkButton as ctkButton, CTkFrame as ctkFrame
+from customtkinter import CTkButton, CTkFrame
+
+from src.gui.custom import ErrorFrame
+from src.managers import MatricesManager
+from src.utils import INPUTS_ICON
 
 from .subframes import ResolverSisFrame
-from ..custom import ErrorFrame
-from ..custom.adapted import CustomScrollFrame
-from ...managers import MatricesManager
-from ...utils import INPUTS_ICON
 
 if TYPE_CHECKING:
-    from ..gui import GaussUI
+    from src.gui import GaussUI
+    from src.gui.custom.adapted import CustomScrollFrame
 
 
-class SistemasFrame(ctkFrame):
+class SistemasFrame(CTkFrame):
     """
     Frame para resolver sistemas de ecuaciones.
     """
 
     def __init__(
-        self, app: "GaussUI", master: "GaussUI", mats_manager: MatricesManager
+        self,
+        app: "GaussUI",
+        master: "GaussUI",
+        mats_manager: MatricesManager,
     ) -> None:
+        """
+        Inicializar diseño de frame principal para sistemas de ecuaciones.
+        """
+
         super().__init__(master, corner_radius=0, fg_color="transparent")
         self.app = app
         self.mats_manager = mats_manager
 
-        self.dummy_frame: ctkFrame  # para pack mensaje de error inicial
+        self.dummy_frame: CTkFrame  # para pack mensaje de error inicial
 
-        self.resolver_frame: Optional[CustomScrollFrame] = None
-        self.msg_frame: Optional[ctkFrame] = None
+        self.resolver_frame: CustomScrollFrame | None = None
+        self.msg_frame: CTkFrame | None = None
 
         self.nombres_sistemas = list(self.mats_manager.sis_ingresados.keys())
         self.setup_frame()
 
     def setup_frame(self) -> None:
         """
-        Crea un tabview con pestañas para cada método de resolver sistemas.
-        Se encarga de validar si hay sistemas ingresados para que
-        los setups de los frames individuales no lo tengan que hacer.
+        Inicializar frame y widgets.
         """
 
         for widget in self.winfo_children():
@@ -51,18 +55,19 @@ class SistemasFrame(ctkFrame):
         if len(self.nombres_sistemas) == 0:
             # si no hay sistemas guardados, mostrar mensaje de error y
             # agregar boton para dirigir al usuario adonde se agregan
-            self.dummy_frame = ctkFrame(self, fg_color="transparent")
+            self.dummy_frame = CTkFrame(self, fg_color="transparent")
             self.msg_frame = ErrorFrame(
-                self.dummy_frame, msg="¡No se ha guardado ningún sistema de ecuaciones!"
+                self.dummy_frame,
+                msg="¡No se ha guardado ningún sistema de ecuaciones!",
             )
 
-            agregar_button = ctkButton(
+            agregar_button = CTkButton(
                 self.dummy_frame,
                 height=30,
                 text="Agregar sistemas",
                 image=INPUTS_ICON,
                 command=lambda: (
-                    self.app.inputs_frame.ir_a_input_sis(mostrar=False)  # type: ignore
+                    self.app.inputs_frame.ir_a_input_frame("Sistemas de Ecuaciones")
                 ),
             )
 
@@ -86,14 +91,14 @@ class SistemasFrame(ctkFrame):
 
         self.resolver_frame.pack(expand=True, fill="both", padx=30, pady=30)
 
-    def update_all(self):
+    def update_all(self) -> None:
         """
-        Actualiza todos los frames del tabview.
+        Actualizar las widgets del frame.
         """
 
         # sortear los diccionarios de datos para que esten alfabetizados
         self.mats_manager.sis_ingresados = dict(
-            sorted(self.mats_manager.sis_ingresados.items())
+            sorted(self.mats_manager.sis_ingresados.items()),
         )
 
         # actualizar los atributos de nombres despues que cambiaron los dicts
@@ -105,10 +110,10 @@ class SistemasFrame(ctkFrame):
             or len(self.nombres_sistemas) == 0
         ):
             # si hay un mensaje de error,
+            # o no se han inicializado el frame,
             # o no hay sistemas ingresados,
-            # o no se han inicializado los frames,
             # correr el setup
             self.setup_frame()
             return
 
-        self.resolver_frame.update_frame()
+        self.resolver_frame.update_frame()  # type: ignore[reportAttributeAccessIssue]

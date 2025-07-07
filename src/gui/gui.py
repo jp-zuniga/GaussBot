@@ -7,15 +7,18 @@ from decimal import getcontext
 from importlib.resources import as_file
 from json import dump, load
 from pathlib import Path
-from typing import Union
 
 from customtkinter import (
-    CTk as ctk,
+    CTk,
     ThemeManager,
     set_appearance_mode as set_mode,
     set_default_color_theme as set_theme,
     set_widget_scaling as set_scaling,
 )
+
+from src import FRAC_PREC
+from src.managers import FuncManager, OpsManager
+from src.utils import CONFIG_PATH, LOGGER, THEMES, set_icon
 
 from .frames import (
     AnalisisFrame,
@@ -27,20 +30,21 @@ from .frames import (
     SistemasFrame,
     VectoresFrame,
 )
-from .. import FRAC_PREC
-from ..managers import FuncManager, OpsManager
-from ..utils import CONFIG_PATH, LOGGER, THEMES, set_icon
 
 
-class GaussUI(ctk):
+class GaussUI(CTk):
     """
     Ventana principal del GUI.
     """
 
     def __init__(self) -> None:
+        """
+        Configurar ventana principal e inicializar subframes.
+        """
+
         super().__init__()
 
-        self.config_options: dict[str, Union[float, str, int]] = {}
+        self.config_options: dict[str, str | float] = {}
         self.escala_inicial: float
         self.escala_actual: float
         self.modo_actual: str
@@ -86,11 +90,15 @@ class GaussUI(ctk):
         )
 
         self.analisis = AnalisisFrame(
-            app=self, master=self, func_manager=self.func_manager
+            app=self,
+            master=self,
+            func_manager=self.func_manager,
         )
 
         self.sistemas = SistemasFrame(
-            app=self, master=self, mats_manager=self.mats_manager
+            app=self,
+            master=self,
+            mats_manager=self.mats_manager,
         )
 
         self.config_frame = ConfigFrame(app=self, master=self)
@@ -107,7 +115,7 @@ class GaussUI(ctk):
 
     def save_config(self) -> None:
         """
-        Guarda la configuración actual en config.json.
+        Guardar configuración actual.
         """
 
         # extraer configuracion actual
@@ -121,18 +129,17 @@ class GaussUI(ctk):
             CONFIG_PATH.parent.mkdir(parents=True, exist_ok=True)
             LOGGER.info("Creando archivo '%s'...", CONFIG_PATH)
 
-        with open(CONFIG_PATH, mode="w", encoding="utf-8") as config_file:
+        with CONFIG_PATH.open(mode="w") as config_file:
             dump(self.config_options, config_file, indent=4, sort_keys=True)
             LOGGER.info("Configuración guardada exitosamente")
 
     def load_config(self) -> None:
         """
-        Carga la configuración guardada en config.json.
-        Si config.json no existe, utiliza valores por defecto.
+        Cargar configuración almacenada.
         """
 
         if CONFIG_PATH.exists():
-            with open(CONFIG_PATH, mode="r", encoding="utf-8") as config_file:
+            with CONFIG_PATH.open() as config_file:
                 self.config_options = load(config_file)
                 LOGGER.info("Configuración cargada exitosamente")
         else:
@@ -150,11 +157,14 @@ class GaussUI(ctk):
             }
 
         # extraer configs individuales del diccionario
-        self.escala_inicial = self.escala_actual = self.config_options["escala"]
-        self.modo_actual = self.config_options["modo"]
-        self.tema_actual = self.config_options["tema"]
-        FRAC_PREC["prec"] = self.frac_prec_actual = self.config_options["frac_prec"]
-        getcontext().prec = self.dec_prec_actual = self.config_options["dec_prec"]
+        self.escala_inicial = self.escala_actual = float(self.config_options["escala"])
+        self.modo_actual = self.config_options["modo"]  # type: ignore[reportAttributeAccessIssue]
+        self.tema_actual = self.config_options["tema"]  # type: ignore[reportAttributeAccessIssue]
+
+        getcontext().prec = self.dec_prec_actual = int(self.config_options["dec_prec"])
+        FRAC_PREC["prec"] = self.frac_prec_actual = int(
+            self.config_options["frac_prec"],
+        )
 
         # aplicar configs
         set_mode(self.modo_actual)

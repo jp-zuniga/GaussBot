@@ -1,6 +1,5 @@
 """
-Implementación de los parents frame de
-los módulos de la aplciación.
+Implementaciones de los frames principales de la aplicación.
 """
 
 from . import subframes
@@ -13,8 +12,7 @@ from .nav import NavFrame
 from .sistemas import SistemasFrame
 from .vectores import VectoresFrame
 
-__all__ = [
-    "subframes",
+__all__: list[str] = [
     "AnalisisFrame",
     "ConfigFrame",
     "HomeFrame",
@@ -27,4 +25,5 @@ __all__ = [
     "NavFrame",
     "SistemasFrame",
     "VectoresFrame",
+    "subframes",
 ]
