@@ -1,45 +1,44 @@
 [project]
-name = "GaussBot"
-version = "1.0.0"
-description = "Aplicación para resolver cálculos de álgebra lineal."
-requires-python = ">=3.12"
-dependencies = [
-    "bidict>=0.23.1",
-    "customtkinter>=5.2.2",
-    "matplotlib>=3.10.3",
-    "sympy>=1.14.0",
-]
+    dependencies = [
+        "bidict>=0.23.1",
+        "customtkinter>=5.2.2",
+        "matplotlib>=3.10.3",
+        "sympy>=1.14.0",
+    ]
+    description     = "Aplicación para resolver cálculos de álgebra lineal."
+    name            = "GaussBot"
+    requires-python = ">=3.12"
+    version         = "1.1.0"
 
 [tool.ruff.lint]
-allowed-confusables = ["−"]
-select = ["ALL"]
-ignore = [
-    "EM101",
-    "EM102",
-    "D200",
-    "D202",
-    "D203",
-    "D205",
-    "D212",
-    "D401",
-    "FBT001",
-    "FBT002",
-    "FBT003",
-    "PLR2004",
-    "TRY003",
-]
+    allowed-confusables = ["−"]
+    ignore = [
+        "D200",
+        "D202",
+        "D203",
+        "D205",
+        "D212",
+        "D401",
+        "EM101",
+        "EM102",
+        "FBT001",
+        "FBT002",
+        "FBT003",
+        "PLR2004",
+        "TRY003",
+    ]
+    select = ["ALL"]
 
+    [tool.ruff.lint.isort]
+        case-sensitive             = true
+        combine-as-imports         = true
+        force-sort-within-sections = true
+        order-by-type              = true
+        relative-imports-order     = "closest-to-furthest"
+        split-on-trailing-comma    = false
 
-[tool.ruff.lint.isort]
-case-sensitive = true
-combine-as-imports = true
-force-sort-within-sections = true
-order-by-type = true
-relative-imports-order = "closest-to-furthest"
-split-on-trailing-comma = false
-
-[tool.ruff.lint.per-file-ignores]
-"src/__init__.py" = ["E402"]
-"src/managers/__init__.py" = ["I001"]
-"src/utils/__init__.py" = ["I001"]
-"src/utils/gui_util_funcs.py" = ["PLC0415"]
+    [tool.ruff.lint.per-file-ignores]
+        "src/__init__.py"             = ["E402"]
+        "src/managers/__init__.py"    = ["I001"]
+        "src/utils/__init__.py"       = ["I001"]
+        "src/utils/gui_util_funcs.py" = ["PLC0415"]
