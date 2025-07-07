@@ -10,8 +10,25 @@ dependencies = [
     "sympy>=1.14.0",
 ]
 
-# [tool.ruff.lint]
-# select = ["ALL"]
+[tool.ruff.lint]
+allowed-confusables = ["−"]
+select = ["ALL"]
+ignore = [
+    "EM101",
+    "EM102",
+    "D200",
+    "D202",
+    "D203",
+    "D205",
+    "D212",
+    "D401",
+    "FBT001",
+    "FBT002",
+    "FBT003",
+    "PLR2004",
+    "TRY003",
+]
+
 
 [tool.ruff.lint.isort]
 case-sensitive = true
@@ -25,3 +42,4 @@ split-on-trailing-comma = false
 "src/__init__.py" = ["E402"]
 "src/managers/__init__.py" = ["I001"]
 "src/utils/__init__.py" = ["I001"]
+"src/utils/gui_util_funcs.py" = ["PLC0415"]
