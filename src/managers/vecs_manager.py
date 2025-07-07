@@ -267,7 +267,7 @@ class VectoresManager:
 
     def _validar_vecs_ingresados(self) -> bool:
         """
-        Valida si el diccionario de vectores ingresados esta vacío o no.
+        Validar si el diccionario de vectores ingresados esta vacío o no.
         """
 
         return self.vecs_ingresados != {}
