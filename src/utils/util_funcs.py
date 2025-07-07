@@ -201,13 +201,7 @@ def generate_range(start: int, end: int) -> list[int]:
 
     """
 
-    valid = list(range(start + 1, end))
-    try:
-        valid.remove(0)
-        valid.remove(1)
-    except ValueError:
-        pass
-    return valid
+    return [x for x in range(start + 1, end) if x not in (0, 1)]
 
 
 def generate_sep(orientation: bool, size: tuple[int, int]) -> ctkImage:
@@ -223,9 +217,7 @@ def generate_sep(orientation: bool, size: tuple[int, int]) -> ctkImage:
 
     """
 
-    if orientation:
-        return load_mode_icon("v_separator.png", size)
-    return load_mode_icon("h_separator.png", size)
+    return load_mode_icon("v_separator.png" if orientation else "h_separator.png", size)
 
 
 def resize_image(img: ctkImage, per: float = 0.75) -> ctkImage:
