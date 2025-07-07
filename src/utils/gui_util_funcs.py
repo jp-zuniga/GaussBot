@@ -132,7 +132,7 @@ def set_icon(app: GaussUI, window: GaussUI | ctkTop) -> None:
         )
 
 
-def toggle_proc(
+def toggle_proc(  # noqa: PLR0913
     app: GaussUI,
     parent_frame: CustomScrollFrame,
     window_title: str,

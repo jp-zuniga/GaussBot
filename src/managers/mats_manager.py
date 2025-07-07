@@ -1,9 +1,9 @@
 """
-Implementación de MatricesManager.
-Almacena matrices, realiza operaciones y retorna resultados.
+Implementación de manejador de matrices.
 """
 
 from fractions import Fraction
+from typing import Literal
 
 from src.models import Matriz, SistemaEcuaciones
 from src.utils import format_factor, format_proc_num
@@ -51,7 +51,7 @@ class MatricesManager:
         else:
             raise TypeError("Argumento inválido para 'sis_ingresados'.")
 
-    def get_matrices(self, calculada: int) -> str:
+    def get_matrices(self, calculada: Literal[-1, 0, 1]) -> str:
         """
         Formatear las matrices guardadas como un solo string.
 
@@ -81,25 +81,23 @@ class MatricesManager:
         matrices = f"\n{header}\n"
         matrices += "---------------------------------------------"
         for nombre, mat in self.mats_ingresadas.items():
-            if (
-                (calculada == 0
-                and len(nombre) > 1)
-                or (calculada == 1
-                and len(nombre) == 1)
+            if (calculada == 0 and len(nombre) > 1) or (
+                calculada == 1 and len(nombre) == 1
             ):
                 continue
             matrices += f"\n{nombre}:\n"
             matrices += str(mat) + "\n"
         matrices += "---------------------------------------------\n"
 
-        if "(" not in matrices:
-            if calculada == 1:
-                return "¡No se ha calculado ninguna matriz!"
-            if calculada == 0:
-                return "¡No se ha ingresado ninguna matriz!"
-        return matrices
+        return (
+            matrices
+            if "[" in matrices
+            else f"¡No se ha {
+                'calculado' if calculada == 1 else 'ingresado'
+            } ninguna matriz!"
+        )
 
-    def get_sistemas(self, calculado: int) -> str:
+    def get_sistemas(self, calculado: Literal[-1, 0, 1]) -> str:
         """
         Formatear los sistemas guardados como un solo string.
 
@@ -129,23 +127,21 @@ class MatricesManager:
         sistemas = f"\n{header}\n"
         sistemas += "---------------------------------------------"
         for nombre, sis in self.sis_ingresados.items():
-            if (
-                (calculado == 0
-                and len(nombre) > 1)
-                or (calculado == 1
-                and len(nombre) == 1)
+            if (calculado == 0 and len(nombre) > 1) or (
+                calculado == 1 and len(nombre) == 1
             ):
                 continue
             sistemas += f"\n{nombre}:\n"
             sistemas += str(sis) + "\n"
         sistemas += "---------------------------------------------\n"
 
-        if "(" not in sistemas:
-            if calculado == 1:
-                return "¡No se ha resuelto ningún sistema de ecuaciones!"
-            if calculado == 0:
-                return "¡No se ha ingresado ningún sistema de ecuaciones!"
-        return sistemas
+        return (
+            sistemas
+            if "[" in sistemas
+            else f"¡No se ha {
+                'calculado' if calculado == 1 else 'ingresado'
+            } ningún sistema!"
+        )
 
     def resolver_sistema(self, nombre_sis: str, metodo: str) -> SistemaEcuaciones:
         """
@@ -175,7 +171,10 @@ class MatricesManager:
         return sistema
 
     def suma_resta_mats(
-        self, operacion: bool, nombre_mat1: str, nombre_mat2: str,
+        self,
+        operacion: bool,
+        nombre_mat1: str,
+        nombre_mat2: str,
     ) -> tuple[str, str, Matriz]:
         """
         Sumar o restar las dos matrices indicadas.
@@ -238,7 +237,9 @@ class MatricesManager:
         return (proc, nombre_mat_resultado, mat_resultado)
 
     def escalar_por_mat(
-        self, escalar: Fraction, nombre_mat: str,
+        self,
+        escalar: Fraction,
+        nombre_mat: str,
     ) -> tuple[str, str, Matriz]:
         """
         Multiplicar la matriz indicada por el escalar especificado.

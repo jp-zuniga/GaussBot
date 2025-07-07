@@ -5,10 +5,10 @@
         "matplotlib>=3.10.3",
         "sympy>=1.14.0",
     ]
-    description     = "Aplicación para resolver cálculos de álgebra lineal."
-    name            = "GaussBot"
+    description = "Aplicación para resolver cálculos de álgebra lineal."
+    name = "GaussBot"
     requires-python = ">=3.12"
-    version         = "1.1.0"
+    version = "1.1.0"
 
 [tool.ruff.lint]
     allowed-confusables = ["−"]
@@ -39,6 +39,7 @@
 
     [tool.ruff.lint.per-file-ignores]
         "src/__init__.py"             = ["E402"]
+        "src/gui/frames/home.py"      = ["PLC0415"]
         "src/managers/__init__.py"    = ["I001"]
         "src/utils/__init__.py"       = ["I001"]
         "src/utils/gui_util_funcs.py" = ["PLC0415"]

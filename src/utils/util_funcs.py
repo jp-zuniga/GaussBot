@@ -18,7 +18,7 @@ from .paths import DARK_NUMPAD_ICONS, DATA_PATH, LIGHT_NUMPAD_ICONS, LOG_PATH, P
 LOGGER = getLogger("GaussBot")
 
 
-def format_factor(
+def format_factor(  # noqa: PLR0911
     factor: Fraction,
     mult: bool = True,
     parenth_negs: bool = False,

@@ -1,8 +1,5 @@
 """
-Implementación de FuncManager.
-Almacena y valida las funciones ingresadas por el usuario.
-Se encarga de aplicar diferentes métodos para encontrar
-raíces de las funciones ingresadas, y retorna los resultados.
+Implementación de manejador de funciones matemáticas.
 """
 
 from decimal import Decimal
@@ -22,8 +19,9 @@ MAX_ITERACIONES: int = 100
 class FuncManager:
     """
     Manager de las funciones de la aplicación.
-    Valida y almacena las funciones ingresadas por el usuario,
-    y realiza operaciones sobre ellas.
+
+    Valida y almacena las entradas matemáticas del usuario,
+    y permite calcular aproximaciones de raíces de funciones mediante distintos métodos.
     """
 
     def __init__(self, funcs_ingresadas: dict[str, Func] | None = None) -> None:
@@ -280,12 +278,8 @@ class FuncManager:
         f_prima = lambdify(func.var, derivada.expr)
 
         xi = float(inicial)
-        try:
-            if xi not in dominio_derivada:
-                return (Decimal(xi), Decimal(float(f(xi))), registro, 0, 1)
-        except TypeError:
-            if not Contains(xi, dominio_derivada):
-                return (Decimal(xi), Decimal(float(f(xi))), registro, 0, 1)
+        if not Contains(xi, dominio_derivada):
+            return (Decimal(xi), Decimal(float(f(xi))), registro, 0, 1)
 
         i: int = 0
         while i < max_its:
@@ -294,16 +288,10 @@ class FuncManager:
             fxi_prima = float(f_prima(xi))
 
             temp_xi = xi
-            try:
-                if temp_xi not in dominio_func:
-                    return (Decimal(temp_xi), Decimal(fxi), registro, i, 2)
-                if temp_xi not in dominio_derivada:
-                    return (Decimal(temp_xi), Decimal(fxi), registro, i, 1)
-            except TypeError:
-                if not Contains(temp_xi, dominio_func):
-                    return (Decimal(temp_xi), Decimal(fxi), registro, i, 2)
-                if not Contains(temp_xi, dominio_derivada):
-                    return (Decimal(temp_xi), Decimal(fxi), registro, i, 1)
+            if not Contains(temp_xi, dominio_func):
+                return (Decimal(temp_xi), Decimal(fxi), registro, i, 2)
+            if not Contains(temp_xi, dominio_derivada):
+                return (Decimal(temp_xi), Decimal(fxi), registro, i, 1)
 
             xi -= fxi / fxi_prima
             registro.append(
@@ -458,7 +446,9 @@ class FuncManager:
                 else:
                     # si no, es un error de verdad
                     LOGGER.error(
-                        "Error al leer archivo '%s':\n%s", FUNCIONES_PATH, str(j),
+                        "Error al leer archivo '%s':\n%s",
+                        FUNCIONES_PATH,
+                        str(j),
                     )
                 return {}
 

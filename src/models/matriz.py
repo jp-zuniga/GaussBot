@@ -104,7 +104,7 @@ class Matriz:
     @overload
     def __getitem__(self, indice: tuple[slice, slice]) -> list[list[Fraction]]: ...
 
-    def __getitem__(
+    def __getitem__(  # noqa: C901, PLR0912
         self,
         indice: int
         | slice

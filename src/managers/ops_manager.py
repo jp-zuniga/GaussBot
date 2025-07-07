@@ -1,7 +1,5 @@
 """
-Implementación de OpsManager.
-Utilizado principalmente para contener
-los datos de MatricesManager y VectoresManager.
+Implementación de manejador de operaciones globales, encargado de matrices y vectores.
 """
 
 from fractions import Fraction
@@ -84,7 +82,7 @@ class OpsManager:
         if mat.columnas != len(vec):
             raise ArithmeticError(
                 "El número de columnas de la matriz debe ser "
-                 "igual al número de componentes del vector.",
+                "igual al número de componentes del vector.",
             )
 
         # inicializar la lista 2D de la matriz resultante
@@ -171,7 +169,8 @@ class OpsManager:
             )
 
             LOGGER.info(
-                "Sistemas de ecuaciones guardados en '%s' exitosamente.", SISTEMAS_PATH,
+                "Sistemas de ecuaciones guardados en '%s' exitosamente.",
+                SISTEMAS_PATH,
             )
 
     def save_matrices(self) -> None:
@@ -286,7 +285,9 @@ class OpsManager:
                 else:
                     # si no, es un error de verdad
                     LOGGER.error(
-                        "Error al leer archivo '%s':\n%s", SISTEMAS_PATH, str(j),
+                        "Error al leer archivo '%s':\n%s",
+                        SISTEMAS_PATH,
+                        str(j),
                     )
                 return {}
 
@@ -324,7 +325,9 @@ class OpsManager:
                 else:
                     # si no, es un error de verdad
                     LOGGER.error(
-                        "Error al leer archivo '%s':\n%s", MATRICES_PATH, str(j),
+                        "Error al leer archivo '%s':\n%s",
+                        MATRICES_PATH,
+                        str(j),
                     )
                 return {}
 
@@ -357,6 +360,8 @@ class OpsManager:
                 else:
                     # si no, es un error de verdad
                     LOGGER.error(
-                        "Error al leer archivo '%s':\n%s", VECTORES_PATH, str(j),
+                        "Error al leer archivo '%s':\n%s",
+                        VECTORES_PATH,
+                        str(j),
                     )
                 return {}

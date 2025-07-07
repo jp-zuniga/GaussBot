@@ -226,7 +226,7 @@ class SistemaEcuaciones:
         self._eliminar_debajo()
         self._eliminar_encima()
 
-    def _eliminar_debajo(self) -> None:
+    def _eliminar_debajo(self) -> None:  # noqa: C901
         """
         Para cada fila de la matriz:
         - Encontrar entradas pivotes maximas.

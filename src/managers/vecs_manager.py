@@ -1,9 +1,9 @@
 """
-Implementación de VectoresManager.
-Almacena vectores, realiza operaciones y retorna resultados.
+Implementación de manejador de vectores.
 """
 
 from fractions import Fraction
+from typing import Literal
 
 from src import FRAC_PREC
 from src.models import Vector
@@ -37,7 +37,7 @@ class VectoresManager:
         else:
             raise TypeError("Argumento inválido para 'vecs_ingresados'.")
 
-    def get_vectores(self, calculado: int) -> str:
+    def get_vectores(self, calculado: Literal[-1, 0, 1]) -> str:
         """
         Formatear los vectores guardados como un solo string.
 
@@ -75,16 +75,17 @@ class VectoresManager:
             vectores += str(vec) + "\n"
         vectores += "---------------------------------------------\n"
 
-        if "[" not in vectores:
-            if calculado == 1:
-                return "¡No se ha calculado ningún vector!"
-            if calculado == 0:
-                return "¡No se ha ingresado ningún vector!"
-        return vectores
+        return (
+            vectores
+            if "[" in vectores
+            else f"¡No se ha {
+                'calculado' if calculado == 1 else 'ingresado'
+            } ningún vector!"
+        )
 
     def suma_resta_vecs(
         self,
-        operacion: bool,
+        operador: Literal["+", "−"],
         nombre_vec1: str,
         nombre_vec2: str,
     ) -> tuple[str, str, Vector]:
@@ -92,7 +93,7 @@ class VectoresManager:
         Sumar o restar los dos vectores indicados.
 
         Args:
-            operacion:   True para sumar, False para restar.
+            operador:    Operador de cálculo a realizar.
             nombre_vec1: Nombre del primer vector.
             nombre_vec2: Nombre del segunda vector.
 
@@ -109,13 +110,8 @@ class VectoresManager:
         vec1 = self.vecs_ingresados[nombre_vec1]
         vec2 = self.vecs_ingresados[nombre_vec2]
 
-        if operacion:
-            vec_resultado = vec1 + vec2
-            operador = "+"
-        else:
-            vec_resultado = vec1 - vec2
-            operador = "−"
         nombre_vec_resultado = f"{nombre_vec1} {operador} {nombre_vec2}"
+        vec_resultado = vec1 + vec2 if operador == "+" else vec1 - vec2
 
         vec_proc = Vector(
             componentes=[  # type: ignore[reportArgumentType]
@@ -148,7 +144,7 @@ class VectoresManager:
         nombre_vec: str,
     ) -> tuple[str, str, Vector]:
         """
-        Multiplicar el vector indicada por el escalar especificado.
+        Multiplicar el vector indicado por un escalar.
 
         Args:
             escalar:    Número por el cual multiplicar el vector.
