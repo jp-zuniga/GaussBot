@@ -91,7 +91,7 @@ class MatricesManager:
 
         return (
             matrices
-            if "[" in matrices
+            if "(" in matrices
             else f"¡No se ha {
                 'calculado' if calculada == 1 else 'ingresado'
             } ninguna matriz!"
@@ -137,7 +137,7 @@ class MatricesManager:
 
         return (
             sistemas
-            if "[" in sistemas
+            if "(" in sistemas
             else f"¡No se ha {
                 'calculado' if calculado == 1 else 'ingresado'
             } ningún sistema!"
