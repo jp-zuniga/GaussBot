@@ -9,7 +9,7 @@ from typing import Literal
 
 from PIL.Image import Image, Resampling, merge, open as open_img
 from PIL.ImageOps import invert
-from customtkinter import CTkImage as ctkImage
+from customtkinter import CTkImage
 
 from .paths import DARK_NUMPAD_ICONS, DATA_PATH, LIGHT_NUMPAD_ICONS, LOG_PATH, PKG
 
@@ -98,7 +98,7 @@ def format_proc_num(
     return f"[ {combine_nums} ]"
 
 
-def load_mode_icon(path: str, size: tuple[int, int] = (20, 20)) -> ctkImage:
+def load_mode_icon(path: str, size: tuple[int, int] = (20, 20)) -> CTkImage:
     """
     Cargar íconos de modo claro/oscuro.
 
@@ -115,19 +115,19 @@ def load_mode_icon(path: str, size: tuple[int, int] = (20, 20)) -> ctkImage:
         as_file(files(PKG) / f"assets/icons/dark/{path}") as d_path,
         as_file(files(PKG) / f"assets/icons/light/{path}") as l_path,
     ):
-        return ctkImage(
+        return CTkImage(
             size=size,
             dark_image=open_img(l_path),
             light_image=open_img(d_path),
         )
 
 
-def load_numpad_icons() -> dict[str, ctkImage]:
+def load_numpad_icons() -> dict[str, CTkImage]:
     """
     Cargar los íconos utilizados en CustomNumpad y almacernalos en un diccionario.
     """
 
-    icons: dict[str, ctkImage] = {}
+    icons: dict[str, CTkImage] = {}
 
     for item in DARK_NUMPAD_ICONS.iterdir():
         if item.name.endswith(".png"):
@@ -136,7 +136,7 @@ def load_numpad_icons() -> dict[str, ctkImage]:
                 as_file(LIGHT_NUMPAD_ICONS / item.name) as l_path,
             ):
                 img = open_img(l_path)
-                icons[item.name[:-4]] = ctkImage(
+                icons[item.name[:-4]] = CTkImage(
                     size=img.size,
                     dark_image=img,
                     light_image=open_img(d_path),
@@ -145,7 +145,7 @@ def load_numpad_icons() -> dict[str, ctkImage]:
     return icons
 
 
-def load_single_icon(path: str) -> ctkImage:
+def load_single_icon(path: str) -> CTkImage:
     """
     Cargar íconos independientes de modo.
 
@@ -158,7 +158,7 @@ def load_single_icon(path: str) -> ctkImage:
     """
 
     with as_file(files(PKG) / f"assets/icons/{path}") as icon_path:
-        return ctkImage(open_img(icon_path))
+        return CTkImage(open_img(icon_path))
 
 
 def log_setup(logger: Logger = LOGGER) -> None:
@@ -204,7 +204,7 @@ def generate_range(start: int, end: int) -> list[int]:
     return [x for x in range(start + 1, end) if x not in (0, 1)]
 
 
-def generate_sep(orientation: bool, size: tuple[int, int]) -> ctkImage:
+def generate_sep(orientation: bool, size: tuple[int, int]) -> CTkImage:
     """
     Crear una imagen de un separador vertical u horizontal.
 
@@ -220,7 +220,7 @@ def generate_sep(orientation: bool, size: tuple[int, int]) -> ctkImage:
     return load_mode_icon("v_separator.png" if orientation else "h_separator.png", size)
 
 
-def resize_image(img: ctkImage, per: float = 0.75) -> ctkImage:
+def resize_image(img: CTkImage, per: float = 0.75) -> CTkImage:
     """
     Reducir el tamaño de una CTkImage según el porcentaje especificado.
 
@@ -242,7 +242,7 @@ def resize_image(img: ctkImage, per: float = 0.75) -> ctkImage:
 
     dark_img: Image = dark.resize((new_width, new_height), Resampling.LANCZOS)
     light_img: Image = light.resize((new_width, new_height), Resampling.LANCZOS)
-    return ctkImage(dark_image=dark_img, light_image=light_img, size=dark_img.size)
+    return CTkImage(dark_image=dark_img, light_image=light_img, size=dark_img.size)
 
 
 def transparent_invert(img: Image) -> Image:

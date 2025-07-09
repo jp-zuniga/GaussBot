@@ -5,7 +5,7 @@ Implementación de manejador de funciones matemáticas.
 from decimal import Decimal
 from json import JSONDecodeError, dump, load
 
-from customtkinter import CTkImage as ctkImage
+from customtkinter import CTkImage
 from sympy import lambdify
 from sympy.sets import Contains
 
@@ -44,7 +44,7 @@ class FuncManager:
         else:
             raise TypeError("Argumento inválido para 'funcs_ingresadas'.")
 
-    def get_funcs(self) -> list[ctkImage]:
+    def get_funcs(self) -> list[CTkImage]:
         """
         Obtener las imagenes de las funciones en 'self.funcs_ingresadas'.
 

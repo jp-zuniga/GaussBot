@@ -45,6 +45,7 @@ class InputsFrame(CTkFrame):
         """
 
         super().__init__(master, corner_radius=0, fg_color="transparent")
+
         self.app = app
         self.func_manager, self.mats_manager, self.vecs_manager = managers
 
@@ -56,7 +57,7 @@ class InputsFrame(CTkFrame):
 
     def setup_tabview(self) -> None:
         """
-        Crear un tabview con pestañas para cada frame de inputs.
+        Crear CTkTabview con pestañas para cada frame de inputs.
         """
 
         self.tabview = CTkTabview(self, fg_color="transparent")
@@ -145,7 +146,7 @@ class ManejarMats(CTkFrame):
 
     def setup_tabview(self) -> None:
         """
-        Crea un tabview para todos los
+        Crear CTkTabview para todos los
         subframes de inputs de matrices.
         """
 
@@ -214,7 +215,7 @@ class ManejarVecs(CTkFrame):
 
     def setup_tabview(self) -> None:
         """
-        Crea un tabview para todos los
+        Crear CTkTabview para todos los
         subframes de inputs de vectores.
         """
 
@@ -267,7 +268,7 @@ class ManejarFuncs(CTkFrame):
         **kwargs,  # noqa: ANN003
     ) -> None:
         """
-        Inicializar diseño de frame de manejo de entradas de .
+        Inicializar diseño de frame de manejo de entradas de funciones.
         """
 
         super().__init__(master_tab, fg_color="transparent", **kwargs)
@@ -289,7 +290,8 @@ class ManejarFuncs(CTkFrame):
 
     def setup_tabview(self) -> None:
         """
-        Crea un tabview con pestañas para cada subframe.
+        Crear CTkTabview para todos los
+        subframes de inputs de funciones.
         """
 
         self.tabview = CTkTabview(self, fg_color="transparent")
@@ -341,7 +343,7 @@ class ManejarSistemas(CTkFrame):
         **kwargs,  # noqa: ANN003
     ) -> None:
         """
-        Inicializar diseño de frame de manejo de entradas de .
+        Inicializar diseño de frame de manejo de entradas de sistemas.
         """
 
         super().__init__(master_tab, fg_color="transparent", **kwargs)
@@ -363,7 +365,7 @@ class ManejarSistemas(CTkFrame):
 
     def setup_tabview(self) -> None:
         """
-        Crea un tabview con pestañas para cada subframe.
+        Crear CTkTabview con pestañas para cada subframe.
         """
 
         self.tabview = CTkTabview(self, fg_color="transparent")

@@ -42,6 +42,7 @@ class MatricesFrame(CTkFrame):
         """
 
         super().__init__(master, corner_radius=0, fg_color="transparent")
+
         self.app = app
         self.mats_manager = mats_manager
         self.vecs_manager = vecs_manager
@@ -77,7 +78,7 @@ class MatricesFrame(CTkFrame):
 
     def setup_tabview(self) -> None:
         """
-        Crear un CTkTabview con pestañas para cada funcionalidad.
+        Crear CTkTabview con pestañas para cada funcionalidad.
         """
 
         for widget in self.winfo_children():

@@ -39,8 +39,8 @@ class NavFrame(CTkFrame):
         """
 
         super().__init__(master, corner_radius=0)
-        self.app = app
 
+        self.app = app
         self.configure(fg_color=ThemeManager.theme["CTk"]["fg_color"])
         self.grid(row=0, column=0, sticky="nsew")
 
@@ -236,7 +236,7 @@ class NavFrame(CTkFrame):
 
     def toggle_nav(self) -> None:
         """
-        Mostrar/ocultar la barra de navegación.
+        Mostrar/ocultar barra de navegación.
         """
 
         if self.hidden:

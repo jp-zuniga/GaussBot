@@ -33,11 +33,11 @@ class SistemasFrame(CTkFrame):
         """
 
         super().__init__(master, corner_radius=0, fg_color="transparent")
+
         self.app = app
         self.mats_manager = mats_manager
 
-        self.dummy_frame: CTkFrame  # para pack mensaje de error inicial
-
+        self.dummy_frame: CTkFrame
         self.resolver_frame: CustomScrollFrame | None = None
         self.msg_frame: CTkFrame | None = None
 

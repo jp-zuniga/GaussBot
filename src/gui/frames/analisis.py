@@ -33,6 +33,7 @@ class AnalisisFrame(CTkFrame):
         """
 
         super().__init__(master, corner_radius=0, fg_color="transparent")
+
         self.app = app
         self.func_manager = func_manager
         self.nombres_funciones = list(func_manager.funcs_ingresadas.keys())
@@ -51,7 +52,7 @@ class AnalisisFrame(CTkFrame):
 
     def setup_tabview(self) -> None:
         """
-        Crear tabview con pestañas para cada módulo de análisis númerico.
+        Crear CTkTabview con pestañas para cada módulo de análisis númerico.
         """
 
         for widget in self.winfo_children():

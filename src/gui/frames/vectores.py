@@ -38,6 +38,7 @@ class VectoresFrame(CTkFrame):
         """
 
         super().__init__(master, corner_radius=0, fg_color="transparent")
+
         self.app = app
         self.vecs_manager = vecs_manager
         self.mats_manager = mats_manager
@@ -56,7 +57,7 @@ class VectoresFrame(CTkFrame):
 
     def setup_tabview(self) -> None:
         """
-        Crear un CTkTabview con pestañas para cada funcionalidad.
+        Crear CTkTabview con pestañas para cada funcionalidad.
         """
 
         for widget in self.winfo_children():
@@ -120,7 +121,7 @@ class VectoresFrame(CTkFrame):
 
     def update_all(self) -> None:
         """
-        Actualizar los datos de todos los frames del tabview.
+        Actualizar todos los frames del tabview.
         """
 
         # sort los diccionarios de datos para que esten alfabetizados

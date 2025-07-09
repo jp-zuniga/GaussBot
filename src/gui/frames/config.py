@@ -2,36 +2,36 @@
 Implementación de frame de configuración.
 """
 
+from __future__ import annotations
+
 from decimal import getcontext
 from tkinter import StringVar
 from typing import TYPE_CHECKING
 
 from bidict import bidict
-from customtkinter import (
-    CTkFrame as ctkFrame,
-    CTkLabel as ctkLabel,
-    set_appearance_mode as set_mode,
-)
+from customtkinter import CTkFrame, CTkLabel, set_appearance_mode as set_mode
 
 from src import FRAC_PREC
-from src.gui.custom import CustomDropdown, SuccessFrame
+from src.gui.custom import CustomDropdown
 from src.utils import delete_msg_frame, place_msg_frame, set_icon
 
 if TYPE_CHECKING:
     from src.gui import GaussUI
+    from src.gui.custom import SuccessFrame
 
 
-class ConfigFrame(ctkFrame):
+class ConfigFrame(CTkFrame):
     """
     Frame personalizado para mostrar y editar la configuración de la aplicación.
     """
 
-    def __init__(self, app: "GaussUI", master: "GaussUI") -> None:
+    def __init__(self, app: GaussUI, master: GaussUI) -> None:
         """
         Inicializar diseño de frame de configuración.
         """
 
         super().__init__(master, corner_radius=0, fg_color="transparent")
+
         self.app = app
         self.msg_frame: SuccessFrame | None = None
 
@@ -94,11 +94,11 @@ class ConfigFrame(ctkFrame):
         )
 
         # crear labels
-        self.escala_label = ctkLabel(self, text="Escala:")
-        self.modos_label = ctkLabel(self, text="Modo:")
-        self.temas_label = ctkLabel(self, text="Tema:")
-        self.frac_precs_label = ctkLabel(self, text="Precisión fraccional:")
-        self.dec_precs_label = ctkLabel(self, text="Precisión decimal:")
+        self.escala_label = CTkLabel(self, text="Escala:")
+        self.modos_label = CTkLabel(self, text="Modo:")
+        self.temas_label = CTkLabel(self, text="Tema:")
+        self.frac_precs_label = CTkLabel(self, text="Precisión fraccional:")
+        self.dec_precs_label = CTkLabel(self, text="Precisión decimal:")
 
         # crear dropdowns
         self.desplegar_escalas = CustomDropdown(
@@ -184,10 +184,10 @@ class ConfigFrame(ctkFrame):
             msg="¡Escala actualizada exitosamente!\n"
             "Sus cambios tomarán efecto al reiniciar la aplicación.",
             tipo="success",
-            row=5,  # type: ignore[reportArgumentType]
-            column=1,  # type: ignore[reportArgumentType]
-            padx=5,  # type: ignore[reportArgumentType]
-            pady=10,  # type: ignore[reportArgumentType]
+            row=5,
+            column=1,
+            padx=5,
+            pady=10,
         )
 
     def cambiar_modo(self, modo_seleccionado: str) -> None:
@@ -218,10 +218,10 @@ class ConfigFrame(ctkFrame):
             msg_frame=self.msg_frame,
             msg="¡Modo actualizado exitosamente!",
             tipo="success",
-            row=5,  # type: ignore[reportArgumentType]
-            column=1,  # type: ignore[reportArgumentType]
-            padx=5,  # type: ignore[reportArgumentType]
-            pady=10,  # type: ignore[reportArgumentType]
+            row=5,
+            column=1,
+            padx=5,
+            pady=10,
         )
 
     def cambiar_tema(self, tema_seleccionado: str) -> None:
@@ -243,10 +243,10 @@ class ConfigFrame(ctkFrame):
             msg="¡Tema actualizado exitosamente!\n"
             "Sus cambios tomarán efecto al reiniciar la aplicación.",
             tipo="success",
-            row=5,  # type: ignore[reportArgumentType]
-            column=1,  # type: ignore[reportArgumentType]
-            padx=5,  # type: ignore[reportArgumentType]
-            pady=10,  # type: ignore[reportArgumentType]
+            row=5,
+            column=1,
+            padx=5,
+            pady=10,
         )
 
     def cambiar_frac_prec(self, prec_seleccionada: str) -> None:
@@ -269,10 +269,10 @@ class ConfigFrame(ctkFrame):
             msg_frame=self.msg_frame,
             msg="¡Precisión fraccional actualizada exitosamente!",
             tipo="success",
-            row=5,  # type: ignore[reportArgumentType]
-            column=1,  # type: ignore[reportArgumentType]
-            padx=5,  # type: ignore[reportArgumentType]
-            pady=10,  # type: ignore[reportArgumentType]
+            row=5,
+            column=1,
+            padx=5,
+            pady=10,
         )
 
     def cambiar_dec_prec(self, prec_seleccionada: str) -> None:
@@ -294,10 +294,10 @@ class ConfigFrame(ctkFrame):
             msg_frame=self.msg_frame,
             msg="¡Precisión decimal actualizada exitosamente!",
             tipo="success",
-            row=5,  # type: ignore[reportArgumentType]
-            column=1,  # type: ignore[reportArgumentType]
-            padx=5,  # type: ignore[reportArgumentType]
-            pady=10,  # type: ignore[reportArgumentType]
+            row=5,
+            column=1,
+            padx=5,
+            pady=10,
         )
 
     def update_frame(self) -> None:

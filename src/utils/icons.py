@@ -4,7 +4,7 @@ Definiciones de todos los íconos e imágenes de la aplicación.
 
 from platform import system
 
-from customtkinter import CTkImage as ctkImage
+from customtkinter import CTkImage
 
 from .paths import ICONS
 from .util_funcs import load_mode_icon, load_numpad_icons, load_single_icon
@@ -38,7 +38,7 @@ INFO_ICON = load_mode_icon("info_icon.png")
 QUESTION_ICON = load_mode_icon("question_icon.png")
 WARNING_ICON = load_single_icon("warning_icon.png")
 
-MSGBOX_ICONS: dict[str, ctkImage] = {
+MSGBOX_ICONS: dict[str, CTkImage] = {
     "check": CHECK_ICON,
     "error": ERROR_ICON,
     "info": INFO_ICON,
@@ -66,4 +66,4 @@ SHUFFLE_ICON = load_mode_icon("shuffle_icon.png")
 ##########################   Íconos de CustomNumpad   ##########################
 ################################################################################
 
-NUMPAD_KEYS: dict[str, ctkImage] = load_numpad_icons()
+NUMPAD_KEYS: dict[str, CTkImage] = load_numpad_icons()
