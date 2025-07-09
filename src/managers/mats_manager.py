@@ -172,7 +172,7 @@ class MatricesManager:
 
     def suma_resta_mats(
         self,
-        operacion: bool,
+        operador: Literal["+", "−"],
         nombre_mat1: str,
         nombre_mat2: str,
     ) -> tuple[str, str, Matriz]:
@@ -180,7 +180,7 @@ class MatricesManager:
         Sumar o restar las dos matrices indicadas.
 
         Args:
-            operacion:   True para sumar, False para restar.
+            operador:    Operador de cálculo a realizar.
             nombre_mat1: Nombre de la primer matriz.
             nombre_mat2: Nombre de la segunda matriz.
 
@@ -197,13 +197,8 @@ class MatricesManager:
         mat1: Matriz = self.mats_ingresadas[nombre_mat1]
         mat2: Matriz = self.mats_ingresadas[nombre_mat2]
 
-        if operacion:
-            mat_resultado: Matriz = mat1 + mat2
-            operador: str = "+"
-        else:
-            mat_resultado: Matriz = mat1 - mat2
-            operador: str = "−"
         nombre_mat_resultado = f"{nombre_mat1} {operador} {nombre_mat2}"
+        mat_resultado = mat1 + mat2 if operador == "+" else mat1 - mat2
 
         mat_proc = Matriz(
             aumentada=False,
