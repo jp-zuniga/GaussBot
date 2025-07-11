@@ -10,6 +10,11 @@
     requires-python = ">=3.12"
     version = "1.1.0"
 
+[tool.pylint]
+    disable       = ["C0415", "E0401", "R0401", "R0801"]
+    jobs          = 0
+    output-format = "colorized"
+
 [tool.ruff.lint]
     allowed-confusables = ["−"]
     ignore = [
