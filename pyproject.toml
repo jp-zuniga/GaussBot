@@ -16,7 +16,7 @@
     output-format = "colorized"
 
 [tool.ruff.lint]
-    allowed-confusables = ["−"]
+    allowed-confusables = ["−", "×"]
     ignore = [
         "D200",
         "D202",
