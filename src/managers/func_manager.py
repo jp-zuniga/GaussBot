@@ -62,7 +62,7 @@ class FuncManager:
         func: Func,
         intervalo: tuple[Decimal, Decimal],
         error: Decimal = MARGEN_ERROR,
-        max_its: int = MAX_ITERACIONES,  # noqa: ARG004
+        max_its: int = MAX_ITERACIONES,
     ) -> bool | tuple[Decimal, Decimal, list[list[str]], int]:
         """
         Implementación del método de bisección,
@@ -112,7 +112,7 @@ class FuncManager:
             return True
 
         i: int = 0
-        while i < MAX_ITERACIONES:
+        while i < max_its:
             i += 1
 
             c = float((a + b) / 2)
@@ -145,7 +145,7 @@ class FuncManager:
         func: Func,
         intervalo: tuple[Decimal, Decimal],
         error: Decimal = MARGEN_ERROR,
-        max_its: int = MAX_ITERACIONES,  # noqa: ARG004
+        max_its: int = MAX_ITERACIONES,
     ) -> bool | tuple[Decimal, Decimal, list[list[str]], int]:
         """
         Implementación del método de bisección,
@@ -195,7 +195,7 @@ class FuncManager:
             return True
 
         i: int = 0
-        while i < MAX_ITERACIONES:
+        while i < max_its:
             i += 1
             fa = float(f(a))
             fb = float(f(b))
