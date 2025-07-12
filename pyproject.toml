@@ -11,12 +11,21 @@
     version = "1.1.0"
 
 [tool.pylint]
-    disable       = ["C0415", "E0401", "R0401", "R0801"]
-    jobs          = 0
+    disable = [
+        "C0301",
+        "C0415",
+        "E0401",
+        "R0401",
+        "R0801",
+        "R0903",
+        "W0201",
+        "W0212",
+    ]
+    jobs = 0
     output-format = "colorized"
 
 [tool.ruff.lint]
-    allowed-confusables = ["−", "×"]
+    allowed-confusables = ["×", "−"]
     ignore = [
         "D200",
         "D202",
@@ -43,8 +52,11 @@
         split-on-trailing-comma    = false
 
     [tool.ruff.lint.per-file-ignores]
-        "src/__init__.py"             = ["E402"]
-        "src/gui/frames/home.py"      = ["PLC0415"]
-        "src/managers/__init__.py"    = ["I001"]
-        "src/utils/__init__.py"       = ["I001"]
-        "src/utils/gui_util_funcs.py" = ["PLC0415"]
+        "src/__init__.py"                  = ["E402"]
+        "src/assets/**.py"                 = ["D104"]
+        "src/gui/custom/adapted/numpad.py" = ["PLC0415"]
+        "src/gui/custom/adapted/table.py"  = ["PLC0415"]
+        "src/gui/frames/home.py"           = ["PLC0415"]
+        "src/managers/__init__.py"         = ["I001"]
+        "src/utils/__init__.py"            = ["I001"]
+        "src/utils/gui_util_funcs.py"      = ["PLC0415"]
