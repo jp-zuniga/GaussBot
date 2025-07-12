@@ -41,6 +41,8 @@ class NavFrame(CTkFrame):
         super().__init__(master, corner_radius=0)
 
         self.app = app
+        self.msg_box: CustomMessageBox | None = None
+
         self.configure(fg_color=ThemeManager.theme["CTk"]["fg_color"])
         self.grid(row=0, column=0, sticky="nsew")
 
@@ -285,11 +287,11 @@ class NavFrame(CTkFrame):
 
         del event
 
-        if hasattr(self, "_quit_box") and self._quit_box.winfo_exists():
-            self._quit_box.focus()
+        if self.msg_box is not None:
+            self.msg_box.focus()
             return
 
-        self._quit_box = CustomMessageBox(
+        self.msg_box = CustomMessageBox(
             self.app,
             name="Cerrar aplicación",
             msg="¿Está seguro que desea cerrar GaussBot?"
@@ -298,9 +300,9 @@ class NavFrame(CTkFrame):
             icon="warning",
         )
 
-        seleccion: str = self._quit_box.get()
-        self._quit_box.destroy()
-        del self._quit_box
+        seleccion: str = self.msg_box.get()
+        self.msg_box.destroy()
+        del self.msg_box
 
         if seleccion == "Sí":
             self.app.func_manager.save_funciones()
