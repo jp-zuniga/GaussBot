@@ -98,6 +98,34 @@ def format_proc_num(
     return f"[ {combine_nums} ]"
 
 
+def handle_pi(num_input: str) -> Fraction:
+    """
+    Procesar string númerico para permitir el ingreso de π.
+    """
+
+    if "pi" not in num_input:
+        return Fraction(num_input)
+
+    pi = Fraction(355, 133)
+
+    if num_input == "pi":
+        return pi
+    if "/" in num_input:
+        num, den = num_input.split("/")
+        num_input = (
+            num.replace("pi", "").replace("*", "").strip()
+            if "pi" in num
+            else den.replace("pi", "").replace("*", "").strip()
+        )
+
+        if "pi" in num:
+            return (Fraction(num_input) * pi) / Fraction(den)
+        return Fraction(num) / (Fraction(num_input) * pi)
+
+    num_input = num_input.replace("pi", "").replace("*", "").strip()
+    return Fraction(num_input) * pi
+
+
 def load_mode_icon(path: str, size: tuple[int, int] = (20, 20)) -> CTkImage:
     """
     Cargar íconos de modo claro/oscuro.
