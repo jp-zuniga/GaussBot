@@ -1,30 +1,21 @@
-# pylint: disable=too-many-lines
-
 """
-Implementación de todos los frames
-de operaciones con vectores.
+Implementación de todos los frames de operaciones de vectores.
 """
 
 from decimal import Decimal
 from fractions import Fraction
 from random import choice
 from tkinter import Variable
-from typing import TYPE_CHECKING, Optional
+from typing import TYPE_CHECKING, Literal
 
 from bidict import bidict
-from customtkinter import (
-    CTkButton as ctkButton,
-    CTkFont as ctkFont,
-    CTkFrame as ctkFrame,
-    CTkLabel as ctkLabel,
-    CTkTabview as ctkTabview,
-)
+from customtkinter import CTkButton, CTkFont, CTkFrame, CTkLabel, CTkTabview
 
-from ...custom import CustomDropdown, CustomEntry, IconButton
-from ...custom.adapted import CustomScrollFrame
-from ....managers import VectoresManager
-from ....models import Vector
-from ....utils import (
+from src.gui.custom import CustomDropdown, CustomEntry, IconButton
+from src.gui.custom.adapted import CustomScrollFrame
+from src.managers import VectoresManager
+from src.models import Vector
+from src.utils import (
     ENTER_ICON,
     INFO_ICON,
     INPUTS_ICON,
@@ -37,8 +28,8 @@ from ....utils import (
 )
 
 if TYPE_CHECKING:
-    from .. import VectoresFrame
-    from ... import GaussUI
+    from src.gui import GaussUI
+    from src.gui.frames import VectoresFrame
 
 
 class MagnitudTab(CustomScrollFrame):
@@ -49,25 +40,31 @@ class MagnitudTab(CustomScrollFrame):
     def __init__(
         self,
         app: "GaussUI",
-        master_tab: ctkFrame,
+        master_tab: CTkFrame,
         master_frame: "VectoresFrame",
         vecs_manager: VectoresManager,
-        **kwargs,
+        **kwargs,  # noqa: ANN003
     ) -> None:
+        """
+        Inicializar diseño de frame de magnitud de vectores.
+        """
+
         super().__init__(master_tab, fg_color="transparent", **kwargs)
+
         self.master_frame = master_frame
         self.app = app
         self.vecs_manager = vecs_manager
         self.columnconfigure(0, weight=1)
         self.columnconfigure(2, weight=1)
 
-        self.msg_frame: Optional[ctkFrame] = None
-        self.proc_label: Optional[ctkLabel] = None
+        self.msg_frame: CTkFrame | None = None
+        self.proc_label: CTkLabel | None = None
         self.proc_hidden = True
 
         # crear widgets
-        instruct_m = ctkLabel(
-            self, text="Seleccione un vector del para calcular su magnitud:"
+        instruct_m = CTkLabel(
+            self,
+            text="Seleccione un vector del para calcular su magnitud:",
         )
 
         self.select_vec = CustomDropdown(
@@ -79,11 +76,14 @@ class MagnitudTab(CustomScrollFrame):
         )
 
         self.vec = self.select_vec.get()
-        calcular_button = ctkButton(
-            self, height=30, text="Calcular", command=self.calcular_magnitud
+        calcular_button = CTkButton(
+            self,
+            height=30,
+            text="Calcular",
+            command=self.calcular_magnitud,
         )
 
-        self.resultado_frame = ctkFrame(self, fg_color="transparent")
+        self.resultado_frame = CTkFrame(self, fg_color="transparent")
 
         # colocar widgets
         instruct_m.grid(row=0, column=0, columnspan=3, padx=5, pady=5, sticky="n")
@@ -92,14 +92,19 @@ class MagnitudTab(CustomScrollFrame):
 
     def calcular_magnitud(self) -> None:
         """
-        Calcula la magnitud del vector seleccionado.
+        Calcular magnitud del vector seleccionado.
         """
 
-        for widget in self.resultado_frame.winfo_children():  # type: ignore
-            widget.destroy()  # type: ignore
+        for widget in self.resultado_frame.winfo_children():
+            widget.destroy()
 
         self.resultado_frame.grid(
-            row=2, column=0, columnspan=3, padx=5, pady=5, sticky="n"
+            row=2,
+            column=0,
+            columnspan=3,
+            padx=5,
+            pady=5,
+            sticky="n",
         )
 
         delete_msg_frame(self.msg_frame)
@@ -138,23 +143,23 @@ class MagnitudTab(CustomScrollFrame):
             tipo="resultado",
         )
 
-        ctkButton(
+        CTkButton(
             self.resultado_frame,
             text="Mostrar procedimiento",
             command=lambda: toggle_proc(
                 app=self.app,
                 parent_frame=self,
                 window_title="GaussBot: Procedimiento para calcular la "
-                + f"magnitud del vector {self.vec}",
+                f"magnitud del vector {self.vec}",
                 proc_label=self.proc_label,
-                label_txt=proc,  # pylint: disable=E0606
+                label_txt=proc,
                 proc_hidden=self.proc_hidden,
             ),
         ).grid(row=1, column=0, pady=5, sticky="n")
 
     def update_frame(self) -> None:
         """
-        Actualiza los backgrounds y los datos del frame.
+        Actualizar widgets y datos del frame.
         """
 
         self.select_vec.configure(
@@ -162,12 +167,16 @@ class MagnitudTab(CustomScrollFrame):
             variable=Variable(value=self.master_frame.nombres_vectores[0]),
         )
 
-        for widget in self.winfo_children():  # type: ignore
-            widget.configure(bg_color="transparent")  # type: ignore
+        for widget in self.winfo_children():
+            widget.configure(bg_color="transparent")
 
     def update_vec(self, valor: str) -> None:
         """
-        Actualiza el valor de self.vec con el valor seleccionado en el dropdown.
+        Actualizar vector seleccionado.
+
+        Args:
+            valor: Nuevo vector seleccionado.
+
         """
 
         self.vec = valor
@@ -181,42 +190,49 @@ class SumaRestaTab(CustomScrollFrame):
     def __init__(
         self,
         app: "GaussUI",
-        master_tab: ctkFrame,
+        master_tab: CTkFrame,
         master_frame: "VectoresFrame",
         vecs_manager: VectoresManager,
-        **kwargs,
+        **kwargs,  # noqa: ANN003
     ) -> None:
+        """
+        Inicializar diseño de frame de suma y resta de vectores.
+        """
+
         super().__init__(master_tab, fg_color="transparent", **kwargs)
+
         self.master_frame = master_frame
         self.app = app
         self.vecs_manager = vecs_manager
         self.columnconfigure(0, weight=1)
         self.columnconfigure(2, weight=1)
-        self.msg_frame: Optional[ctkFrame] = None
+        self.msg_frame: CTkFrame | None = None
 
         # para el boton de ejecutar y el dropdown de operadores
-        self.operaciones: bidict[str, str] = bidict({"Sumar": "+", "Restar": "−"})
+        self.operaciones: bidict[str, Literal["+", "−"]] = bidict(
+            {"Sumar": "+", "Restar": "−"},
+        )
 
         # definir atributos, se inicializan en setup_frame()
-        self.instruct_sr: ctkLabel
+        self.instruct_sr: CTkLabel
         self.select_operacion: CustomDropdown
         self.select_1: CustomDropdown
         self.select_2: CustomDropdown
-        self.ejecutar_button: ctkButton
-        self.resultado_frame: ctkFrame
+        self.ejecutar_button: CTkButton
+        self.resultado_frame: CTkFrame
 
-        self.operacion = "Sumar"
-        self.vec1 = ""
-        self.vec2 = ""
+        self.operacion: Literal["+", "−"] = "+"
+        self.vec1: str = ""
+        self.vec2: str = ""
 
-        self.proc_label: Optional[ctkLabel] = None
+        self.proc_label: CTkLabel | None = None
         self.proc_hidden = True
 
         self.setup_frame()
 
     def setup_frame(self, default: str = "Sumar") -> None:
         """
-        Inicializa y configura las widgets del frame.
+        Inicializar y configurar widgets del frame.
         """
 
         delete_msg_frame(self.msg_frame)
@@ -227,14 +243,15 @@ class SumaRestaTab(CustomScrollFrame):
             placeholder2 = Variable(value=self.master_frame.nombres_vectores[1])
 
         # crear widgets
-        self.instruct_sr = ctkLabel(
-            self, text=f"Seleccione los vectores a {default.lower()}:"
+        self.instruct_sr = CTkLabel(
+            self,
+            text=f"Seleccione los vectores a {default.lower()}:",
         )
 
         self.select_operacion = CustomDropdown(
             self,
             width=40,
-            font=ctkFont(size=16),
+            font=CTkFont(size=16),
             values=list(self.operaciones.values()),
             variable=Variable(value=self.operaciones[default]),
             command=self.update_operacion,
@@ -258,48 +275,56 @@ class SumaRestaTab(CustomScrollFrame):
 
         self.vec1 = self.select_1.get()
         self.vec2 = self.select_2.get()
-        self.ejecutar_button = ctkButton(
-            self, height=30, text=default, command=self.ejecutar_operacion
+        self.ejecutar_button = CTkButton(
+            self,
+            height=30,
+            text=default,
+            command=self.ejecutar_operacion,
         )
 
-        self.resultado_frame = ctkFrame(self, fg_color="transparent")
+        self.resultado_frame = CTkFrame(self, fg_color="transparent")
 
         # colocar widgets
         self.instruct_sr.grid(row=0, column=0, columnspan=3, padx=5, pady=5, sticky="n")
-
         self.select_1.grid(row=1, column=0, padx=5, pady=5, sticky="e")
         self.select_operacion.grid(row=1, column=1, padx=5, pady=5, sticky="ew")
         self.select_2.grid(row=1, column=2, padx=5, pady=5, sticky="w")
-
         self.ejecutar_button.grid(
-            row=2, column=0, columnspan=3, padx=5, pady=10, sticky="n"
+            row=2,
+            column=0,
+            columnspan=3,
+            padx=5,
+            pady=10,
+            sticky="n",
         )
 
     def ejecutar_operacion(self) -> None:
         """
-        Suma o resta las matrices seleccionadas.
+        Sumar o restar los vectores seleccionados.
         """
 
-        for widget in self.resultado_frame.winfo_children():  # type: ignore
-            widget.destroy()  # type: ignore
+        for widget in self.resultado_frame.winfo_children():
+            widget.destroy()
 
-        self.update_operacion(self.select_operacion.get())
+        self.update_operacion(self.select_operacion.get())  # type: ignore[reportArgumentType]
         self.update_vec1(self.select_1.get())
         self.update_vec2(self.select_2.get())
         self.resultado_frame.grid(
-            row=3, column=0, columnspan=3, padx=5, pady=5, sticky="n"
+            row=3,
+            column=0,
+            columnspan=3,
+            padx=5,
+            pady=5,
+            sticky="n",
         )
 
         delete_msg_frame(self.msg_frame)
         try:
-            if self.operacion == "+":
-                proc, header, resultado = self.vecs_manager.suma_resta_vecs(
-                    True, self.vec1, self.vec2
-                )
-            elif self.operacion == "−":
-                proc, header, resultado = self.vecs_manager.suma_resta_vecs(
-                    False, self.vec1, self.vec2
-                )
+            proc, header, resultado = self.vecs_manager.suma_resta_vecs(
+                self.operacion,
+                self.vec1,
+                self.vec2,
+            )
         except ArithmeticError as e:
             self.msg_frame = place_msg_frame(
                 parent_frame=self.resultado_frame,
@@ -314,11 +339,11 @@ class SumaRestaTab(CustomScrollFrame):
         self.msg_frame = place_msg_frame(
             parent_frame=self.resultado_frame,
             msg_frame=self.msg_frame,
-            msg=f"\n{header}:\n{str(resultado)}\n",  # pylint: disable=E0606
+            msg=f"\n{header}:\n{resultado!s}\n",
             tipo="resultado",
         )
 
-        ctkButton(
+        CTkButton(
             self.resultado_frame,
             text="Mostrar procedimiento",
             command=lambda: toggle_proc(
@@ -326,18 +351,18 @@ class SumaRestaTab(CustomScrollFrame):
                 parent_frame=self,
                 window_title=f"GaussBot: Procedimiento de {header}",
                 proc_label=self.proc_label,
-                label_txt=proc,  # pylint: disable=E0606
+                label_txt=proc,
                 proc_hidden=self.proc_hidden,
             ),
         ).grid(row=1, column=0, pady=5, sticky="n")
 
     def update_frame(self) -> None:
         """
-        Actualiza los backgrounds y los datos del frame.
+        Actualizar widgets y datos del frame.
         """
 
         for widget in self.winfo_children():
-            widget.configure(bg_color="transparent")  # type: ignore
+            widget.configure(bg_color="transparent")
 
         placeholder1 = Variable(value=self.master_frame.nombres_vectores[0])
         if len(self.master_frame.nombres_vectores) == 1:
@@ -346,37 +371,47 @@ class SumaRestaTab(CustomScrollFrame):
             placeholder2 = Variable(value=self.master_frame.nombres_vectores[1])
 
         self.select_1.configure(
-            variable=placeholder1, values=self.master_frame.nombres_vectores
+            variable=placeholder1,
+            values=self.master_frame.nombres_vectores,
         )
 
         self.select_2.configure(
-            variable=placeholder2, values=self.master_frame.nombres_vectores
+            variable=placeholder2,
+            values=self.master_frame.nombres_vectores,
         )
 
-    def update_operacion(self, valor: str) -> None:
+    def update_operacion(self, valor: Literal["+", "−"]) -> None:
         """
-        Cambia el texto del botón de ejecutar operación
-        y el texto de la instrucción según la opción
-        seleccionada en el dropdown.
+        Actualizar botón de ejecutar operación y texto de la instrucción.
+
+        Args:
+            valor: Operación a realizar.
+
         """
 
-        op_text: str = self.operaciones.inverse[valor]
+        op_text = self.operaciones.inverse[valor]
         self.ejecutar_button.configure(text=op_text)
         self.instruct_sr.configure(text=f"Seleccione los vectores a {op_text.lower()}:")
         self.operacion = valor
 
     def update_vec1(self, valor: str) -> None:
         """
-        Actualiza el valor de self.vec1 con el
-        valor seleccionado en el dropdown correspondiente.
+        Actualizar vector seleccionado.
+
+        Args:
+            valor: Nuevo primer vector seleccionado.
+
         """
 
         self.vec1 = valor
 
     def update_vec2(self, valor: str) -> None:
         """
-        Actualiza el valor de self.vec2 con el
-        valor seleccionado en el dropdown correspondiente.
+        Actualizar vector seleccionado.
+
+        Args:
+            valor: Nuevo segundo vector seleccionado.
+
         """
 
         self.vec2 = valor
@@ -384,44 +419,50 @@ class SumaRestaTab(CustomScrollFrame):
 
 class MultiplicacionTab(CustomScrollFrame):
     """
-    Frame para realizar multiplicaciones de vectores por escalares,
-    producto punto y producto matriz-vector.
+    Frame para realizar multiplicación escalar,
+    producto punto, producto cruz
+    y producto matriz-vector.
     """
 
     def __init__(
         self,
         app: "GaussUI",
-        master_tab: ctkFrame,
+        master_tab: CTkFrame,
         master_frame: "VectoresFrame",
         vecs_manager: VectoresManager,
-        **kwargs,
+        **kwargs,  # noqa: ANN003
     ) -> None:
+        """
+        Inicializar diseño de frame de multiplicación.
+        """
+
         super().__init__(master_tab, fg_color="transparent", **kwargs)
+
         self.master_frame = master_frame
         self.app = app
         self.vecs_manager = vecs_manager
         self.columnconfigure(0, weight=1)
 
         # definir atributos, se inicializan en setup_tabs()
-        self.msg_frame: Optional[ctkFrame] = None
+        self.msg_frame: CTkFrame | None = None
         self.select_escalar_vec: CustomDropdown
         self.escalar_entry: CustomEntry
-        self.dimensiones_entry: CustomEntry
+        self.dimension_entry: CustomEntry
         self.select_vec1: CustomDropdown
         self.select_vec2: CustomDropdown
         self.select_vmat: CustomDropdown
         self.select_mvec: CustomDropdown
 
-        self.escalar_vec = ""
-        self.vec1 = ""
-        self.vec2 = ""
-        self.vmat = ""
-        self.mvec = ""
+        self.escalar_vec: str = ""
+        self.vec1: str = ""
+        self.vec2: str = ""
+        self.vmat: str = ""
+        self.mvec: str = ""
 
-        self.proc_label: Optional[ctkLabel] = None
+        self.proc_label: CTkLabel | None = None
         self.proc_hidden = True
 
-        self.tabview = ctkTabview(self, fg_color="transparent")
+        self.tabview = CTkTabview(self, fg_color="transparent")
         self.tabview.pack(expand=True, fill="both")
 
         # crear tabs
@@ -434,19 +475,17 @@ class MultiplicacionTab(CustomScrollFrame):
     def setup_tabs(self) -> None:
         """
         Wrapper para llamar todos los métodos de configuración de tabs.
-        Se encarga de validar si hay matrices para que los setups
-        individuales no lo tengan que hacer.
         """
 
         for tab in self.tabview.winfo_children():
-            tab.columnconfigure(0, weight=1)  # type: ignore
-            tab.columnconfigure(2, weight=1)  # type: ignore
+            tab.columnconfigure(0, weight=1)
+            tab.columnconfigure(2, weight=1)
 
         # crear frames de resultado
-        self.resultado_escalar = ctkFrame(self.tab_escalar, fg_color="transparent")
-        self.resultado_punto = ctkFrame(self.tab_prod_punto, fg_color="transparent")
-        self.resultado_cruz = ctkFrame(self.tab_prod_cruz, fg_color="transparent")
-        self.resultado_mat_vec = ctkFrame(self.tab_mat_vec, fg_color="transparent")
+        self.resultado_escalar = CTkFrame(self.tab_escalar, fg_color="transparent")
+        self.resultado_punto = CTkFrame(self.tab_prod_punto, fg_color="transparent")
+        self.resultado_cruz = CTkFrame(self.tab_prod_cruz, fg_color="transparent")
+        self.resultado_mat_vec = CTkFrame(self.tab_mat_vec, fg_color="transparent")
 
         self.setup_escalar_tab()
         self.setup_prod_punto_tab()
@@ -463,25 +502,26 @@ class MultiplicacionTab(CustomScrollFrame):
                 columnspan=3,
             )
 
-            ctkButton(
+            CTkButton(
                 self.tab_mat_vec,
                 height=30,
                 text="Agregar matrices",
                 image=INPUTS_ICON,
-                command=lambda: self.app.home_frame.ir_a_mats(mostrar=False),  # type: ignore
+                command=lambda: self.app.home_frame.ir_a_frame("matrices"),
             ).grid(row=1, column=0, columnspan=3, padx=5, pady=5, sticky="n")
 
     def setup_escalar_tab(self) -> None:
         """
-        Setup de la tab para multiplicar un vector por un escalar.
+        Configurar pestaña de multiplicación escalar.
         """
 
         delete_msg_frame(self.msg_frame)
 
         # crear widgets
-        operador_label = ctkLabel(self.tab_escalar, text="•", font=ctkFont(size=16))
-        instruct_e = ctkLabel(
-            self.tab_escalar, text="Seleccione el vector e ingrese el escalar:"
+        operador_label = CTkLabel(self.tab_escalar, text="•", font=CTkFont(size=16))
+        instruct_e = CTkLabel(
+            self.tab_escalar,
+            text="Seleccione el vector e ingrese el escalar:",
         )
 
         self.select_escalar_vec = CustomDropdown(
@@ -500,8 +540,7 @@ class MultiplicacionTab(CustomScrollFrame):
         )
 
         self.escalar_entry.bind("<Return>", lambda _: self.mult_por_escalar())
-
-        multiplicar_button = ctkButton(
+        multiplicar_button = CTkButton(
             self.tab_escalar,
             height=30,
             text="Multiplicar",
@@ -513,14 +552,18 @@ class MultiplicacionTab(CustomScrollFrame):
         self.escalar_entry.grid(row=1, column=0, padx=5, pady=5, sticky="e")
         operador_label.grid(row=1, column=1, padx=5, pady=5, sticky="ew")
         self.select_escalar_vec.grid(row=1, column=2, padx=5, pady=5, sticky="w")
-
         multiplicar_button.grid(
-            row=2, column=0, columnspan=3, padx=5, pady=10, sticky="n"
+            row=2,
+            column=0,
+            columnspan=3,
+            padx=5,
+            pady=10,
+            sticky="n",
         )
 
     def setup_prod_punto_tab(self) -> None:
         """
-        Setup de la tab para calcular el producto punto de dos vectores.
+        Configurar pestaña de producto punto.
         """
 
         delete_msg_frame(self.msg_frame)
@@ -531,10 +574,10 @@ class MultiplicacionTab(CustomScrollFrame):
             placeholder2 = Variable(value=self.master_frame.nombres_vectores[1])
 
         # crear widgets
-        operador_label = ctkLabel(self.tab_prod_punto, text=".", font=ctkFont(size=26))
-
-        instruct_v = ctkLabel(
-            self.tab_prod_punto, text="Seleccione los vectores a multiplicar:"
+        operador_label = CTkLabel(self.tab_prod_punto, text=".", font=CTkFont(size=26))
+        instruct_v = CTkLabel(
+            self.tab_prod_punto,
+            text="Seleccione los vectores a multiplicar:",
         )
 
         self.select_vec1 = CustomDropdown(
@@ -555,8 +598,11 @@ class MultiplicacionTab(CustomScrollFrame):
 
         self.vec1 = self.select_vec1.get()
         self.vec2 = self.select_vec2.get()
-        multiplicar_button = ctkButton(
-            self.tab_prod_punto, height=30, text="Multiplicar", command=self.prod_punto
+        multiplicar_button = CTkButton(
+            self.tab_prod_punto,
+            height=30,
+            text="Multiplicar",
+            command=self.prod_punto,
         )
 
         # colocar widgets
@@ -564,68 +610,91 @@ class MultiplicacionTab(CustomScrollFrame):
         self.select_vec1.grid(row=1, column=0, padx=5, pady=5, sticky="e")
         operador_label.grid(row=1, column=1, padx=5, pady=5, sticky="ew")
         self.select_vec2.grid(row=1, column=2, padx=5, pady=5, sticky="w")
-
         multiplicar_button.grid(
-            row=2, column=0, columnspan=3, padx=5, pady=10, sticky="n"
+            row=2,
+            column=0,
+            columnspan=3,
+            padx=5,
+            pady=10,
+            sticky="n",
         )
 
     def setup_prod_cruz_tab(self) -> None:
         """
-        Setup de la tab para multiplicar vectores.
+        Configurar pestaña de producto cruz.
         """
 
         delete_msg_frame(self.msg_frame)
-
-        ctkLabel(self.tab_prod_cruz, text="Ingrese las dimensiones:").grid(
-            row=0, column=0, padx=5, pady=5, sticky="e"
+        CTkLabel(self.tab_prod_cruz, text="Ingrese las dimensiones:").grid(
+            row=0,
+            column=0,
+            padx=5,
+            pady=5,
+            sticky="e",
         )
 
-        self.dimensiones_entry = CustomEntry(
-            self.tab_prod_cruz, placeholder_text="3", width=60
+        self.dimension_entry = CustomEntry(
+            self.tab_prod_cruz,
+            placeholder_text="3",
+            width=60,
         )
 
-        self.dimensiones_entry.bind(
-            "<Return>", lambda _: setup_selections(self.dimensiones_entry.get())
+        self.dimension_entry.bind(
+            "<Return>",
+            lambda _: setup_selections(self.dimension_entry.get()),
         )
 
-        self.dimensiones_entry.grid(row=0, column=1, padx=5, pady=5, sticky="n")
-
+        self.dimension_entry.grid(row=0, column=1, padx=5, pady=5, sticky="n")
         IconButton(
             self.tab_prod_cruz,
             image=ENTER_ICON,
-            tooltip_text="Ingresar dimensiones",
-            command=lambda: setup_selections(self.dimensiones_entry.get()),
+            tooltip_text="Ingresar dimension",
+            command=lambda: setup_selections(self.dimension_entry.get()),
         ).grid(row=0, column=2, padx=5, pady=5, sticky="w")
 
-        def setup_selections(input_dims: str) -> None:
+        def setup_selections(input_dim: str) -> None:
+            """
+            Inicializa widgets para seleccionar vectores a multiplicar.
+
+            Args:
+                input_dim: Dimensión seleccionada para multiplicación.
+
+            """
+
             delete_msg_frame(self.msg_frame)
-            for widget in self.tab_prod_cruz.winfo_children():  # type: ignore
+            for widget in self.tab_prod_cruz.winfo_children():
                 if (
                     widget is not self.resultado_cruz
-                    and dict(widget.grid_info()).get("row", -1) > 0  # type: ignore
+                    and dict(widget.grid_info()).get("row", -1) > 0
                 ):
-                    widget.destroy()  # type: ignore
+                    widget.destroy()
+
+            dims_invalidas: str = "Debe ingresar un número entero mayor a 1."
+            falta_vectores: str = f"No hay suficientes vectores en R{
+                input_dim
+            } para calcular un producto cruz."
 
             try:
-                dimensiones = int(input_dims)
-                if dimensiones <= 1:
-                    raise ValueError
-                if dimensiones - 1 > len(self.master_frame.nombres_vectores):
-                    raise ValueError(
-                        f"No hay suficientes vectores en R{dimensiones} "
-                        + "para calcular un producto cruz."
-                    )
-            except ValueError as e:
-                str_e = str(e)
-                if "!" not in str_e:
-                    msg = "Debe ingresar un número entero mayor a 1."
-                else:
-                    msg = str_e
-
+                dimension = int(input_dim)
+                if dimension <= 1:
+                    raise ValueError  # noqa: TRY301
+            except ValueError:
                 self.msg_frame = place_msg_frame(
                     parent_frame=self.tab_prod_cruz,
                     msg_frame=self.msg_frame,
-                    msg=msg,
+                    msg=dims_invalidas,
+                    tipo="error",
+                    row=1,
+                    columnspan=3,
+                )
+
+                return
+
+            if dimension - 1 > len(self.master_frame.nombres_vectores):
+                self.msg_frame = place_msg_frame(
+                    parent_frame=self.tab_prod_cruz,
+                    msg_frame=self.msg_frame,
+                    msg=falta_vectores,
                     tipo="error",
                     row=1,
                     columnspan=3,
@@ -637,14 +706,14 @@ class MultiplicacionTab(CustomScrollFrame):
             vecs_validos = [
                 nombre
                 for nombre, vec in self.vecs_manager.vecs_ingresados.items()
-                if len(vec) == dimensiones
+                if len(vec) == dimension
             ]
 
             if not vecs_validos:
                 self.msg_frame = place_msg_frame(
                     parent_frame=self.tab_prod_cruz,
                     msg_frame=self.msg_frame,
-                    msg=f"¡No se han guardado vectores en R{dimensiones}!",
+                    msg=f"¡No se han guardado vectores en R{dimension}!",
                     tipo="error",
                     row=1,
                     columnspan=3,
@@ -656,14 +725,15 @@ class MultiplicacionTab(CustomScrollFrame):
                 self.tab_prod_cruz,
                 image=INFO_ICON,
                 tooltip_text="Solamente se están mostrando "
-                + f"los vectores guardados en R{dimensiones}.",
+                f"vectores guardados en R{dimension}.",
             ).grid(row=1, column=0, columnspan=3, padx=5, pady=(15, 3), sticky="n")
 
-            ctkLabel(
-                self.tab_prod_cruz, text="Seleccione los vectores a multiplicar:"
+            CTkLabel(
+                self.tab_prod_cruz,
+                text="Seleccione los vectores a multiplicar:",
             ).grid(row=2, column=0, columnspan=3, padx=5, pady=3, sticky="n")
 
-            range_dims = dimensiones if dimensiones == 2 else dimensiones - 1
+            range_dims = dimension if dimension == 2 else dimension - 1
             for i in range(range_dims):
                 dropdowns.append(
                     CustomDropdown(
@@ -671,25 +741,35 @@ class MultiplicacionTab(CustomScrollFrame):
                         width=60,
                         values=vecs_validos,
                         variable=Variable(value=vecs_validos[i]),
-                    )
+                    ),
                 )
 
                 dropdowns[i].grid(
-                    row=i + 3, column=0, columnspan=3, padx=5, pady=5, sticky="n"
+                    row=i + 3,
+                    column=0,
+                    columnspan=3,
+                    padx=5,
+                    pady=5,
+                    sticky="n",
                 )
 
-            ctkButton(
+            CTkButton(
                 self.tab_prod_cruz,
                 height=30,
                 text="Multiplicar",
                 command=lambda: self.prod_cruz(dropdowns),
             ).grid(
-                row=dimensiones + 3, column=0, columnspan=3, padx=5, pady=10, sticky="n"
+                row=dimension + 3,
+                column=0,
+                columnspan=3,
+                padx=5,
+                pady=10,
+                sticky="n",
             )
 
     def setup_mat_vec_tab(self) -> None:
         """
-        Setup de la tab para multiplicar matrices y vectores.
+        Configurar pestaña de producto matriz-vector.
         """
 
         delete_msg_frame(self.msg_frame)
@@ -697,9 +777,10 @@ class MultiplicacionTab(CustomScrollFrame):
         placeholder2 = Variable(value=self.master_frame.nombres_vectores[0])
 
         # crear widgets
-        operador_label = ctkLabel(self.tab_mat_vec, text="•", font=ctkFont(size=16))
-        instruct_mv = ctkLabel(
-            self.tab_mat_vec, text="Seleccione la matriz y el vector a multiplicar:"
+        operador_label = CTkLabel(self.tab_mat_vec, text="•", font=CTkFont(size=16))
+        instruct_mv = CTkLabel(
+            self.tab_mat_vec,
+            text="Seleccione la matriz y el vector a multiplicar:",
         )
 
         self.select_vmat = CustomDropdown(
@@ -720,8 +801,11 @@ class MultiplicacionTab(CustomScrollFrame):
 
         self.vmat = self.select_vmat.get()
         self.mvec = self.select_mvec.get()
-        multiplicar_button = ctkButton(
-            self.tab_mat_vec, height=30, text="Multiplicar", command=self.mult_mat_vec
+        multiplicar_button = CTkButton(
+            self.tab_mat_vec,
+            height=30,
+            text="Multiplicar",
+            command=self.mult_mat_vec,
         )
 
         # colocar widgets
@@ -731,27 +815,38 @@ class MultiplicacionTab(CustomScrollFrame):
         self.select_mvec.grid(row=1, column=2, padx=5, pady=5, sticky="w")
 
         multiplicar_button.grid(
-            row=2, column=0, columnspan=3, padx=5, pady=10, sticky="n"
+            row=2,
+            column=0,
+            columnspan=3,
+            padx=5,
+            pady=10,
+            sticky="n",
         )
 
     def mult_por_escalar(self) -> None:
         """
-        Realiza la multiplicación de un vector por un escalar.
+        Multiplicar vector seleccionado por escalar ingresado.
         """
 
-        for widget in self.resultado_escalar.winfo_children():  # type: ignore
-            widget.destroy()  # type: ignore
+        for widget in self.resultado_escalar.winfo_children():
+            widget.destroy()
 
         self.update_escalar_vec(self.select_escalar_vec.get())
         self.resultado_escalar.grid(
-            row=3, column=0, columnspan=3, padx=5, pady=5, sticky="n"
+            row=3,
+            column=0,
+            columnspan=3,
+            padx=5,
+            pady=5,
+            sticky="n",
         )
 
         delete_msg_if(self.msg_frame, (self.tab_escalar, self.resultado_escalar))
         try:
-            escalar = Fraction(self.escalar_entry.get())  # type: ignore
+            escalar = Fraction(self.escalar_entry.get())
             proc, header, resultado = self.vecs_manager.escalar_por_vec(
-                escalar, self.escalar_vec
+                escalar,
+                self.escalar_vec,
             )
         except (ValueError, ZeroDivisionError) as e:
             if isinstance(e, ValueError):
@@ -772,42 +867,47 @@ class MultiplicacionTab(CustomScrollFrame):
         self.msg_frame = place_msg_frame(
             parent_frame=self.resultado_escalar,
             msg_frame=self.msg_frame,
-            msg=f"\n{header}:\n{str(resultado)}\n",  # pylint: disable=E0606
+            msg=f"\n{header}:\n{resultado!s}\n",
             tipo="resultado",
         )
 
-        ctkButton(
+        CTkButton(
             self.resultado_escalar,
             text="Mostrar procedimiento",
             command=lambda: toggle_proc(
                 app=self.app,
                 parent_frame=self,
-                window_title="GaussBot: Procedimiento de la "
-                + f"multiplicación {header}",
+                window_title=f"GaussBot: Procedimiento de la multiplicación {header}",
                 proc_label=self.proc_label,
-                label_txt=proc,  # pylint: disable=E0606
+                label_txt=proc,
                 proc_hidden=self.proc_hidden,
             ),
         ).grid(row=1, column=0, pady=5, sticky="n")
 
     def prod_punto(self) -> None:
         """
-        Realiza el producto punto de dos vectores.
+        Calcular producto punto de vectores seleccionados.
         """
 
-        for widget in self.resultado_punto.winfo_children():  # type: ignore
-            widget.destroy()  # type: ignore
+        for widget in self.resultado_punto.winfo_children():
+            widget.destroy()
 
         self.update_vec1(self.select_vec1.get())
         self.update_vec2(self.select_vec2.get())
         self.resultado_punto.grid(
-            row=3, column=0, columnspan=3, padx=5, pady=5, sticky="n"
+            row=3,
+            column=0,
+            columnspan=3,
+            padx=5,
+            pady=5,
+            sticky="n",
         )
 
         delete_msg_if(self.msg_frame, (self.tab_prod_punto, self.resultado_punto))
         try:
             proc, header, resultado = self.vecs_manager.producto_punto(
-                self.vec1, self.vec2
+                self.vec1,
+                self.vec2,
             )
         except ArithmeticError as e:
             self.msg_frame = place_msg_frame(
@@ -822,29 +922,28 @@ class MultiplicacionTab(CustomScrollFrame):
         self.msg_frame = place_msg_frame(
             parent_frame=self.resultado_punto,
             msg_frame=self.msg_frame,
-            msg=f"{header}:\n{str(resultado)}",  # pylint: disable=E0606
+            msg=f"{header}:\n{resultado!s}",
             tipo="resultado",
             ipadx=5,
             ipady=5,
         )
 
-        ctkButton(
+        CTkButton(
             self.resultado_punto,
             text="Mostrar procedimiento",
             command=lambda: toggle_proc(
                 app=self.app,
                 parent_frame=self,
-                window_title="GaussBot: Procedimiento de la "
-                + f"multiplicación {header}",
+                window_title=f"GaussBot: Procedimiento de la multiplicación {header}",
                 proc_label=self.proc_label,
-                label_txt=proc,  # pylint: disable=E0606
+                label_txt=proc,
                 proc_hidden=self.proc_hidden,
             ),
         ).grid(row=1, column=0, pady=5, sticky="n")
 
     def prod_cruz(self, dropdowns: list[CustomDropdown]) -> None:
         """
-        Realiza el producto cruz de dos vectores.
+        Calcular producto cruz de vectores seleccionados.
         """
 
         delete_msg_frame(self.msg_frame)
@@ -853,7 +952,12 @@ class MultiplicacionTab(CustomScrollFrame):
         ]
 
         self.resultado_cruz.grid(
-            row=len(vectores) + 5, column=0, columnspan=3, padx=5, pady=5, sticky="n"
+            row=len(vectores) + 5,
+            column=0,
+            columnspan=3,
+            padx=5,
+            pady=5,
+            sticky="n",
         )
 
         header = " × ".join([dropdown.get() for dropdown in dropdowns])
@@ -862,25 +966,31 @@ class MultiplicacionTab(CustomScrollFrame):
         self.msg_frame = place_msg_frame(
             parent_frame=self.resultado_cruz,
             msg_frame=self.msg_frame,
-            msg=f"\n{header}:\n{str(resultado)}\n",
+            msg=f"\n{header}:\n{resultado!s}\n",
             tipo="resultado",
         )
 
     def mult_mat_vec(self) -> None:
         """
-        Realiza el producto de una matriz por un vector.
+        Multiplicar matriz y vector seleccionados.
         """
 
         self.update_vmat(self.select_vmat.get())
         self.update_mvec(self.select_mvec.get())
         self.resultado_mat_vec.grid(
-            row=3, column=0, columnspan=3, padx=5, pady=5, sticky="n"
+            row=3,
+            column=0,
+            columnspan=3,
+            padx=5,
+            pady=5,
+            sticky="n",
         )
 
         delete_msg_if(self.msg_frame, (self.tab_mat_vec, self.resultado_mat_vec))
         try:
             proc, header, resultado = self.app.ops_manager.mat_por_vec(
-                self.vmat, self.mvec
+                self.vmat,
+                self.mvec,
             )
         except ArithmeticError as e:
             self.msg_frame = place_msg_frame(
@@ -895,28 +1005,26 @@ class MultiplicacionTab(CustomScrollFrame):
         self.msg_frame = place_msg_frame(
             parent_frame=self.resultado_mat_vec,
             msg_frame=self.msg_frame,
-            msg=f"\n{header}:\n{str(resultado)}\n",  # pylint: disable=E0606
+            msg=f"\n{header}:\n{resultado!s}\n",
             tipo="resultado",
         )
 
-        ctkButton(
+        CTkButton(
             self.resultado_mat_vec,
             text="Mostrar procedimiento",
             command=lambda: toggle_proc(
                 app=self.app,
                 parent_frame=self,
-                window_title="GaussBot: Procedimiento de la "
-                + f"multiplicación {header}",
+                window_title=f"GaussBot: Procedimiento de la multiplicación {header}",
                 proc_label=self.proc_label,
-                label_txt=proc,  # pylint: disable=E0606
+                label_txt=proc,
                 proc_hidden=self.proc_hidden,
             ),
         ).grid(row=1, column=0, pady=5, sticky="n")
 
     def update_frame(self) -> None:
         """
-        Destruye todas las widgets en todas las tabs,
-        y vuelve a correr el setup.
+        Correr setup nuevamente para actualizar frame.
         """
 
         for tab in self.tabview.winfo_children():
@@ -929,40 +1037,55 @@ class MultiplicacionTab(CustomScrollFrame):
 
     def update_escalar_vec(self, valor: str) -> None:
         """
-        Actualiza el valor de self.escalar_vec con
-        el valor seleccionado en el dropdown.
+        Actualizar vector seleccionado para multiplicación escalar.
+
+        Args:
+            valor: Nueva vector seleccionado.
+
         """
 
         self.escalar_vec = valor
 
     def update_vec1(self, valor: str) -> None:
         """
-        Actualiza el valor de self.vec1 con
-        el valor seleccionado en el dropdown.
+        Actualizar primer vector seleccionado para producto punto.
+
+        Args:
+            valor: Nueva vector seleccionado.
+
         """
 
         self.vec1 = valor
 
     def update_vec2(self, valor: str) -> None:
         """
-        Actualiza el valor de self.vec2 con
-        el valor seleccionado en el dropdown.
+        Actualizar segundo vector seleccionado para producto punto.
+
+        Args:
+            valor: Nueva vector seleccionado.
+
         """
 
         self.vec2 = valor
 
     def update_vmat(self, valor: str) -> None:
         """
-        Actualiza el valor de self.vmat con
-        el valor seleccionado en el dropdown.
+        Actualizar vector seleccionado para producto matriz-vector.
+
+        Args:
+            valor: Nueva matriz seleccionada.
+
         """
 
         self.vmat = valor
 
     def update_mvec(self, valor: str) -> None:
         """
-        Actualiza el valor de self.mvec con
-        el valor seleccionado en el dropdown.
+        Actualizar vector seleccionado para producto matriz-vector.
+
+        Args:
+            valor: Nuevo vector seleccionado.
+
         """
 
         self.mvec = valor

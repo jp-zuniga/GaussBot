@@ -6,15 +6,21 @@ from fractions import Fraction
 from random import choice, randint
 from string import ascii_uppercase
 from tkinter import Variable
-from typing import TYPE_CHECKING, Optional
+from typing import TYPE_CHECKING, Literal
 
-from customtkinter import CTkFrame as ctkFrame, CTkLabel as ctkLabel
+from customtkinter import CTkFrame, CTkLabel
 
-from ...custom import CustomDropdown, CustomEntry, ErrorFrame, IconButton, SuccessFrame
-from ...custom.adapted import CustomScrollFrame
-from ....managers import KeyBindingManager, MatricesManager
-from ....models import Matriz
-from ....utils import (
+from src.gui.custom import (
+    CustomDropdown,
+    CustomEntry,
+    ErrorFrame,
+    IconButton,
+    SuccessFrame,
+)
+from src.gui.custom.adapted import CustomScrollFrame
+from src.managers import KeyBindingManager, MatricesManager
+from src.models import Matriz
+from src.utils import (
     ACEPTAR_ICON,
     ELIMINAR_ICON,
     ENTER_ICON,
@@ -27,49 +33,58 @@ from ....utils import (
 )
 
 if TYPE_CHECKING:
-    from .. import ManejarSistemas
-    from ... import GaussUI
+    from src.gui import GaussUI
+    from src.gui.frames import ManejarSistemas
 
 
 class AgregarSistemas(CustomScrollFrame):
     """
-    Frame para agregar un nuevo sistema.
+    Frame para agregar nuevos sistemas de ecuaciones.
     """
 
     def __init__(
         self,
         app: "GaussUI",
-        master_tab: ctkFrame,
+        master_tab: CTkFrame,
         master_frame: "ManejarSistemas",
         mats_manager: MatricesManager,
-        **kwargs,
+        **kwargs,  # noqa: ANN003
     ) -> None:
+        """
+        Inicializar diseño de frame de agregar sistemas de ecuaciones.
+        """
+
         super().__init__(master_tab, fg_color="transparent", **kwargs)
+
         self.app = app
         self.master_frame = master_frame
         self.mats_manager = mats_manager
         self.columnconfigure(0, weight=1)
 
         self.key_binder = KeyBindingManager(es_matriz=True)
-        self.msg_frame: Optional[ctkFrame] = None
+        self.msg_frame: CTkFrame | None = None
         self.input_entries: list[list[CustomEntry]] = []
 
         # frames para contener secciones de la interfaz
-        self.pre_sis_frame = ctkFrame(self, fg_color="transparent")
-        self.sis_frame = ctkFrame(self, fg_color="transparent")
-        self.post_sis_frame = ctkFrame(self, fg_color="transparent")
+        self.pre_sis_frame = CTkFrame(self, fg_color="transparent")
+        self.sis_frame = CTkFrame(self, fg_color="transparent")
+        self.post_sis_frame = CTkFrame(self, fg_color="transparent")
         self.nombre_entry: CustomEntry
 
         # crear widgets iniciales para las dimensiones
-        ecuaciones_label = ctkLabel(self.pre_sis_frame, text="Ecuaciones:")
-        variables_label = ctkLabel(self.pre_sis_frame, text="Variables:")
+        ecuaciones_label = CTkLabel(self.pre_sis_frame, text="Ecuaciones:")
+        variables_label = CTkLabel(self.pre_sis_frame, text="Variables:")
 
         self.ecuaciones_entry = CustomEntry(
-            self.pre_sis_frame, width=60, placeholder_text="3"
+            self.pre_sis_frame,
+            width=60,
+            placeholder_text="3",
         )
 
         self.variables_entry = CustomEntry(
-            self.pre_sis_frame, width=60, placeholder_text="3"
+            self.pre_sis_frame,
+            width=60,
+            placeholder_text="3",
         )
 
         ingresar_button = IconButton(
@@ -86,27 +101,30 @@ class AgregarSistemas(CustomScrollFrame):
             command=self.generar_aleatoria,
         )
 
-        # crear bindings para todas las entry's iniciales
-        # para que se pueda navegar con las flechas
+        # crear bindings para todas las entries iniciales
         self.ecuaciones_entry.bind("<Return>", lambda _: self.generar_casillas())
         self.ecuaciones_entry.bind("<Down>", lambda _: self.key_binder.focus_first())
         self.variables_entry.bind("<Return>", lambda _: self.generar_casillas())
         self.variables_entry.bind("<Down>", lambda _: self.key_binder.focus_first())
 
         self.ecuaciones_entry.bind(
-            "<Left>", lambda _: self.key_binder.focus_columnas(self.variables_entry)
+            "<Left>",
+            lambda _: self.key_binder.focus_columnas(self.variables_entry),
         )
 
         self.ecuaciones_entry.bind(
-            "<Right>", lambda _: self.key_binder.focus_columnas(self.variables_entry)
+            "<Right>",
+            lambda _: self.key_binder.focus_columnas(self.variables_entry),
         )
 
         self.variables_entry.bind(
-            "<Left>", lambda _: self.key_binder.focus_filas(self.ecuaciones_entry)
+            "<Left>",
+            lambda _: self.key_binder.focus_filas(self.ecuaciones_entry),
         )
 
         self.variables_entry.bind(
-            "<Right>", lambda _: self.key_binder.focus_filas(self.ecuaciones_entry)
+            "<Right>",
+            lambda _: self.key_binder.focus_filas(self.ecuaciones_entry),
         )
 
         # colocar widgets
@@ -120,7 +138,7 @@ class AgregarSistemas(CustomScrollFrame):
 
     def limpiar_casillas(self) -> None:
         """
-        Borra todos los valores ingresados en las casillas del sistema.
+        Eliminar valores ingresados previamente.
         """
 
         for fila_entries in self.input_entries:
@@ -130,27 +148,36 @@ class AgregarSistemas(CustomScrollFrame):
 
     def generar_casillas(self) -> None:
         """
-        Genera casillas para ingresar un sistema con las dimensiones indicadas.
+        Generar casillas para ingresar un sistema con las dimensiones indicadas.
         """
 
         # si habian widgets debajo de
         # self.pre_sis_frame, borrarlos
         for widget in self.sis_frame.winfo_children():
-            widget.destroy()  # type: ignore
+            widget.destroy()
         for widget in self.post_sis_frame.winfo_children():
-            widget.destroy()  # type: ignore
+            widget.destroy()
 
         delete_msg_frame(self.msg_frame)
         try:
-            ecuaciones, variables = self.validar_dimensiones()  # type: ignore
-        except TypeError:
-            # hubo input invalido
+            ecuaciones, variables = self.validar_dimensiones()
+        except ValueError as v:
+            self.msg_frame = place_msg_frame(
+                parent_frame=self,
+                msg_frame=self.msg_frame,
+                msg=str(v),
+                tipo="error",
+                row=1,
+            )
+
             return
         delete_msg_frame(self.msg_frame)
 
         # crear separador para la columna de constantes
-        sep_label = ctkLabel(
-            self.sis_frame, text="", image=generate_sep(True, (8, 40 * ecuaciones))
+        sep_label = CTkLabel(
+            self.sis_frame,
+            text="",
+            image=generate_sep(True, (8, 40 * ecuaciones)),
         )
 
         # crear entries para ingresar elementos
@@ -159,7 +186,9 @@ class AgregarSistemas(CustomScrollFrame):
             fila_entries = []
             for j in range(variables):
                 input_entry = CustomEntry(
-                    self.sis_frame, width=80, placeholder_text=str(randint(-15, 15))
+                    self.sis_frame,
+                    width=80,
+                    placeholder_text=str(randint(-15, 15)),
                 )
 
                 if j != variables - 1:
@@ -172,7 +201,7 @@ class AgregarSistemas(CustomScrollFrame):
             self.input_entries.append(fila_entries)
 
         # crear post_sis_frame widgets
-        nombre_label = ctkLabel(self.post_sis_frame, text="Nombre del sistema:")
+        nombre_label = CTkLabel(self.post_sis_frame, text="Nombre del sistema:")
         self.nombre_entry = CustomEntry(
             self.post_sis_frame,
             width=60,
@@ -181,7 +210,7 @@ class AgregarSistemas(CustomScrollFrame):
                     x
                     for x in ascii_uppercase
                     if x not in self.mats_manager.sis_ingresados.values()
-                ]
+                ],
             ),
         )
 
@@ -211,8 +240,8 @@ class AgregarSistemas(CustomScrollFrame):
         limpiar_button.grid(row=0, column=3, padx=2, pady=5)
 
         # configurar atributos de keybinder y crear bindings
-        self.key_binder.entry_list = self.input_entries  # type: ignore
-        self.key_binder.extra_entries = (self.nombre_entry, self.ecuaciones_entry)  # type: ignore
+        self.key_binder.entry_list = self.input_entries
+        self.key_binder.extra_entries = (self.nombre_entry, self.ecuaciones_entry)
         self.key_binder.create_key_bindings()
 
         # encargarse de bindings de nombre_entry
@@ -221,8 +250,7 @@ class AgregarSistemas(CustomScrollFrame):
 
     def generar_aleatoria(self) -> None:
         """
-        Genera un sistema de las dimensiones indicadas,
-        con valores enteros aleatorios.
+        Generar sistema con valores aleatorios.
         """
 
         self.generar_casillas()
@@ -232,21 +260,28 @@ class AgregarSistemas(CustomScrollFrame):
 
     def agregar_sis(self) -> None:
         """
-        Agrega el sistema ingresado a la lista de sistemas ingresados.
+        Agregar el sistema ingresado al diccionario de sistemas ingresados.
         """
 
         delete_msg_frame(self.msg_frame)
         try:
-            ecuaciones, variables = self.validar_dimensiones()  # type: ignore
-        except TypeError:
-            # hubo input invalido
+            ecuaciones, variables = self.validar_dimensiones()
+        except ValueError as v:
+            self.msg_frame = place_msg_frame(
+                parent_frame=self,
+                msg_frame=self.msg_frame,
+                msg=str(v),
+                tipo="error",
+                row=1,
+            )
+
             return
         delete_msg_frame(self.msg_frame)
 
         # si los inputs de ecuaciones/variables
         # cambiaron despues de generar las casillas
         dimensiones_validas = ecuaciones == len(
-            self.input_entries
+            self.input_entries,
         ) and variables == len(self.input_entries[0])
 
         if not dimensiones_validas:
@@ -254,7 +289,7 @@ class AgregarSistemas(CustomScrollFrame):
                 parent_frame=self,
                 msg_frame=self.msg_frame,
                 msg="Las dimensiones del sistema ingresado "
-                + "no coinciden con las dimensiones indicadas.",
+                "no coinciden con las dimensiones indicadas.",
                 tipo="error",
                 row=3,
             )
@@ -287,7 +322,10 @@ class AgregarSistemas(CustomScrollFrame):
 
         nombre_nuevo_sis = self.nombre_entry.get()
         nuevo_sis = Matriz(
-            aumentada=True, filas=ecuaciones, columnas=variables, valores=valores
+            aumentada=True,
+            filas=ecuaciones,
+            columnas=variables,
+            valores=valores,
         )
 
         # validar nombre del sistema
@@ -326,45 +364,36 @@ class AgregarSistemas(CustomScrollFrame):
 
         # mandar a actualizar los datos
         self.master_frame.update_all()
-        self.app.sistemas.update_all()  # type: ignore
+        self.app.sistemas.update_all()
 
-    def validar_dimensiones(self) -> Optional[tuple[int, int]]:
+    def validar_dimensiones(self) -> tuple[int, int]:
         """
-        Valida si las dimensiones ingresadas por el usuario
-        son válidas y las retorna.
+        Validar dimensiones ingresadas.
 
-        Retorna una tupla con las ecuaciones y variables
-        si son válidas, o None si son inválidas.
+        Returns:
+            (int, int): Ecuaciones, variables.
+
         """
 
-        try:
-            ecuaciones = int(self.ecuaciones_entry.get())
-            variables = int(self.variables_entry.get()) + 1
-            if ecuaciones <= 0 or variables - 1 <= 0:
-                raise ValueError
-        except ValueError:
-            self.msg_frame = place_msg_frame(
-                parent_frame=self,
-                msg_frame=self.msg_frame,
-                msg="Debe ingresar números enteros "
-                + "positivos como ecuaciones y variables.",
-                tipo="error",
-                row=1,
+        ecuaciones = int(self.ecuaciones_entry.get())
+        variables = int(self.variables_entry.get())
+
+        if ecuaciones <= 0 or variables <= 0:
+            raise ValueError(
+                "Debe ingresar números enteros positivos como ecuaciones y variables.",
             )
-            return None
         return (ecuaciones, variables)
 
     def update_frame(self) -> None:
         """
-        Actualiza los backgrounds de todas las widgets
-        por si hubo cambio de modo de apariencia.
+        Actualizar colores de widgets.
         """
 
         for widget in self.winfo_children():
-            widget.configure(bg_color="transparent")  # type: ignore
-            if isinstance(widget, ctkFrame):
+            widget.configure(bg_color="transparent")
+            if isinstance(widget, CTkFrame):
                 for subwidget in widget.winfo_children():
-                    subwidget.configure(bg_color="transparent")  # type: ignore
+                    subwidget.configure(bg_color="transparent")
 
 
 class MostrarSistemas(CustomScrollFrame):
@@ -375,36 +404,41 @@ class MostrarSistemas(CustomScrollFrame):
     def __init__(
         self,
         app: "GaussUI",
-        master_tab: ctkFrame,
+        master_tab: CTkFrame,
         master_frame: "ManejarSistemas",
         mats_manager: MatricesManager,
-        **kwargs,
+        **kwargs,  # noqa: ANN003
     ) -> None:
+        """
+        Inicializar diseño de frame de mostrar sistemas de ecuaciones.
+        """
+
         super().__init__(master_tab, fg_color="transparent", **kwargs)
+
         self.app = app
         self.master_frame = master_frame
         self.mats_manager = mats_manager
         self.columnconfigure(0, weight=1)
         self.columnconfigure(1, weight=1)
 
-        self.show_frame: Optional[ctkFrame] = None
+        self.show_frame: CTkFrame | None = None
 
         # definir los filtros que se mandaran
         # a self.mats_manager.get_sistemas()
-        self.opciones: dict[str, int] = {
+        self.opciones: dict[str, Literal[-1, 0, 1]] = {
             "Mostrar todos": -1,
             "Sistemas ingresados": 0,
             "Sistemas calculados": 1,
         }
 
         self.select_opcion: CustomDropdown
-        self.opcion_seleccionada: Optional[int] = None
+        self.opcion_seleccionada: Literal[-1, 0, 1] = -1
 
         self.setup_frame()
 
     def setup_frame(self) -> None:
         """
-        Inicializa las widgets del frame.
+        Inicializar widgets del frame.
         """
 
         delete_msg_frame(self.show_frame)
@@ -419,8 +453,8 @@ class MostrarSistemas(CustomScrollFrame):
 
             return
 
-        for widget in self.winfo_children():  # type: ignore
-            widget.destroy()  # type: ignore
+        for widget in self.winfo_children():
+            widget.destroy()
 
         self.select_opcion = CustomDropdown(
             self,
@@ -440,7 +474,7 @@ class MostrarSistemas(CustomScrollFrame):
 
     def mostrar_sis(self) -> None:
         """
-        Muestra los sistemas guardados, usando el filtro seleccionado.
+        Mostrar matrices según el filtro seleccionado..
         """
 
         delete_msg_frame(self.show_frame)
@@ -457,7 +491,7 @@ class MostrarSistemas(CustomScrollFrame):
             return
 
         self.update_opcion(self.select_opcion.get())
-        sis_text = self.mats_manager.get_sistemas(self.opcion_seleccionada)  # type: ignore
+        sis_text = self.mats_manager.get_sistemas(self.opcion_seleccionada)
         self.show_frame = place_msg_frame(
             parent_frame=self,
             msg_frame=self.show_frame,
@@ -467,28 +501,31 @@ class MostrarSistemas(CustomScrollFrame):
             columnspan=2,
         )
 
-        self.show_frame.columnconfigure(0, weight=1)  # type: ignore
+        self.show_frame.columnconfigure(0, weight=1)
 
     def update_frame(self) -> None:
         """
-        Elimina self.show_frame y configura los backgrounds.
+        Eliminar self.show_frame y configurar backgrounds.
         """
 
         delete_msg_frame(self.show_frame)
         for widget in self.winfo_children():
-            widget.configure(bg_color="transparent")  # type: ignore
+            widget.configure(bg_color="transparent")
 
         if isinstance(self.show_frame, ErrorFrame):
             self.setup_frame()
         else:
             self.select_opcion.configure(
-                variable=Variable(value="Seleccione un filtro:")
+                variable=Variable(value="Seleccione un filtro:"),
             )
 
     def update_opcion(self, valor: str) -> None:
         """
-        Actualiza self.opcion_seleccionada
-        con la opción seleccionada en el dropdown
+        Actualizar 'self.opcion_seleccionada'.
+
+        Args:
+            valor: Selección del dropdown.
+
         """
 
         self.opcion_seleccionada = self.opciones[valor]
@@ -502,12 +539,17 @@ class EliminarSistemas(CustomScrollFrame):
     def __init__(
         self,
         app: "GaussUI",
-        master_tab: ctkFrame,
+        master_tab: CTkFrame,
         master_frame: "ManejarSistemas",
         mats_manager: MatricesManager,
-        **kwargs,
+        **kwargs,  # noqa: ANN003
     ) -> None:
+        """
+        Inicializar diseño de frame de eliminar sistemas de ecuaciones.
+        """
+
         super().__init__(master_tab, fg_color="transparent", **kwargs)
+
         self.app = app
         self.master_frame = master_frame
         self.mats_manager = mats_manager
@@ -515,7 +557,7 @@ class EliminarSistemas(CustomScrollFrame):
         self.columnconfigure(1, weight=1)
 
         self.nombres_sistemas = list(self.mats_manager.sis_ingresados.keys())
-        self.msg_frame: Optional[ctkFrame] = None
+        self.msg_frame: CTkFrame | None = None
 
         self.select_sis: CustomDropdown
         self.sis_seleccionado = ""
@@ -539,11 +581,11 @@ class EliminarSistemas(CustomScrollFrame):
 
             return
 
-        for widget in self.winfo_children():  # type: ignore
-            widget.destroy()  # type: ignore
+        for widget in self.winfo_children():
+            widget.destroy()
 
         # crear widgets
-        instruct_eliminar = ctkLabel(self, text="¿Cuál sistema desea eliminar?")
+        instruct_eliminar = CTkLabel(self, text="¿Cuál sistema desea eliminar?")
         self.select_sis = CustomDropdown(
             self,
             height=30,
@@ -563,14 +605,19 @@ class EliminarSistemas(CustomScrollFrame):
 
         # colocar widgets
         instruct_eliminar.grid(
-            row=0, column=0, columnspan=2, padx=5, pady=5, sticky="n"
+            row=0,
+            column=0,
+            columnspan=2,
+            padx=5,
+            pady=5,
+            sticky="n",
         )
         self.select_sis.grid(row=1, column=0, padx=5, pady=5, sticky="e")
         button.grid(row=1, column=1, padx=5, pady=5, sticky="w")
 
     def eliminar_sis(self) -> None:
         """
-        Elimina el sistema seleccionado.
+        Eliminar sistema seleccionado.
         """
 
         delete_msg_frame(self.msg_frame)
@@ -587,11 +634,11 @@ class EliminarSistemas(CustomScrollFrame):
         )
 
         self.master_frame.update_all()
-        self.app.sistemas.update_all()  # type: ignore
+        self.app.sistemas.update_all()
 
     def update_frame(self) -> None:
         """
-        Actualiza el frame y sus datos.
+        Actualizar frame y datos.
         """
 
         self.nombres_sistemas = list(self.mats_manager.sis_ingresados.keys())
@@ -609,7 +656,7 @@ class EliminarSistemas(CustomScrollFrame):
                 )
 
                 for widget in self.winfo_children():
-                    if not isinstance(widget, ctkFrame):
+                    if not isinstance(widget, CTkFrame):
                         widget.destroy()
 
             self.after(1000, clear_after_wait)
@@ -619,7 +666,7 @@ class EliminarSistemas(CustomScrollFrame):
 
         else:
             for widget in self.winfo_children():
-                widget.configure(bg_color="transparent")  # type: ignore
+                widget.configure(bg_color="transparent")
             self.select_sis.configure(
                 values=self.nombres_sistemas,
                 variable=Variable(value=self.nombres_sistemas[0]),
@@ -629,7 +676,10 @@ class EliminarSistemas(CustomScrollFrame):
 
     def update_sis(self, valor: str) -> None:
         """
-        Actualiza sis_seleccionado con el valor seleccionado en el dropdown.
-        """
+        Actualizar 'self.mat_seleccionada'.
 
+        Args:
+            valor: Selección del dropdown.
+
+        """
         self.sis_seleccionado = valor

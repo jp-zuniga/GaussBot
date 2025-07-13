@@ -1,32 +1,27 @@
 """
-Implementación de SistemasFrame, el frame que
-resuelve sistemas de ecuaciones lineales.
+Implementación de frame para resolver sistemas de ecuaciones lineales.
 """
 
 from tkinter import Variable
-from typing import TYPE_CHECKING, Optional
+from typing import TYPE_CHECKING
 
-from customtkinter import (
-    CTkButton as ctkButton,
-    CTkFrame as ctkFrame,
-    CTkLabel as ctkLabel,
-)
+from customtkinter import CTkButton, CTkFrame, CTkLabel
 
-from ...custom import CustomDropdown
-from ...custom.adapted import CustomScrollFrame
-from ....managers import MatricesManager
-from ....models import SistemaEcuaciones
-from ....utils import (
-    APP_ICON,
+from src.gui.custom import CustomDropdown
+from src.gui.custom.adapted import CustomScrollFrame
+from src.managers import MatricesManager
+from src.utils import (
     delete_msg_frame,
     generate_sep,
     place_msg_frame,
+    set_icon,
     toggle_proc,
 )
 
 if TYPE_CHECKING:
-    from .. import SistemasFrame
-    from ... import GaussUI
+    from src.gui import GaussUI
+    from src.gui.frames import SistemasFrame
+    from src.models import SistemaEcuaciones
 
 
 class ResolverSisFrame(CustomScrollFrame):
@@ -41,50 +36,53 @@ class ResolverSisFrame(CustomScrollFrame):
         app: "GaussUI",
         master_frame: "SistemasFrame",
         mats_manager: MatricesManager,
-        **kwargs,
+        **kwargs,  # noqa: ANN003
     ) -> None:
+        """
+        Inicializar diseño de frame de sistemas de ecuaciones.
+        """
+
         super().__init__(master_frame, fg_color="transparent", **kwargs)
+
         self.app = app
         self.master_frame = master_frame
         self.mats_manager = mats_manager
         self.columnconfigure(0, weight=1)
 
-        self.msg_frame: Optional[ctkFrame] = None
+        self.msg_frame: CTkFrame | None = None
         self.metodos: dict[str, str] = {"Gauss-Jordan": "gj", "Regla de Cramer": "c"}
 
         # definir atributos, se inicializan en setup_frame
         self.select_sis_mat: CustomDropdown
         self.select_modo: CustomDropdown
-        self.sis_mat = ""
-        self.met = ""
+        self.sis_mat: str = ""
+        self.met: str = ""
 
-        self.proc_label: Optional[ctkLabel] = None
+        self.proc_label: CTkLabel | None = None
         self.proc_hidden = True
 
         self.setup_frame()
 
     def setup_frame(self) -> None:
         """
-        Inicializa y configura el frame.
-        Se encarga de mostrar mensaje de error si
-        no hay sistemas de ecuaciones ingresados.
+        Inicializar widgets del frame.
         """
 
         for widget in self.winfo_children():
-            widget.destroy()  # type: ignore
+            widget.destroy()
 
         self.select_sis_mat = CustomDropdown(
             self,
             width=40,
             values=self.master_frame.nombres_sistemas,
-            variable=Variable(value="Seleccione el sistema de ecuaciones a resolver:"),
+            variable=Variable(value="Seleccione sistema de ecuaciones a resolver:"),
             command=self.update_sis_mat,
         )
 
         self.select_metodo = CustomDropdown(
             self,
             width=40,
-            variable=Variable(value="Seleccione el método a utilizar:"),
+            variable=Variable(value="Seleccione método a utilizar:"),
             values=list(self.metodos.keys()),
             command=self.update_metodo,
         )
@@ -94,12 +92,11 @@ class ResolverSisFrame(CustomScrollFrame):
 
     def resolver(self) -> None:
         """
-        Resuelve el sistema de ecuaciones seleccionado
-        por el usuario, utilizando el método indicado.
+        Resolver sistema de ecuaciones seleccionado utilizando método seleccionado.
         """
 
         delete_msg_frame(self.msg_frame)
-        self.update_sis_mat(self.select_sis_mat.get())  # type: ignore
+        self.update_sis_mat(self.select_sis_mat.get())
 
         sistema: SistemaEcuaciones
         met = self.metodos[self.met]
@@ -109,28 +106,25 @@ class ResolverSisFrame(CustomScrollFrame):
         if self.mats_manager.sis_ingresados[self.sis_mat].es_matriz_cero():
             met = "gj"
 
-        if met == "gj":
+        try:
             sistema = self.mats_manager.resolver_sistema(self.sis_mat, met)
-        elif met == "c":
-            try:
-                sistema = self.mats_manager.resolver_sistema(self.sis_mat, met)
-            except (ValueError, ArithmeticError, ZeroDivisionError) as e:
-                self.msg_frame = place_msg_frame(
-                    parent_frame=self,
-                    msg_frame=self.msg_frame,
-                    msg=str(e),  # type: ignore
-                    tipo="error",
-                    row=5,
-                    pady=10,
-                )
+        except (ValueError, ArithmeticError, ZeroDivisionError) as e:
+            self.msg_frame = place_msg_frame(
+                parent_frame=self,
+                msg_frame=self.msg_frame,
+                msg=str(e),
+                tipo="error",
+                row=5,
+                pady=10,
+            )
 
-                return
+            return
 
         delete_msg_frame(self.msg_frame)
         self.msg_frame = place_msg_frame(
             parent_frame=self,
             msg_frame=self.msg_frame,
-            msg=sistema.solucion,  # type: ignore
+            msg=sistema.solucion,
             tipo="error" if "!=" in sistema.solucion else "resultado",
             row=5,
             pady=10,
@@ -142,15 +136,15 @@ class ResolverSisFrame(CustomScrollFrame):
             else sistema.procedimiento + sistema.solucion
         )
 
-        ctkButton(
+        CTkButton(
             self,
             text="Mostrar procedimiento",
             command=lambda: toggle_proc(
                 app=self.app,
                 parent_frame=self,
                 window_title="GaussBot: Procedimiento para resolver "
-                + f"el sistema de ecuaciones {self.sis_mat} mediante "
-                + f"{'el método' if '−' in self.met else 'la'} {self.met}",
+                f"el sistema de ecuaciones {self.sis_mat} mediante "
+                f"{'el método' if '−' in self.met else 'la'} {self.met}",
                 proc_label=self.proc_label,
                 label_txt=proc_text,
                 proc_hidden=self.proc_hidden,
@@ -159,7 +153,7 @@ class ResolverSisFrame(CustomScrollFrame):
 
     def update_frame(self) -> None:
         """
-        Actualizar el frame y sus datos.
+        Actualizar frame y datos.
         """
 
         self.select_sis_mat.configure(
@@ -173,64 +167,72 @@ class ResolverSisFrame(CustomScrollFrame):
         )
 
         if not self.proc_hidden:
-            if self.app.modo_actual == "dark":
-                self.after(
-                    250,
-                    lambda: self.proc_label.master.master.iconbitmap(APP_ICON[1]),  # type: ignore
-                )
-            elif self.app.modo_actual == "light":
-                self.after(
-                    250,
-                    lambda: self.proc_label.master.master.iconbitmap(APP_ICON[0]),  # type: ignore
-                )
+            set_icon(self.app, self.proc_label.master.master)  # type: ignore[reportArgumentType]
 
-        for widget in self.winfo_children():  # type: ignore
-            widget.configure(bg_color="transparent")  # type: ignore
+        for widget in self.winfo_children():
+            widget.configure(bg_color="transparent")
             if widget not in (self.select_metodo, self.select_sis_mat):
-                widget.destroy()  # type: ignore
+                widget.destroy()
 
     def update_sis_mat(self, valor: str) -> None:
         """
-        Actualiza self.sis_mat con la opción
-        seleccionada en el dropdown.
+        Actualizar sistema de ecuaciones seleccionado.
+
+        Args:
+            valor: Sistema seleccionado.
+
         """
 
         self.sis_mat = valor
         delete_msg_frame(self.msg_frame)
 
-        for widget in self.winfo_children():  # type: ignore
+        for widget in self.winfo_children():
             if widget.grid_info()["row"] > 0 and widget not in (
                 self.select_sis_mat,
                 self.select_metodo,
             ):
-                widget.destroy()  # type: ignore
+                widget.destroy()
 
-        ctkLabel(self, text=str(self.mats_manager.sis_ingresados[self.sis_mat])).grid(
-            row=1, column=0, pady=10, sticky="n"
+        CTkLabel(self, text=str(self.mats_manager.sis_ingresados[self.sis_mat])).grid(
+            row=1,
+            column=0,
+            pady=10,
+            sticky="n",
         )
 
-        ctkLabel(self, text="", image=generate_sep(False, (300, 3))).grid(
-            row=2, column=0, sticky="n"
+        CTkLabel(self, text="", image=generate_sep(False, (300, 3))).grid(
+            row=2,
+            column=0,
+            sticky="n",
         )
 
         self.select_metodo.grid_configure(row=3)
         if "" not in (self.sis_mat, self.met):
-            ctkButton(self, height=30, text="Resolver", command=self.resolver).grid(
-                row=4, column=0, pady=5, sticky="n"
+            CTkButton(self, height=30, text="Resolver", command=self.resolver).grid(
+                row=4,
+                column=0,
+                pady=5,
+                sticky="n",
             )
 
     def update_metodo(self, valor: str) -> None:
         """
-        Actualiza self.met con la opción
-        seleccionada en el dropdown.
+        Actualizar método seleccionado.
+
+        Args:
+            valor: Método seleccionado.
+
         """
 
         self.met = valor
-        for widget in self.winfo_children():  # type: ignore
+        for widget in self.winfo_children():
             if widget.grid_info()["row"] > 4:
-                widget.destroy()  # type: ignore
+                widget.destroy()
 
         if "" not in (self.sis_mat, self.met):
-            ctkButton(self, height=30, text="Resolver", command=self.resolver).grid(
-                row=4, column=0, pady=5, sticky="n"
+            CTkButton(self, height=30, text="Resolver", command=self.resolver).grid(
+                row=4,
+                column=0,
+                pady=5,
+                sticky="n",
             )

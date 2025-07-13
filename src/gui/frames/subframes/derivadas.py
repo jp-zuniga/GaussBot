@@ -1,42 +1,40 @@
 """
-Implementación de DerivadasFrame,
-un frame que permite encontrar
-las raíces de funciones matemáticas.
+Implementación de frame de derivadas de funciones.
 """
 
 from tkinter import Variable
-from typing import TYPE_CHECKING, Optional
+from typing import TYPE_CHECKING
 
-from customtkinter import (
-    CTkButton as ctkButton,
-    CTkFrame as ctkFrame,
-    CTkLabel as ctkLabel,
-)
+from customtkinter import CTkButton, CTkFrame, CTkLabel
 
-from ...custom import CustomDropdown
-from ...custom.adapted import CustomScrollFrame
-from ....managers import FuncManager
-from ....models import Func
-from ....utils import delete_msg_frame, generate_sep, place_msg_frame
+from src.gui.custom import CustomDropdown
+from src.gui.custom.adapted import CustomScrollFrame
+from src.managers import FuncManager
+from src.models import Func
+from src.utils import delete_msg_frame, generate_sep, place_msg_frame
 
 if TYPE_CHECKING:
-    from .. import AnalisisFrame
-    from ... import GaussUI
+    from src.gui import GaussUI
+    from src.gui.frames import AnalisisFrame
 
 
 class DerivadasFrame(CustomScrollFrame):
     """
-    Frame que permite encontrar la derivada de una función.
+    Frame para derivar funciones.
     """
 
     def __init__(
         self,
         app: "GaussUI",
-        master_tab: ctkFrame,
+        master_tab: CTkFrame,
         master_frame: "AnalisisFrame",
         func_manager: FuncManager,
-        **kwargs,
+        **kwargs,  # noqa: ANN003
     ) -> None:
+        """
+        Inicializar diseño de frame de derivadas.
+        """
+
         super().__init__(master_tab, fg_color="transparent", **kwargs)
         self.app = app
         self.master_frame = master_frame
@@ -44,7 +42,7 @@ class DerivadasFrame(CustomScrollFrame):
         self.columnconfigure(0, weight=1)
 
         self.nombres_funcs = list(self.func_manager.funcs_ingresadas.keys())
-        self.msg_frame: Optional[ctkFrame] = None
+        self.msg_frame: CTkFrame | None = None
 
         self.func: Func
         self.func_select = CustomDropdown(
@@ -59,25 +57,33 @@ class DerivadasFrame(CustomScrollFrame):
 
     def mostrar_func(self, nombre_func: str) -> None:
         """
-        Muestra la función seleccionada en el dropdown,
-        y crea un botón para encontrar la derivada.
+        Mostrar función seleccionada y crear botón para derivar.
+
+        Args:
+            nombre_func: Función seleccionada.
+
         """
 
         delete_msg_frame(self.msg_frame)
-        for widget in self.winfo_children():  # type: ignore
-            if dict(widget.grid_info()).get("row", -1) > 0:  # type: ignore
-                widget.destroy()  # type: ignore
+        for widget in self.winfo_children():
+            if dict(widget.grid_info()).get("row", -1) > 0:
+                widget.destroy()
 
         self.func = self.func_manager.funcs_ingresadas[nombre_func]
-        ctkLabel(self, text="", image=self.func.get_png()).grid(
-            row=1, column=0, pady=(10, 5), sticky="n"
+        CTkLabel(self, text="", image=self.func.get_png()).grid(
+            row=1,
+            column=0,
+            pady=(10, 5),
+            sticky="n",
         )
 
-        ctkLabel(self, text="", image=generate_sep(False, (250, 5))).grid(
-            row=2, column=0, sticky="n"
+        CTkLabel(self, text="", image=generate_sep(False, (250, 5))).grid(
+            row=2,
+            column=0,
+            sticky="n",
         )
 
-        ctkButton(
+        CTkButton(
             self,
             height=30,
             text=f"Derivar {self.func.nombre}",
@@ -86,8 +92,7 @@ class DerivadasFrame(CustomScrollFrame):
 
     def encontrar_derivada(self) -> None:
         """
-        Encuentra y muestra la derivada de
-        la función seleccionada.
+        Derivar la función seleccionada y mostrar el resultado.
         """
 
         derivada = self.func.derivar()
@@ -101,14 +106,13 @@ class DerivadasFrame(CustomScrollFrame):
                 con_nombre=True,
             ),
             tipo="resultado",
-            row=4,
-            pady=10,
+            row=4,  # type: ignore[reportArgumentType]
+            pady=10,  # type: ignore[reportArgumentType]
         )
 
-    def update_frame(self):
+    def update_frame(self) -> None:
         """
-        Configura todos los backgrounds de los widgets
-        por si hubo un cambio de modo de apariencia.
+        Actualizar colores de widgets.
         """
 
         delete_msg_frame(self.msg_frame)
@@ -118,7 +122,7 @@ class DerivadasFrame(CustomScrollFrame):
             variable=Variable(value="Seleccione una función para derivar:"),
         )
 
-        for widget in self.winfo_children():  # type: ignore
-            widget.configure(bg_color="transparent")  # type: ignore
+        for widget in self.winfo_children():
+            widget.configure(bg_color="transparent")
             if dict(widget.grid_info()).get("row", -1) > 0:
                 widget.destroy()

@@ -1,29 +1,19 @@
-# pylint: disable=too-many-lines
-# no lo puedo hacer mas corto sin perder legibilidad
-
 """
-Implementación de todos los frames
-de operaciones con matrices.
+Implementación de todos los frames de operaciones de matrices.
 """
 
 from fractions import Fraction
 from random import choice
 from tkinter import Variable
-from typing import TYPE_CHECKING, Optional
+from typing import TYPE_CHECKING, Literal
 
 from bidict import bidict
-from customtkinter import (
-    CTkButton as ctkButton,
-    CTkFont as ctkFont,
-    CTkFrame as ctkFrame,
-    CTkLabel as ctkLabel,
-    CTkTabview as ctkTabview,
-)
+from customtkinter import CTkButton, CTkFont, CTkFrame, CTkLabel, CTkTabview
 
-from ...custom import CustomDropdown, CustomEntry
-from ...custom.adapted import CustomScrollFrame
-from ....managers import MatricesManager
-from ....utils import (
+from src.gui.custom import CustomDropdown, CustomEntry
+from src.gui.custom.adapted import CustomScrollFrame
+from src.managers import MatricesManager
+from src.utils import (
     INPUTS_ICON,
     delete_msg_frame,
     delete_msg_if,
@@ -33,8 +23,8 @@ from ....utils import (
 )
 
 if TYPE_CHECKING:
-    from ..matrices import MatricesFrame
-    from ...gui import GaussUI
+    from src.gui.frames.matrices import MatricesFrame
+    from src.gui.gui import GaussUI
 
 
 class SumaRestaTab(CustomScrollFrame):
@@ -45,41 +35,46 @@ class SumaRestaTab(CustomScrollFrame):
     def __init__(
         self,
         app: "GaussUI",
-        master_tab: ctkFrame,
+        master_tab: CTkFrame,
         master_frame: "MatricesFrame",
         mats_manager: MatricesManager,
-        **kwargs,
+        **kwargs,  # noqa: ANN003
     ) -> None:
+        """
+        Inicializar diseño de frame de suma y resta de matrices.
+        """
+
         super().__init__(master_tab, fg_color="transparent", **kwargs)
+
         self.app = app
         self.master_frame = master_frame
         self.mats_manager = mats_manager
         self.columnconfigure(0, weight=1)
         self.columnconfigure(2, weight=1)
 
-        self.msg_frame: Optional[ctkFrame] = None
+        self.msg_frame: CTkFrame | None = None
         self.operaciones: bidict[str, str] = bidict({"Sumar": "+", "Restar": "−"})
 
         # definir atributos; se inicializan en setup_frame
-        self.instruct_sr: ctkLabel
+        self.instruct_sr: CTkLabel
         self.select_operacion: CustomDropdown
         self.select_1: CustomDropdown
         self.select_2: CustomDropdown
-        self.ejecutar_button: ctkButton
-        self.resultado_frame: ctkFrame
+        self.ejecutar_button: CTkButton
+        self.resultado_frame: CTkFrame
 
-        self.proc_label: Optional[ctkLabel] = None
+        self.proc_label: CTkLabel | None = None
         self.proc_hidden = True
 
-        self.operacion = "Sumar"
-        self.mat1 = ""
-        self.mat2 = ""
+        self.operacion: Literal["+", "−"] = "+"
+        self.mat1: str = ""
+        self.mat2: str = ""
 
         self.setup_frame()
 
-    def setup_frame(self, default: str = "Sumar") -> None:
+    def setup_frame(self) -> None:
         """
-        Inicializa el frame y sus atributos.
+        Inicializar frame y atributos.
         """
 
         delete_msg_frame(self.msg_frame)
@@ -91,16 +86,17 @@ class SumaRestaTab(CustomScrollFrame):
             placeholder2 = Variable(self, value=self.master_frame.nombres_matrices[1])
 
         # crear widgets
-        self.instruct_sr = ctkLabel(
-            self, text=f"Seleccione las matrices a {default.lower()}:"
+        self.instruct_sr = CTkLabel(
+            self,
+            text="Seleccione las matrices a sumar:",
         )
 
         self.select_operacion = CustomDropdown(
             self,
             width=40,
-            font=ctkFont(size=16),
+            font=CTkFont(size=16),
             values=list(self.operaciones.values()),
-            variable=Variable(value=self.operaciones[default]),
+            variable=Variable(value=self.operaciones["Sumar"]),
             command=self.update_operacion,
         )
 
@@ -122,47 +118,56 @@ class SumaRestaTab(CustomScrollFrame):
 
         self.mat1 = self.select_1.get()
         self.mat2 = self.select_2.get()
-        self.ejecutar_button = ctkButton(
-            self, height=30, text=default, command=self.ejecutar_operacion
+        self.ejecutar_button = CTkButton(
+            self,
+            height=30,
+            text="Sumar",
+            command=self.ejecutar_operacion,
         )
 
-        self.resultado_frame = ctkFrame(self, fg_color="transparent")
+        self.resultado_frame = CTkFrame(self, fg_color="transparent")
 
         # colocar widgets
         self.instruct_sr.grid(row=0, column=0, columnspan=3, padx=5, pady=5, sticky="n")
-
         self.select_1.grid(row=1, column=0, padx=5, pady=5, sticky="e")
         self.select_operacion.grid(row=1, column=1, padx=5, pady=5, sticky="ew")
         self.select_2.grid(row=1, column=2, padx=5, pady=5, sticky="w")
         self.ejecutar_button.grid(
-            row=2, column=0, columnspan=3, padx=5, pady=10, sticky="n"
+            row=2,
+            column=0,
+            columnspan=3,
+            padx=5,
+            pady=10,
+            sticky="n",
         )
 
     def ejecutar_operacion(self) -> None:
         """
-        Suma o resta las matrices seleccionadas.
+        Sumar o restar las matrices seleccionadas.
         """
 
-        for widget in self.resultado_frame.winfo_children():  # type: ignore
-            widget.destroy()  # type: ignore
+        for widget in self.resultado_frame.winfo_children():
+            widget.destroy()
 
-        self.update_operacion(self.select_operacion.get())
+        self.update_operacion(self.select_operacion.get())  # type: ignore[reportArgumentType]
         self.update_mat1(self.select_1.get())
         self.update_mat2(self.select_2.get())
         self.resultado_frame.grid(
-            row=3, column=0, columnspan=3, padx=5, pady=5, sticky="n"
+            row=3,
+            column=0,
+            columnspan=3,
+            padx=5,
+            pady=5,
+            sticky="n",
         )
 
         delete_msg_frame(self.msg_frame)
         try:
-            if self.operacion == "+":
-                proc, header, resultado = self.mats_manager.suma_resta_mats(
-                    True, self.mat1, self.mat2
-                )
-            elif self.operacion == "−":
-                proc, header, resultado = self.mats_manager.suma_resta_mats(
-                    False, self.mat1, self.mat2
-                )
+            proc, header, resultado = self.mats_manager.suma_resta_mats(
+                self.operacion,
+                self.mat1,
+                self.mat2,
+            )
         except ArithmeticError as e:
             self.msg_frame = place_msg_frame(
                 parent_frame=self.resultado_frame,
@@ -170,17 +175,18 @@ class SumaRestaTab(CustomScrollFrame):
                 msg=str(e),
                 tipo="error",
             )
+
             return
         delete_msg_frame(self.msg_frame)
 
         self.msg_frame = place_msg_frame(
             parent_frame=self.resultado_frame,
             msg_frame=self.msg_frame,
-            msg=f"\n{header}:\n{resultado}\n",  # pylint: disable=E0606
+            msg=f"\n{header}:\n{resultado}\n",
             tipo="resultado",
         )
 
-        ctkButton(
+        CTkButton(
             self.resultado_frame,
             text="Mostrar procedimiento",
             command=lambda: toggle_proc(
@@ -188,18 +194,18 @@ class SumaRestaTab(CustomScrollFrame):
                 parent_frame=self,
                 window_title=f"GaussBot: Procedimiento de {header}",
                 proc_label=self.proc_label,
-                label_txt=proc,  # pylint: disable=E0606
+                label_txt=proc,
                 proc_hidden=self.proc_hidden,
             ),
         ).grid(row=1, column=0, pady=5, sticky="n")
 
     def update_frame(self) -> None:
         """
-        Actualiza todos los backgrounds y valores de los dropdowns.
+        Actualizar colores de widgets y valores de dropdowns.
         """
 
         for widget in self.winfo_children():
-            widget.configure(bg_color="transparent")  # type: ignore
+            widget.configure(bg_color="transparent")
 
         placeholder1 = Variable(value=self.master_frame.nombres_matrices[0])
         if len(self.master_frame.nombres_matrices) == 1:
@@ -208,18 +214,22 @@ class SumaRestaTab(CustomScrollFrame):
             placeholder2 = Variable(self, value=self.master_frame.nombres_matrices[1])
 
         self.select_1.configure(
-            variable=placeholder1, values=self.master_frame.nombres_matrices
+            variable=placeholder1,
+            values=self.master_frame.nombres_matrices,
         )
 
         self.select_2.configure(
-            variable=placeholder2, values=self.master_frame.nombres_matrices
+            variable=placeholder2,
+            values=self.master_frame.nombres_matrices,
         )
 
-    def update_operacion(self, valor: str) -> None:
+    def update_operacion(self, valor: Literal["+", "−"]) -> None:
         """
-        Cambia el texto del botón de ejecutar operación
-        y el texto de la instrucción según la opción
-        seleccionada en el dropdown.
+        Actualizar botón de ejecutar operación y texto de la instrucción.
+
+        Args:
+            valor: Operación a realizar.
+
         """
 
         op_text: str = self.operaciones.inverse[valor]
@@ -229,16 +239,22 @@ class SumaRestaTab(CustomScrollFrame):
 
     def update_mat1(self, valor: str) -> None:
         """
-        Actualiza el valor de self.mat1 con el
-        valor seleccionado en el dropdown correspondiente.
+        Actualizar primera matriz seleccionada.
+
+        Args:
+            valor: Nueva matriz seleccionada.
+
         """
 
         self.mat1 = valor
 
     def update_mat2(self, valor: str) -> None:
         """
-        Actualiza el valor de self.mat2 con el
-        valor seleccionado en el dropdown correspondiente.
+        Actualizar segunda matriz seleccionada.
+
+        Args:
+            valor: Nueva matriz seleccionada.
+
         """
 
         self.mat2 = valor
@@ -253,18 +269,23 @@ class MultiplicacionTab(CustomScrollFrame):
     def __init__(
         self,
         app: "GaussUI",
-        master_tab: ctkFrame,
+        master_tab: CTkFrame,
         master_frame: "MatricesFrame",
         mats_manager: MatricesManager,
-        **kwargs,
+        **kwargs,  # noqa: ANN003
     ) -> None:
+        """
+        Inicializar diseño de frame de multiplicación de matrices.
+        """
+
         super().__init__(master_tab, fg_color="transparent", **kwargs)
+
         self.app = app
         self.master_frame = master_frame
         self.mats_manager = mats_manager
         self.columnconfigure(0, weight=1)
 
-        self.msg_frame: Optional[ctkFrame] = None
+        self.msg_frame: CTkFrame | None = None
 
         # definir atributos; se inicializan en setup_tabs
         self.select_escalar_mat: CustomDropdown
@@ -274,16 +295,16 @@ class MultiplicacionTab(CustomScrollFrame):
         self.select_mvec: CustomDropdown
         self.select_vmat: CustomDropdown
 
-        self.escalar_mat = ""
-        self.mat1 = ""
-        self.mat2 = ""
-        self.vmat = ""
-        self.mvec = ""
+        self.escalar_mat: str = ""
+        self.mat1: str = ""
+        self.mat2: str = ""
+        self.vmat: str = ""
+        self.mvec: str = ""
 
-        self.proc_label: Optional[ctkLabel] = None
+        self.proc_label: CTkLabel | None = None
         self.proc_hidden = True
 
-        self.tabview = ctkTabview(self, fg_color="transparent")
+        self.tabview = CTkTabview(self, fg_color="transparent")
         self.tabview.pack(expand=True, fill="both")
 
         # crear tabs
@@ -295,18 +316,16 @@ class MultiplicacionTab(CustomScrollFrame):
     def setup_tabs(self) -> None:
         """
         Wrapper para llamar todos los métodos de configuración de tabs.
-        Se encarga de validar si hay vectores ingresados para que
-        los setups individuales no lo tengan que hacer.
         """
 
         for tab in self.tabview.winfo_children():
-            tab.columnconfigure(0, weight=1)  # type: ignore
-            tab.columnconfigure(2, weight=1)  # type: ignore
+            tab.columnconfigure(0, weight=1)
+            tab.columnconfigure(2, weight=1)
 
         # crear frames de resultado
-        self.resultado_escalar = ctkFrame(self.tab_escalar, fg_color="transparent")
-        self.resultado_mats = ctkFrame(self.tab_mats, fg_color="transparent")
-        self.resultado_mat_vec = ctkFrame(self.tab_mat_vec, fg_color="transparent")
+        self.resultado_escalar = CTkFrame(self.tab_escalar, fg_color="transparent")
+        self.resultado_mats = CTkFrame(self.tab_mats, fg_color="transparent")
+        self.resultado_mat_vec = CTkFrame(self.tab_mat_vec, fg_color="transparent")
 
         self.setup_escalar_tab()
         self.setup_mult_mats_tab()
@@ -314,7 +333,7 @@ class MultiplicacionTab(CustomScrollFrame):
         if len(self.master_frame.nombres_vectores) >= 1:
             self.setup_mat_vec_tab()
         else:
-            # si no hay vectores, informar al usuario,
+            # si no hay vectores, informar al usuario
             self.msg_frame = place_msg_frame(
                 parent_frame=self.tab_mat_vec,
                 msg_frame=self.msg_frame,
@@ -324,23 +343,24 @@ class MultiplicacionTab(CustomScrollFrame):
             )
 
             # y dirigirlos al menu de datos para agregar vectores
-            ctkButton(
+            CTkButton(
                 self.tab_mat_vec,
                 height=30,
                 text="Agregar vectores",
                 image=INPUTS_ICON,
-                command=lambda: self.app.home_frame.ir_a_vecs(mostrar=False),  # type: ignore
+                command=lambda: self.app.home_frame.ir_a_frame("vectores"),
             ).grid(row=1, column=0, columnspan=3, padx=5, pady=5, sticky="n")
 
     def setup_escalar_tab(self) -> None:
         """
-        Configura la pestaña para multiplicación escalar.
+        Configurar pestaña de multiplicación escalar.
         """
 
         # crear widgets
-        operador_label = ctkLabel(self.tab_escalar, text="•", font=ctkFont(size=16))
-        instruct_e = ctkLabel(
-            self.tab_escalar, text="Seleccione la matriz e ingrese el escalar:"
+        operador_label = CTkLabel(self.tab_escalar, text="•", font=CTkFont(size=16))
+        instruct_e = CTkLabel(
+            self.tab_escalar,
+            text="Seleccione la matriz e ingrese el escalar:",
         )
 
         self.select_escalar_mat = CustomDropdown(
@@ -360,7 +380,7 @@ class MultiplicacionTab(CustomScrollFrame):
 
         self.escalar_entry.bind("<Return>", lambda _: self.mult_por_escalar())
 
-        multiplicar_button = ctkButton(
+        multiplicar_button = CTkButton(
             self.tab_escalar,
             height=30,
             text="Multiplicar",
@@ -374,12 +394,17 @@ class MultiplicacionTab(CustomScrollFrame):
         self.select_escalar_mat.grid(row=1, column=2, padx=5, pady=5, sticky="w")
 
         multiplicar_button.grid(
-            row=2, column=0, columnspan=3, padx=5, pady=10, sticky="n"
+            row=2,
+            column=0,
+            columnspan=3,
+            padx=5,
+            pady=10,
+            sticky="n",
         )
 
     def setup_mult_mats_tab(self) -> None:
         """
-        Configura la pestaña para multiplicación matricial.
+        Configurar pestaña de multiplicación matricial.
         """
 
         delete_msg_frame(self.msg_frame)
@@ -391,9 +416,10 @@ class MultiplicacionTab(CustomScrollFrame):
             placeholder2 = Variable(value=self.master_frame.nombres_matrices[1])
 
         # crear widgets
-        operador_label = ctkLabel(self.tab_mats, text="•", font=ctkFont(size=16))
-        instruct_ms = ctkLabel(
-            self.tab_mats, text="Seleccione las matrices a multiplicar:"
+        operador_label = CTkLabel(self.tab_mats, text="•", font=CTkFont(size=16))
+        instruct_ms = CTkLabel(
+            self.tab_mats,
+            text="Seleccione las matrices a multiplicar:",
         )
 
         self.select_mat1 = CustomDropdown(
@@ -414,8 +440,11 @@ class MultiplicacionTab(CustomScrollFrame):
 
         self.mat1 = self.select_mat1.get()
         self.mat2 = self.select_mat2.get()
-        multiplicar_button = ctkButton(
-            self.tab_mats, height=30, text="Multiplicar", command=self.mult_matrices
+        multiplicar_button = CTkButton(
+            self.tab_mats,
+            height=30,
+            text="Multiplicar",
+            command=self.mult_matrices,
         )
 
         # colocar widgets
@@ -425,12 +454,17 @@ class MultiplicacionTab(CustomScrollFrame):
         self.select_mat2.grid(row=1, column=2, padx=5, pady=5, sticky="w")
 
         multiplicar_button.grid(
-            row=2, column=0, columnspan=3, padx=5, pady=10, sticky="n"
+            row=2,
+            column=0,
+            columnspan=3,
+            padx=5,
+            pady=10,
+            sticky="n",
         )
 
     def setup_mat_vec_tab(self) -> None:
         """
-        Configura la pestaña para producto matriz-vector.
+        Configurar pestaña de producto matriz-vector.
         """
 
         delete_msg_frame(self.msg_frame)
@@ -438,9 +472,10 @@ class MultiplicacionTab(CustomScrollFrame):
         placeholder2 = Variable(value=self.master_frame.nombres_vectores[0])
 
         # crear widgets
-        operador_label = ctkLabel(self.tab_mat_vec, text="•", font=ctkFont(size=16))
-        instruct_mv = ctkLabel(
-            self.tab_mat_vec, text="Seleccione la matriz y el vector a multiplicar:"
+        operador_label = CTkLabel(self.tab_mat_vec, text="•", font=CTkFont(size=16))
+        instruct_mv = CTkLabel(
+            self.tab_mat_vec,
+            text="Seleccione la matriz y el vector a multiplicar:",
         )
 
         self.select_vmat = CustomDropdown(
@@ -461,8 +496,11 @@ class MultiplicacionTab(CustomScrollFrame):
 
         self.vmat = self.select_vmat.get()
         self.mvec = self.select_mvec.get()
-        multiplicar_button = ctkButton(
-            self.tab_mat_vec, height=30, text="Multiplicar", command=self.mult_mat_vec
+        multiplicar_button = CTkButton(
+            self.tab_mat_vec,
+            height=30,
+            text="Multiplicar",
+            command=self.mult_mat_vec,
         )
 
         # colocar widgets
@@ -472,28 +510,38 @@ class MultiplicacionTab(CustomScrollFrame):
         self.select_mvec.grid(row=1, column=2, padx=5, pady=5, sticky="w")
 
         multiplicar_button.grid(
-            row=2, column=0, columnspan=3, padx=5, pady=10, sticky="n"
+            row=2,
+            column=0,
+            columnspan=3,
+            padx=5,
+            pady=10,
+            sticky="n",
         )
 
     def mult_por_escalar(self) -> None:
         """
-        Realiza la multiplicación escalar de la
-        matriz seleccionada por el escalar indicado.
+        Multiplicar matriz seleccionada por escalar ingresado.
         """
 
-        for widget in self.resultado_escalar.winfo_children():  # type: ignore
-            widget.destroy()  # type: ignore
+        for widget in self.resultado_escalar.winfo_children():
+            widget.destroy()
 
         self.update_escalar_mat(self.select_escalar_mat.get())
         self.resultado_escalar.grid(
-            row=3, column=0, columnspan=3, padx=5, pady=5, sticky="n"
+            row=3,
+            column=0,
+            columnspan=3,
+            padx=5,
+            pady=5,
+            sticky="n",
         )
 
         delete_msg_if(self.msg_frame, (self.tab_escalar, self.resultado_escalar))
         try:
-            escalar = Fraction(self.escalar_entry.get())  # type: ignore
+            escalar = Fraction(self.escalar_entry.get())
             proc, header, resultado = self.mats_manager.escalar_por_mat(
-                escalar, self.escalar_mat
+                escalar,
+                self.escalar_mat,
             )
         except (ValueError, ZeroDivisionError) as e:
             if isinstance(e, ValueError):
@@ -512,36 +560,40 @@ class MultiplicacionTab(CustomScrollFrame):
         self.msg_frame = place_msg_frame(
             parent_frame=self.resultado_escalar,
             msg_frame=self.msg_frame,
-            msg=f"\n{header}:\n{str(resultado)}\n",  # pylint: disable=E0606
+            msg=f"\n{header}:\n{resultado!s}\n",
             tipo="resultado",
         )
 
-        ctkButton(
+        CTkButton(
             self.resultado_escalar,
             text="Mostrar procedimiento",
             command=lambda: toggle_proc(
                 app=self.app,
                 parent_frame=self,
-                window_title="GaussBot: Procedimiento de la "
-                + f"multiplicación {header}",
+                window_title=f"GaussBot: Procedimiento de la multiplicación {header}",
                 proc_label=self.proc_label,
-                label_txt=proc,  # pylint: disable=E0606
+                label_txt=proc,
                 proc_hidden=self.proc_hidden,
             ),
         ).grid(row=1, column=0, pady=5, sticky="n")
 
     def mult_matrices(self) -> None:
         """
-        Realiza la multiplicación matricial de las matrices seleccionadas.
+        Multiplicar matrices seleccionadas.
         """
 
-        for widget in self.resultado_mats.winfo_children():  # type: ignore
-            widget.destroy()  # type: ignore
+        for widget in self.resultado_mats.winfo_children():
+            widget.destroy()
 
         self.update_mat1(self.select_mat1.get())
         self.update_mat2(self.select_mat2.get())
         self.resultado_mats.grid(
-            row=3, column=0, columnspan=3, padx=5, pady=5, sticky="n"
+            row=3,
+            column=0,
+            columnspan=3,
+            padx=5,
+            pady=5,
+            sticky="n",
         )
 
         delete_msg_if(self.msg_frame, (self.tab_mats, self.resultado_mats))
@@ -560,42 +612,47 @@ class MultiplicacionTab(CustomScrollFrame):
         self.msg_frame = place_msg_frame(
             parent_frame=self.resultado_mats,
             msg_frame=self.msg_frame,
-            msg=f"\n{header}:\n{str(resultado)}\n",  # pylint: disable=E0606
+            msg=f"\n{header}:\n{resultado!s}\n",
             tipo="resultado",
         )
 
-        ctkButton(
+        CTkButton(
             self.resultado_mats,
             text="Mostrar procedimiento",
             command=lambda: toggle_proc(
                 app=self.app,
                 parent_frame=self,
-                window_title="GaussBot: Procedimiento de la "
-                + f"multiplicación {header}",
+                window_title=f"GaussBot: Procedimiento de la multiplicación {header}",
                 proc_label=self.proc_label,
-                label_txt=proc,  # pylint: disable=E0606
+                label_txt=proc,
                 proc_hidden=self.proc_hidden,
             ),
         ).grid(row=1, column=0, pady=5, sticky="n")
 
     def mult_mat_vec(self) -> None:
         """
-        Realiza el producto matriz-vector de la matriz y el vector seleccionados.
+        Multiplicar matriz y vector seleccionados.
         """
 
-        for widget in self.resultado_mat_vec.winfo_children():  # type: ignore
-            widget.destroy()  # type: ignore
+        for widget in self.resultado_mat_vec.winfo_children():
+            widget.destroy()
 
         self.update_mvec(self.select_vmat.get())
         self.update_mvec(self.select_mvec.get())
         self.resultado_mat_vec.grid(
-            row=3, column=0, columnspan=3, padx=5, pady=5, sticky="n"
+            row=3,
+            column=0,
+            columnspan=3,
+            padx=5,
+            pady=5,
+            sticky="n",
         )
 
         delete_msg_if(self.msg_frame, (self.tab_mat_vec, self.resultado_mat_vec))
         try:
-            proc, header, resultado = self.app.ops_manager.mat_por_vec(  # type: ignore
-                self.vmat, self.mvec
+            proc, header, resultado = self.app.ops_manager.mat_por_vec(
+                self.vmat,
+                self.mvec,
             )
         except ArithmeticError as e:
             self.msg_frame = place_msg_frame(
@@ -610,28 +667,26 @@ class MultiplicacionTab(CustomScrollFrame):
         self.msg_frame = place_msg_frame(
             parent_frame=self.resultado_mat_vec,
             msg_frame=self.msg_frame,
-            msg=f"\n{header}:\n{str(resultado)}\n",  # pylint: disable=E0606
+            msg=f"\n{header}:\n{resultado!s}\n",
             tipo="resultado",
         )
 
-        ctkButton(
+        CTkButton(
             self.resultado_mat_vec,
             text="Mostrar procedimiento",
             command=lambda: toggle_proc(
                 app=self.app,
                 parent_frame=self,
-                window_title="GaussBot: Procedimiento de la "
-                + f"multiplicación {header}",
+                window_title=f"GaussBot: Procedimiento de la multiplicación {header}",
                 proc_label=self.proc_label,
-                label_txt=proc,  # pylint: disable=E0606
+                label_txt=proc,
                 proc_hidden=self.proc_hidden,
             ),
         ).grid(row=1, column=0, pady=5, sticky="n")
 
     def update_frame(self) -> None:
         """
-        Destruye todas las widgets en todas las tabs,
-        y vuelve a correr el setup.
+        Correr setup nuevamente para actualizar frame.
         """
 
         for tab in self.tabview.winfo_children():
@@ -644,40 +699,55 @@ class MultiplicacionTab(CustomScrollFrame):
 
     def update_escalar_mat(self, valor: str) -> None:
         """
-        Actualiza el valor de self.escalar_mat con
-        el valor seleccionado en el dropdown.
+        Actualizar matriz seleccionada para multiplicación escalar.
+
+        Args:
+            valor: Nueva matriz seleccionada.
+
         """
 
         self.escalar_mat = valor
 
     def update_mat1(self, valor: str) -> None:
         """
-        Actualiza el valor de self.mat1 con
-        el valor seleccionado en el dropdown.
+        Actualizar primera matriz seleccionada para multiplicación matricial.
+
+        Args:
+            valor: Nueva matriz seleccionada.
+
         """
 
         self.mat1 = valor
 
     def update_mat2(self, valor: str) -> None:
         """
-        Actualiza el valor de self.mat2 con
-        el valor seleccionado en el dropdown.
+        Actualizar segunda matriz seleccionada para multiplicación matricial.
+
+        Args:
+            valor: Nueva matriz seleccionada.
+
         """
 
         self.mat2 = valor
 
     def update_vmat(self, valor: str) -> None:
         """
-        Actualiza el valor de self.vmat con
-        el valor seleccionado en el dropdown.
+        Actualizar matriz seleccionada para producto matriz-vector.
+
+        Args:
+            valor: Nueva matriz seleccionada.
+
         """
 
         self.vmat = valor
 
     def update_mvec(self, valor: str) -> None:
         """
-        Actualiza el valor de self.mvec con
-        el valor seleccionado en el dropdown.
+        Actualizar vector seleccionado para producto matriz-vector.
+
+        Args:
+            valor: Nuevo vector seleccionado.
+
         """
 
         self.mvec = valor
@@ -691,36 +761,42 @@ class DeterminanteTab(CustomScrollFrame):
     def __init__(
         self,
         app: "GaussUI",
-        master_tab: ctkFrame,
+        master_tab: CTkFrame,
         master_frame: "MatricesFrame",
         mats_manager: MatricesManager,
-        **kwargs,
+        **kwargs,  # noqa: ANN003
     ) -> None:
+        """
+        Inicializar diseño de frame de determinantes.
+        """
+
         super().__init__(master_tab, fg_color="transparent", **kwargs)
+
         self.app = app
         self.master_frame = master_frame
         self.mats_manager = mats_manager
         self.columnconfigure(0, weight=1)
 
         # definir atributos, inicalizados en setup_frame()
-        self.msg_frame: Optional[ctkFrame] = None
+        self.msg_frame: CTkFrame | None = None
         self.select_dmat: CustomDropdown
-        self.dmat = ""
-        self.resultado: ctkFrame
+        self.dmat: str = ""
+        self.resultado: CTkFrame
 
-        self.proc_label: Optional[ctkLabel] = None
+        self.proc_label: CTkLabel | None = None
         self.proc_hidden = True
 
         self.setup_frame()
 
     def setup_frame(self) -> None:
         """
-        Inicializa y configura los widgets del frame.
+        Inicializar y configurar widgets.
         """
 
         delete_msg_frame(self.msg_frame)
-        instruct_d = ctkLabel(
-            self, text="Seleccione una matriz para calcular su determinante:"
+        instruct_d = CTkLabel(
+            self,
+            text="Seleccione una matriz para calcular su determinante:",
         )
 
         self.select_dmat = CustomDropdown(
@@ -732,11 +808,14 @@ class DeterminanteTab(CustomScrollFrame):
         )
 
         self.dmat = self.select_dmat.get()
-        button = ctkButton(
-            self, height=30, text="Calcular", command=self.calcular_determinante
+        button = CTkButton(
+            self,
+            height=30,
+            text="Calcular",
+            command=self.calcular_determinante,
         )
 
-        self.resultado = ctkFrame(self)
+        self.resultado = CTkFrame(self)
         self.resultado.columnconfigure(0, weight=1)
 
         instruct_d.grid(row=0, column=0, padx=5, pady=5, sticky="n")
@@ -746,12 +825,12 @@ class DeterminanteTab(CustomScrollFrame):
 
     def calcular_determinante(self) -> None:
         """
-        Calcula el determinante de la matriz seleccionada.
+        Calcular determinante de la matriz seleccionada.
         """
 
         delete_msg_frame(self.msg_frame)
-        for widget in self.resultado.winfo_children():  # type: ignore
-            widget.destroy()  # type: ignore
+        for widget in self.resultado.winfo_children():
+            widget.destroy()
 
         self.update_dmat(self.select_dmat.get())
 
@@ -774,23 +853,23 @@ class DeterminanteTab(CustomScrollFrame):
             tipo="resultado",
         )
 
-        ctkButton(
+        CTkButton(
             self.resultado,
             text="Mostrar procedimiento",
             command=lambda: toggle_proc(
                 app=self.app,
                 parent_frame=self,
                 window_title="GaussBot: Procedimiento para calcular "
-                + f"el determinante de la matriz {self.dmat}",
+                f"el determinante de la matriz {self.dmat}",
                 proc_label=self.proc_label,
-                label_txt=proc,  # pylint: disable=E0606
+                label_txt=proc,
                 proc_hidden=self.proc_hidden,
             ),
         ).grid(row=1, column=0, pady=5, sticky="n")
 
     def update_frame(self) -> None:
         """
-        Actualiza los valores del dropdown.
+        Actualizar valores del dropdown.
         """
 
         self.select_dmat.configure(
@@ -798,13 +877,16 @@ class DeterminanteTab(CustomScrollFrame):
             values=self.master_frame.nombres_matrices,
         )
 
-        for widget in self.winfo_children():  # type: ignore
-            widget.configure(bg_color="transparent")  # type: ignore
+        for widget in self.winfo_children():
+            widget.configure(bg_color="transparent")
 
     def update_dmat(self, valor: str) -> None:
         """
-        Actualiza self.dmat con el valor
-        seleccionado en el dropdown.
+        Actualizar matriz seleccionada.
+
+        Args:
+            valor: Nueva matriz seleccionada.
+
         """
 
         self.dmat = valor
@@ -818,35 +900,40 @@ class TransposicionTab(CustomScrollFrame):
     def __init__(
         self,
         app: "GaussUI",
-        master_tab: ctkFrame,
+        master_tab: CTkFrame,
         master_frame: "MatricesFrame",
         mats_manager: MatricesManager,
-        **kwargs,
+        **kwargs,  # noqa: ANN003
     ) -> None:
+        """
+        Inicializar diseño de frame de transposición.
+        """
+
         super().__init__(master_tab, fg_color="transparent", **kwargs)
+
         self.app = app
         self.master_frame = master_frame
         self.mats_manager = mats_manager
         self.columnconfigure(0, weight=1)
 
         # definir atributos, inicializados en setup_frame()
-        self.msg_frame: Optional[ctkFrame] = None
+        self.msg_frame: CTkFrame | None = None
         self.select_tmat: CustomDropdown
-        self.tmat = ""
-        self.resultado: ctkFrame
+        self.tmat: str = ""
+        self.resultado: CTkFrame
 
-        self.proc_label: Optional[ctkLabel] = None
+        self.proc_label: CTkLabel | None = None
         self.proc_hidden = True
 
         self.setup_frame()
 
     def setup_frame(self) -> None:
         """
-        Inicializa todas las widgets y las configura.
+        Inicializar y configurar widgets.
         """
 
         delete_msg_frame(self.msg_frame)
-        instruct_t = ctkLabel(self, text="Seleccione la matriz a transponer:")
+        instruct_t = CTkLabel(self, text="Seleccione la matriz a transponer:")
 
         self.select_tmat = CustomDropdown(
             self,
@@ -857,11 +944,14 @@ class TransposicionTab(CustomScrollFrame):
         )
 
         self.tmat = self.select_tmat.get()
-        button = ctkButton(
-            self, height=30, text="Transponer", command=self.encontrar_transpuesta
+        button = CTkButton(
+            self,
+            height=30,
+            text="Transponer",
+            command=self.encontrar_transpuesta,
         )
 
-        self.resultado = ctkFrame(self, fg_color="transparent")
+        self.resultado = CTkFrame(self, fg_color="transparent")
         self.resultado.columnconfigure(0, weight=1)
 
         instruct_t.grid(row=0, column=0, padx=5, pady=5, sticky="n")
@@ -871,43 +961,43 @@ class TransposicionTab(CustomScrollFrame):
 
     def encontrar_transpuesta(self) -> None:
         """
-        Transpone la matriz seleccionada.
+        Transponer matriz seleccionada.
         """
 
         delete_msg_frame(self.msg_frame)
-        for widget in self.resultado.winfo_children():  # type: ignore
-            widget.destroy()  # type: ignore
+        for widget in self.resultado.winfo_children():
+            widget.destroy()
 
         self.update_tmat(self.select_tmat.get())
         proc, nombre_transpuesta, transpuesta = self.mats_manager.transponer_mat(
-            self.tmat
+            self.tmat,
         )
 
         self.msg_frame = place_msg_frame(
             parent_frame=self.resultado,
             msg_frame=self.msg_frame,
-            msg=f"\n{nombre_transpuesta}:\n{str(transpuesta)}\n",
+            msg=f"\n{nombre_transpuesta}:\n{transpuesta!s}\n",
             tipo="resultado",
             columnspan=3,
         )
 
-        ctkButton(
+        CTkButton(
             self.resultado,
             text="Mostrar procedimiento",
             command=lambda: toggle_proc(
                 app=self.app,
                 parent_frame=self,
                 window_title="GaussBot: Procedimiento de la "
-                + f"transposición de la matriz {self.tmat}",
+                f"transposición de la matriz {self.tmat}",
                 proc_label=self.proc_label,
-                label_txt=proc,  # pylint: disable=E0606
+                label_txt=proc,
                 proc_hidden=self.proc_hidden,
             ),
         ).grid(row=1, column=0, pady=5, sticky="n")
 
     def update_frame(self) -> None:
         """
-        Actualiza los valores del dropdown.
+        Actualizar valores del dropdown.
         """
 
         self.select_tmat.configure(
@@ -915,13 +1005,16 @@ class TransposicionTab(CustomScrollFrame):
             values=self.master_frame.nombres_matrices,
         )
 
-        for widget in self.winfo_children():  # type: ignore
-            widget.configure(bg_color="transparent")  # type: ignore
+        for widget in self.winfo_children():
+            widget.configure(bg_color="transparent")
 
     def update_tmat(self, valor: str) -> None:
         """
-        Actualiza self.tmat con el valor
-        seleccionado en el dropdown.
+        Actualizar matriz seleccionada.
+
+        Args:
+            valor: Nueva matriz seleccionada.
+
         """
 
         self.tmat = valor
@@ -935,35 +1028,40 @@ class InversaTab(CustomScrollFrame):
     def __init__(
         self,
         app: "GaussUI",
-        master_tab: ctkFrame,
+        master_tab: CTkFrame,
         master_frame: "MatricesFrame",
         mats_manager: MatricesManager,
-        **kwargs,
+        **kwargs,  # noqa: ANN003
     ) -> None:
+        """
+        Inicializar diseño de frame de inversas.
+        """
+
         super().__init__(master_tab, fg_color="transparent", **kwargs)
+
         self.app = app
         self.master_frame = master_frame
         self.mats_manager = mats_manager
         self.columnconfigure(0, weight=1)
 
         # definir atributos, se inicializan en setup_frame()
-        self.msg_frame: Optional[ctkFrame] = None
+        self.msg_frame: CTkFrame | None = None
         self.select_imat: CustomDropdown
-        self.imat = ""
-        self.resultado: ctkFrame
+        self.imat: str = ""
+        self.resultado: CTkFrame
 
-        self.proc_label: Optional[ctkLabel] = None
+        self.proc_label: CTkLabel | None = None
         self.proc_hidden = True
 
         self.setup_frame()
 
     def setup_frame(self) -> None:
         """
-        Inicializa todas las widgets y las configura.
+        Inicializar y configurar widgets.
         """
 
         delete_msg_frame(self.msg_frame)
-        instruct_i = ctkLabel(self, text="Seleccione la matriz a invertir:")
+        instruct_i = CTkLabel(self, text="Seleccione la matriz a invertir:")
 
         self.select_imat = CustomDropdown(
             self,
@@ -974,11 +1072,14 @@ class InversaTab(CustomScrollFrame):
         )
 
         self.imat = self.select_imat.get()
-        button = ctkButton(
-            self, height=30, text="Invertir", command=self.encontrar_inversa
+        button = CTkButton(
+            self,
+            height=30,
+            text="Invertir",
+            command=self.encontrar_inversa,
         )
 
-        self.resultado = ctkFrame(self, fg_color="transparent")
+        self.resultado = CTkFrame(self, fg_color="transparent")
         self.resultado.columnconfigure(0, weight=1)
 
         instruct_i.grid(row=0, column=0, padx=5, pady=5, sticky="n")
@@ -988,12 +1089,12 @@ class InversaTab(CustomScrollFrame):
 
     def encontrar_inversa(self) -> None:
         """
-        Invierte la matriz seleccionada.
+        Invertir matriz seleccionada.
         """
 
         delete_msg_frame(self.msg_frame)
-        for widget in self.resultado.winfo_children():  # type: ignore
-            widget.destroy()  # type: ignore
+        for widget in self.resultado.winfo_children():
+            widget.destroy()
 
         self.update_imat(self.select_imat.get())
 
@@ -1017,23 +1118,23 @@ class InversaTab(CustomScrollFrame):
             columnspan=3,
         )
 
-        ctkButton(
+        CTkButton(
             self.resultado,
             text="Mostrar procedimiento",
             command=lambda: toggle_proc(
                 app=self.app,
                 parent_frame=self,
                 window_title="GaussBot: Procedimiento para encontrar "
-                + f"la inversa de la matriz {self.imat}",
+                f"la inversa de la matriz {self.imat}",
                 proc_label=self.proc_label,
-                label_txt=proc,  # pylint: disable=E0606
+                label_txt=proc,
                 proc_hidden=self.proc_hidden,
             ),
         ).grid(row=1, column=0, pady=5, sticky="n")
 
     def update_frame(self) -> None:
         """
-        Actualiza los valores del dropdown.
+        Actualizar valores del dropdown.
         """
 
         self.select_imat.configure(
@@ -1041,13 +1142,16 @@ class InversaTab(CustomScrollFrame):
             values=self.master_frame.nombres_matrices,
         )
 
-        for widget in self.winfo_children():  # type: ignore
-            widget.configure(bg_color="transparent")  # type: ignore
+        for widget in self.winfo_children():
+            widget.configure(bg_color="transparent")
 
     def update_imat(self, valor: str) -> None:
         """
-        Actualiza self.imat con el valor
-        seleccionado en el dropdown.
+        Actualizar matriz seleccionada.
+
+        Args:
+            valor: Nueva matriz seleccionada.
+
         """
 
         self.imat = valor

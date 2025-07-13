@@ -6,15 +6,21 @@ from fractions import Fraction
 from random import choice, randint
 from string import ascii_uppercase
 from tkinter import Variable
-from typing import TYPE_CHECKING, Optional
+from typing import TYPE_CHECKING, Literal
 
-from customtkinter import CTkFrame as ctkFrame, CTkLabel as ctkLabel
+from customtkinter import CTkFrame, CTkLabel
 
-from ...custom import CustomDropdown, CustomEntry, ErrorFrame, IconButton, SuccessFrame
-from ...custom.adapted import CustomScrollFrame
-from ....managers import KeyBindingManager, MatricesManager
-from ....models import Matriz
-from ....utils import (
+from src.gui.custom import (
+    CustomDropdown,
+    CustomEntry,
+    ErrorFrame,
+    IconButton,
+    SuccessFrame,
+)
+from src.gui.custom.adapted import CustomScrollFrame
+from src.managers import KeyBindingManager, MatricesManager
+from src.models import Matriz
+from src.utils import (
     ACEPTAR_ICON,
     ELIMINAR_ICON,
     ENTER_ICON,
@@ -26,49 +32,58 @@ from ....utils import (
 )
 
 if TYPE_CHECKING:
-    from .. import ManejarMats
-    from ... import GaussUI
+    from src.gui import GaussUI
+    from src.gui.frames import ManejarMats
 
 
 class AgregarMats(CustomScrollFrame):
     """
-    Frame para agregar una nueva matriz.
+    Frame para agregar nuevas matrices.
     """
 
     def __init__(
         self,
         app: "GaussUI",
-        master_tab: ctkFrame,
+        master_tab: CTkFrame,
         master_frame: "ManejarMats",
         mats_manager: MatricesManager,
-        **kwargs,
+        **kwargs,  # noqa: ANN003
     ) -> None:
+        """
+        Inicializar diseño de frame de agregar matrices.
+        """
+
         super().__init__(master_tab, fg_color="transparent", **kwargs)
+
         self.app = app
         self.master_frame = master_frame
         self.mats_manager = mats_manager
         self.columnconfigure(0, weight=1)
 
         self.key_binder = KeyBindingManager(es_matriz=True)
-        self.msg_frame: Optional[ctkFrame] = None
+        self.msg_frame: CTkFrame | None = None
         self.input_entries: list[list[CustomEntry]] = []
 
         # frames para contener secciones de la interfaz
-        self.pre_mat_frame = ctkFrame(self, fg_color="transparent")
-        self.matriz_frame = ctkFrame(self, fg_color="transparent")
-        self.post_mat_frame = ctkFrame(self, fg_color="transparent")
+        self.pre_mat_frame = CTkFrame(self, fg_color="transparent")
+        self.matriz_frame = CTkFrame(self, fg_color="transparent")
+        self.post_mat_frame = CTkFrame(self, fg_color="transparent")
         self.nombre_entry: CustomEntry
 
         # crear widgets iniciales para ingresar dimensiones de matriz
-        filas_label = ctkLabel(self.pre_mat_frame, text="Filas:")
-        columnas_label = ctkLabel(self.pre_mat_frame, text="Columnas:")
+        filas_label = CTkLabel(self.pre_mat_frame, text="Filas:")
+        columnas_label = CTkLabel(self.pre_mat_frame, text="Columnas:")
 
         self.filas_entry = CustomEntry(
-            self.pre_mat_frame, width=60, placeholder_text="3"
+            self.pre_mat_frame,
+            width=60,
+            placeholder_text="3",
         )
 
         self.columnas_entry = CustomEntry(
-            self.pre_mat_frame, width=60, placeholder_text="3"
+            self.pre_mat_frame,
+            width=60,
+            placeholder_text="3",
         )
 
         ingresar_button = IconButton(
@@ -85,25 +100,28 @@ class AgregarMats(CustomScrollFrame):
             command=self.generar_aleatoria,
         )
 
-        # crear bindings para todas las entry's iniciales
-        # para que se pueda navegar con las flechas
+        # crear bindings para todas las entries iniciales
         self.filas_entry.bind("<Return>", lambda _: self.generar_casillas())
         self.filas_entry.bind(
-            "<Left>", lambda _: self.key_binder.focus_columnas(self.columnas_entry)
+            "<Left>",
+            lambda _: self.key_binder.focus_columnas(self.columnas_entry),
         )
 
         self.filas_entry.bind(
-            "<Right>", lambda _: self.key_binder.focus_columnas(self.columnas_entry)
+            "<Right>",
+            lambda _: self.key_binder.focus_columnas(self.columnas_entry),
         )
 
         self.filas_entry.bind("<Down>", lambda _: self.key_binder.focus_first())
         self.columnas_entry.bind("<Return>", lambda _: self.generar_casillas())
         self.columnas_entry.bind(
-            "<Left>", lambda _: self.key_binder.focus_filas(self.filas_entry)
+            "<Left>",
+            lambda _: self.key_binder.focus_filas(self.filas_entry),
         )
 
         self.columnas_entry.bind(
-            "<Right>", lambda _: self.key_binder.focus_filas(self.filas_entry)
+            "<Right>",
+            lambda _: self.key_binder.focus_filas(self.filas_entry),
         )
 
         self.columnas_entry.bind("<Down>", lambda _: self.key_binder.focus_first())
@@ -119,7 +137,7 @@ class AgregarMats(CustomScrollFrame):
 
     def limpiar_casillas(self) -> None:
         """
-        Borra todos los valores ingresados en las casillas de la matriz.
+        Eliminar valores ingresados previamente.
         """
 
         for fila_entries in self.input_entries:
@@ -129,21 +147,28 @@ class AgregarMats(CustomScrollFrame):
 
     def generar_casillas(self) -> None:
         """
-        Genera casillas para ingresar una matriz de las dimensiones indicadas.
+        Generar casillas para ingresar una matriz de las dimensiones indicadas.
         """
 
         # si habian widgets creadas debajo
         # de self.pre_mat_frame, eliminarlas
         for widget in self.matriz_frame.winfo_children():
-            widget.destroy()  # type: ignore
+            widget.destroy()
         for widget in self.post_mat_frame.winfo_children():
-            widget.destroy()  # type: ignore
+            widget.destroy()
 
         delete_msg_frame(self.msg_frame)
         try:
-            filas, columnas = self.validar_dimensiones()  # type: ignore
-        except TypeError:
-            # hubo input invalido
+            filas, columnas = self.validar_dimensiones()
+        except ValueError as v:
+            self.msg_frame = place_msg_frame(
+                parent_frame=self,
+                msg_frame=self.msg_frame,
+                msg=str(v),
+                tipo="error",
+                row=1,
+            )
+
             return
         delete_msg_frame(self.msg_frame)
 
@@ -153,7 +178,9 @@ class AgregarMats(CustomScrollFrame):
             fila_entries = []
             for j in range(columnas):
                 input_entry = CustomEntry(
-                    self.matriz_frame, width=80, placeholder_text=str(randint(-15, 15))
+                    self.matriz_frame,
+                    width=80,
+                    placeholder_text=str(randint(-15, 15)),
                 )
 
                 input_entry.grid(row=i, column=j, padx=5, pady=5)
@@ -161,7 +188,7 @@ class AgregarMats(CustomScrollFrame):
             self.input_entries.append(fila_entries)
 
         # crear post_mat_frame widgets
-        nombre_label = ctkLabel(self.post_mat_frame, text="Nombre de la matriz:")
+        nombre_label = CTkLabel(self.post_mat_frame, text="Nombre de la matriz:")
         self.nombre_entry = CustomEntry(
             self.post_mat_frame,
             width=60,
@@ -170,7 +197,7 @@ class AgregarMats(CustomScrollFrame):
                     x
                     for x in ascii_uppercase
                     if x not in self.mats_manager.mats_ingresadas.values()
-                ]
+                ],
             ),
         )
 
@@ -200,8 +227,8 @@ class AgregarMats(CustomScrollFrame):
         limpiar_button.grid(row=0, column=3, padx=2, pady=5)
 
         # configurar atributos de self.key_binder y crear bindings
-        self.key_binder.entry_list = self.input_entries  # type: ignore
-        self.key_binder.extra_entries = (self.nombre_entry, self.filas_entry)  # type: ignore
+        self.key_binder.entry_list = self.input_entries
+        self.key_binder.extra_entries = (self.nombre_entry, self.filas_entry)
         self.key_binder.create_key_bindings()
 
         # encargarse de los bindings de nombre_entry
@@ -210,8 +237,7 @@ class AgregarMats(CustomScrollFrame):
 
     def generar_aleatoria(self) -> None:
         """
-        Genera una matriz de las dimensiones indicadas,
-        con valores enteros aleatorios.
+        Generar matriz con valores aleatorios.
         """
 
         self.generar_casillas()
@@ -221,21 +247,28 @@ class AgregarMats(CustomScrollFrame):
 
     def agregar_matriz(self) -> None:
         """
-        Agrega la matriz ingresada a la lista de matrices ingresadas.
+        Agregar matriz ingresada al diccionario de matrices ingresadas.
         """
 
         delete_msg_frame(self.msg_frame)
         try:
-            filas, columnas = self.validar_dimensiones()  # type: ignore
-        except TypeError:
-            # hubo input invalido
+            filas, columnas = self.validar_dimensiones()
+        except ValueError as v:
+            self.msg_frame = place_msg_frame(
+                parent_frame=self,
+                msg_frame=self.msg_frame,
+                msg=str(v),
+                tipo="error",
+                row=1,
+            )
+
             return
         delete_msg_frame(self.msg_frame)
 
         # si los inputs de filas/columnas
         # cambiaron despues de generar las casillas
         dimensiones_validas = filas == len(self.input_entries) and columnas == len(
-            self.input_entries[0]
+            self.input_entries[0],
         )
 
         if not dimensiones_validas:
@@ -243,7 +276,7 @@ class AgregarMats(CustomScrollFrame):
                 parent_frame=self,
                 msg_frame=self.msg_frame,
                 msg="Las dimensiones de la matriz ingresada "
-                + "no coinciden con las dimensiones indicadas.",
+                "no coinciden con las dimensiones indicadas.",
                 tipo="error",
                 row=3,
             )
@@ -311,91 +344,87 @@ class AgregarMats(CustomScrollFrame):
         )
 
         # mandar a actualizar los datos
-        self.app.matrices.update_all()  # type: ignore
-        self.app.vectores.update_all()  # type: ignore
+        self.app.matrices.update_all()
+        self.app.vectores.update_all()
         self.master_frame.update_all()
 
-    def validar_dimensiones(self) -> Optional[tuple[int, int]]:
+    def validar_dimensiones(self) -> tuple[int, int]:
         """
-        Valida si las dimensiones ingresadas por el usuario
-        son válidas y las retorna.
+        Validar dimensiones ingresadas.
 
-        Retorna una tupla con las filas y columnas
-        si son válidas, o None si son inválidas.
+        Returns:
+            (int, int): Filas, columnas.
+
         """
 
-        try:
-            filas = int(self.filas_entry.get())
-            columnas = int(self.columnas_entry.get())
-            if filas <= 0 or columnas <= 0:
-                raise ValueError
-        except ValueError:
-            self.msg_frame = place_msg_frame(
-                parent_frame=self,
-                msg_frame=self.msg_frame,
-                msg="Debe ingresar números enteros "
-                + "positivos como filas y columnas.",
-                tipo="error",
-                row=1,
+        filas = int(self.filas_entry.get())
+        columnas = int(self.columnas_entry.get())
+
+        if filas <= 0 or columnas <= 0:
+            raise ValueError(
+                "Debe ingresar números enteros positivos como filas y columnas.",
             )
-            return None
         return (filas, columnas)
 
     def update_frame(self) -> None:
         """
-        Actualiza los backgrounds de todas las widgets
-        por si hubo cambio de modo de apariencia.
+        Actualizar colores de widgets.
         """
 
         for widget in self.winfo_children():
-            widget.configure(bg_color="transparent")  # type: ignore
-            if isinstance(widget, ctkFrame):
+            widget.configure(bg_color="transparent")
+            if isinstance(widget, CTkFrame):
                 for subwidget in widget.winfo_children():
-                    subwidget.configure(bg_color="transparent")  # type: ignore
+                    subwidget.configure(bg_color="transparent")
 
 
 class MostrarMats(CustomScrollFrame):
     """
-    Frame para mostrar las matrices guardadas.
+    Frame para mostrar matrices.
     """
 
     def __init__(
         self,
         app: "GaussUI",
-        master_tab: ctkFrame,
+        master_tab: CTkFrame,
         master_frame: "ManejarMats",
         mats_manager: MatricesManager,
-        **kwargs,
+        **kwargs,  # noqa: ANN003
     ) -> None:
+        """
+        Inicializar diseño de frame de mostrar matrices.
+        """
+
         super().__init__(master_tab, fg_color="transparent", **kwargs)
+
         self.app = app
         self.master_frame = master_frame
         self.mats_manager = mats_manager
         self.columnconfigure(0, weight=1)
         self.columnconfigure(1, weight=1)
 
-        self.show_frame: Optional[ctkFrame] = None
+        self.show_frame: CTkFrame | None = None
 
         # definir los filtros que se mandaran
         # a self.mats_manager.get_matrices()
-        self.opciones: dict[str, int] = {
+        self.opciones: dict[str, Literal[-1, 0, 1]] = {
             "Mostrar todas": -1,
             "Matrices ingresadas": 0,
             "Matrices calculadas": 1,
         }
 
         self.select_opcion: CustomDropdown
-        self.opcion_seleccionada: Optional[int] = None
+        self.opcion_seleccionada: Literal[-1, 0, 1] = -1
 
         self.setup_frame()
 
     def setup_frame(self) -> None:
         """
-        Inicializa las widgets del frame.
+        Inicializar widgets del frame.
         """
 
-        for widget in self.winfo_children():  # type: ignore
-            widget.destroy()  # type: ignore
+        for widget in self.winfo_children():
+            widget.destroy()
 
         if len(self.mats_manager.mats_ingresadas.keys()) == 0:
             self.show_frame = place_msg_frame(
@@ -426,7 +455,7 @@ class MostrarMats(CustomScrollFrame):
 
     def show_mats(self) -> None:
         """
-        Muestra las matrices guardadas, usando el filtro seleccionado.
+        Mostrar matrices según el filtro seleccionado..
         """
 
         delete_msg_frame(self.show_frame)
@@ -443,43 +472,43 @@ class MostrarMats(CustomScrollFrame):
             return
 
         self.update_opcion(self.select_opcion.get())
-        mats_text = self.mats_manager.get_matrices(self.opcion_seleccionada)  # type: ignore
 
-        if "!" in mats_text:
-            tipo = "error"
-        else:
-            tipo = "resultado"
+        mats_text = self.mats_manager.get_matrices(self.opcion_seleccionada)
+        tipo: str = "error" if "!" in mats_text else "resultado"
 
         self.show_frame = place_msg_frame(
             parent_frame=self,
             msg_frame=self.show_frame,
             msg=mats_text,
-            tipo=tipo,  # type: ignore
+            tipo=tipo,
             row=1,
             columnspan=2,
         )
 
-        self.show_frame.columnconfigure(0, weight=1)  # type: ignore
+        self.show_frame.columnconfigure(0, weight=1)
 
     def update_frame(self) -> None:
         """
-        Elimina self.show_frame y configura los backgrounds.
+        Eliminar self.show_frame y configurar backgrounds.
         """
 
         for widget in self.winfo_children():
-            widget.configure(bg_color="transparent")  # type: ignore
+            widget.configure(bg_color="transparent")
 
         if isinstance(self.show_frame, ErrorFrame):
             self.setup_frame()
         else:
             self.select_opcion.configure(
-                variable=Variable(value="Seleccione un filtro:")
+                variable=Variable(value="Seleccione un filtro:"),
             )
 
     def update_opcion(self, valor: str) -> None:
         """
-        Actualiza self.opcion_seleccionada
-        con la opción seleccionada en el dropdown
+        Actualizar 'self.opcion_seleccionada'.
+
+        Args:
+            valor: Selección del dropdown.
+
         """
 
         self.opcion_seleccionada = self.opciones[valor]
@@ -493,12 +522,17 @@ class EliminarMats(CustomScrollFrame):
     def __init__(
         self,
         app: "GaussUI",
-        master_tab: ctkFrame,
+        master_tab: CTkFrame,
         master_frame: "ManejarMats",
         mats_manager: MatricesManager,
-        **kwargs,
+        **kwargs,  # noqa: ANN003
     ) -> None:
+        """
+        Inicializar diseño de frame de eliminar matrices.
+        """
+
         super().__init__(master_tab, fg_color="transparent", **kwargs)
+
         self.app = app
         self.master_frame = master_frame
         self.mats_manager = mats_manager
@@ -506,7 +540,7 @@ class EliminarMats(CustomScrollFrame):
         self.columnconfigure(1, weight=1)
 
         self.nombres_matrices = list(self.mats_manager.mats_ingresadas.keys())
-        self.msg_frame: Optional[ctkFrame] = None
+        self.msg_frame: CTkFrame | None = None
 
         self.select_mat: CustomDropdown
         self.mat_seleccionada = ""
@@ -530,11 +564,11 @@ class EliminarMats(CustomScrollFrame):
 
             return
 
-        for widget in self.winfo_children():  # type: ignore
-            widget.destroy()  # type: ignore
+        for widget in self.winfo_children():
+            widget.destroy()
 
         # crear widgets
-        instruct_eliminar = ctkLabel(self, text="¿Cuál matriz desea eliminar?")
+        instruct_eliminar = CTkLabel(self, text="¿Cuál matriz desea eliminar?")
         self.select_mat = CustomDropdown(
             self,
             height=30,
@@ -554,14 +588,19 @@ class EliminarMats(CustomScrollFrame):
 
         # colocar widgets
         instruct_eliminar.grid(
-            row=0, column=0, columnspan=2, padx=5, pady=5, sticky="n"
+            row=0,
+            column=0,
+            columnspan=2,
+            padx=5,
+            pady=5,
+            sticky="n",
         )
         self.select_mat.grid(row=1, column=0, padx=5, pady=5, sticky="e")
         button.grid(row=1, column=1, padx=5, pady=5, sticky="w")
 
     def eliminar_matriz(self) -> None:
         """
-        Elimina la matriz seleccionada.
+        Eliminar matriz seleccionada.
         """
 
         delete_msg_frame(self.msg_frame)
@@ -578,13 +617,13 @@ class EliminarMats(CustomScrollFrame):
         )
 
         # mandar a actualizar los datos
-        self.app.matrices.update_all()  # type: ignore
-        self.app.vectores.update_all()  # type: ignore
+        self.app.matrices.update_all()
+        self.app.vectores.update_all()
         self.master_frame.update_all()
 
     def update_frame(self) -> None:
         """
-        Actualiza el frame y sus datos.
+        Actualizar frame y datos.
         """
 
         self.nombres_matrices = list(self.mats_manager.mats_ingresadas.keys())
@@ -602,7 +641,7 @@ class EliminarMats(CustomScrollFrame):
                 )
 
                 for widget in self.winfo_children():
-                    if not isinstance(widget, ctkFrame):
+                    if not isinstance(widget, CTkFrame):
                         widget.grid_remove()
 
             self.after(1000, clear_after_wait)
@@ -612,7 +651,7 @@ class EliminarMats(CustomScrollFrame):
 
         else:
             for widget in self.winfo_children():
-                widget.configure(bg_color="transparent")  # type: ignore
+                widget.configure(bg_color="transparent")
             self.select_mat.configure(
                 values=self.nombres_matrices,
                 variable=Variable(value=self.nombres_matrices[0]),
@@ -622,7 +661,11 @@ class EliminarMats(CustomScrollFrame):
 
     def update_mat(self, valor: str) -> None:
         """
-        Actualiza mat_seleccionada con el valor seleccionado en el dropdown.
+        Actualizar 'self.mat_seleccionada'.
+
+        Args:
+            valor: Selección del dropdown.
+
         """
 
         self.mat_seleccionada = valor

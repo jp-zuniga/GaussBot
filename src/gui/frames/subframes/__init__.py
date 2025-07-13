@@ -25,7 +25,7 @@ from .operaciones_vecs import (
 from .raices import RaicesFrame
 from .resolver_sis import ResolverSisFrame
 
-__all__ = [
+__all__: list[str] = [
     "AgregarFuncs",
     "AgregarMats",
     "AgregarSistemas",
@@ -36,8 +36,8 @@ __all__ = [
     "EliminarMats",
     "EliminarSistemas",
     "EliminarVecs",
-    "InversaTab",
     "IntegralesFrame",
+    "InversaTab",
     "MagnitudTab",
     "MostrarFuncs",
     "MostrarMats",
