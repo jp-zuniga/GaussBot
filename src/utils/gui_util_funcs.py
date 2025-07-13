@@ -8,7 +8,7 @@ from platform import system
 from typing import TYPE_CHECKING, Literal
 
 from PIL.ImageTk import PhotoImage
-from customtkinter import CTkFont, CTkFrame, CTkImage, CTkLabel, CTkToplevel as CTkTop
+from customtkinter import CTkFont, CTkFrame, CTkImage, CTkLabel, CTkToplevel
 
 from .icons import APP_ICON
 
@@ -107,7 +107,7 @@ def place_msg_frame(
     return msg_frame
 
 
-def set_icon(app: GaussUI, window: GaussUI | CTkTop) -> None:
+def set_icon(app: GaussUI, window: GaussUI | CTkToplevel) -> None:
     """
     Establecer el ícono de una ventana según
     la plataforma y el modo actual de la aplicación.
@@ -151,20 +151,20 @@ def toggle_proc(  # noqa: PLR0913
     from src.gui.custom.adapted import CustomNumpad, CustomScrollFrame
 
     if not proc_hidden or any(
-        isinstance(widget, CTkTop) and not isinstance(widget, CustomNumpad)
+        isinstance(widget, CTkToplevel) and not isinstance(widget, CustomNumpad)
         for widget in app.winfo_children()
     ):
         return
 
-    new_window = CTkTop(app)
-    new_window.title(window_title)
-    new_window.geometry("800x800")
+    window = CTkToplevel(app)
+    window.title(window_title)
+    window.geometry("800x800")
 
-    parent_frame.after(100, new_window.focus)
-    parent_frame.after(250, lambda: set_icon(app, new_window))
+    parent_frame.after(100, window.focus)
+    parent_frame.after(250, lambda: set_icon(app, window))
 
     dummy_frame = CTkFrame(
-        new_window,
+        window,
         fg_color="transparent",
         corner_radius=20,
         border_width=3,
@@ -179,11 +179,11 @@ def toggle_proc(  # noqa: PLR0913
     proc_label.pack(expand=True, fill="both", padx=10, pady=10)
     proc_hidden = False
 
-    new_window.protocol("WM_DELETE_WINDOW", lambda: delete_window(new_window))
+    window.protocol("WM_DELETE_WINDOW", lambda: delete_window(window))
 
-    def delete_window(new_window: CTkTop) -> None:
+    def delete_window(window: CTkToplevel) -> None:
         nonlocal proc_hidden, proc_label  # ocupar las variables del alcance exterior
 
         proc_hidden = True
-        new_window.destroy()
+        window.destroy()
         proc_label = None

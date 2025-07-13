@@ -1,5 +1,5 @@
 """
-Implementación de la clase Func.
+Implementación de clase representando funciones matemáticas.
 """
 
 from decimal import Decimal
@@ -7,7 +7,7 @@ from logging import WARNING, getLogger
 from re import compile as comp, sub
 
 from PIL.Image import open as open_img
-from customtkinter import CTkImage as ctkImage
+from customtkinter import CTkImage
 from matplotlib import use
 from matplotlib.backends.backend_agg import FigureCanvasAgg
 from matplotlib.pyplot import axis, close, rc, savefig, subplots, text
@@ -40,8 +40,7 @@ TRANSFORMS: tuple = (*standard_transformations, implicit_multiplication_applicat
 
 class Func:
     """
-    Representa una función matemática, con métodos
-    para encontrar su derivada e integral.
+    Representa una función matemática.
     """
 
     def __init__(self, nombre: str, expr: str, latexified: bool = False) -> None:
@@ -62,7 +61,7 @@ class Func:
         self.var = Symbol(comp(var_pattern).findall(nombre)[0])
 
         self.latexified = latexified
-        self.latex_img: ctkImage | None = None
+        self.latex_img: CTkImage | None = None
 
         def replace_var(expr: str) -> str:
             var_str = str(self.var)
@@ -231,7 +230,7 @@ class Func:
             rf" {self.nombre[0] + rf'({self.var})'}d{self.var!s}"
         )
 
-    def get_png(self) -> ctkImage:
+    def get_png(self) -> CTkImage:
         """
         Retornar una imagen PNG de self.
 
@@ -263,7 +262,7 @@ class Func:
         misc_str: str | None = None,
         con_nombre: bool = False,
         **kwargs,  # noqa: ANN003
-    ) -> ctkImage:
+    ) -> CTkImage:
         """
         Convertir texto a formato LaTeX para crear una imagen PNG.
 
@@ -341,7 +340,7 @@ class Func:
 
         img = open_img(output_file)
         inverted_img = transparent_invert(img)
-        return ctkImage(
+        return CTkImage(
             dark_image=inverted_img,
             light_image=img,
             size=(int(width * 20), int(height * 20)),
