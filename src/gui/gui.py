@@ -111,7 +111,7 @@ class GaussUI(CTk):
         self.protocol("WM_DELETE_WINDOW", self.nav_frame.quit_event)
 
         self.unbind_all("<Escape>")
-        self.bind("<Escape>", self.nav_frame.quit_event)
+        self.bind("<Escape>", lambda _: self.nav_frame.quit_event())
 
     def save_config(self) -> None:
         """

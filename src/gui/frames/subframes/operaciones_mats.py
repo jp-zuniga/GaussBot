@@ -23,8 +23,8 @@ from src.utils import (
 )
 
 if TYPE_CHECKING:
-    from src.gui.frames.matrices import MatricesFrame
-    from src.gui.gui import GaussUI
+    from src.gui import GaussUI
+    from src.gui.frames import MatricesFrame
 
 
 class SumaRestaTab(CustomScrollFrame):

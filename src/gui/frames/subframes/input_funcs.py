@@ -319,7 +319,7 @@ class AgregarFuncs(CustomScrollFrame):
 
         self.msg_box.get()
         self.msg_box.destroy()
-        del self.msg_box
+        self.msg_box = None
 
     def update_frame(self) -> None:
         """

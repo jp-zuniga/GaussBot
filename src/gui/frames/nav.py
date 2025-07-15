@@ -2,7 +2,6 @@
 Implementación de barra de navegación.
 """
 
-from tkinter import Event
 from typing import TYPE_CHECKING
 
 from bidict import bidict
@@ -280,12 +279,10 @@ class NavFrame(CTkFrame):
 
             self.hide_button.grid_configure(column=0, columnspan=2, sticky="nse")
 
-    def quit_event(self, event: Event | None = None) -> None:
+    def quit_event(self) -> None:
         """
         Guardar datos y cerrar aplicación.
         """
-
-        del event
 
         if self.msg_box is not None:
             self.msg_box.focus()
@@ -301,8 +298,9 @@ class NavFrame(CTkFrame):
         )
 
         seleccion: str = self.msg_box.get()
+
         self.msg_box.destroy()
-        del self.msg_box
+        self.msg_box = None
 
         if seleccion == "Sí":
             self.app.func_manager.save_funciones()
