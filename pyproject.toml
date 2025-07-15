@@ -4,7 +4,8 @@
         "customtkinter>=5.2.2",
         "matplotlib>=3.10.3",
         "sympy>=1.14.0",
-    ]
+        "tzlocal>=5.3.1",
+]
     description = "Aplicación para resolver cálculos de álgebra lineal."
     name = "GaussBot"
     requires-python = ">=3.12"
@@ -12,7 +13,9 @@
 
 [tool.pylint]
     disable = [
+        "C0103",
         "C0301",
+        "C0302",
         "C0415",
         "E0401",
         "R0401",
