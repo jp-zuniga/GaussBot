@@ -202,7 +202,6 @@ class Func:
 
         Returns:
             str: El nombre de la derivada formateado.
-        ---
 
         """
 
@@ -221,13 +220,12 @@ class Func:
 
         Returns:
             str: El nombre del integral formateado.
-        ---
 
         """
 
         return (
             rf"{r''.join(r'\int' for _ in range(num_integ))}"
-            rf" {self.nombre[0] + rf'({self.var})'}d{self.var!s}"
+            rf" {self.nombre[0] + rf'({self.var})'}\, d{self.var!s}"
         )
 
     def get_png(self) -> CTkImage:
@@ -236,7 +234,6 @@ class Func:
 
         Returns:
             CTkImage: Imagen de self generada con LaTeX y matplotlib.
-        ---
 
         """
 
