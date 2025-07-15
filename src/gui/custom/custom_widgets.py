@@ -2,53 +2,67 @@
 Implementaciones de widgets personalizadas.
 """
 
-from typing import Any, Optional
+from typing import TYPE_CHECKING
 
 from customtkinter import (
-    CTkButton as ctkButton,
-    CTkEntry as ctkEntry,
-    CTkImage as ctkImage,
-    CTkLabel as ctkLabel,
-    CTkOptionMenu as ctkOptionMenu,
+    CTkButton,
+    CTkEntry,
+    CTkImage,
+    CTkLabel,
+    CTkOptionMenu,
     ThemeManager,
 )
 
+from src.utils import DROPDOWN_ICON
+
 from .adapted.tooltip import Tooltip
-from ...utils import DROPDOWN_ICON
+
+if TYPE_CHECKING:
+    from customtkinter import CTkBaseClass
 
 
-class CustomEntry(ctkEntry):
+class CustomEntry(CTkEntry):
     """
-    Entry personalizado con texto centrado y autocomplete bindings.
+    Entry personalizado con texto centrado y custom bindings.
     """
 
     def __init__(
-        self, master: Any, placeholder_text: Optional[str] = None, **kwargs
+        self,
+        master: "CTkBaseClass",
+        placeholder_text: str | None = None,
+        **kwargs,  # noqa: ANN003
     ) -> None:
-        justify = kwargs.pop("justify", "center")
+        """
+        Inicializar con justificación centrada y `Tab` binding.
+
+        Args:
+            master:           Widget a la cual este entry pertenece.
+            placeholder_text: Texto marcador de posición.
+            kwargs:           Argumentos a pasar a CTkEntry.__init__().
+
+        """
+
         super().__init__(
             master,
             width=kwargs.pop("width", 140),
             height=kwargs.pop("height", 36),
+            justify=kwargs.pop("justify", "center"),
             placeholder_text=placeholder_text,
             **kwargs,
         )
 
-        self.configure(justify=justify)
-        self.bind("<Tab>", self.autocomplete_placeholder)
+        self.bind("<Tab>", lambda _: self.autocomplete_placeholder())
 
-    def autocomplete_placeholder(self, event) -> str:
+    def autocomplete_placeholder(self) -> str:
         """
-        Inserta el placeholder en el entry si no hay texto
-        cuando el usuario presiona la tecla Tab.
+        Insertar placeholder text si no se ha ingresado texto.
         """
 
-        del event
         if self.get() == "" and self.cget("placeholder_text") is not None:
             self.insert(0, self.cget("placeholder_text"))
         return "break"
 
-    def grid(self, **kwargs):
+    def grid(self, **kwargs) -> None:  # noqa: ANN003, D102
         if "ipadx" not in kwargs:
             kwargs["ipadx"] = 0
         if "ipady" not in kwargs:
@@ -56,13 +70,23 @@ class CustomEntry(ctkEntry):
         super().grid(**kwargs)
 
 
-class CustomDropdown(ctkOptionMenu):
+class CustomDropdown(CTkOptionMenu):
     """
-    OptionMenu personalizado con un ícono mejor.
+    CTkOptionMenu personalizado con otro ícono.
     """
 
-    def __init__(self, master: Any, **kwargs) -> None:
+    def __init__(self, master: "CTkBaseClass", **kwargs) -> None:  # noqa: ANN003
+        """
+        Configurar ícono de dropdown.
+
+        Args:
+            master: Widget a la cual este entry pertenece.
+            kwargs: Argumentos a pasar a CTkOptionMenu.__init__().
+
+        """
+
         anchor = kwargs.pop("text_anchor", "center")
+
         super().__init__(
             master,
             width=kwargs.pop("width", 140),
@@ -70,24 +94,28 @@ class CustomDropdown(ctkOptionMenu):
             **kwargs,
         )
 
-        self.icon_label: ctkLabel
+        self.icon_label: CTkLabel
         self._text_label.configure(anchor=anchor)
 
-        light_dropdown = ctkImage(DROPDOWN_ICON._dark_image)
         self.grid_configure(ipadx=5)
-        self.set_dropdown_icon(light_dropdown)
+        self.set_dropdown_icon(CTkImage(DROPDOWN_ICON._dark_image))  # noqa: SLF001
         self.update_idletasks()
 
-    def set_dropdown_icon(self, image: ctkImage, right_distance: int = 5) -> None:
+    def set_dropdown_icon(self, image: CTkImage, right_distance: int = 5) -> None:
         """
-        Cambia el ícono del dropdown
+        Cambiar ícono de dropdown.
+
+        Args:
+            image:          Ícono de dropdown a utilizar.
+            right_distance: Valor de padx.
+
         """
 
-        self.icon_label = ctkLabel(self, text="", image=image)
-
+        self.icon_label = CTkLabel(self, text="", image=image)
         self._canvas.delete("dropdown_arrow")
-        color = self._canvas.itemcget("inner_parts_right", "fill")
-        self.icon_label.configure(fg_color=color)
+        self.icon_label.configure(
+            fg_color=self._canvas.itemcget("inner_parts_right", "fill"),
+        )
 
         grid_info = self._text_label.grid_info()
         grid_info["padx"], grid_info["sticky"] = right_distance, "e"
@@ -97,7 +125,7 @@ class CustomDropdown(ctkOptionMenu):
         self.icon_label.bind("<Enter>", self._on_enter)
         self.icon_label.bind("<Leave>", self._on_leave)
 
-    def configure(self, require_redraw=False, **kwargs):
+    def configure(self, require_redraw: bool = False, **kwargs) -> None:  # noqa: ANN003, D102
         super().configure(require_redraw, **kwargs)
         try:
             color = self._apply_appearance_mode(self._button_color)
@@ -105,45 +133,56 @@ class CustomDropdown(ctkOptionMenu):
         except AttributeError:
             pass
 
-    def _on_enter(self, event: int = 0):
+    def _on_enter(self, event: int = 0) -> None:
         super()._on_enter(event)
-        color = self._apply_appearance_mode(self._button_hover_color)
+        color: str = ThemeManager.theme["CTkOptionMenu"]["button_color"]
         self.icon_label.configure(fg_color=color, bg_color=color)
 
-    def _on_leave(self, event: int = 0):
+    def _on_leave(self, event: int = 0) -> None:
         super()._on_leave(event)
-        color = self._apply_appearance_mode(self._button_color)
+        color: str = ThemeManager.theme["CTkOptionMenu"]["button_color"]
         self.icon_label.configure(fg_color=color, bg_color=color)
 
 
-class IconButton(ctkButton):
+class IconButton(CTkButton):
     """
-    CTkButton personalizado para tener
-    botones con íconos y tooltips.
+    CTkButton personalizado con ícono y tooltip.
     """
 
     def __init__(
         self,
-        master: Any,
-        image: Optional[ctkImage] = None,
-        tooltip_text: Optional[str] = None,
-        **kwargs,
+        master: "CTkBaseClass",
+        image: CTkImage | None = None,
+        tooltip_text: str | None = None,
+        **kwargs,  # noqa: ANN003
     ) -> None:
-        text = kwargs.pop("text", "")
-        width = kwargs.pop("width", 30)
-        height = kwargs.pop("height", 30)
-        border_width = kwargs.pop("border_width", 0)
-        border_spacing = kwargs.pop("border_spacing", 0)
-        fg_color = kwargs.pop("fg_color", "transparent")
-        hover_color = kwargs.pop(
-            "hover_color", ThemeManager.theme["CTkFrame"]["top_fg_color"]
+        """
+        Inicializar botón con configuración personalizada y crear tooltip si se desea.
+
+        Args:
+            master:       Widget a la cual este entry pertenece.
+            image:        Imagen a colocar en el frame.
+            tooltip_text: Texto a colocar en tooltip.
+            kwargs:       Argumentos a pasar a CTkButton.__init__().
+
+        """
+
+        text: str = kwargs.pop("text", "")
+        width: int = kwargs.pop("width", 30)
+        height: int = kwargs.pop("height", 30)
+        border_width: int = kwargs.pop("border_width", 0)
+        border_spacing: int = kwargs.pop("border_spacing", 0)
+        fg_color: str = kwargs.pop("fg_color", "transparent")
+        hover_color: str = kwargs.pop(
+            "hover_color",
+            ThemeManager.theme["CTkFrame"]["top_fg_color"],
         )
 
-        tt_padx = kwargs.pop("tooltip_padx", 15)
-        tt_pady = kwargs.pop("tooltip_pady", 5)
-        tt_x_offset = kwargs.pop("tooltip_x_offset", 20)
-        tt_y_offset = kwargs.pop("tooltip_y_offset", 20)
-        swap_tt_colors = kwargs.pop("swap_tooltip_colors", False)
+        tt_padx: int = kwargs.pop("tooltip_padx", 15)
+        tt_pady: int = kwargs.pop("tooltip_pady", 5)
+        tt_x_offset: int = kwargs.pop("tooltip_x_offset", 20)
+        tt_y_offset: int = kwargs.pop("tooltip_y_offset", 20)
+        swap_tt_colors: bool = kwargs.pop("swap_tooltip_colors", False)
 
         super().__init__(
             master,
@@ -158,8 +197,11 @@ class IconButton(ctkButton):
             **kwargs,
         )
 
-        if text == "":
-            self._image_label.grid_configure(columnspan=3, sticky="nsew")
+        if text == "" and image is not None:
+            self._image_label.grid_configure(  # type: ignore[reportOptionalMemberAccess]
+                columnspan=3,
+                sticky="nsew",
+            )
 
         if tooltip_text is None:
             self.tooltip = None
@@ -170,7 +212,7 @@ class IconButton(ctkButton):
                 else ThemeManager.theme["CTkFrame"]["fg_color"]
             )
 
-            self.tooltip: Optional[Tooltip] = Tooltip(
+            self.tooltip: Tooltip | None = Tooltip(
                 self,
                 tooltip_text,
                 padx=tt_padx,
@@ -180,20 +222,20 @@ class IconButton(ctkButton):
                 bg_color=bg,
             )
 
-    def destroy(self):
+    def destroy(self) -> None:  # noqa: D102
         if self.tooltip is not None:
             self.tooltip.destroy()
         super().destroy()
 
-    def configure(self, require_redraw=False, **kwargs):
+    def configure(self, require_redraw: bool = False, **kwargs) -> None:  # noqa: ANN003, D102
         if "tooltip_text" in kwargs:
-            tt_text = kwargs.pop("tooltip_text")
+            tt_text = kwargs.pop("tooltip_text", None)
             if self.tooltip is None and tt_text is not None:
                 self.tooltip = Tooltip(self, tt_text)
             elif self.tooltip is not None and tt_text is None:
                 self.tooltip.destroy()
                 self.tooltip = None
-            else:
+            elif self.tooltip is not None and tt_text is not None:
                 self.tooltip.configure_tooltip(message=tt_text)
 
         super().configure(require_redraw, **kwargs)
