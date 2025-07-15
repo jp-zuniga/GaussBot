@@ -1,5 +1,5 @@
 """
-Implementaciones de los anagers de la aplicación.
+Implementaciones de los managers de la aplicación.
 Se encargan de almacenar datos y realizar operaciones matemáticas.
 """
 
