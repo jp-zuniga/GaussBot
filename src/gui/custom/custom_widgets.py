@@ -135,7 +135,7 @@ class CustomDropdown(CTkOptionMenu):
 
     def _on_enter(self, event: int = 0) -> None:
         super()._on_enter(event)
-        color: str = ThemeManager.theme["CTkOptionMenu"]["button_color"]
+        color: str = ThemeManager.theme["CTkOptionMenu"]["button_hover_color"]
         self.icon_label.configure(fg_color=color, bg_color=color)
 
     def _on_leave(self, event: int = 0) -> None:
