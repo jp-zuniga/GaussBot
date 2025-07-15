@@ -68,7 +68,6 @@ class KeyBindingManager:
 
         Raises:
             ValueError: Si 'entry_list' o 'extra_entries' son None.
-        ---
 
         """
 
@@ -93,7 +92,6 @@ class KeyBindingManager:
             row:    Fila del entry.
             column: Columna del entry.
             entry:  CustomEntry a configurar.
-        ---
 
         """
 
@@ -111,7 +109,6 @@ class KeyBindingManager:
         Args:
             row:    Fila del entry.
             entry:  CustomEntry a configurar.
-        ---
 
         """
 
@@ -129,7 +126,6 @@ class KeyBindingManager:
             row:        Fila del entry.
             column:     Columna del entry.
             data_entry: CustomEntry a configurar.
-        ---
 
         """
 
@@ -158,7 +154,6 @@ class KeyBindingManager:
             row:          Fila del entry.
             column:       Columna del entry.
             nombre_entry: CustomEntry a configurar.
-        ---
 
         """
 
@@ -180,7 +175,6 @@ class KeyBindingManager:
         Args:
             row:    Fila del entry.
             column: Columna del entry.
-        ---
 
         """
 
@@ -202,7 +196,6 @@ class KeyBindingManager:
         Args:
             row:    Fila del entry.
             column: Columna del entry.
-        ---
 
         """
 
@@ -253,10 +246,10 @@ class KeyBindingManager:
         if self.es_matriz:
             for row in self.entry_list:
                 for entry in row:
-                    entry.autocomplete_placeholder(event=None)
+                    entry.autocomplete_placeholder()
         else:
             for entry in self.entry_list:
-                entry.autocomplete_placeholder(event=None)
+                entry.autocomplete_placeholder()
         return "break"
 
     @staticmethod
@@ -266,7 +259,6 @@ class KeyBindingManager:
 
         Args:
             dimensiones_entry: Entry a enfocar.
-        ---
 
         """
 
@@ -279,7 +271,6 @@ class KeyBindingManager:
 
         Args:
             filas_entry: Entry a enfocar.
-        ---
 
         """
 
@@ -292,7 +283,6 @@ class KeyBindingManager:
 
         Args:
             columnas_entry: Entry a enfocar.
-        ---
 
         """
 

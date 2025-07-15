@@ -458,7 +458,6 @@ class FuncManager:
 
         Returns:
             bool: Si el diccionario está vacío o no.
-        ---
 
         """
 
