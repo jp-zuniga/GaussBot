@@ -5,7 +5,7 @@
         "matplotlib>=3.10.3",
         "sympy>=1.14.0",
         "tzlocal>=5.3.1",
-]
+    ]
     description = "Aplicación para resolver cálculos de álgebra lineal."
     name = "GaussBot"
     requires-python = ">=3.12"
