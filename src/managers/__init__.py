@@ -1,7 +1,6 @@
 """
-Managers de la aplicación.
-Se encargan de guardar los datos y de
-realizar las operaciones matemáticas.
+Implementaciones de los anagers de la aplicación.
+Se encargan de almacenar datos y realizar operaciones matemáticas.
 """
 
 from .binding_manager import KeyBindingManager

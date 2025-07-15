@@ -1,39 +1,37 @@
 """
-Implementación de FuncManager.
-Almacena y valida las funciones ingresadas por el usuario.
-Se encarga de aplicar diferentes métodos para encontrar
-raíces de las funciones ingresadas, y retorna los resultados.
+Implementación de manejador de funciones matemáticas.
 """
 
 from decimal import Decimal
 from json import JSONDecodeError, dump, load
 
-from customtkinter import CTkImage as ctkImage
+from customtkinter import CTkImage
 from sympy import lambdify
 from sympy.sets import Contains
 
-from ..models import Func
-from ..utils import FUNCIONES_PATH, LOGGER
+from src.models import Func
+from src.utils import FUNCIONES_PATH, LOGGER
 
-MARGEN_ERROR = Decimal(1e-4)
+MARGEN_ERROR = Decimal("1e-4")
 MAX_ITERACIONES: int = 100
 
 
 class FuncManager:
     """
     Manager de las funciones de la aplicación.
-    Valida y almacena las funciones ingresadas por el usuario,
-    y realiza operaciones sobre ellas.
+
+    Valida y almacena las entradas matemáticas del usuario,
+    y permite calcular aproximaciones de raíces de funciones mediante distintos métodos.
     """
 
-    def __init__(self, funcs_ingresadas: dict[str, Func] | None = None):
+    def __init__(self, funcs_ingresadas: dict[str, Func] | None = None) -> None:
         """
         Args:
             funcs_ingresadas: Diccionario de funciones guardadas.
 
         Raises:
             TypeError: Si funcs_ingresadas no es un dict[str, Func].
-        ---
+
         """
 
         if funcs_ingresadas is None:
@@ -46,22 +44,18 @@ class FuncManager:
         else:
             raise TypeError("Argumento inválido para 'funcs_ingresadas'.")
 
-    def get_funcs(self) -> list[ctkImage]:
+    def get_funcs(self) -> list[CTkImage]:
         """
         Obtener las imagenes de las funciones en 'self.funcs_ingresadas'.
 
         Returns:
             list[CTkImage]: Las imagenes de todas las funciones guardadas.
-        ---
+
         """
 
         if not self._validar_funcs_ingresadas():
             return []
-
-        funcs: list[ctkImage] = []
-        for func in self.funcs_ingresadas.values():
-            funcs.append(func.get_png())
-        return funcs
+        return [func.get_png() for func in self.funcs_ingresadas.values()]
 
     @staticmethod
     def biseccion(
@@ -90,7 +84,7 @@ class FuncManager:
                 valor y de raíz,
                 registro de iteraciones e
                 iteración final.
-        ---
+
         """
 
         if not func.es_continua(intervalo):
@@ -106,7 +100,7 @@ class FuncManager:
                 f"{func.nombre[0]}(a)",
                 f"{func.nombre[0]}(b)",
                 f"{func.nombre[0]}(c)",
-            ]
+            ],
         ]
 
         a, b = float(intervalo[0]), float(intervalo[1])
@@ -118,7 +112,7 @@ class FuncManager:
             return True
 
         i: int = 0
-        while i < MAX_ITERACIONES:
+        while i < max_its:
             i += 1
 
             c = float((a + b) / 2)
@@ -135,7 +129,7 @@ class FuncManager:
                     FuncManager._format_decimal(fa),
                     FuncManager._format_decimal(fb),
                     FuncManager._format_decimal(fc),
-                ]
+                ],
             )
 
             if abs(fc) < error:
@@ -144,7 +138,7 @@ class FuncManager:
                 b: float = c
             elif fb * fc < 0:
                 a: float = c
-        return (Decimal(c), Decimal(fc), registro, -1)
+        return (Decimal(c), Decimal(fc), registro, -1)  # type: ignore[reportPossiblyUnboundVariable]
 
     @staticmethod
     def falsa_posicion(
@@ -173,7 +167,7 @@ class FuncManager:
                 valor y de raíz,
                 registro de iteraciones e
                 iteración final.
-        ---
+
         """
 
         if not func.es_continua(intervalo):
@@ -189,7 +183,7 @@ class FuncManager:
                 f"{func.nombre[0]}(a)",
                 f"{func.nombre[0]}(b)",
                 f"{func.nombre[0]}(xᵣ)",
-            ]
+            ],
         ]
 
         a, b = float(intervalo[0]), float(intervalo[1])
@@ -201,7 +195,7 @@ class FuncManager:
             return True
 
         i: int = 0
-        while i < MAX_ITERACIONES:
+        while i < max_its:
             i += 1
             fa = float(f(a))
             fb = float(f(b))
@@ -218,7 +212,7 @@ class FuncManager:
                     FuncManager._format_decimal(fa),
                     FuncManager._format_decimal(fb),
                     FuncManager._format_decimal(fxr),
-                ]
+                ],
             )
 
             if abs(fxr) < error:
@@ -227,7 +221,7 @@ class FuncManager:
                 b: float = xr
             elif fb * fxr < 0:
                 a: float = xr
-        return (Decimal(xr), Decimal(fxr), registro, -1)
+        return (Decimal(xr), Decimal(fxr), registro, -1)  # type: ignore[reportPossiblyUnboundVariable]
 
     @staticmethod
     def newton(
@@ -262,7 +256,7 @@ class FuncManager:
                      1: se llegó a un valor fuera del dominio de la derivada;
                      2: se llegó a un valor fuera del dominio de la función.
                 )
-        ---
+
         """
 
         registro: list[list[str]] = [
@@ -273,7 +267,7 @@ class FuncManager:
                 "E",
                 f"{func.nombre[0]}(xᵢ)",
                 f"{func.nombre[0]}'(xᵢ)",
-            ]
+            ],
         ]
 
         derivada = func.derivar()
@@ -284,12 +278,8 @@ class FuncManager:
         f_prima = lambdify(func.var, derivada.expr)
 
         xi = float(inicial)
-        try:
-            if xi not in dominio_derivada:
-                return (Decimal(xi), Decimal(float(f(xi))), registro, 0, 1)
-        except TypeError:
-            if not Contains(xi, dominio_derivada):
-                return (Decimal(xi), Decimal(float(f(xi))), registro, 0, 1)
+        if not Contains(xi, dominio_derivada):
+            return (Decimal(xi), Decimal(float(f(xi))), registro, 0, 1)
 
         i: int = 0
         while i < max_its:
@@ -298,16 +288,10 @@ class FuncManager:
             fxi_prima = float(f_prima(xi))
 
             temp_xi = xi
-            try:
-                if temp_xi not in dominio_func:
-                    return (Decimal(temp_xi), Decimal(fxi), registro, i, 2)
-                if temp_xi not in dominio_derivada:
-                    return (Decimal(temp_xi), Decimal(fxi), registro, i, 1)
-            except TypeError:
-                if not Contains(temp_xi, dominio_func):
-                    return (Decimal(temp_xi), Decimal(fxi), registro, i, 2)
-                if not Contains(temp_xi, dominio_derivada):
-                    return (Decimal(temp_xi), Decimal(fxi), registro, i, 1)
+            if not Contains(temp_xi, dominio_func):
+                return (Decimal(temp_xi), Decimal(fxi), registro, i, 2)
+            if not Contains(temp_xi, dominio_derivada):
+                return (Decimal(temp_xi), Decimal(fxi), registro, i, 1)
 
             xi -= fxi / fxi_prima
             registro.append(
@@ -318,13 +302,13 @@ class FuncManager:
                     FuncManager._format_decimal(fxi),
                     FuncManager._format_decimal(fxi),
                     FuncManager._format_decimal(fxi_prima),
-                ]
+                ],
             )
 
             if abs(fxi) < error or fxi_prima == 0:
                 return (Decimal(xi), Decimal(fxi), registro, i, 0)
 
-        return (Decimal(xi), Decimal(fxi), registro, max_its, -1)
+        return (Decimal(xi), Decimal(fxi), registro, max_its, -1)  # type: ignore[reportPossiblyUnboundVariable]
 
     @staticmethod
     def secante(
@@ -359,7 +343,7 @@ class FuncManager:
                      1: se llegó a un valor fuera del dominio de la derivada;
                      2: se llegó a un valor fuera del dominio de la función.
                 )
-        ---
+
         """
 
         registro: list[list[str]] = [["Iteración", "xᵢ − 1", "xᵢ", "xᵢ + 1"]]
@@ -380,7 +364,7 @@ class FuncManager:
                     FuncManager._format_decimal(xi),
                     FuncManager._format_decimal(xn),
                     FuncManager._format_decimal(new_xn),
-                ]
+                ],
             )
 
             if abs(fxn) < error:
@@ -389,10 +373,10 @@ class FuncManager:
             xi, xn = xn, new_xn
             if xn not in f_dominio:
                 return (Decimal(xn), Decimal(fxn), registro, i, 2)
-        return (Decimal(xn), Decimal(fxn), registro, max_its, -1)
+        return (Decimal(xn), Decimal(fxn), registro, max_its, -1)  # type: ignore[reportPossiblyUnboundVariable]
 
     @staticmethod
-    def _format_decimal(num: int | float) -> str:
+    def _format_decimal(num: float) -> str:
         """
         Formatear número para uso en registro de iteraciones.
         """
@@ -427,7 +411,7 @@ class FuncManager:
             LOGGER.info("No hay funciones para guardar, dejando archivo vacío...")
             return
 
-        with open(FUNCIONES_PATH, mode="w", encoding="utf-8") as funciones_file:
+        with FUNCIONES_PATH.open(mode="w") as funciones_file:
             dump(funciones_dict, funciones_file, indent=4, sort_keys=True)
 
         LOGGER.info("Funciones guardadas en '%s' exitosamente.", FUNCIONES_PATH)
@@ -442,7 +426,7 @@ class FuncManager:
             LOGGER.info("Archivo '%s' no existe...", FUNCIONES_PATH)
             return {}
 
-        with open(FUNCIONES_PATH, mode="r", encoding="utf-8") as funciones_file:
+        with FUNCIONES_PATH.open() as funciones_file:
             try:
                 funciones_dict: dict = load(funciones_file)
                 LOGGER.info("Funciones cargadas exitosamente.")
@@ -462,7 +446,9 @@ class FuncManager:
                 else:
                     # si no, es un error de verdad
                     LOGGER.error(
-                        "Error al leer archivo '%s':\n%s", FUNCIONES_PATH, str(j)
+                        "Error al leer archivo '%s':\n%s",
+                        FUNCIONES_PATH,
+                        str(j),
                     )
                 return {}
 
@@ -472,7 +458,7 @@ class FuncManager:
 
         Returns:
             bool: Si el diccionario está vacío o no.
-        ---
+
         """
 
         return self.funcs_ingresadas != {}

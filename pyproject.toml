@@ -1,27 +1,66 @@
 [project]
-name = "GaussBot"
-version = "1.0.0"
-description = "Aplicación para resolver cálculos de álgebra lineal."
-requires-python = ">=3.12"
-dependencies = [
-    "bidict>=0.23.1",
-    "customtkinter>=5.2.2",
-    "matplotlib>=3.10.3",
-    "sympy>=1.14.0",
+    dependencies = [
+        "bidict>=0.23.1",
+        "customtkinter>=5.2.2",
+        "matplotlib>=3.10.3",
+        "sympy>=1.14.0",
+        "tzlocal>=5.3.1",
 ]
+    description = "Aplicación para resolver cálculos de álgebra lineal."
+    name = "GaussBot"
+    requires-python = ">=3.12"
+    version = "1.1.0"
 
-# [tool.ruff.lint]
-# select = ["ALL"]
+[tool.pylint]
+    disable = [
+        "C0103",
+        "C0301",
+        "C0302",
+        "C0415",
+        "E0401",
+        "R0401",
+        "R0801",
+        "R0903",
+        "W0201",
+        "W0212",
+    ]
+    jobs = 0
+    output-format = "colorized"
 
-[tool.ruff.lint.isort]
-case-sensitive = true
-combine-as-imports = true
-force-sort-within-sections = true
-order-by-type = true
-relative-imports-order = "closest-to-furthest"
-split-on-trailing-comma = false
+[tool.ruff.lint]
+    allowed-confusables = ["×", "−"]
+    ignore = [
+        "D200",
+        "D202",
+        "D203",
+        "D205",
+        "D212",
+        "D401",
+        "EM101",
+        "EM102",
+        "FBT001",
+        "FBT002",
+        "FBT003",
+        "PLR2004",
+        "S311",
+        "TRY003",
+    ]
+    select = ["ALL"]
 
-[tool.ruff.lint.per-file-ignores]
-"src/__init__.py" = ["E402"]
-"src/managers/__init__.py" = ["I001"]
-"src/utils/__init__.py" = ["I001"]
+    [tool.ruff.lint.isort]
+        case-sensitive             = true
+        combine-as-imports         = true
+        force-sort-within-sections = true
+        order-by-type              = true
+        relative-imports-order     = "closest-to-furthest"
+        split-on-trailing-comma    = false
+
+    [tool.ruff.lint.per-file-ignores]
+        "src/__init__.py"                  = ["E402"]
+        "src/assets/**.py"                 = ["D104"]
+        "src/gui/custom/adapted/numpad.py" = ["PLC0415"]
+        "src/gui/custom/adapted/table.py"  = ["PLC0415"]
+        "src/gui/frames/home.py"           = ["PLC0415"]
+        "src/managers/__init__.py"         = ["I001"]
+        "src/utils/__init__.py"            = ["I001"]
+        "src/utils/gui_util_funcs.py"      = ["PLC0415"]

@@ -27,5 +27,5 @@ def main() -> None:
     app.mainloop()
 
 
-__version__: str = "1.0.0"
-__all__: list[str] = ["main", "managers", "models", "utils", "gui"]
+__version__: str = "1.1.0"
+__all__: list[str] = ["gui", "main", "managers", "models", "utils"]

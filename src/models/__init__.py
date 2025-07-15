@@ -1,6 +1,5 @@
 """
-Modelos fundamentales de la aplicación.
-Implementaciones de matrices, vectores y sistemas de ecuaciones.
+Implementaciones de modelos fundamentales de la aplicación.
 """
 
 from .fraction_encoding import FractionDecoder, FractionEncoder
@@ -10,8 +9,8 @@ from .sistema_ecuaciones import SistemaEcuaciones
 from .vector import Vector
 
 __all__: list[str] = [
-    "FractionEncoder",
     "FractionDecoder",
+    "FractionEncoder",
     "Func",
     "Matriz",
     "SistemaEcuaciones",

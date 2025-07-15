@@ -17,8 +17,17 @@ class Vector:
     Representa un vector matemático de cualquier dimensión.
     """
 
-    def __init__(self, componentes: list[Fraction]) -> None:
-        self._componentes = componentes
+    def __init__(self, componentes: list[Fraction] | None) -> None:
+        """
+        Args:
+            componentes: Elementos del vector.
+
+        """
+
+        if componentes is None:
+            self._componentes: list[Fraction] = []
+        else:
+            self._componentes = componentes
 
     @property
     def componentes(self) -> list[Fraction]:
@@ -54,7 +63,7 @@ class Vector:
         Raises:
             IndexError: Si el índice está fuera de rango.
             TypeError:  Si el índice es de tipo inválido.
-        ---
+
         """
 
         if isinstance(indice, int) and -len(self) <= indice < len(self):
@@ -73,9 +82,24 @@ class Vector:
     def __len__(self) -> int:
         """
         Encontrar la longitud del vector.
+
+        Returns:
+            int: Longitud de 'self.componentes'.
+
         """
 
         return len(self.componentes)
+
+    def __hash__(self) -> int:
+        """
+        Hashear los componentes del vector.
+
+        Returns:
+            int: Hash de 'self.componentes'.
+
+        """
+
+        return hash(self.componentes)
 
     def __eq__(self, other: object) -> bool:
         """
@@ -86,7 +110,7 @@ class Vector:
 
         Returns:
             bool: Si self es igual a other.
-        ---
+
         """
 
         if not isinstance(other, Vector):
@@ -94,15 +118,25 @@ class Vector:
         if len(self) != len(other):
             return False
 
-        return all(a == b for a, b in zip(self.componentes, other.componentes))
+        return all(
+            a == b for a, b in zip(self.componentes, other.componentes, strict=False)
+        )
 
     def __str__(self) -> str:
         """
-        Usa la implementación de __str__() de Matriz().
+        Convertir self a una Matriz() y convertir la matriz resultante a un string.
+
+        Returns:
+            str: self representado en texto formateado y legible.
+
         """
 
         return str(
-            Matriz(filas=len(self), columnas=1, valores=[[c] for c in self.componentes])
+            Matriz(
+                filas=len(self),
+                columnas=1,
+                valores=[[c] for c in self.componentes],
+            ),
         )
 
     def __add__(self, vec2: Vector) -> Vector:
@@ -114,12 +148,14 @@ class Vector:
 
         Raises:
             ArithmeticError: Si los vectores no tienen las mismas dimensiones.
-        ---
+
         """
 
         if len(self) != len(vec2):
             raise ArithmeticError("Los vectores deben tener la misma longitud.")
-        return Vector([a + b for a, b in zip(self.componentes, vec2.componentes)])
+        return Vector(
+            [a + b for a, b in zip(self.componentes, vec2.componentes, strict=False)],
+        )
 
     def __sub__(self, vec2: Vector) -> Vector:
         """
@@ -130,21 +166,24 @@ class Vector:
 
         Raises:
             ArithmeticError: Si los vectores no tienen las mismas dimensiones.
-        ---
+
         """
 
         if len(self) != len(vec2):
             raise ArithmeticError("Los vectores deben tener la misma longitud.")
-        return Vector([a - b for a, b in zip(self.componentes, vec2.componentes)])
+        return Vector(
+            [a - b for a, b in zip(self.componentes, vec2.componentes, strict=False)],
+        )
 
     @overload
-    def __mul__(self, vec2: Vector) -> Fraction: ...
+    def __mul__(self, multiplicador: Vector) -> Fraction: ...
 
     @overload
-    def __mul__(self, escalar: int | float | Fraction) -> Vector: ...
+    def __mul__(self, multiplicador: float | Fraction) -> Vector: ...
 
     def __mul__(
-        self, multiplicador: Vector | int | float | Fraction
+        self,
+        multiplicador: Vector | float | Fraction,
     ) -> Fraction | Vector:
         """
         Overload del operador para realizar producto punto o multiplicación escalar.
@@ -163,21 +202,28 @@ class Vector:
         Raises:
             ArithmeticError: Si los vectores no tienen la misma longitud.
             TypeError:       Si el tipo de dato del argumento es inválido.
-        ---
+
         """
 
         if isinstance(multiplicador, Vector):
             if len(self) != len(multiplicador):
                 raise ArithmeticError("Los vectores deben tener la misma longitud.")
             return Fraction(
-                sum(a * b for a, b in zip(self.componentes, multiplicador.componentes))
+                sum(
+                    a * b
+                    for a, b in zip(
+                        self.componentes,
+                        multiplicador.componentes,
+                        strict=False,
+                    )
+                ),
             )
 
         if isinstance(multiplicador, (int, float, Fraction)):
             return Vector([Fraction(c * multiplicador) for c in self.componentes])
         raise TypeError("Tipo de dato inválido.")
 
-    def __rmul__(self, multiplicador: int | float | Fraction) -> Vector:
+    def __rmul__(self, multiplicador: float | Fraction) -> Vector:
         """
         Overload del operador para realizar multiplicación escalar por la derecha.
 
@@ -192,7 +238,7 @@ class Vector:
 
         Raises:
             TypeError: Si el tipo de dato del argumento es inválido.
-        ---
+
         """
 
         if isinstance(multiplicador, (int, float, Fraction)):
@@ -204,11 +250,11 @@ class Vector:
         Calcular la magnitud de self.
 
         Utiliza la fórmula:
-        - || a || = √(x^2 + y^2 + z^2 + ...)
+        - || a || = √(a^2 + b^2 + c^2 + ...)
 
         Returns:
             Fraction: Magnitud de self.
-        ---
+
         """
 
         return Fraction(sum(c**2 for c in self.componentes) ** Fraction(1, 2))
@@ -228,7 +274,7 @@ class Vector:
         Raises:
             ArithmeticError: Si no hay (n - 1) vectores en vecs.
             ArithmeticError: Si los vectores no están en R^n.
-        ---
+
         """
 
         if not all(len(x) == dimensiones for x in vecs):
@@ -242,14 +288,14 @@ class Vector:
         if len(vecs) != dimensiones - 1:
             raise ArithmeticError(
                 f"Para encontrar un producto cruz en R{dimensiones}, "
-                + f"se necesitan {dimensiones - 1} vectores."
+                f"se necesitan {dimensiones - 1} vectores.",
             )
 
         if dimensiones == 3:
             a1, a2, a3 = vecs[0].componentes
             b1, b2, b3 = vecs[1].componentes
             return Vector(
-                [(a2 * b3) - (a3 * b2), (a3 * b1) - (a1 * b3), (a1 * b2) - (a2 * b1)]
+                [(a2 * b3) - (a3 * b2), (a3 * b1) - (a1 * b3), (a1 * b2) - (a2 * b1)],
             )
 
         mat_prod_cruz = (

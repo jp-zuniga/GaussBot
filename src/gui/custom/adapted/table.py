@@ -1,29 +1,24 @@
 """
-Based on:
-* https://github.com/Akascape/CTkTable
-* By: Akash Bora
-
-Modified by: Joaquín Zúñiga, on 11/21/2024.
-Heavily modified and simplified the original
-for the purposes of this project.
+Based on CTkTable by Akash Bora (https://github.com/Akascape/CTkTable).
 """
+
+from __future__ import annotations
 
 from csv import writer
 from datetime import datetime
 from pathlib import Path
 from typing import TYPE_CHECKING
 
-from customtkinter import (
-    CTkButton as ctkButton,
-    CTkFont as ctkFont,
-    CTkToplevel as ctkTop,
-    ThemeManager,
-)
+from customtkinter import CTkButton, CTkFont, ThemeManager
+from tzlocal import get_localzone
 
 from .scrollframe import CustomScrollFrame
 
 if TYPE_CHECKING:
-    from ...gui import GaussUI
+    from customtkinter import CTk, CTkFrame, CTkToplevel
+
+    from src.gui import GaussUI
+    from src.gui.custom.adapted import CustomMessageBox
 
 
 class CustomTable(CustomScrollFrame):
@@ -33,19 +28,34 @@ class CustomTable(CustomScrollFrame):
 
     def __init__(
         self,
-        app: "GaussUI",
-        master: ctkTop,
+        app: GaussUI,
+        master: CTk | CTkFrame | CTkToplevel | CustomScrollFrame | GaussUI,
         values: list[list[str]],
         header: str = "Registro de Iteraciones:",
-    ):
-        from .. import IconButton
+    ) -> None:
+        """
+        Initialize cells of table.
+
+        Args:
+            app:    Root application instance.
+            master: Window within which this widget is in.
+            values: Values of table.
+            header: Table header.
+
+        """
+
+        from src.gui.custom import IconButton
 
         super().__init__(master, border_width=3, fg_color="transparent")
+
         self.rowconfigure(1, weight=1)
         self.app = app
-        self.values = values
+        self.parent = master
 
-        ctkButton(
+        self.values = values
+        self.msg_box: CustomMessageBox | None = None
+
+        CTkButton(
             self,
             height=40,
             corner_radius=10,
@@ -53,7 +63,7 @@ class CustomTable(CustomScrollFrame):
             border_color=ThemeManager.theme["CTkFrame"]["border_color"],
             text_color=ThemeManager.theme["CTkLabel"]["text_color"],
             text=header,
-            font=ctkFont(size=16, weight="bold"),
+            font=CTkFont(size=16, weight="bold"),
             fg_color="transparent",
             hover=False,
         ).grid(
@@ -75,11 +85,11 @@ class CustomTable(CustomScrollFrame):
             border_color=ThemeManager.theme["CTkFrame"]["border_color"],
             text_color=ThemeManager.theme["CTkLabel"]["text_color"],
             text="Exportar tabla",
-            font=ctkFont(size=12, slant="italic"),
+            font=CTkFont(size=12, slant="italic"),
             command=self.export_to_csv,
         ).grid(row=0, column=len(self.values[0]) - 1, padx=10, pady=10, sticky="ne")
 
-    def init_table(self):
+    def init_table(self) -> None:
         """
         Initialize the table.
         """
@@ -87,7 +97,7 @@ class CustomTable(CustomScrollFrame):
         for i, row in enumerate(self.values):
             for j, value in enumerate(row):
                 self.rowconfigure(i + 1, weight=1)
-                cell = ctkButton(
+                cell = CTkButton(
                     self,
                     text=value,
                     text_color=ThemeManager.theme["CTkLabel"]["text_color"],
@@ -101,10 +111,10 @@ class CustomTable(CustomScrollFrame):
                         else "transparent"
                     ),
                     border_color=ThemeManager.theme["CTkFrame"]["border_color"],
-                    border_width=2 if i == 0 or i == len(self.values) - 1 else 1,
+                    border_width=2 if i in (0, len(self.values) - 1) else 1,
                     border_spacing=1,
                     corner_radius=10,
-                    font=ctkFont(
+                    font=CTkFont(
                         size=(
                             12 if j == 0 or i == 0 or i == len(self.values) - 1 else 10
                         ),
@@ -117,7 +127,9 @@ class CustomTable(CustomScrollFrame):
                     hover=False,
                 )
 
-                cell._text_label.configure(justify="center")  # type: ignore
+                cell._text_label.configure(  # type: ignore[reportOptionalMemberAccess]  # noqa: SLF001
+                    justify="center",
+                )
                 cell.grid(
                     row=i + 1,
                     column=j,
@@ -134,28 +146,29 @@ class CustomTable(CustomScrollFrame):
                     sticky="nsw",
                 )
 
-    def export_to_csv(self):
+    def export_to_csv(self) -> None:
         """
         Export table data to a CSV file.
         """
 
         from .messagebox import CustomMessageBox
 
-        if hasattr(self, "_success_box") and self._success_box.winfo_exists():
-            self._success_box.focus()
+        if self.msg_box is not None:
+            self.msg_box.focus()
             return
 
         csv_path: Path = (
             Path.home()
             / "Desktop"
-            / f"registro_iteraciones_{datetime.now().strftime('%Y-%m-%d_%H:%M:%S')}.csv"
+            / f"registro_iteraciones_{
+                datetime.now(tz=get_localzone()).strftime('%Y-%m-%d_%H:%M:%S')
+            }.csv"
         )
 
-        with open(csv_path, mode="w", encoding="utf-8", newline="") as file:
-            csv_writer = writer(file)
-            csv_writer.writerows(self.values)
+        with csv_path.open(mode="w") as file:
+            writer(file).writerows(self.values)
 
-        self._success_box = CustomMessageBox(
+        self.msg_box = CustomMessageBox(
             self.app,
             width=480,
             name="¡Exportación exitosa!",
@@ -166,6 +179,6 @@ class CustomTable(CustomScrollFrame):
             fg_color=ThemeManager.theme["CTkFrame"]["fg_color"],
         )
 
-        self._success_box.get()
-        self._success_box.destroy()
-        del self._success_box
+        self.msg_box.get()
+        self.msg_box.destroy()
+        self.msg_box = None

@@ -9,7 +9,7 @@ from typing import Literal
 
 from PIL.Image import Image, Resampling, merge, open as open_img
 from PIL.ImageOps import invert
-from customtkinter import CTkImage as ctkImage
+from customtkinter import CTkImage
 
 from .paths import DARK_NUMPAD_ICONS, DATA_PATH, LIGHT_NUMPAD_ICONS, LOG_PATH, PKG
 
@@ -18,7 +18,7 @@ from .paths import DARK_NUMPAD_ICONS, DATA_PATH, LIGHT_NUMPAD_ICONS, LOG_PATH, P
 LOGGER = getLogger("GaussBot")
 
 
-def format_factor(
+def format_factor(  # noqa: PLR0911
     factor: Fraction,
     mult: bool = True,
     parenth_negs: bool = False,
@@ -37,7 +37,7 @@ def format_factor(
 
     Returns:
         str: El factor formateado según los parámetros.
-    ---
+
     """
 
     if factor == 1:
@@ -65,7 +65,8 @@ def format_factor(
 
 
 def format_proc_num(
-    nums: tuple[Fraction, Fraction], operador: Literal["•", "+", "−"] = "•"
+    nums: tuple[Fraction, Fraction],
+    operador: Literal["•", "+", "−"] = "•",  # type: ignore[reportRedeclaration]
 ) -> str:
     """
     Formatear un par de números para mostrarlos
@@ -77,7 +78,7 @@ def format_proc_num(
 
     Returns:
         str: La operación entre los números formateada.
-    ---
+
     """
 
     num1, num2 = nums
@@ -90,41 +91,71 @@ def format_proc_num(
 
     combine_nums = (
         f"{format_factor(num1, mult=False, parenth_negs=False)}"
-        + f" {operador} "
-        + f"{format_factor(num2, mult=False, parenth_negs=True)}"
+        f" {operador} "
+        f"{format_factor(num2, mult=False, parenth_negs=True)}"
     )
 
     return f"[ {combine_nums} ]"
 
 
-def load_mode_icon(path: str, size: tuple[int, int] = (20, 20)) -> ctkImage:
+def handle_pi(num_input: str) -> Fraction:
+    """
+    Procesar string númerico para permitir el ingreso de π.
+    """
+
+    if "pi" not in num_input:
+        return Fraction(num_input)
+
+    pi = Fraction(355, 133)
+
+    if num_input == "pi":
+        return pi
+    if "/" in num_input:
+        num, den = num_input.split("/")
+        num_input = (
+            num.replace("pi", "").replace("*", "").strip()
+            if "pi" in num
+            else den.replace("pi", "").replace("*", "").strip()
+        )
+
+        if "pi" in num:
+            return (Fraction(num_input) * pi) / Fraction(den)
+        return Fraction(num) / (Fraction(num_input) * pi)
+
+    num_input = num_input.replace("pi", "").replace("*", "").strip()
+    return Fraction(num_input) * pi
+
+
+def load_mode_icon(path: str, size: tuple[int, int] = (20, 20)) -> CTkImage:
     """
     Cargar íconos de modo claro/oscuro.
 
     Args:
-        dark_path: Dirección del ícono dentro del directorio de assets.
-        size:      Tamaño a pasar a CTkImage.
+        path: Dirección del ícono dentro del directorio de assets.
+        size: Tamaño a pasar a CTkImage.
 
     Returns:
         CTkImage: Objeto de imagen conteniendo los íconos.
-    ---
+
     """
 
     with (
         as_file(files(PKG) / f"assets/icons/dark/{path}") as d_path,
         as_file(files(PKG) / f"assets/icons/light/{path}") as l_path,
     ):
-        return ctkImage(
-            size=size, dark_image=open_img(l_path), light_image=open_img(d_path)
+        return CTkImage(
+            size=size,
+            dark_image=open_img(l_path),
+            light_image=open_img(d_path),
         )
 
 
-def load_numpad_icons() -> dict[str, ctkImage]:
+def load_numpad_icons() -> dict[str, CTkImage]:
     """
     Cargar los íconos utilizados en CustomNumpad y almacernalos en un diccionario.
     """
 
-    icons: dict[str, ctkImage] = {}
+    icons: dict[str, CTkImage] = {}
 
     for item in DARK_NUMPAD_ICONS.iterdir():
         if item.name.endswith(".png"):
@@ -133,14 +164,16 @@ def load_numpad_icons() -> dict[str, ctkImage]:
                 as_file(LIGHT_NUMPAD_ICONS / item.name) as l_path,
             ):
                 img = open_img(l_path)
-                icons[item.name[:-4]] = ctkImage(
-                    size=img.size, dark_image=img, light_image=open_img(d_path)
+                icons[item.name[:-4]] = CTkImage(
+                    size=img.size,
+                    dark_image=img,
+                    light_image=open_img(d_path),
                 )
 
     return icons
 
 
-def load_single_icon(path: str) -> ctkImage:
+def load_single_icon(path: str) -> CTkImage:
     """
     Cargar íconos independientes de modo.
 
@@ -149,21 +182,20 @@ def load_single_icon(path: str) -> ctkImage:
 
     Returns:
         CTkImage: Objeto de imagen conteniendo el ícono.
-    ---
+
     """
 
     with as_file(files(PKG) / f"assets/icons/{path}") as icon_path:
-        return ctkImage(open_img(icon_path))
+        return CTkImage(open_img(icon_path))
 
 
 def log_setup(logger: Logger = LOGGER) -> None:
     """
-    Configurar el logger de la aplicación y
-    crear el archivo 'log.txt' si no existe.
+    Configurar el logger de la aplicación y crear el archivo 'log.txt' si no existe.
 
     Args:
         logger: Objeto Logger a configurar.
-    ---
+
     """
 
     if not LOG_PATH.exists():
@@ -171,7 +203,7 @@ def log_setup(logger: Logger = LOGGER) -> None:
         LOG_PATH.touch()
 
     # si hay mas de 500 lineas en el log, limpiarlo
-    with open(LOG_PATH, mode="r", encoding="utf-8") as log_file:
+    with LOG_PATH.open() as log_file:
         if len(log_file.readlines()) > 500:
             LOG_PATH.write_text("")
 
@@ -194,19 +226,13 @@ def generate_range(start: int, end: int) -> list[int]:
 
     Returns:
         list[int]: Números aleatorios generados.
-    ---
+
     """
 
-    valid = list(range(start + 1, end))
-    try:
-        valid.remove(0)
-        valid.remove(1)
-    except ValueError:
-        pass
-    return valid
+    return [x for x in range(start + 1, end) if x not in (0, 1)]
 
 
-def generate_sep(orientation: bool, size: tuple[int, int]) -> ctkImage:
+def generate_sep(orientation: bool, size: tuple[int, int]) -> CTkImage:
     """
     Crear una imagen de un separador vertical u horizontal.
 
@@ -216,15 +242,13 @@ def generate_sep(orientation: bool, size: tuple[int, int]) -> ctkImage:
 
     Returns:
         CTkImage: Imagen del separador creada.
-    ---
+
     """
 
-    if orientation:
-        return load_mode_icon("v_separator.png", size)
-    return load_mode_icon("h_separator.png", size)
+    return load_mode_icon("v_separator.png" if orientation else "h_separator.png", size)
 
 
-def resize_image(img: ctkImage, per: float = 0.75) -> ctkImage:
+def resize_image(img: CTkImage, per: float = 0.75) -> CTkImage:
     """
     Reducir el tamaño de una CTkImage según el porcentaje especificado.
 
@@ -234,7 +258,7 @@ def resize_image(img: ctkImage, per: float = 0.75) -> ctkImage:
 
     Returns:
         CTkImage: Imagen redimensionada.
-    ---
+
     """
 
     width, height = img.cget("size")
@@ -244,9 +268,9 @@ def resize_image(img: ctkImage, per: float = 0.75) -> ctkImage:
     new_width = int(width * per)
     new_height = int(height * per)
 
-    dark_img: ctkImage = dark.resize((new_width, new_height), Resampling.LANCZOS)
-    light_img: ctkImage = light.resize((new_width, new_height), Resampling.LANCZOS)
-    return ctkImage(dark_image=dark_img, light_image=light_img, size=dark_img.size)
+    dark_img: Image = dark.resize((new_width, new_height), Resampling.LANCZOS)
+    light_img: Image = light.resize((new_width, new_height), Resampling.LANCZOS)
+    return CTkImage(dark_image=dark_img, light_image=light_img, size=dark_img.size)
 
 
 def transparent_invert(img: Image) -> Image:
@@ -258,7 +282,7 @@ def transparent_invert(img: Image) -> Image:
 
     Returns:
         Image: Imagen transparente invertida.
-    ---
+
     """
 
     r, g, b, a = img.split()

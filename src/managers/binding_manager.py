@@ -1,11 +1,16 @@
+# type: ignore[reportAttributeAccessIssue]
+# type: ignore[reportArgumentType]
+# type: ignore[reportOptionalIterable]
+# type: ignore[reportOptionalSubscript]
+# type: ignore[reportGeneralTypeIssues]
+
 """
-Implementación de KeyBindingManager, encargado de crear
-bindings a las teclas de flecha para navegar entre entries.
+Implementación de manejador de bindings de tecla para los widgets de entrada.
 """
 
 from tkinter import Event
 
-from ..gui.custom import CustomEntry
+from src.gui.custom import CustomEntry
 
 
 class KeyBindingManager:
@@ -30,7 +35,7 @@ class KeyBindingManager:
             ValueError: Si 'entry_list' o 'extra_entries' son listas vacías;
                         si 'es_matriz' es True y 'entry_list' no es una lista 2D;
                         si 'es_matriz' es False y 'entry_list' no es una lista 1D.
-        ---
+
         """
 
         self.es_matriz = es_matriz
@@ -48,13 +53,13 @@ class KeyBindingManager:
 
         if self.es_matriz and not all(isinstance(row, list) for row in self.entry_list):
             raise ValueError(
-                "Para una matriz, 'entry_list' debe ser una lista bidimensional."
+                "Para una matriz, 'entry_list' debe ser una lista bidimensional.",
             )
         if not self.es_matriz and any(
             isinstance(item, list) for item in self.entry_list
         ):
             raise ValueError(
-                "Para un vector, 'entry_list' debe ser una lista unidimensional."
+                "Para un vector, 'entry_list' debe ser una lista unidimensional.",
             )
 
     def create_key_bindings(self) -> None:
@@ -63,7 +68,7 @@ class KeyBindingManager:
 
         Raises:
             ValueError: Si 'entry_list' o 'extra_entries' son None.
-        ---
+
         """
 
         if self.entry_list is None:
@@ -87,7 +92,7 @@ class KeyBindingManager:
             row:    Fila del entry.
             column: Columna del entry.
             entry:  CustomEntry a configurar.
-        ---
+
         """
 
         nombre_entry, filas_entry = self.extra_entries
@@ -104,7 +109,7 @@ class KeyBindingManager:
         Args:
             row:    Fila del entry.
             entry:  CustomEntry a configurar.
-        ---
+
         """
 
         nombre_entry, dimensiones_entry = self.extra_entries
@@ -121,7 +126,7 @@ class KeyBindingManager:
             row:        Fila del entry.
             column:     Columna del entry.
             data_entry: CustomEntry a configurar.
-        ---
+
         """
 
         if row > 0:
@@ -136,7 +141,10 @@ class KeyBindingManager:
                 KeyBindingManager.focus_dimensiones(data_entry)
 
     def _entry_move_down(
-        self, row: int, column: int, nombre_entry: CustomEntry
+        self,
+        row: int,
+        column: int,
+        nombre_entry: CustomEntry,
     ) -> None:
         """
         Cambiar focus al entry debajo del actual,
@@ -146,7 +154,7 @@ class KeyBindingManager:
             row:          Fila del entry.
             column:       Columna del entry.
             nombre_entry: CustomEntry a configurar.
-        ---
+
         """
 
         if row < len(self.entry_list) - 1:
@@ -167,7 +175,7 @@ class KeyBindingManager:
         Args:
             row:    Fila del entry.
             column: Columna del entry.
-        ---
+
         """
 
         if column > 0:
@@ -188,7 +196,7 @@ class KeyBindingManager:
         Args:
             row:    Fila del entry.
             column: Columna del entry.
-        ---
+
         """
 
         if column < len(self.entry_list[row]) - 1:
@@ -231,16 +239,17 @@ class KeyBindingManager:
 
         Args:
             event: Evento de tkinter que desencadenó este método.
+
         """
 
         del event
         if self.es_matriz:
             for row in self.entry_list:
                 for entry in row:
-                    entry.autocomplete_placeholder(event=None)
+                    entry.autocomplete_placeholder()
         else:
             for entry in self.entry_list:
-                entry.autocomplete_placeholder(event=None)
+                entry.autocomplete_placeholder()
         return "break"
 
     @staticmethod
@@ -250,7 +259,7 @@ class KeyBindingManager:
 
         Args:
             dimensiones_entry: Entry a enfocar.
-        ---
+
         """
 
         dimensiones_entry.focus_set()
@@ -262,7 +271,7 @@ class KeyBindingManager:
 
         Args:
             filas_entry: Entry a enfocar.
-        ---
+
         """
 
         filas_entry.focus_set()
@@ -274,7 +283,7 @@ class KeyBindingManager:
 
         Args:
             columnas_entry: Entry a enfocar.
-        ---
+
         """
 
         columnas_entry.focus_set()

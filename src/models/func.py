@@ -1,5 +1,5 @@
 """
-Implementación de la clase Func.
+Implementación de clase representando funciones matemáticas.
 """
 
 from decimal import Decimal
@@ -7,7 +7,7 @@ from logging import WARNING, getLogger
 from re import compile as comp, sub
 
 from PIL.Image import open as open_img
-from customtkinter import CTkImage as ctkImage
+from customtkinter import CTkImage
 from matplotlib import use
 from matplotlib.backends.backend_agg import FigureCanvasAgg
 from matplotlib.pyplot import axis, close, rc, savefig, subplots, text
@@ -30,18 +30,17 @@ from sympy.parsing.sympy_parser import (
     standard_transformations,
 )
 
-from ..utils import SAVED_FUNCS_PATH, transparent_invert
+from src.utils import SAVED_FUNCS_PATH, transparent_invert
 
 use("TkAgg")
 getLogger("matplotlib").setLevel(WARNING)
 
-TRANSFORMS: tuple = standard_transformations + (implicit_multiplication_application,)
+TRANSFORMS: tuple = (*standard_transformations, implicit_multiplication_application)
 
 
 class Func:
     """
-    Representa una función matemática, con métodos
-    para encontrar su derivada e integral.
+    Representa una función matemática.
     """
 
     def __init__(self, nombre: str, expr: str, latexified: bool = False) -> None:
@@ -53,7 +52,7 @@ class Func:
 
         Raises:
             ValueError: Si la expresión tiene un dominio complejo.
-        ---
+
         """
 
         self.nombre = nombre
@@ -62,7 +61,7 @@ class Func:
         self.var = Symbol(comp(var_pattern).findall(nombre)[0])
 
         self.latexified = latexified
-        self.latex_img: ctkImage | None = None
+        self.latex_img: CTkImage | None = None
 
         def replace_var(expr: str) -> str:
             var_str = str(self.var)
@@ -87,6 +86,10 @@ class Func:
             raise ValueError("La función tiene un dominio complejo.")
 
     def __str__(self) -> str:
+        """
+        Crear ecuación matemática con 'self.nombre' y 'self.expr'.
+        """
+
         return f"{self.nombre} = {self.expr}"
 
     def get_dominio(self) -> Interval:
@@ -95,7 +98,7 @@ class Func:
 
         Returns:
             Interval: El dominio real de 'self.expr'.
-        ---
+
         """
 
         return continuous_domain(self.expr, self.var, Reals)
@@ -110,13 +113,13 @@ class Func:
 
         Returns:
             bool: Si la función es continua o no.
-        ---
+
         """
 
         a, b = intervalo
         return Interval(a, b, left_open=True, right_open=True).is_subset(
-            self.get_dominio()
-        )
+            self.get_dominio(),
+        )  # type: ignore[reportReturnType]
 
     def derivar(self) -> "Func":
         """
@@ -124,7 +127,7 @@ class Func:
 
         Returns:
             Func: Derivada de 'self.expr'.
-        ---
+
         """
 
         if "'" not in self.nombre:
@@ -145,11 +148,11 @@ class Func:
 
         Returns:
             Func: Integral indefinida de 'self.expr'.
-        ---
+
         """
 
         try:
-            match: list | None = list(comp(r"\^\(-\d+\)").finditer(self.nombre))[-1]
+            match = list(comp(r"\^\(-\d+\)").finditer(self.nombre))[-1]
         except IndexError:
             match = None
 
@@ -178,14 +181,14 @@ class Func:
 
         Raises:
             NotImplementedError: Bajo circumstancias misteriosas inimaginables.
-        ---
+
         """
 
         if diffr:
             return self.get_derivada_nombre(self.nombre.count("'"))
         if integ:
             return self.get_integral_nombre(
-                int(next((x for x in self.nombre if x.isdigit()), 0))
+                int(next((x for x in self.nombre if x.isdigit()), 0)),
             )
         raise NotImplementedError("¿Cómo llegamos aquí?")
 
@@ -199,12 +202,12 @@ class Func:
 
         Returns:
             str: El nombre de la derivada formateado.
-        ---
+
         """
 
         return (
             f"\\frac{{d{f'^{{{num_diff}}}' if num_diff > 1 else ''}{self.nombre[0]}}}"
-            + f"{{d{str(self.var)}{f'^{{{num_diff}}}' if num_diff > 1 else ''}}}"
+            f"{{d{self.var!s}{f'^{{{num_diff}}}' if num_diff > 1 else ''}}}"
         )
 
     def get_integral_nombre(self, num_integ: int) -> str:
@@ -217,21 +220,21 @@ class Func:
 
         Returns:
             str: El nombre del integral formateado.
-        ---
+
         """
 
         return (
             rf"{r''.join(r'\int' for _ in range(num_integ))}"
-            + rf" {self.nombre[0] + rf'({self.var})'}d{str(self.var)}"
+            rf" {self.nombre[0] + rf'({self.var})'}\, d{self.var!s}"
         )
 
-    def get_png(self) -> ctkImage:
+    def get_png(self) -> CTkImage:
         """
         Retornar una imagen PNG de self.
 
         Returns:
             CTkImage: Imagen de self generada con LaTeX y matplotlib.
-        ---
+
         """
 
         if not self.latexified or self.latex_img is None:
@@ -250,18 +253,18 @@ class Func:
 
     @staticmethod
     def latex_to_png(
-        output_file: str | None = None,
+        file_name: str | None = None,
         nombre_expr: str | None = None,
         expr: str | None = None,
         misc_str: str | None = None,
         con_nombre: bool = False,
-        **kwargs,
-    ) -> ctkImage:
+        **kwargs,  # noqa: ANN003
+    ) -> CTkImage:
         """
         Convertir texto a formato LaTeX para crear una imagen PNG.
 
         Args:
-            output_file: Nombre del archivo de salida.
+            file_name:   Nombre del archivo de salida.
             nombre_expr: Nombre de la función a mostrar.
             expr:        String de la expresión a convertir.
             misc_str:    String de texto a convertir.
@@ -273,11 +276,11 @@ class Func:
 
         Raises:
             ValueError: Si no se recibe texto a convertir.
-        ---
+
         """
 
         SAVED_FUNCS_PATH.mkdir(exist_ok=True)
-        output_file = SAVED_FUNCS_PATH / rf"{output_file or nombre_expr}.png"
+        output_file = SAVED_FUNCS_PATH / rf"{file_name or nombre_expr}.png"
 
         if expr is not None:
             latex_str: str = latex(
@@ -334,7 +337,7 @@ class Func:
 
         img = open_img(output_file)
         inverted_img = transparent_invert(img)
-        return ctkImage(
+        return CTkImage(
             dark_image=inverted_img,
             light_image=img,
             size=(int(width * 20), int(height * 20)),

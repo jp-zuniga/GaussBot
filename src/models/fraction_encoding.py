@@ -5,7 +5,7 @@ para leer y escribir objetos Fraction() a archivos .json.
 
 from fractions import Fraction
 from json import JSONDecoder, JSONEncoder
-from typing import Any
+from typing import override
 
 
 class FractionEncoder(JSONEncoder):
@@ -14,10 +14,12 @@ class FractionEncoder(JSONEncoder):
     a archivos .json en un formato personalizado.
     """
 
-    # override del metodo default() de JSONEncoder:
-    # se utiliza cuando json.load encuentra un objeto
-    # que no puede ser serializado por defecto.
-    def default(self, o: Any) -> dict[str, str | int] | Any:
+    @override
+    def default(self, o: object) -> dict:
+        """
+        Serializar objetos Fraction.
+        """
+
         if isinstance(o, Fraction):
             # si el objeto encontrado es una instancia de Fraction,
             # se serializa como un diccionario, que incluye
@@ -38,9 +40,16 @@ class FractionDecoder(JSONDecoder):
     de archivos .json, codificados por FractionEncoder.
     """
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args, **kwargs) -> None:  # noqa: ANN002, ANN003
+        """
+        Args:
+            args:   Argumentos posicionales para JSONDecoder.__init__().
+            kwargs: Argumentos de palabra clave para JSONDecoder.__init__().
+
+        """
+
         # inicializar con fraction_object_hook() como hook por defecto
-        super().__init__(object_hook=self.fraction_object_hook, *args, **kwargs)
+        super().__init__(*args, object_hook=self.fraction_object_hook, **kwargs)
 
     def fraction_object_hook(self, obj: dict) -> Fraction | dict:
         """
