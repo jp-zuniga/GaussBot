@@ -62,7 +62,15 @@ class CustomEntry(CTkEntry):
             self.insert(0, self.cget("placeholder_text"))
         return "break"
 
-    def grid(self, **kwargs) -> None:  # noqa: ANN003, D102
+    def grid(self, **kwargs) -> None:  # noqa: ANN003
+        """
+        Position widget in parent widget's grid, while maintaining internal padding.
+
+        Args:
+            kwargs: Configuration options.
+
+        """
+
         if "ipadx" not in kwargs:
             kwargs["ipadx"] = 0
         if "ipady" not in kwargs:
@@ -125,20 +133,43 @@ class CustomDropdown(CTkOptionMenu):
         self.icon_label.bind("<Enter>", self._on_enter)
         self.icon_label.bind("<Leave>", self._on_leave)
 
-    def configure(self, require_redraw: bool = False, **kwargs) -> None:  # noqa: ANN003, D102
+    def configure(self, require_redraw: bool = False, **kwargs) -> None:  # noqa: ANN003
+        """
+        Configure dropdown and `self.icon_label`.
+
+        Args:
+            require_redraw: Internal CTkOptionMenu.configure() argument.
+            kwargs:         Config arguments for widget.
+
+        """
+
         super().configure(require_redraw, **kwargs)
-        try:
-            color = self._apply_appearance_mode(self._button_color)
-            self.icon_label.configure(fg_color=color, bg_color=color)
-        except AttributeError:
-            pass
+
+        color: str = ThemeManager.theme["CTkOptionMenu"]["button_color"]
+        self.icon_label.configure(fg_color=color, bg_color=color)
 
     def _on_enter(self, event: int = 0) -> None:
+        """
+        Override for CTkOptionMenu._on_enter() that handles the new icon's color change.
+
+        Args:
+            event: Event position.
+
+        """
+
         super()._on_enter(event)
         color: str = ThemeManager.theme["CTkOptionMenu"]["button_hover_color"]
         self.icon_label.configure(fg_color=color, bg_color=color)
 
     def _on_leave(self, event: int = 0) -> None:
+        """
+        Override for CTkOptionMenu._on_leave() that handles the new icon's color change.
+
+        Args:
+            event: Event position.
+
+        """
+
         super()._on_leave(event)
         color: str = ThemeManager.theme["CTkOptionMenu"]["button_color"]
         self.icon_label.configure(fg_color=color, bg_color=color)
@@ -222,12 +253,25 @@ class IconButton(CTkButton):
                 bg_color=bg,
             )
 
-    def destroy(self) -> None:  # noqa: D102
+    def destroy(self) -> None:
+        """
+        Destroys `self.tooltip` before destroying `self`.
+        """
+
         if self.tooltip is not None:
             self.tooltip.destroy()
         super().destroy()
 
-    def configure(self, require_redraw: bool = False, **kwargs) -> None:  # noqa: ANN003, D102
+    def configure(self, require_redraw: bool = False, **kwargs) -> None:  # noqa: ANN003
+        """
+        Configure widget, with support for tooltip configuration.
+
+        Args:
+            require_redraw: Internal CTkButton.configure() argument.
+            kwargs:         Config arguments for button and/or tooltip.
+
+        """
+
         if "tooltip_text" in kwargs:
             tt_text = kwargs.pop("tooltip_text", None)
             if self.tooltip is None and tt_text is not None:
