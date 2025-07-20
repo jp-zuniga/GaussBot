@@ -17,7 +17,7 @@ class Tooltip(Toplevel):
         self,
         widget: CTkBaseClass,
         message: str,
-        delay: int = 50,
+        delay: float = 0.1,
         padx: int = 15,
         pady: int = 5,
         x_offset: int = 20,
@@ -25,7 +25,7 @@ class Tooltip(Toplevel):
         **kwargs,  # noqa: ANN003
     ) -> None:
         """
-        Initialize design mouse-over functionality.
+        Initialize design and mouse-over functionality.
 
         Args:
             widget:   Widget tooltip is attached to.
@@ -46,7 +46,6 @@ class Tooltip(Toplevel):
         self.withdraw()
 
         self.widget = widget
-        self.disable = False
         self.status = "outside"
         self.delay = delay
         self.last_moved = 0.0
@@ -73,7 +72,7 @@ class Tooltip(Toplevel):
         )
 
         self.frame.pack(expand=True, fill="both")
-        self.message_label.pack(fill="both", padx=padx, pady=pady, expand=True)
+        self.message_label.pack(expand=True, fill="both", padx=padx, pady=pady)
 
         self.widget.bind("<Enter>", self._on_enter, add="+")
         self.widget.bind("<Leave>", lambda _: self._on_leave(), add="+")
@@ -110,11 +109,10 @@ class Tooltip(Toplevel):
 
         if not self.widget.winfo_exists():
             self.hide()
-            self.destroy()
 
         if self.status == "inside" and (time() - self.last_moved >= self.delay):
-            self.status = "visible"
             self.deiconify()
+            self.status = "visible"
 
     def hide(self) -> None:
         """
@@ -124,17 +122,14 @@ class Tooltip(Toplevel):
         if not self.winfo_exists():
             return
         self.withdraw()
-        self.disable = True
+        self.destroy()
 
     def _on_enter(self, event: Event) -> None:
         """
         Handle tooltip movement.
         """
 
-        if self.disable:
-            return
         self.last_moved = time()
-
         if self.status == "outside":
             self.status = "inside"
 
@@ -146,14 +141,12 @@ class Tooltip(Toplevel):
             offset_x: int = -text_width - 20
 
         self.geometry(f"+{event.x_root + offset_x}+{event.y_root + self.y_offset}")
-        self.after(self.delay, self.show)
+        self.after(int(self.delay * 1000), self.show)
 
     def _on_leave(self) -> None:
         """
         Hide tooltip when mouse leaves `self.widget`.
         """
 
-        if self.disable:
-            return
         self.status = "outside"
         self.withdraw()
